@@ -11814,3 +11814,110 @@ body[data-domain] #measurementCard .measurement-stamp {
   #batchCard .batch-create-panel button:hover,
   #batchCard .batch-harvest-entry button:hover { transform:none !important; }
 }
+
+
+/* Pass 57 — batch selector, record summary, event journal and system feedback */
+#batchCard .batch-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; align-items:stretch; }
+#batchCard .batch-list > .batch-item {
+  position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:.42rem;
+  width:100%; min-width:0; min-height:104px; padding:1rem 1.05rem;
+  overflow:hidden; text-align:left; color:var(--text,#e8eee9);
+  border:1px solid var(--border,rgba(255,255,255,.13)); border-radius:13px;
+  background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),var(--surface,rgba(20,27,23,.92));
+  box-shadow:0 8px 22px rgba(0,0,0,.11);
+  transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+#batchCard .batch-list > .batch-item::before {
+  content:""; position:absolute; inset:0 auto 0 0; width:3px;
+  background:var(--brand,var(--accent,#8ab49a)); opacity:.72;
+}
+#batchCard .batch-list > .batch-item strong {
+  display:block; max-width:100%; overflow-wrap:anywhere; font-size:.88rem; letter-spacing:.035em;
+}
+#batchCard .batch-list > .batch-item .muted {
+  display:block; color:var(--muted,#a2ada5); font-size:.72rem; line-height:1.55; overflow-wrap:anywhere;
+}
+#batchCard .batch-list > .batch-item:hover {
+  transform:translateY(-2px); border-color:var(--brand,var(--accent,#8ab49a));
+  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.02)),var(--surface,rgba(20,27,23,.92));
+  box-shadow:0 13px 28px rgba(0,0,0,.17);
+}
+#batchCard .batch-list > .batch-item:focus-visible {
+  outline:2px solid var(--brand,var(--accent,#8ab49a)); outline-offset:3px;
+}
+#batchCard .batch-list > .info {
+  grid-column:1/-1; margin:0; padding:1.1rem 1.2rem;
+  border:1px dashed var(--border,rgba(255,255,255,.17)); border-radius:12px;
+  background:var(--surface-2,rgba(255,255,255,.025)); line-height:1.55;
+}
+#batchCard #batchInfo.info {
+  margin:1.1rem 0; padding:clamp(1rem,2.2vw,1.5rem);
+  border:1px solid var(--border,rgba(255,255,255,.14)); border-radius:16px;
+  background:radial-gradient(ellipse at 100% 0%,rgba(255,255,255,.055),transparent 55%),var(--surface,rgba(20,27,23,.92));
+  box-shadow:0 16px 36px rgba(0,0,0,.14);
+}
+#batchCard #batchInfo > strong {
+  display:block; margin-bottom:1rem; padding-bottom:.8rem;
+  border-bottom:1px solid var(--border,rgba(255,255,255,.12));
+  font-size:1.05rem; letter-spacing:.035em; overflow-wrap:anywhere;
+}
+#batchCard #batchInfo .batch-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.65rem; }
+#batchCard #batchInfo .batch-stat {
+  min-width:0; padding:.85rem; border:1px solid var(--border,rgba(255,255,255,.1));
+  border-radius:11px; background:var(--surface-2,rgba(255,255,255,.035));
+}
+#batchCard #batchInfo .batch-stat-label {
+  margin-bottom:.4rem; color:var(--muted,#9ba69e); font-size:.68rem;
+  text-transform:uppercase; letter-spacing:.075em;
+}
+#batchCard #batchInfo .batch-stat-value {
+  color:var(--text,#edf1ed); font-size:.83rem; font-weight:650; line-height:1.45; overflow-wrap:anywhere;
+}
+#batchCard .batch-event-list { display:grid; gap:.6rem; margin-top:1rem; }
+#batchCard .batch-event-item {
+  position:relative; margin:0; padding:.85rem 1rem .85rem 1.15rem;
+  border:1px solid var(--border,rgba(255,255,255,.11)); border-radius:11px;
+  background:var(--surface-2,rgba(255,255,255,.025));
+}
+#batchCard .batch-event-item::before {
+  content:""; position:absolute; top:1rem; bottom:1rem; left:0;
+  width:2px; border-radius:2px; background:var(--brand,var(--accent,#8ab49a));
+}
+#batchCard .batch-event-item strong { display:block; margin-bottom:.28rem; font-size:.82rem; }
+#batchCard .batch-event-item .muted { margin-bottom:.35rem; font-size:.68rem; }
+#batchCard .batch-event-item > div:last-child { color:var(--text,#dfe7e0); font-size:.76rem; line-height:1.55; overflow-wrap:anywhere; }
+#message { position:relative; z-index:5; }
+#message > .card.success,
+#message > .card.warning,
+#message > .card.error {
+  display:flex; align-items:flex-start; gap:.8rem; margin:0 0 1rem; padding:.95rem 1.1rem;
+  border:1px solid var(--border,rgba(255,255,255,.13)); border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.15); line-height:1.55; font-size:.83rem;
+  animation:batch-feedback-in .24s ease-out both;
+}
+#message > .card.success { border-color:rgba(89,178,126,.35); background:linear-gradient(110deg,rgba(55,135,88,.16),transparent 80%),var(--surface,rgba(20,27,23,.96)); }
+#message > .card.warning { border-color:rgba(211,164,83,.38); background:linear-gradient(110deg,rgba(174,126,47,.16),transparent 80%),var(--surface,rgba(20,27,23,.96)); }
+#message > .card.error { border-color:rgba(208,94,88,.4); background:linear-gradient(110deg,rgba(174,65,60,.17),transparent 80%),var(--surface,rgba(20,27,23,.96)); }
+#message > .card.success::before,
+#message > .card.warning::before,
+#message > .card.error::before {
+  content:""; flex:0 0 7px; width:7px; height:7px; margin-top:.42rem; border-radius:50%;
+  background:currentColor; box-shadow:0 0 0 4px color-mix(in srgb,currentColor 15%,transparent);
+}
+@keyframes batch-feedback-in { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+@media (max-width:900px) {
+  #batchCard #batchInfo .batch-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:640px) {
+  #batchCard .batch-list { grid-template-columns:minmax(0,1fr); }
+  #batchCard .batch-list > .batch-item { min-height:0; }
+  #batchCard #batchInfo .batch-grid { grid-template-columns:minmax(0,1fr); }
+  #batchCard #batchInfo .batch-stat { padding:.75rem .85rem; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #batchCard .batch-list > .batch-item,
+  #message > .card.success,
+  #message > .card.warning,
+  #message > .card.error { transition:none !important; animation:none !important; }
+  #batchCard .batch-list > .batch-item:hover { transform:none !important; }
+}
