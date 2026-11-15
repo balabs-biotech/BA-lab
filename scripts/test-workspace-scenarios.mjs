@@ -885,16 +885,16 @@ console.log("✓ Feedback states: semantic status surfaces, loading, empty and r
 
 // Feedback states need one reusable visual contract rather than scattered,
 // domain-specific overrides for each individual status message.
-const feedbackCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+const feedbackContractCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
 for (const state of ["info", "success", "warning", "error"]) {
-  assert.match(feedbackCss, new RegExp('body\\[data-domain\\] \\.feedback-' + state),
+  assert.match(feedbackContractCss, new RegExp('body\\[data-domain\\] \\.feedback-' + state),
     "feedback-" + state + " must expose a shared semantic surface");
 }
-assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-state\\[data-loading="true"\\]/,
+assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-state\\[data-loading="true"\\]/,
   "loading feedback must expose a stable busy state");
-assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-state\\[data-empty="true"\\]/,
+assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-state\\[data-empty="true"\\]/,
   "empty feedback must remain a first-class operational state");
-assert.match(feedbackCss, /@media \\(max-width: 600px\\)[\\s\\S]*?\\.feedback-state/,
+assert.match(feedbackContractCss, /@media \\(max-width: 600px\\)[\\s\\S]*?\\.feedback-state/,
   "feedback surfaces must remain compact on phones");
 console.log("✓ Feedback states: semantic status, loading, empty and mobile treatment");
 
@@ -908,7 +908,7 @@ assert.match(feedbackJs, /div\\.textContent =\\s*text/,
   "message content must remain text-only, not interpreted as HTML");
 assert.match(feedbackJs, /type === "error" \\|\\| type === "warning"[\\s\\S]*?"alert"[\\s\\S]*?"status"/,
   "error and warning messages must keep alert semantics");
-assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-info/);
-assert.match(feedbackCss, /var\\(--warn\\)/,
+assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-info/);
+assert.match(feedbackContractCss, /var\\(--warn\\)/,
   "warning surfaces must use the established --warn design token");
 console.log("✓ Message renderer: semantic classes, safe text and accessible urgency");
