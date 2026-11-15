@@ -45,6 +45,9 @@ const base = {
   measurements: [{ id: measurementId, organization_id: org, culture_id: cultureId, environment_id: envA,
     variable_code: "air_temperature", raw_value: 295, raw_unit_code: "K", normalized_value: 22,
     normalized_unit_code: "degC", measured_at: "2026-11-10T08:00:00Z", quality_state: "valid", metadata: {} }],
+  events: [{ id: "99999999-9999-4999-8999-999999999993", organization_id: org,
+    event_type: "fruiting_stage_started", occurred_at: "2026-11-10T09:15:00Z",
+    culture_id: cultureId, plant_culture_id: null, payload: { stage: "primordia" } }],
   observations: [{ id: "99999999-9999-4999-8999-999999999991", organization_id: org,
     culture_id: cultureId, plant_culture_id: null, variable_code: "morphology_note",
     value_text: "primordia formation", observed_at: "2026-11-10T09:30:00Z",
@@ -68,7 +71,12 @@ const snapshot = await loadAuthenticatedBiologicalContextSnapshot({
 });
 assert.equal(snapshot.scope.environment_id, envA);
 assert.equal(snapshot.scope.location_id, locationA);
-assert.equal(snapshot.input.records.length, 3);
+assert.equal(snapshot.input.records.length, 4);
+const eventRecord = snapshot.input.records.find((row) => row.record_type === "event");
+assert.equal(eventRecord.data.event_type, "fruiting_stage_started");
+assert.equal(eventRecord.context.culture_id, cultureId);
+assert.equal(eventRecord.data.payload.stage, "primordia");
+assert.equal(counts.events, 1);
 const morphologyRecord = snapshot.input.records.find((row) => row.record_type === "observation");
 assert.equal(morphologyRecord.context.event_id, "99999999-9999-4999-8999-999999999992");
 assert.equal(morphologyRecord.data.value_text, "primordia formation");
@@ -139,6 +147,9 @@ const plantData = {
   }],
   environments: base.environments,
   locations: base.locations,
+  events: [{ id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeec", organization_id: org,
+    event_type: "growth_stage_changed", occurred_at: "2026-11-10T08:45:00Z",
+    culture_id: null, plant_culture_id: plantCultureId, payload: { stage: "vegetative" } }],
   observations: [{ id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeef", organization_id: org,
     culture_id: null, plant_culture_id: plantCultureId, variable_code: "leaf_note",
     value_text: "new leaf observed", observed_at: "2026-11-10T09:00:00Z",
@@ -151,7 +162,11 @@ const plantSnapshot = await loadAuthenticatedPlantBiologicalContextSnapshot({
 });
 assert.equal(plantSnapshot.scope.plant_culture_id, plantCultureId);
 assert.equal(Object.hasOwn(plantSnapshot.scope, "culture_id"), false);
-assert.equal(plantSnapshot.input.records.length, 3);
+assert.equal(plantSnapshot.input.records.length, 4);
+const plantEvent = plantSnapshot.input.records.find((row) => row.record_type === "event");
+assert.equal(plantEvent.context.plant_culture_id, plantCultureId);
+assert.equal(plantEvent.data.event_type, "growth_stage_changed");
+assert.equal(plantCounts.events, 1);
 const plantObservation = plantSnapshot.input.records.find((row) => row.record_type === "observation");
 assert.equal(plantObservation.context.plant_culture_id, plantCultureId);
 assert.equal(plantObservation.context.event_id, "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeed");
