@@ -29,6 +29,13 @@
  const controls=document.createElement('div');controls.className='experience-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Navigation entre les espaces');
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';controls.append(prev,count,next);main.append(controls);
+ const rail=document.createElement('nav');rail.className='chapter-rail';rail.setAttribute('aria-label','Parcours des chapitres');
+ rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 C8 76 55 108 32 150 S8 224 32 276 S55 350 32 402 S8 456 32 476"/><path class="filament-progress" d="M32 24 C8 76 55 108 32 150 S8 224 32 276 S55 350 32 402 S8 456 32 476"/></svg><div class="chapter-rail-nodes"></div>';
+ const railNodes=rail.querySelector('.chapter-rail-nodes');
+ groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
+ main.append(rail);
+ const filament=rail.querySelector('.filament-progress');let filamentLength=0;
+ try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){}
  let current=0;
  const lang=()=>document.documentElement.lang||'fr';
  const update=()=>{
@@ -36,6 +43,9 @@
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   progress.firstElementChild.style.width=((idx+1)/pages.length*100)+'%';
+  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false');});
+  rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
+  if(filamentLength)filament.style.strokeDashoffset=String(filamentLength*(1-idx/Math.max(1,pages.length-1)));
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
@@ -58,6 +68,7 @@
   prev.setAttribute('aria-label',({fr:'Espace précédent',en:'Previous space',ar:'المساحة السابقة',pt:'Espaço anterior'})[l]);
   next.setAttribute('aria-label',({fr:'Espace suivant',en:'Next space',ar:'المساحة التالية',pt:'Próximo espaço'})[l]);
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
+  rail.setAttribute('aria-label',({fr:'Parcours des chapitres',en:'Chapter navigation',ar:'التنقل بين الفصول',pt:'Navegação por capítulos'})[l]);
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
  localize();update();
