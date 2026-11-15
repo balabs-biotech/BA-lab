@@ -6884,6 +6884,8 @@ function setupDomainWorkspaces() {
     }
     if (toolbarStatus) toolbarStatus.textContent = config.status;
     document.documentElement.dataset.domain = activeDomain;
+    // Every domain switch returns to a deterministic landing module and clears stale nav state.
+    activateWorkspaceModule("overviewCard");
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
     }
