@@ -38,6 +38,21 @@ export interface BiologicalMeasurementRow {
   metadata?: Record<string, unknown> | null;
 }
 
+export interface BiologicalEventRow {
+  id: string;
+  organization_id: string;
+  event_type: string;
+  occurred_at: string;
+  culture_id?: string | null;
+  plant_culture_id?: string | null;
+  material_id?: string | null;
+  sample_id?: string | null;
+  experimental_unit_id?: string | null;
+  location_id?: string | null;
+  environment_id?: string | null;
+  payload?: Record<string, unknown> | null;
+}
+
 export interface BiologicalObservationRow {
   id: string;
   organization_id: string;
@@ -107,6 +122,7 @@ export async function buildBiologicalContextSnapshot(input: {
   environment: BiologicalEnvironmentRow | null;
   measurements: BiologicalMeasurementRow[];
   observations?: BiologicalObservationRow[];
+  events?: BiologicalEventRow[];
   environmentalObservations: BiologicalEnvironmentalObservationRow[];
   measurementContextById?: Record<string, {
     status: string;
@@ -203,6 +219,34 @@ export async function buildBiologicalContextSnapshot(input: {
     records.push({
       record_id: row.id,
       record_type: "observation",
+      payload_sha256: await sha256(stable({ source: row, context })),
+      data,
+      context,
+    });
+  }
+
+  for (const row of input.events ?? []) {
+    if (row.organization_id !== organizationId || row[subjectField] !== subject.id) {
+      throw new Error("event_" + subjectType + "_scope_mismatch");
+    }
+    const instant = parseInstant(row.occurred_at, "event_timestamp");
+    if (instant < windowStart || instant >= windowEnd) continue;
+    const context = {
+      [subjectField]: row[subjectField],
+      material_id: row.material_id ?? null,
+      sample_id: row.sample_id ?? null,
+      experimental_unit_id: row.experimental_unit_id ?? null,
+      location_id: row.location_id ?? null,
+      environment_id: row.environment_id ?? null,
+    };
+    const data = {
+      event_type: row.event_type,
+      occurred_at: row.occurred_at,
+      payload: row.payload ?? {},
+    };
+    records.push({
+      record_id: row.id,
+      record_type: "event",
       payload_sha256: await sha256(stable({ source: row, context })),
       data,
       context,
