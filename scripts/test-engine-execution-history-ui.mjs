@@ -282,6 +282,8 @@ assert.match(biologicalRenderer, /Chronologie biologique/);
 assert.match(biologicalRenderer, /Voir l’événement associé/);
 assert.match(biologicalRenderer, /engine-biological-fact-timeline/);
 assert.match(biologicalRenderer, /engine-biological-fact-event-link/);
+assert.match(biologicalRenderer, /Observations liées : /);
+assert.match(biologicalRenderer, /engine-biological-fact-related-observations/);
 console.log("✓ Persisted result identity, durable result ID and ledger parity are exposed in execution history");
 
 for (const contract of [
