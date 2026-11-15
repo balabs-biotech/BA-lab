@@ -100,11 +100,7 @@ function clearAuthenticatedWorkspaceState() {
   if (typeof engineExecutionPollingOrganizationId !== "undefined") engineExecutionPollingOrganizationId = null;
   const engineHistoryPanel = document.getElementById("overviewRecentEngineExecutions");
   if (engineHistoryPanel) {
-    engineHistoryPanel.replaceChildren();
-    const clearedState = document.createElement("p");
-    clearedState.className = "muted";
-    clearedState.textContent = "Connectez-vous pour charger les analyses de l’organisation.";
-    engineHistoryPanel.appendChild(clearedState);
+    renderCollectionFeedback(engineHistoryPanel, "info", "Connectez-vous pour charger les analyses de l’organisation.");
   }
   initializationWarnings = [];
 
@@ -1052,14 +1048,14 @@ async function initializeAuthenticatedTracker(
         console.error("Historique des analyses indisponible :", engineHistoryError);
         initializationWarnings.push("historique des analyses");
         const panel = document.getElementById("overviewRecentEngineExecutions");
-        if (panel) panel.textContent = "Historique des analyses indisponible. Les autres modules restent utilisables.";
+        if (panel) renderCollectionFeedback(panel, "error", "Historique des analyses indisponible. Les autres modules restent utilisables.");
       }
     } catch (measurementError) {
       if (initRevision !== authStateRevision) return;
       console.error("Initialisation du catalogue de mesures :", measurementError);
       initializationWarnings.push("catalogue des mesures");
-      measurementHistory.textContent = "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.";
-      observationHistory.textContent = "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.";
+      renderCollectionFeedback(measurementHistory, "error", "Le catalogue des mesures est indisponible ; les modules de culture et de production restent utilisables.");
+      renderCollectionFeedback(observationHistory, "error", "Le catalogue des observations est indisponible ; les modules de culture et de production restent utilisables.");
       saveMeasurementButton.disabled = true;
       saveObservationButton.disabled = true;
     }
@@ -7130,6 +7126,7 @@ async function loadRecentEngineExecutions() {
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
   if (!loadOrganizationId || !panel) return;
+  renderCollectionFeedback(panel, "loading", "Chargement des analyses récentes…");
 
   const query = await supabaseClient.from("engine_executions")
     .select("id,engine_id,engine_version,status,result_payload,error_code,created_at,completed_at,input_record_ids,input_snapshot_sha256,scope")
@@ -7139,7 +7136,11 @@ async function loadRecentEngineExecutions() {
 
   if (requestId !== engineExecutionHistoryRequestId ||
       !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-  if (query.error) throw new Error("Chargement des exécutions analytiques impossible : " + query.error.message);
+  if (query.error) {
+    const message = "Chargement des exécutions analytiques impossible : " + query.error.message;
+    renderCollectionFeedback(panel, "error", message);
+    throw new Error(message);
+  }
   recentEngineExecutions = query.data || [];
 
   const completedIds = recentEngineExecutions
@@ -7153,7 +7154,11 @@ async function loadRecentEngineExecutions() {
       .in("execution_id", completedIds);
     if (requestId !== engineExecutionHistoryRequestId ||
         !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return;
-    if (resultsQuery.error) throw new Error("Chargement des résultats analytiques impossible : " + resultsQuery.error.message);
+    if (resultsQuery.error) {
+      const message = "Chargement des résultats analytiques impossible : " + resultsQuery.error.message;
+      renderCollectionFeedback(panel, "error", message);
+      throw new Error(message);
+    }
     recentEngineResultsByExecution = new Map(
       (resultsQuery.data || []).map((row) => [row.execution_id, row])
     );
@@ -7188,6 +7193,8 @@ function scheduleEngineExecutionPolling(expectedOrganizationId, expectedRevision
       if (engineExecutionPollingOrganizationId === expectedOrganizationId &&
           isCurrentWorkspaceRevision(expectedRevision, expectedOrganizationId)) {
         console.warn("Actualisation de l’état des analyses différée :", error);
+        const panel = document.getElementById("overviewRecentEngineExecutions");
+        renderCollectionFeedback(panel, "warning", "Actualisation des analyses momentanément indisponible. Nouvelle tentative automatique.");
         scheduleEngineExecutionPolling(expectedOrganizationId, expectedRevision, true);
       }
     }
@@ -7531,15 +7538,13 @@ function renderBiologicalContextAssessment(article, result) {
 function renderRecentEngineExecutions() {
   const panel = document.getElementById("overviewRecentEngineExecutions");
   if (!panel) return;
-  panel.replaceChildren();
-
   if (!recentEngineExecutions.length) {
-    const empty = document.createElement("p");
-    empty.className = "muted";
-    empty.textContent = "Aucune exécution analytique enregistrée pour cette organisation.";
-    panel.appendChild(empty);
+    renderCollectionFeedback(panel, "empty", "Aucune exécution analytique enregistrée pour cette organisation.");
     return;
   }
+  panel.removeAttribute("data-feedback-state");
+  panel.removeAttribute("aria-busy");
+  panel.replaceChildren();
 
   renderEngineExecutionComparison(panel, getComparableEngineExecutions());
 
