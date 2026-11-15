@@ -118,7 +118,8 @@
                 "enum": [
                   "measurement",
                   "observation",
-                  "environmental_observation"
+                  "environmental_observation",
+                  "event"
                 ]
               },
               "payload_sha256": {
