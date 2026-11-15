@@ -548,7 +548,7 @@ function setupUI() {
 function onPointerDown(e) {
   // Chromium may cancel the first touch pointer when a second finger joins.
   // isPrimary=false is an independent signal, even if the pointer map was reset.
-  if(e.pointerType==='touch'&&e.isPrimary===false){multiTouchGesture=true;lastMultiTouchAt=performance.now();dragGesture=true;moved=true;touchFallback=null;}
+  if(e.pointerType==='touch'&&e.isPrimary===false){multiTouchGesture=true;lastMultiTouchAt=performance.now();dragGesture=true;moved=true;}
   if(pointers.size===0){if(e.pointerType!=='touch'||(!multiTouchGesture&&performance.now()-lastMultiTouchAt>=900))multiTouchGesture=false;dragGesture=false;moved=false}
   const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
   if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
