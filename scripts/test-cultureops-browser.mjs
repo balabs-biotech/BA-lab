@@ -119,6 +119,7 @@ try {
           labelColor: firstLabel ? getComputedStyle(firstLabel).color : null,
           statusColor: status ? getComputedStyle(status).color : null,
           authVisible: !!card && card.getBoundingClientRect().height > 0,
+          authEmailPrefilled: !!document.querySelector("#authEmail")?.value,
           toolbarPosition: toolbar ? getComputedStyle(toolbar).position : null,
           toolbarTop: toolbar?.getBoundingClientRect().top ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
@@ -142,6 +143,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
+      if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
       const accessibility = await page.evaluate(() => {
         const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
         const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
