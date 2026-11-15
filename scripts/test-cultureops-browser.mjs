@@ -98,6 +98,12 @@ try {
         const style = getComputedStyle(body);
         const cardStyle = card ? getComputedStyle(card) : null;
         const headingStyle = heading ? getComputedStyle(heading) : null;
+        const description = card?.querySelector(".muted");
+        const firstLabel = card?.querySelector("label");
+        const status = card?.querySelector("#authStatus");
+        const toolbar = document.querySelector(".app-toolbar");
+        const hero = document.querySelector(".app-hero");
+        const languageLabel = document.querySelector("#languageLabel");
         return {
           domain: body.dataset.domain,
           title: document.title,
@@ -109,7 +115,14 @@ try {
           cardBackground: cardStyle?.backgroundColor || null,
           headingColor: headingStyle?.color || null,
           headingText: heading?.textContent?.trim() || null,
+          descriptionColor: description ? getComputedStyle(description).color : null,
+          labelColor: firstLabel ? getComputedStyle(firstLabel).color : null,
+          statusColor: status ? getComputedStyle(status).color : null,
           authVisible: !!card && card.getBoundingClientRect().height > 0,
+          toolbarPosition: toolbar ? getComputedStyle(toolbar).position : null,
+          toolbarTop: toolbar?.getBoundingClientRect().top ?? null,
+          heroTop: hero?.getBoundingClientRect().top ?? null,
+          languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           navLinks: document.querySelectorAll(".section-nav a").length,
         };
       });
@@ -118,7 +131,13 @@ try {
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
-      if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
+      const descriptionContrast = contrastRatio(metrics.descriptionColor, metrics.surfaceToken);
+      const labelContrast = contrastRatio(metrics.labelColor, metrics.surfaceToken);
+      if (descriptionContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth description contrast ${descriptionContrast.toFixed(2)}:1 is below 4.5:1`);
+      if (labelContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth label contrast ${labelContrast.toFixed(2)}:1 is below 4.5:1`);
+      if (viewport.name === "desktop" && (metrics.toolbarPosition !== "fixed" || metrics.heroTop > 200)) failures.push(`${workspace.slug}/${viewport.name}: desktop navigation still occupies content flow (position=${metrics.toolbarPosition}, heroTop=${metrics.heroTop})`);
+      if (viewport.name === "mobile" && metrics.languageLabelWraps) failures.push(`${workspace.slug}/${viewport.name}: language label wraps unexpectedly`);
+            if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       for (const language of ["en", "pt", "ar", "fr"]) {
