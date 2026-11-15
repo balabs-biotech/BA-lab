@@ -252,6 +252,50 @@ assert.deepEqual(fallbackShortcuts.map(item => item.target),
 console.log("✓ Overview shortcuts: each domain targets only its own available modules");
 
 
+// The overview presentation must explain the active biological workspace.
+function overviewPresentationScenario(domain) {
+  const ids = [
+    "overviewTitle", "overviewDescription", "overviewActivityTitle",
+    "overviewObservationSummary", "overviewEngineSummary", "overviewFootnote",
+    "overviewMetrics"
+  ];
+  const elements = Object.fromEntries(ids.map(id => [id, {
+    textContent: "",
+    attributes: {},
+    setAttribute(name, value) { this.attributes[name] = value; }
+  }]));
+  const document = { getElementById: id => elements[id] || null };
+  const source = extractFunction(engine, "configureOverviewPresentation");
+  vm.runInNewContext(
+    `${source}; configureOverviewPresentation(injected.domain)`,
+    { document, injected: { domain } }
+  );
+  return elements;
+}
+const greenTechOverview = overviewPresentationScenario("agronomy");
+assert.equal(greenTechOverview.overviewTitle.textContent, "Tableau de bord GreenTech");
+assert.match(greenTechOverview.overviewDescription.textContent, /unités végétales/);
+assert.equal(greenTechOverview.overviewActivityTitle.textContent, "Activité agronomique");
+assert.match(greenTechOverview.overviewObservationSummary.textContent, /agronomiques/);
+assert.equal(greenTechOverview.overviewMetrics.attributes["aria-label"], "Indicateurs des cultures végétales");
+
+const mycologyOverview = overviewPresentationScenario("mycology");
+assert.equal(mycologyOverview.overviewTitle.textContent, "Tableau de bord Mycology");
+assert.match(mycologyOverview.overviewDescription.textContent, /cultures fongiques/);
+assert.equal(mycologyOverview.overviewActivityTitle.textContent, "Activité mycologique");
+assert.match(mycologyOverview.overviewFootnote.textContent, /souche, du protocole, du substrat/);
+
+const laboratoryOverview = overviewPresentationScenario("laboratory");
+assert.equal(laboratoryOverview.overviewTitle.textContent, "Tableau de bord Laboratoire");
+assert.match(laboratoryOverview.overviewDescription.textContent, /cultures microbiologiques/);
+assert.equal(laboratoryOverview.overviewActivityTitle.textContent, "Activité du laboratoire");
+assert.match(laboratoryOverview.overviewObservationSummary.textContent, /microbiologiques/);
+
+const fallbackOverview = overviewPresentationScenario("unknown");
+assert.equal(fallbackOverview.overviewTitle.textContent, "Tableau de bord Laboratoire");
+console.log("✓ Overview presentation: domain-specific titles, context, activity and accessible metric labels");
+
+
 // Switching between the three workspaces must refresh tenant-scoped data,
 // not merely replace the hero labels. A superseded switch must not render.
 const setupStart = engine.indexOf("function setupDomainWorkspaces()");

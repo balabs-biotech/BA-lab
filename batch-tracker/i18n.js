@@ -763,6 +763,27 @@
     ["Consulter les lots", "View batches", "Consultar lotes", "عرض الدفعات"],
     ["Étapes et contrôle qualité", "Stages and quality control", "Etapas e controlo de qualidade", "المراحل ومراقبة الجودة"],
     ["Valeur, unité et méthode", "Value, unit and method", "Valor, unidade e método", "القيمة والوحدة والطريقة"],
+    ["Tableau de bord GreenTech", "GreenTech dashboard", "Painel GreenTech", "لوحة GreenTech"],
+    ["Vue de suivi des unités végétales, des observations agronomiques et des analyses environnementales.", "Overview of plant units, agronomic observations and environmental assessments.", "Visão geral das unidades vegetais, observações agronómicas e avaliações ambientais.", "عرض وحدات النباتات والملاحظات الزراعية والتقييمات البيئية."],
+    ["Activité agronomique", "Agronomic activity", "Atividade agronómica", "النشاط الزراعي"],
+    ["Afficher les dernières observations agronomiques", "Show latest agronomic observations", "Mostrar as observações agronómicas recentes", "عرض أحدث الملاحظات الزراعية"],
+    ["Afficher les dernières analyses environnementales", "Show latest environmental assessments", "Mostrar as avaliações ambientais recentes", "عرض أحدث التقييمات البيئية"],
+    ["Indicateurs des cultures végétales", "Plant-culture indicators", "Indicadores das culturas vegetais", "مؤشرات زراعة النباتات"],
+    ["Les indicateurs portent sur les fiches végétales et les observations actuellement chargées. Les analyses doivent préciser la variable, l’unité, la période et le périmètre étudiés.", "Indicators cover currently loaded plant records and observations. Assessments must specify the variable, unit, period and scope.", "Os indicadores abrangem as fichas vegetais e observações carregadas. As avaliações devem indicar a variável, unidade, período e âmbito.", "تشمل المؤشرات سجلات النباتات والملاحظات المحمّلة حاليًا. يجب أن تحدد التقييمات المتغير والوحدة والفترة والنطاق."],
+    ["Tableau de bord Mycology", "Mycology dashboard", "Painel Mycology", "لوحة علم الفطريات"],
+    ["Vue de suivi des cultures fongiques, des observations de croissance et des évaluations mycologiques.", "Overview of fungal cultures, growth observations and mycological assessments.", "Visão geral das culturas fúngicas, observações de crescimento e avaliações micológicas.", "عرض المزارع الفطرية وملاحظات النمو والتقييمات الفطرية."],
+    ["Activité mycologique", "Mycological activity", "Atividade micológica", "النشاط الفطري"],
+    ["Afficher les dernières observations mycologiques", "Show latest mycological observations", "Mostrar as observações micológicas recentes", "عرض أحدث الملاحظات الفطرية"],
+    ["Afficher les dernières évaluations mycologiques", "Show latest mycological assessments", "Mostrar as avaliações micológicas recentes", "عرض أحدث التقييمات الفطرية"],
+    ["Indicateurs des cultures fongiques", "Fungal-culture indicators", "Indicadores das culturas fúngicas", "مؤشرات المزارع الفطرية"],
+    ["Les indicateurs portent sur les cultures et observations mycologiques actuellement chargées. Toute comparaison doit tenir compte de la souche, du protocole, du substrat et des conditions de culture.", "Indicators cover currently loaded mycological cultures and observations. Comparisons must account for strain, protocol, substrate and culture conditions.", "Os indicadores abrangem as culturas e observações micológicas carregadas. As comparações devem considerar a estirpe, o protocolo, o substrato e as condições de cultura.", "تشمل المؤشرات المزارع والملاحظات الفطرية المحمّلة. يجب أن تراعي المقارنات السلالة والبروتوكول والركيزة وظروف الزراعة."],
+    ["Tableau de bord Laboratoire", "Laboratory dashboard", "Painel do Laboratório", "لوحة المختبر"],
+    ["Vue de suivi des cultures microbiologiques, des lots de production et des observations de laboratoire.", "Overview of microbiological cultures, production batches and laboratory observations.", "Visão geral das culturas microbiológicas, lotes de produção e observações laboratoriais.", "عرض المزارع الميكروبيولوجية ودفعات الإنتاج وملاحظات المختبر."],
+    ["Activité du laboratoire", "Laboratory activity", "Atividade do laboratório", "نشاط المختبر"],
+    ["Afficher les dernières observations microbiologiques", "Show latest microbiological observations", "Mostrar as observações microbiológicas recentes", "عرض أحدث الملاحظات الميكروبيولوجية"],
+    ["Afficher les dernières analyses de laboratoire", "Show latest laboratory analyses", "Mostrar as análises laboratoriais recentes", "عرض أحدث تحليلات المختبر"],
+    ["Indicateurs des cultures et lots", "Culture and batch indicators", "Indicadores de culturas e lotes", "مؤشرات المزارع والدفعات"],
+    ["Les indicateurs portent sur les cultures, lots et observations actuellement chargés. Toute comparaison doit préciser la méthode, le milieu, l’unité et la période.", "Indicators cover currently loaded cultures, batches and observations. Comparisons must specify method, medium, unit and period.", "Os indicadores abrangem as culturas, lotes e observações carregados. As comparações devem especificar o método, meio, unidade e período.", "تشمل المؤشرات المزارع والدفعات والملاحظات المحمّلة. يجب أن تحدد المقارنات الطريقة والوسط والوحدة والفترة."]
     ["Évaluation transmise. Consultez l’historique des exécutions.", "Assessment submitted. Check execution history.", "Avaliação enviada. Consulte o histórico de execuções.", "تم إرسال التقييم. راجع سجل التنفيذ."]
   ];
   for (const [fr, en, pt, ar] of supplementalCoverage) {
