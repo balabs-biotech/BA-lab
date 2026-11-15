@@ -799,9 +799,9 @@ for (const domain of ["agronomy", "mycology", "laboratory"]) {
   const selector = new RegExp('body\\[data-domain="' + domain + '"\\] :is\\(input, select, textarea\\)');
   assert.match(formThemeCss, selector,
     domain + " form controls must use the workspace surface and text palette");
-  assert.match(formThemeCss, new RegExp('body\\[data-domain="' + domain + '"\\] :is\\(input\\[type="checkbox"\\], input\\[type="radio"\\]\\)'),
-    domain + " checkbox and radio controls must use the workspace accent");
 }
+assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input\\[type="checkbox"\\], input\\[type="radio"\\]\\)/,
+  "checkbox and radio controls must use the active workspace accent token");
 assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\)\\[aria-invalid="true"\\]/,
   "invalid form controls must expose a consistent semantic error state");
 assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\):disabled/,
