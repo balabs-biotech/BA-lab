@@ -592,6 +592,36 @@ def analyze_biological_context_features(request: Mapping[str, Any]) -> dict[str,
         data = record["data"]
         context = record.get("context") or {}
 
+        if record_type == "event":
+            if context.get(subject_field) != subject_id:
+                excluded.append({"record_id": record_id, "reason": f"event_{subject_type}_scope_mismatch"})
+                continue
+            event_type = data.get("event_type")
+            timestamp_value = data.get("occurred_at")
+            if not isinstance(event_type, str) or not event_type.strip():
+                excluded.append({"record_id": record_id, "reason": "missing_event_type"})
+                continue
+            try:
+                occurred_at = _timestamp(timestamp_value, "event_timestamp")
+            except (TypeError, ValueError):
+                excluded.append({"record_id": record_id, "reason": "invalid_or_timezone_naive_timestamp"})
+                continue
+            if occurred_at < window_start or occurred_at >= window_end:
+                excluded.append({"record_id": record_id, "reason": "outside_requested_window"})
+                continue
+            payload = data.get("payload")
+            if not isinstance(payload, dict):
+                payload = {}
+            observed_facts.append({
+                "fact_code": f"event.{event_type.strip().lower().replace('-', '_')[:60]}",
+                "statement": f"recorded_event: {event_type.strip()[:160]}",
+                "observed_at": _iso(occurred_at),
+                "source_record_ids": [record_id],
+                "event_id": record_id,
+                "value": payload,
+            })
+            accepted_by_type[record_type] += 1
+            continue
         if record_type == "observation":
             if data.get("quality_state") == "excluded":
                 excluded.append({"record_id": record_id, "reason": "observation_quality_state_excluded"})
