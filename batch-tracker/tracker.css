@@ -9933,3 +9933,292 @@ body[data-domain] .statistics-filters .statistics-filter-action button { width: 
   body[data-domain] #overviewCard .overview-shortcut { min-height: 54px; }
   body[data-domain] .bio-operation-form #saveBioOperation { width: 100%; }
 }
+
+
+/* ============================================================
+   PASS 47 — CULTURE & BATCH CREATION FLOWS
+   ============================================================ */
+body[data-domain] #trackerCard > .entry-intro {
+  position: relative;
+  margin: 2px 0 20px;
+  padding: 0 0 17px 17px;
+  border-bottom: 1px solid var(--workspace-border);
+}
+body[data-domain] #trackerCard > .entry-intro::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 17px;
+  left: 0;
+  width: 3px;
+  border-radius: 9px;
+  background: var(--workspace-accent);
+}
+body[data-domain] #trackerCard > .entry-intro .entry-step-mark {
+  display: inline-flex;
+  margin: 0 0 8px;
+  color: var(--workspace-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+body[data-domain] #trackerCard > .entry-intro h2 {
+  margin: 0 0 7px;
+  font-size: clamp(22px,2.4vw,30px);
+}
+body[data-domain] #trackerCard > .entry-intro p {
+  max-width: 680px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.65;
+}
+body[data-domain] #trackerCard .assisted-entry-panel {
+  margin: 18px 0 24px;
+  padding: clamp(14px,2vw,20px);
+  border-color: color-mix(in srgb,var(--workspace-accent) 28%,var(--workspace-border));
+  background:
+    linear-gradient(135deg,color-mix(in srgb,var(--workspace-accent) 8%,transparent),transparent 58%),
+    var(--workspace-panel-raised);
+  box-shadow: 0 9px 24px rgba(0,0,0,.12);
+}
+body[data-domain] #trackerCard .assisted-entry-heading h3 {
+  color: var(--workspace-text);
+  font-size: 15px;
+  letter-spacing: -.015em;
+}
+body[data-domain] #trackerCard .assisted-entry-tag {
+  color: var(--workspace-muted);
+  border-color: var(--workspace-border);
+  background: color-mix(in srgb,var(--workspace-panel) 70%,transparent);
+}
+body[data-domain] #trackerCard .assisted-entry-panel > p {
+  max-width: 780px;
+  font-size: 10px;
+  line-height: 1.65;
+}
+body[data-domain] #trackerCard .assisted-entry-panel > label {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 10px;
+  font-weight: 750;
+}
+body[data-domain] #trackerCard .assisted-entry-panel textarea {
+  min-height: 108px;
+  border-color: var(--workspace-border);
+  border-radius: 10px;
+  background: var(--workspace-control);
+  color: var(--workspace-text);
+  font-size: 11px;
+  line-height: 1.6;
+}
+body[data-domain] #trackerCard .assisted-entry-help {
+  padding-top: 10px;
+  border-top: 1px solid var(--workspace-border);
+}
+body[data-domain] #trackerCard .guided-entry-step {
+  position: relative;
+  margin: 16px 0;
+  padding: clamp(15px,2vw,21px);
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent) 4%,transparent),transparent 65%),
+    var(--workspace-panel-raised);
+}
+body[data-domain] #trackerCard .guided-entry-step[hidden] { display: none !important; }
+body[data-domain] #trackerCard .guided-entry-step > .entry-step-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  color: var(--workspace-accent);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+body[data-domain] #trackerCard .guided-entry-step > .entry-step-mark::after {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: color-mix(in srgb,var(--workspace-accent) 45%,transparent);
+}
+body[data-domain] #trackerCard .guided-entry-step.is-locked {
+  opacity: .56;
+}
+body[data-domain] #trackerCard .guided-entry-step .grid,
+body[data-domain] #batchCard .batch-create-panel > .grid,
+body[data-domain] #measurementCard > .grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 13px;
+  margin: 12px 0;
+}
+body[data-domain] :is(#trackerCard,#batchCard,#measurementCard) .grid > div { min-width: 0; }
+body[data-domain] #trackerCard .guided-entry-step > label,
+body[data-domain] #trackerCard .guided-entry-step .grid label,
+body[data-domain] #batchCard .batch-create-panel label,
+body[data-domain] #measurementCard > label {
+  display: block;
+  margin: 10px 0 6px;
+  color: var(--workspace-soft,var(--workspace-text));
+  font-size: 10px;
+  font-weight: 700;
+}
+body[data-domain] #trackerCard .guided-entry-step .hint,
+body[data-domain] #batchCard .batch-create-panel .hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--workspace-muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+body[data-domain] #trackerCard #strainInfo,
+body[data-domain] #trackerCard #generationInfo {
+  margin: 10px 0;
+  padding: 11px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: color-mix(in srgb,var(--workspace-accent) 6%,var(--workspace-panel));
+  color: var(--workspace-soft,var(--workspace-text));
+  font-size: 10px;
+  line-height: 1.6;
+}
+body[data-domain] #trackerCard .consent-panel {
+  margin: 14px 0 0;
+  padding: 15px;
+  border-color: var(--workspace-border);
+  background: color-mix(in srgb,var(--workspace-panel) 65%,transparent);
+}
+body[data-domain] #trackerCard .consent-panel > strong { font-size: 11px; }
+body[data-domain] #trackerCard .consent-panel p { font-size: 10px; line-height: 1.65; }
+body[data-domain] #trackerCard .consent-option {
+  display: grid;
+  grid-template-columns: 18px minmax(0,1fr);
+  align-items: start;
+  gap: 9px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--workspace-border);
+}
+body[data-domain] #trackerCard .consent-option input { margin: 3px 0 0; }
+body[data-domain] #trackerCard .consent-option label {
+  margin: 0;
+  color: var(--workspace-soft,var(--workspace-text));
+  font-size: 10px;
+  line-height: 1.6;
+}
+body[data-domain] #trackerCard #createButton,
+body[data-domain] #batchCard #createBatchButton,
+body[data-domain] #measurementCard #saveMeasurementButton,
+body[data-domain] #measurementCard #saveObservationButton {
+  min-height: 46px;
+  padding: 11px 19px;
+  border: 1px solid color-mix(in srgb,var(--workspace-accent) 65%,transparent);
+  border-radius: 10px;
+  background: linear-gradient(135deg,color-mix(in srgb,var(--workspace-accent) 24%,var(--workspace-panel-raised)),var(--workspace-panel-raised));
+  color: var(--workspace-text);
+  font-weight: 800;
+  letter-spacing: .01em;
+  box-shadow: 0 7px 18px rgba(0,0,0,.18);
+}
+body[data-domain] #trackerCard #createButton { width: 100%; margin: 5px 0 14px; }
+body[data-domain] #trackerCard .sync-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 11px 12px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: color-mix(in srgb,var(--workspace-panel-raised) 75%,transparent);
+}
+body[data-domain] #trackerCard .sync-line #syncStatus {
+  font-size: 10px;
+  line-height: 1.55;
+}
+body[data-domain] #batchCard .batch-create-panel {
+  margin: 18px 0 22px;
+  padding: clamp(15px,2.2vw,22px);
+  border: 1px solid color-mix(in srgb,var(--workspace-accent) 30%,var(--workspace-border));
+  border-radius: 13px;
+  background:
+    linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent) 7%,transparent),transparent 62%),
+    var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .batch-create-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 15px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--workspace-border);
+}
+body[data-domain] #batchCard .batch-create-heading h3 {
+  margin: 5px 0 6px;
+  color: var(--workspace-text);
+  font-size: 18px;
+}
+body[data-domain] #batchCard .batch-create-heading p {
+  max-width: 660px;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.6;
+}
+body[data-domain] #batchCard .batch-required-note {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 999px;
+  color: var(--workspace-muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+body[data-domain] #batchCard .batch-required-note > span { color: var(--workspace-accent); font-weight: 900; }
+body[data-domain] #batchCard #createBatchButton { width: 100%; margin-top: 10px; }
+body[data-domain] #batchCard > h3 {
+  margin: 22px 0 11px;
+  padding-top: 16px;
+  border-top: 1px solid var(--workspace-border);
+  color: var(--workspace-text);
+  font-size: 16px;
+}
+body[data-domain] #measurementCard .quick-capture {
+  margin: 16px 0 19px;
+  padding: clamp(14px,2vw,20px);
+  border-color: color-mix(in srgb,var(--workspace-accent) 28%,var(--workspace-border));
+  background:
+    linear-gradient(135deg,color-mix(in srgb,var(--workspace-accent) 8%,transparent),transparent 62%),
+    var(--workspace-panel-raised);
+}
+body[data-domain] #measurementCard > .grid { margin: 13px 0; }
+body[data-domain] #measurementCard > textarea,
+body[data-domain] #measurementCard > input { width: 100%; box-sizing: border-box; }
+body[data-domain] #measurementCard .observation-details {
+  margin-top: 18px;
+  padding: 15px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 11px;
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] #measurementCard .observation-details summary {
+  color: var(--workspace-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+@media (max-width: 760px) {
+  body[data-domain] #trackerCard .guided-entry-step .grid,
+  body[data-domain] #batchCard .batch-create-panel > .grid,
+  body[data-domain] #measurementCard > .grid { grid-template-columns: minmax(0,1fr); gap: 8px; }
+  body[data-domain] #batchCard .batch-create-heading { flex-direction: column; }
+  body[data-domain] #batchCard .batch-required-note { align-self: flex-start; }
+}
+@media (max-width: 460px) {
+  body[data-domain] #trackerCard .guided-entry-step { padding: 13px; }
+  body[data-domain] #trackerCard .assisted-entry-heading h3 { font-size: 14px; }
+  body[data-domain] #trackerCard #createButton,
+  body[data-domain] #batchCard #createBatchButton,
+  body[data-domain] #measurementCard #saveMeasurementButton,
+  body[data-domain] #measurementCard #saveObservationButton { width: 100%; }
+  body[data-domain] #measurementCard .observation-details { padding: 12px; }
+}
