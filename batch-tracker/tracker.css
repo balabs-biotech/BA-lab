@@ -8290,3 +8290,118 @@ body[data-domain="laboratory"] .card .progress-track { background: #121c25 !impo
   }
   body[data-domain] .card :is(input,select,textarea) { font-size: 16px; }
 }
+
+
+/* BA LABS CULTUREOPS — canonical workspace surface layer.
+   One shared component contract; domain tokens supply the visual identity. */
+body[data-domain] {
+  --workspace-bg: #111713;
+  --workspace-panel: #19211c;
+  --workspace-panel-raised: #202a24;
+  --workspace-control: #141c17;
+  --workspace-border: #35443a;
+  --workspace-text: #e8eee7;
+  --workspace-muted: #aab7aa;
+  --workspace-accent: var(--domain-accent);
+  background: var(--workspace-bg) !important;
+  color: var(--workspace-text) !important;
+}
+body[data-domain="agronomy"] {
+  --workspace-bg: #101812;
+  --workspace-panel: #19251c;
+  --workspace-panel-raised: #223126;
+  --workspace-control: #121d15;
+  --workspace-border: #3b5140;
+  --workspace-text: #e7efe4;
+  --workspace-muted: #aebeaa;
+  --workspace-accent: #b4f477;
+}
+body[data-domain="mycology"] {
+  --workspace-bg: #141210;
+  --workspace-panel: #211b17;
+  --workspace-panel-raised: #2b211b;
+  --workspace-control: #181512;
+  --workspace-border: #594538;
+  --workspace-text: #eee4dc;
+  --workspace-muted: #c0ad9f;
+  --workspace-accent: #c98259;
+}
+body[data-domain="laboratory"] {
+  --workspace-bg: #111820;
+  --workspace-panel: #1a2530;
+  --workspace-panel-raised: #243342;
+  --workspace-control: #141e27;
+  --workspace-border: #3a5063;
+  --workspace-text: #e5edf4;
+  --workspace-muted: #aebdca;
+  --workspace-accent: #78b8e8;
+}
+body[data-domain] :is(.card,.assisted-entry-panel,.assisted-entry-help,.guided-entry-step,
+  .consent-panel,.consent-option,.overview-metric,.overview-activity,.overview-shortcuts,
+  .overview-shortcut,.culture-catalog-row,.culture-detail,.culture-detail-field,
+  .culture-detail-summary,.culture-timeline-entry,.bio-operation-panel,.bio-lineage-panel,
+  .batch-create-panel,.batch-compare-panel,.batch-list,.batch-item,.batch-info,
+  .batch-stages,.stage-list,.stage,.qc-list,.qc-row,.batch-harvest-entry,.batch-event-list,
+  .statistics-filters,.statistics-filter-action,.statistics-summary,.statistics-summary-item,
+  .statistics-chart,.statistics-table-wrap,.statistics-demo-note,.quick-capture,
+  .quick-capture-tile,.observation-details,#contextPanel,.context-panel) {
+  background-color: var(--workspace-panel) !important;
+  color: var(--workspace-text) !important;
+  border-color: var(--workspace-border) !important;
+  box-shadow: none !important;
+}
+body[data-domain] :is(.overview-metric,.overview-shortcut,.culture-detail-field,
+  .culture-timeline-entry,.stage,.qc-row,.batch-item,.quick-capture-tile,
+  .statistics-summary-item,.statistics-chart,.statistics-table-wrap) {
+  background-color: var(--workspace-panel-raised) !important;
+}
+body[data-domain] :is(.card,.assisted-entry-panel,.assisted-entry-help,.guided-entry-step,
+  .consent-panel,.consent-option,.overview-metric,.overview-activity,.overview-shortcuts,
+  .overview-shortcut,.culture-catalog-row,.culture-detail,.culture-detail-field,
+  .culture-detail-summary,.culture-timeline-entry,.bio-operation-panel,.bio-lineage-panel,
+  .batch-create-panel,.batch-compare-panel,.batch-list,.batch-item,.batch-info,
+  .batch-stages,.stage-list,.stage,.qc-list,.qc-row,.batch-harvest-entry,.batch-event-list,
+  .statistics-filters,.statistics-filter-action,.statistics-summary,.statistics-summary-item,
+  .statistics-chart,.statistics-table-wrap,.quick-capture,.quick-capture-tile,
+  .observation-details,#contextPanel,.context-panel) :is(h2,h3,h4,p,label,small,strong,span,
+  legend,dt,dd,th,td,caption) {
+  color: inherit;
+}
+body[data-domain] :is(.muted,.hint,.overview-metric-note,.culture-catalog-meta,
+  .measurement-meta,.statistics-footnote,.assisted-entry-tag) {
+  color: var(--workspace-muted) !important;
+}
+body[data-domain] :is(input:not([type=checkbox]):not([type=radio]),select,textarea) {
+  color: var(--workspace-text) !important;
+  -webkit-text-fill-color: var(--workspace-text) !important;
+  background: var(--workspace-control) !important;
+  border: 1px solid var(--workspace-border) !important;
+}
+body[data-domain] :is(input,select,textarea,button,a):focus-visible {
+  outline: 2px solid var(--workspace-accent) !important;
+  outline-offset: 3px;
+}
+body[data-domain] :is(.statistics-table-wrap,.batch-event-list,.culture-detail-timeline) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+body[data-domain] .statistics-table-wrap table { min-width: 600px; }
+body[data-domain] :is(.culture-catalog-row,.overview-shortcut,.quick-capture-tile) {
+  border-radius: 11px !important;
+  transition: border-color .16s ease, background-color .16s ease;
+}
+body[data-domain] :is(.culture-catalog-row,.overview-shortcut,.quick-capture-tile):hover {
+  border-color: var(--workspace-accent) !important;
+}
+body[data-domain] .section-nav a[aria-current="page"] {
+  color: var(--workspace-accent) !important;
+  border-color: var(--workspace-accent) !important;
+}
+body[data-domain] :is(.success,.warning,.error) { border-style: solid !important; }
+@media (max-width: 760px) {
+  body[data-domain] :is(.overview-metrics,.overview-lower,.culture-catalog-list,
+    .culture-catalog-filters,.statistics-filters,.bio-operation-form) {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  body[data-domain] .statistics-table-wrap table { min-width: 560px; }
+}
