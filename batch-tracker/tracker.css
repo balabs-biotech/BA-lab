@@ -7972,3 +7972,204 @@ body[data-domain="mycology"] #authCard :is(.muted, label, small) {
   -webkit-text-fill-color: #e9e2dc !important;
   opacity: 1 !important;
 }
+
+
+/* BA LABS / CULTUREOPS — cohesive interior surfaces, pass 35.
+   Consolidates legacy light components into the three dark scientific workspaces. */
+body[data-domain] {
+  color-scheme: dark;
+  --ui-bg: #111713;
+  --ui-panel: #19211c;
+  --ui-panel-raised: #202a24;
+  --ui-control: #141c17;
+  --ui-line: #35443a;
+  --ui-text: #e8eee7;
+  --ui-muted: #aab7aa;
+  --ui-soft: #c8d2c7;
+  background: var(--ui-bg) !important;
+  color: var(--ui-text) !important;
+}
+body[data-domain] .container,
+body[data-domain] main,
+body[data-domain] section { color: var(--ui-text); }
+body[data-domain] .card,
+body[data-domain] .panel,
+body[data-domain] .info:not(.success):not(.warning):not(.error),
+body[data-domain] .consent-panel,
+body[data-domain] .batch-create-panel,
+body[data-domain] .batch-stat,
+body[data-domain] .stage,
+body[data-domain] .qc-row,
+body[data-domain] .culture-catalog-row,
+body[data-domain] .statistics-summary-item,
+body[data-domain] .measurement-card,
+body[data-domain] .observation-card,
+body[data-domain] .environment-card {
+  background: var(--ui-panel) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-line) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.16) !important;
+}
+body[data-domain] .card h2,
+body[data-domain] .card h3,
+body[data-domain] .card h4,
+body[data-domain] h1,
+body[data-domain] h2,
+body[data-domain] h3,
+body[data-domain] h4,
+body[data-domain] legend,
+body[data-domain] label,
+body[data-domain] strong,
+body[data-domain] .qc-label,
+body[data-domain] .stage-name,
+body[data-domain] .batch-stat-value {
+  color: var(--ui-text) !important;
+}
+body[data-domain] p,
+body[data-domain] .muted,
+body[data-domain] small,
+body[data-domain] .hint,
+body[data-domain] .batch-stat-label,
+body[data-domain] .progress-label,
+body[data-domain] .qc-code,
+body[data-domain] .measurement-meta,
+body[data-domain] .statistics-footnote {
+  color: var(--ui-muted) !important;
+}
+body[data-domain] input:not([type=checkbox]):not([type=radio]),
+body[data-domain] select,
+body[data-domain] textarea {
+  color: var(--ui-text) !important;
+  -webkit-text-fill-color: var(--ui-text) !important;
+  background: var(--ui-control) !important;
+  border: 1px solid var(--ui-line) !important;
+  border-radius: 10px;
+}
+body[data-domain] input::placeholder,
+body[data-domain] textarea::placeholder {
+  color: #89998b !important;
+  -webkit-text-fill-color: #89998b !important;
+  opacity: 1;
+}
+body[data-domain] input:disabled,
+body[data-domain] select:disabled,
+body[data-domain] textarea:disabled {
+  background: #202923 !important;
+  color: #87968a !important;
+}
+body[data-domain] table,
+body[data-domain] .statistics-table {
+  background: var(--ui-panel) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-line) !important;
+}
+body[data-domain] th {
+  background: #26332b !important;
+  color: #cbd8cb !important;
+  border-color: var(--ui-line) !important;
+}
+body[data-domain] td {
+  color: var(--ui-soft) !important;
+  border-color: var(--ui-line) !important;
+}
+body[data-domain] tr:nth-child(even) td { background: rgba(255,255,255,.018) !important; }
+body[data-domain] code,
+body[data-domain] pre {
+  background: #101713 !important;
+  color: #d9e5d9 !important;
+  border: 1px solid var(--ui-line);
+}
+body[data-domain] a:not(.section-nav a):not(.toolbar-brand) { color: var(--domain-accent); }
+body[data-domain] .batch-item,
+body[data-domain] .universe-home-link,
+body[data-domain] .overview-observation,
+body[data-domain] .culture-detail-field,
+body[data-domain] .data-flow li,
+body[data-domain] .culture-lineage-node,
+body[data-domain] .stage,
+body[data-domain] .qc-row {
+  background: var(--ui-panel-raised) !important;
+  color: var(--ui-text) !important;
+  border-color: var(--ui-line) !important;
+}
+body[data-domain] .stage.active,
+body[data-domain] .guided-entry-step.is-ready {
+  border-color: var(--domain-accent) !important;
+  background: color-mix(in srgb, var(--domain-accent) 9%, var(--ui-panel)) !important;
+}
+body[data-domain] .app-toolbar {
+  background: rgba(22,30,25,.94) !important;
+  border-color: var(--ui-line) !important;
+}
+body[data-domain] .toolbar-brand,
+body[data-domain] .section-nav a { color: var(--ui-soft) !important; }
+body[data-domain] .toolbar-divider { background: var(--ui-line) !important; }
+body[data-domain] .toolbar-status {
+  background: var(--ui-panel-raised) !important;
+  border-color: var(--ui-line) !important;
+  color: var(--ui-muted) !important;
+}
+body[data-domain] .app-hero { border-color: var(--ui-line) !important; }
+body[data-domain] .card h2::before { background: var(--domain-accent) !important; }
+body[data-domain] .secondary-button,
+body[data-domain] button.secondary-button {
+  background: var(--ui-panel-raised) !important;
+  color: var(--ui-text) !important;
+  border: 1px solid var(--ui-line) !important;
+}
+body[data-domain] .success { background: #1d3327 !important; color: #c5e2c9 !important; border-color: #42664d !important; }
+body[data-domain] .warning { background: #392f1d !important; color: #f0d39a !important; border-color: #76613a !important; }
+body[data-domain] .error { background: #3b2422 !important; color: #f4c4bd !important; border-color: #87504a !important; }
+body[data-domain] hr,
+body[data-domain] .divider { border-color: var(--ui-line) !important; }
+body[data-domain] :focus-visible {
+  outline: 2px solid var(--domain-accent) !important;
+  outline-offset: 3px;
+}
+body[data-domain] .auth-card,
+body[data-domain] #authCard { background: var(--ui-panel) !important; border-color: var(--ui-line) !important; color: var(--ui-text) !important; }
+body[data-domain] .auth-card h2,
+body[data-domain] #authCard h2,
+body[data-domain] #authCard label,
+body[data-domain] #authCard .muted { color: var(--ui-text) !important; }
+body[data-domain="agronomy"] {
+  --ui-bg: #101812;
+  --ui-panel: #19251c;
+  --ui-panel-raised: #223126;
+  --ui-control: #121d15;
+  --ui-line: #3b5140;
+  --ui-text: #e7efe4;
+  --ui-muted: #aebeaa;
+  --ui-soft: #cbd8c8;
+  --domain-accent: #b4f477;
+}
+body[data-domain="mycology"] {
+  --ui-bg: #141210;
+  --ui-panel: #211b17;
+  --ui-panel-raised: #2b211b;
+  --ui-control: #181512;
+  --ui-line: #594538;
+  --ui-text: #eee4dc;
+  --ui-muted: #c0ad9f;
+  --ui-soft: #d8c8bb;
+  --domain-accent: #c98259;
+}
+body[data-domain="laboratory"] {
+  --ui-bg: #111820;
+  --ui-panel: #1a2530;
+  --ui-panel-raised: #243342;
+  --ui-control: #141e27;
+  --ui-line: #3a5063;
+  --ui-text: #e5edf4;
+  --ui-muted: #aebdca;
+  --ui-soft: #cbd9e5;
+  --domain-accent: #78b8e8;
+}
+@media (max-width: 700px) {
+  body[data-domain] .card { padding: 18px 15px !important; }
+  body[data-domain] .grid,
+  body[data-domain] .batch-grid,
+  body[data-domain] .batch-actions,
+  body[data-domain] .auth-actions { gap: 12px; }
+  body[data-domain] .app-toolbar { gap: 9px; padding: 10px; }
+}
