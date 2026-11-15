@@ -8131,7 +8131,64 @@ function renderBiologicalContextAssessment(article, result) {
   const observed = coverage.observed_window;
   if (observed?.start && observed?.end) addLine(article, "Fenêtre observée : " + observed.start + " → " + observed.end);
   addList(article, "Contexte manquant ou non résolu", coverage.missing_context, item => item, 12);
-  addList(article, "Faits observés et sources", value.observed_facts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (item.event_id ? " · événement : " + item.event_id : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 12);
+  const biologicalFacts = Array.isArray(value.observed_facts) ? value.observed_facts : [];
+  if (biologicalFacts.length) {
+    const factTimeline = document.createElement("section");
+    factTimeline.className = "engine-biological-fact-timeline";
+    factTimeline.setAttribute("aria-label", "Chronologie des faits biologiques");
+    const timelineHeading = document.createElement("strong");
+    timelineHeading.textContent = "Chronologie biologique · " + biologicalFacts.length;
+    factTimeline.appendChild(timelineHeading);
+    const eventFactIds = new Set(biologicalFacts
+      .filter(fact => String(fact.fact_code || "").startsWith("event.") && fact.event_id)
+      .map(fact => String(fact.event_id)));
+    const factList = document.createElement("ol");
+    const visibleFacts = biologicalFacts.slice(0, 40);
+    for (const fact of visibleFacts) {
+      const item = document.createElement("li");
+      item.className = "engine-biological-fact-entry";
+      const sourceIds = Array.isArray(fact.source_record_ids) ? fact.source_record_ids : [];
+      const primarySourceId = sourceIds.find(id => typeof id === "string" && id);
+      if (primarySourceId) item.id = "bie-record-" + primarySourceId.replace(/[^a-zA-Z0-9_-]/g, "-");
+      const timestamp = document.createElement("time");
+      timestamp.dateTime = String(fact.observed_at || "");
+      timestamp.textContent = fact.observed_at
+        ? new Date(fact.observed_at).toLocaleString()
+        : "Date inconnue";
+      const content = document.createElement("div");
+      const label = document.createElement("strong");
+      const code = String(fact.fact_code || "biological_fact");
+      label.textContent = code.startsWith("event.")
+        ? "Événement · " + code.slice(6).replaceAll("_", " ")
+        : code.startsWith("observation.")
+          ? "Observation · " + code.slice(12).replaceAll("_", " ")
+          : code.replaceAll(".", " · ").replaceAll("_", " ");
+      const statement = document.createElement("p");
+      statement.textContent = String(fact.statement || "Fait sans description");
+      content.append(label, statement);
+      if (fact.event_id && eventFactIds.has(String(fact.event_id)) && !code.startsWith("event.")) {
+        const eventLink = document.createElement("a");
+        eventLink.className = "engine-biological-fact-event-link";
+        eventLink.href = "#bie-record-" + String(fact.event_id).replace(/[^a-zA-Z0-9_-]/g, "-");
+        eventLink.textContent = "Voir l’événement associé";
+        content.appendChild(eventLink);
+      }
+      if (sourceIds.length) {
+        const sources = document.createElement("small");
+        sources.className = "muted";
+        sources.textContent = "Source(s) : " + sourceIds.join(", ");
+        content.appendChild(sources);
+      }
+      item.append(timestamp, content);
+      factList.appendChild(item);
+    }
+    factTimeline.appendChild(factList);
+    if (biologicalFacts.length > visibleFacts.length) {
+      addLine(factTimeline, (biologicalFacts.length - visibleFacts.length) + " faits supplémentaires non affichés dans cette chronologie.");
+    }
+    article.appendChild(factTimeline);
+  }
+  addList(article, "Faits observés et sources", biologicalFacts, item => String(item.statement || item.fact_code || "Fait") + (item.observed_at ? " · " + item.observed_at : "") + (item.event_id ? " · événement : " + item.event_id : "") + (Array.isArray(item.source_record_ids) ? " · sources : " + item.source_record_ids.join(", ") : ""), 12);
   const temporalFeatures = Array.isArray(value.derived_features) ? value.derived_features.filter(item =>
     item && typeof item.feature_code === "string" &&
     (item.feature_code.endsWith(".range") ||
