@@ -8142,6 +8142,13 @@ function renderBiologicalContextAssessment(article, result) {
     const eventFactIds = new Set(biologicalFacts
       .filter(fact => String(fact.fact_code || "").startsWith("event.") && fact.event_id)
       .map(fact => String(fact.event_id)));
+    const observationsByEvent = new Map();
+    for (const fact of biologicalFacts) {
+      const factCode = String(fact.fact_code || "");
+      if (!factCode.startsWith("observation.") || !fact.event_id) continue;
+      if (!observationsByEvent.has(String(fact.event_id))) observationsByEvent.set(String(fact.event_id), []);
+      observationsByEvent.get(String(fact.event_id)).push(fact);
+    }
     const factList = document.createElement("ol");
     const visibleFacts = biologicalFacts.slice(0, 40);
     for (const fact of visibleFacts) {
@@ -8172,6 +8179,28 @@ function renderBiologicalContextAssessment(article, result) {
         eventLink.href = "#bie-record-" + String(fact.event_id).replace(/[^a-zA-Z0-9_-]/g, "-");
         eventLink.textContent = "Voir l’événement associé";
         content.appendChild(eventLink);
+      }
+      if (code.startsWith("event.") && fact.event_id) {
+        const linkedObservations = observationsByEvent.get(String(fact.event_id)) || [];
+        if (linkedObservations.length) {
+          const related = document.createElement("div");
+          related.className = "engine-biological-fact-related-observations";
+          const relatedLabel = document.createElement("small");
+          relatedLabel.textContent = "Observations liées : ";
+          related.appendChild(relatedLabel);
+          linkedObservations.forEach((observation, index) => {
+            const observationSource = Array.isArray(observation.source_record_ids)
+              ? observation.source_record_ids.find(id => typeof id === "string" && id)
+              : null;
+            if (!observationSource) return;
+            if (index > 0) related.appendChild(document.createTextNode(" · "));
+            const observationLink = document.createElement("a");
+            observationLink.href = "#bie-record-" + observationSource.replace(/[^a-zA-Z0-9_-]/g, "-");
+            observationLink.textContent = String(observation.statement || observation.fact_code || "Observation").slice(0, 90);
+            related.appendChild(observationLink);
+          });
+          content.appendChild(related);
+        }
       }
       if (sourceIds.length) {
         const sources = document.createElement("small");
