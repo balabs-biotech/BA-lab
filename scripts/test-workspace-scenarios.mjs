@@ -790,3 +790,20 @@ for (const domain of ["agronomy", "mycology", "laboratory"]) {
     domain + " brand mark must harmonize with its workspace palette");
 }
 console.log("✓ Shared navigation chrome follows all three workspace visual identities");
+
+
+// Form controls must inherit the active scientific workspace palette, including
+// validation and disabled states rather than retaining the generic green defaults.
+const formThemeCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
+for (const domain of ["agronomy", "mycology", "laboratory"]) {
+  const selector = new RegExp('body\\[data-domain="' + domain + '"\\] :is\\(input, select, textarea\\)');
+  assert.match(formThemeCss, selector,
+    domain + " form controls must use the workspace surface and text palette");
+  assert.match(formThemeCss, new RegExp('body\\[data-domain="' + domain + '"\\] :is\\(input\\[type="checkbox"\\], input\\[type="radio"\\]\\)'),
+    domain + " checkbox and radio controls must use the workspace accent");
+}
+assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\)\\[aria-invalid="true"\\]/,
+  "invalid form controls must expose a consistent semantic error state");
+assert.match(formThemeCss, /body\\[data-domain\\] :is\\(input, select, textarea\\):disabled/,
+  "disabled form controls must remain visibly distinct in every workspace");
+console.log("✓ Form controls: domain surfaces, accent controls, validation and disabled states");
