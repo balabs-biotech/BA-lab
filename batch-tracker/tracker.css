@@ -12277,3 +12277,117 @@ body[data-domain] #measurementCard .measurement-stamp {
   #trackerCard .culture-catalog-action { transition:none !important; animation:none !important; }
   #trackerCard .culture-catalog-row:hover { transform:none !important; }
 }
+
+
+/* Pass 60 — production workbench, batch selection and operational journal */
+#batchCard > .batch-create-panel {
+  position:relative; isolation:isolate; overflow:hidden;
+  margin:1.15rem 0 1.35rem; padding:clamp(1rem,2.2vw,1.45rem);
+  border:1px solid var(--border-strong,var(--border)); border-radius:16px;
+  background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--brand,var(--accent,#8ab49a)) 11%,transparent),transparent 52%),linear-gradient(145deg,rgba(255,255,255,.035),transparent 58%),var(--surface-2);
+}
+#batchCard > .batch-create-panel::before {
+  content:""; position:absolute; z-index:-1; inset:0 auto 0 0; width:3px;
+  background:linear-gradient(180deg,var(--brand,var(--accent,#8ab49a)),transparent 82%);
+}
+#batchCard .batch-create-heading {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;
+  margin-bottom:1.1rem; padding-bottom:.9rem; border-bottom:1px solid var(--border);
+}
+#batchCard .batch-create-heading h3 { margin:.25rem 0 .35rem; font-size:1.08rem; letter-spacing:-.025em; }
+#batchCard .batch-create-heading p { max-width:58ch; margin:0; font-size:.72rem; line-height:1.55; }
+#batchCard .batch-required-note {
+  flex:0 0 auto; padding:.4rem .6rem; border:1px solid var(--border); border-radius:8px;
+  background:var(--surface); color:var(--muted); font-size:.62rem; font-weight:700;
+}
+#batchCard .batch-required-note > span { color:var(--brand,var(--accent,#8ab49a)); }
+#batchCard .batch-create-panel > .grid { gap:.85rem 1rem; margin:.8rem 0; }
+#batchCard .batch-create-panel label,
+#batchCard #batchEvents .batch-harvest-entry label {
+  display:block; margin:.2rem 0 .4rem; color:var(--text); font-size:.72rem; font-weight:700;
+}
+#batchCard .batch-create-panel input,
+#batchCard .batch-create-panel select,
+#batchCard #batchEvents .batch-harvest-entry input,
+#batchCard #batchEvents .batch-harvest-entry select,
+#batchCard #batchEvents .batch-harvest-entry textarea {
+  box-sizing:border-box; width:100%; min-width:0; min-height:42px; padding:.65rem .75rem;
+  border:1px solid var(--border); border-radius:9px; background:var(--surface); color:var(--text);
+  font:inherit; font-size:.75rem; transition:border-color .18s ease,box-shadow .18s ease;
+}
+#batchCard .batch-create-panel input:focus-visible,
+#batchCard .batch-create-panel select:focus-visible,
+#batchCard #batchEvents .batch-harvest-entry input:focus-visible,
+#batchCard #batchEvents .batch-harvest-entry select:focus-visible,
+#batchCard #batchEvents .batch-harvest-entry textarea:focus-visible {
+  outline:0; border-color:var(--brand,var(--accent,#8ab49a));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--brand,var(--accent,#8ab49a)) 17%,transparent);
+}
+#batchCard .batch-create-panel .hint { display:block; margin:.38rem 0 0; color:var(--muted); font-size:.63rem; line-height:1.45; }
+#batchCard #createBatchButton { width:100%; min-height:45px; margin:.5rem 0 0; border-radius:10px; font-weight:800; }
+#batchCard > h3 { margin:1.45rem 0 .7rem; font-size:.95rem; letter-spacing:-.015em; }
+#batchCard #batchList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+#batchCard #batchList .batch-item {
+  position:relative; display:block; width:100%; min-width:0; padding:.85rem .9rem;
+  overflow:hidden; border:1px solid var(--border); border-radius:11px;
+  background:var(--surface-2); color:var(--text); text-align:left; line-height:1.5;
+  transition:border-color .18s ease,background .18s ease,transform .18s ease;
+}
+#batchCard #batchList .batch-item::before {
+  content:""; position:absolute; inset:0 auto 0 0; width:2px;
+  background:var(--brand,var(--accent,#8ab49a)); opacity:.65;
+}
+#batchCard #batchList .batch-item strong { display:block; margin-bottom:.25rem; font-size:.78rem; overflow-wrap:anywhere; }
+#batchCard #batchList .batch-item .muted { display:block; font-size:.66rem; line-height:1.5; overflow-wrap:anywhere; }
+#batchCard #batchList .batch-item:hover,
+#batchCard #batchList .batch-item:focus-visible {
+  border-color:var(--brand,var(--accent,#8ab49a)); background:var(--surface);
+}
+#batchCard #batchList .batch-item:hover { transform:translateY(-1px); }
+#batchCard #batchList .batch-item:focus-visible { outline:2px solid var(--brand,var(--accent,#8ab49a)); outline-offset:2px; }
+#batchCard #batchInfo { margin:1rem 0; }
+#batchCard #batchStages,
+#batchCard #batchQc { margin:1rem 0; padding:clamp(.9rem,2vw,1.2rem); border:1px solid var(--border); border-radius:14px; background:var(--surface-2); }
+#batchCard #batchStages > h3,
+#batchCard #batchQc > h3 { margin:.1rem 0 .9rem; font-size:.95rem; }
+#batchCard #batchEvents {
+  margin:1rem 0 0; padding:clamp(.9rem,2vw,1.25rem);
+  border:1px solid var(--border); border-radius:15px;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),transparent 55%),var(--surface-2);
+}
+#batchCard #batchEvents > h3 { margin:.35rem 0 .45rem; font-size:1rem; }
+#batchCard #batchEvents > .muted { max-width:72ch; font-size:.69rem; line-height:1.55; }
+#batchCard #batchEvents .batch-harvest-entry {
+  margin:1rem 0; padding:1rem; border:1px solid var(--border); border-radius:12px;
+  background:var(--surface);
+}
+#batchCard #batchEvents .batch-harvest-entry h4 { margin:0 0 .35rem; font-size:.82rem; }
+#batchCard #batchEvents .batch-harvest-entry > .muted { margin:.2rem 0 .85rem; font-size:.67rem; line-height:1.5; }
+#batchCard #batchEvents .batch-harvest-entry .grid { gap:.75rem; margin:.75rem 0; }
+#batchCard #batchEvents .batch-harvest-entry textarea { min-height:76px; resize:vertical; }
+#batchCard #batchEvents #recordHarvestButton,
+#batchCard #batchEvents #moveBatchButton { min-height:40px; margin-top:.75rem; border-radius:9px; font-size:.72rem; font-weight:750; }
+#batchCard #batchEvents #harvestStatus,
+#batchCard #batchEvents #moveBatchStatus {
+  margin:.65rem 0 0; padding:.55rem .7rem; border-left:2px solid var(--brand,var(--accent,#8ab49a));
+  background:var(--surface-2); font-size:.66rem; line-height:1.5;
+}
+#batchCard #batchEventList { margin-top:1rem; }
+@media (max-width:760px) {
+  #batchCard #batchList { grid-template-columns:minmax(0,1fr); }
+}
+@media (max-width:560px) {
+  #batchCard .batch-create-heading { flex-direction:column; }
+  #batchCard .batch-required-note { align-self:flex-start; }
+  #batchCard .batch-create-panel > .grid,
+  #batchCard #batchEvents .batch-harvest-entry .grid { grid-template-columns:minmax(0,1fr); }
+}
+@media (prefers-reduced-motion:reduce) {
+  #batchCard #batchList .batch-item,
+  #batchCard .batch-create-panel input,
+  #batchCard .batch-create-panel select,
+  #batchCard #batchEvents .batch-harvest-entry input,
+  #batchCard #batchEvents .batch-harvest-entry select,
+  #batchCard #batchEvents .batch-harvest-entry textarea { transition:none !important; }
+  #batchCard #batchList .batch-item:hover { transform:none !important; }
+}
