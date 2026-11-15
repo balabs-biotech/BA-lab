@@ -2786,3 +2786,254 @@ body[data-domain] :is(button, input, select, textarea, a, [tabindex]):focus-visi
   outline: 3px solid var(--focus) !important;
   outline-offset: 3px;
 }
+
+
+/* ============================================================
+   CULTUREOPS — interface refinement / 2026-11-15
+   Presentation-only layer. Keeps workspace-specific palettes
+   and all existing application behavior intact.
+   ============================================================ */
+:root {
+  --ui-radius-lg: 20px;
+  --ui-radius-md: 14px;
+  --ui-shadow-soft: 0 12px 32px rgba(10, 20, 14, .08);
+  --ui-shadow-card: 0 5px 18px rgba(10, 20, 14, .055);
+}
+body[data-domain] {
+  min-width: 320px;
+  font-feature-settings: "tnum" 1;
+}
+body[data-domain] .app-toolbar {
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  min-width: 0;
+  gap: 16px;
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--ui-shadow-soft);
+  backdrop-filter: blur(18px) saturate(1.15);
+}
+body[data-domain] .toolbar-brand { flex: 0 0 auto; }
+body[data-domain] .section-nav {
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+body[data-domain] .section-nav a {
+  min-height: 40px;
+  border-radius: 10px;
+  white-space: nowrap;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+body[data-domain] .toolbar-status {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  letter-spacing: .09em;
+}
+body[data-domain] .universe-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin: 0 0 14px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+body[data-domain] .universe-home-link:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+body[data-domain] .app-hero {
+  isolation: isolate;
+  box-shadow: var(--ui-shadow-soft);
+}
+body[data-domain] .card {
+  min-width: 0;
+  scroll-margin-top: 112px;
+  box-shadow: var(--ui-shadow-card);
+}
+body[data-domain] .card > .section-kicker,
+body[data-domain] .section-kicker {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+body[data-domain] .card h2 {
+  line-height: 1.2;
+  text-wrap: balance;
+}
+body[data-domain] .card h3 {
+  line-height: 1.3;
+  text-wrap: balance;
+}
+body[data-domain] .muted,
+body[data-domain] .hint {
+  line-height: 1.6;
+}
+body[data-domain] :is(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+body[data-domain] textarea {
+  resize: vertical;
+  min-height: 104px;
+}
+body[data-domain] .grid,
+body[data-domain] .batch-grid,
+body[data-domain] .batch-actions,
+body[data-domain] .auth-actions {
+  min-width: 0;
+}
+body[data-domain] :is(.batch-item, .overview-shortcut, .quick-capture-tile) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(.table-wrap, .statistics-table-wrap, .environmental-details) {
+  border: 1px solid var(--border);
+  border-radius: var(--ui-radius-md);
+  background: var(--surface);
+}
+body[data-domain] :is(table, .statistics-table) {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+body[data-domain] :is(th, td) {
+  line-height: 1.5;
+}
+body[data-domain] :is(.info, .consent-panel, .assisted-entry-panel) {
+  border-radius: var(--ui-radius-md);
+}
+body[data-domain] .progress-track {
+  border: 1px solid var(--border);
+}
+body[data-domain] .stage {
+  min-width: 0;
+  gap: 12px;
+}
+body[data-domain] .stage-name {
+  overflow-wrap: anywhere;
+}
+body[data-domain] .stage-status {
+  letter-spacing: .045em;
+}
+body[data-domain] #message .card {
+  box-shadow: var(--ui-shadow-card);
+}
+body[data-domain] button:focus-visible,
+body[data-domain] a:focus-visible {
+  scroll-margin-block: 120px;
+}
+body[data-domain] ::selection {
+  background: color-mix(in srgb, var(--brand) 28%, transparent);
+  color: var(--text);
+}
+
+/* Workspace identity remains explicit and consistent. */
+body[data-domain="agronomy"] .app-toolbar {
+  border-top: 3px solid #8fbf78;
+}
+body[data-domain="mycology"] .app-toolbar {
+  border-top: 3px solid #b96b3e;
+}
+body[data-domain="laboratory"] .app-toolbar {
+  border-top: 3px solid #4e8bbd;
+}
+
+/* Medium screens: allow navigation to scroll instead of squeezing content. */
+@media (max-width: 980px) {
+  body[data-domain] .app-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px 16px;
+    padding: 12px 14px;
+  }
+  body[data-domain] .toolbar-divider { display: none; }
+  body[data-domain] .section-nav {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 1px 7px;
+    -webkit-overflow-scrolling: touch;
+  }
+  body[data-domain] .toolbar-status {
+    justify-self: end;
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+@media (max-width: 640px) {
+  body[data-domain] { padding-inline: 10px; }
+  body[data-domain] .app-toolbar {
+    position: sticky;
+    top: 5px;
+    border-radius: 14px;
+    gap: 7px 10px;
+    margin-bottom: 14px;
+  }
+  body[data-domain] .toolbar-brand { min-width: 0; }
+  body[data-domain] .brand-symbol { width: 34px; height: 34px; }
+  body[data-domain] .brand-wordmark strong { font-size: 12px; }
+  body[data-domain] .brand-wordmark small { font-size: 8px; }
+  body[data-domain] .toolbar-status {
+    font-size: 8px;
+    letter-spacing: .04em;
+  }
+  body[data-domain] .section-nav a {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+  body[data-domain] .section-nav .nav-number { display: none; }
+  body[data-domain] .card {
+    margin-bottom: 12px;
+    padding: 16px;
+    border-radius: 15px;
+    scroll-margin-top: 150px;
+  }
+  body[data-domain] .app-hero {
+    margin-bottom: 18px;
+    border-radius: 18px;
+  }
+  body[data-domain] .app-hero h1 {
+    font-size: clamp(30px, 8.5vw, 42px);
+    overflow-wrap: anywhere;
+  }
+  body[data-domain] .hero-tags { gap: 6px; }
+  body[data-domain] .hero-tags span { max-width: 100%; }
+  body[data-domain] .batch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body[data-domain] .batch-actions { grid-template-columns: 1fr; }
+  body[data-domain] .batch-actions button { width: 100%; }
+  body[data-domain] .stage {
+    grid-template-columns: 28px minmax(0, 1fr);
+    padding: 11px;
+  }
+  body[data-domain] .stage-status { grid-column: 2; }
+  body[data-domain] .sync-line { align-items: stretch; }
+  body[data-domain] .sync-line > * { min-width: 0; }
+}
+@media (max-width: 380px) {
+  body[data-domain] .toolbar-status { display: none; }
+  body[data-domain] .app-toolbar { grid-template-columns: minmax(0, 1fr); }
+  body[data-domain] .section-nav { grid-column: 1; }
+  body[data-domain] .batch-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] *,
+  body[data-domain] *::before,
+  body[data-domain] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
