@@ -14570,3 +14570,270 @@ body[data-domain] .card :is(button,input,select,textarea,summary,a):focus-visibl
   body[data-domain] .card .statistics-summary { gap: 7px; }
   body[data-domain] .card .statistics-summary-item { padding: 10px; }
 }
+
+
+/* ============================================================
+   BA LABS BRAND ALIGNMENT — PASS 72
+   Correctly map the live ecosystem site's graphite / forest /
+   copper / mineral system into the three CultureOps workspaces.
+   Replaces the temporary light editorial overrides from pass 71.
+   ============================================================ */
+body[data-domain] {
+  --ui-ink: #D1D0C5;
+  --ui-muted: #9BAEA4;
+  --ui-paper: #111B1D;
+  --ui-panel: #263B38;
+  --ui-panel-soft: #202F2D;
+  --ui-line: #40534D;
+  --ui-shadow: 0 12px 28px rgba(0,0,0,.18);
+  --balabs-graphite: #111B1D;
+  --balabs-forest: #263B38;
+  --balabs-copper: #B96B4D;
+  --balabs-mineral: #D1D0C5;
+  --balabs-paper: #F2F1E9;
+  --balabs-muted: #9BAEA4;
+  --balabs-line: #40534D;
+  color: var(--workspace-text);
+  background: var(--workspace-bg);
+}
+body[data-domain="agronomy"] {
+  --ui-accent: #91bd78;
+  --ui-accent-strong: #b4f477;
+  --ui-accent-soft: #263b38;
+  --ui-accent-line: #526b50;
+}
+body[data-domain="mycology"] {
+  --ui-accent: #B96B4D;
+  --ui-accent-strong: #D18A69;
+  --ui-accent-soft: #382820;
+  --ui-accent-line: #76513f;
+}
+body[data-domain="laboratory"] {
+  --ui-accent: #78b8e8;
+  --ui-accent-strong: #9bcbed;
+  --ui-accent-soft: #203443;
+  --ui-accent-line: #46657b;
+}
+body[data-domain] .app-toolbar {
+  border: 1px solid var(--balabs-line);
+  background: rgba(17,27,29,.94);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  color: var(--balabs-mineral);
+}
+body[data-domain] .toolbar-brand,
+body[data-domain] .brand-wordmark strong { color: var(--balabs-paper); }
+body[data-domain] .brand-symbol {
+  color: var(--balabs-copper);
+  background: var(--balabs-forest);
+  border-color: var(--balabs-line);
+}
+body[data-domain] .brand-wordmark small,
+body[data-domain] .toolbar-status { color: var(--balabs-muted); }
+body[data-domain] .section-nav a {
+  color: var(--balabs-mineral);
+  border-color: transparent;
+  background: transparent;
+}
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a[aria-current="page"] {
+  color: var(--balabs-paper);
+  border-color: var(--balabs-line);
+  background: var(--balabs-forest);
+}
+body[data-domain] .nav-number { color: var(--ui-accent); }
+body[data-domain] .universe-home-link { color: var(--balabs-copper); }
+body[data-domain] .app-hero {
+  border-color: var(--balabs-line);
+  background:
+    radial-gradient(circle at 86% 18%, color-mix(in srgb,var(--ui-accent) 19%,transparent), transparent 18rem),
+    linear-gradient(125deg,#111B1D 0%,#1b2b29 65%,#263B38 100%);
+}
+body[data-domain] .hero-copy h1 { color: var(--balabs-paper); }
+body[data-domain] .hero-copy h1 span { color: var(--balabs-copper); }
+body[data-domain] .hero-description { color: var(--balabs-mineral); }
+body[data-domain] .hero-tags span {
+  color: var(--balabs-mineral);
+  border-color: var(--balabs-line);
+  background: rgba(38,59,56,.55);
+}
+body[data-domain] .card {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel);
+  box-shadow: 0 10px 26px rgba(0,0,0,.14);
+}
+body[data-domain] .card h2,
+body[data-domain] .card h3,
+body[data-domain] .card h4 { color: var(--workspace-text); }
+body[data-domain] .card h2::before { background: var(--workspace-accent); }
+body[data-domain] .section-kicker > span:first-child,
+body[data-domain] .entry-step-mark,
+body[data-domain] .section-kicker-label { color: var(--workspace-accent); }
+body[data-domain] .kicker-line { background: var(--workspace-border); }
+body[data-domain] .card .muted,
+body[data-domain] .card .hint,
+body[data-domain] .card small { color: var(--workspace-muted); }
+body[data-domain] .card label { color: var(--workspace-text); }
+body[data-domain] .card input:not([type=checkbox]):not([type=radio]),
+body[data-domain] .card select,
+body[data-domain] .card textarea {
+  color: var(--workspace-text) !important;
+  border-color: var(--workspace-border) !important;
+  background: var(--workspace-control) !important;
+  caret-color: var(--workspace-accent);
+}
+body[data-domain] .card input::placeholder,
+body[data-domain] .card textarea::placeholder { color: var(--workspace-muted); opacity:.78; }
+body[data-domain] .card input:focus,
+body[data-domain] .card select:focus,
+body[data-domain] .card textarea:focus {
+  border-color: var(--workspace-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--workspace-accent) 18%,transparent);
+}
+body[data-domain] .card button:not(.secondary-button):not(.overview-shortcut):not(.culture-catalog-action) {
+  color: #111B1D;
+  background: var(--workspace-accent);
+  box-shadow: 0 4px 12px color-mix(in srgb,var(--workspace-accent) 18%,transparent);
+}
+body[data-domain] .card button:not(:disabled):not(.secondary-button):hover {
+  filter: brightness(1.08);
+}
+body[data-domain] .card .secondary-button {
+  color: var(--workspace-text);
+  border: 1px solid var(--workspace-border);
+  background: var(--workspace-panel-raised);
+  box-shadow: none;
+}
+body[data-domain] .card .secondary-button:hover:not(:disabled) {
+  color: var(--workspace-text);
+  background: color-mix(in srgb,var(--workspace-panel-raised) 78%,var(--workspace-accent));
+}
+body[data-domain] .info,
+body[data-domain] .overview-shortcuts,
+body[data-domain] .statistics-filters {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .overview-metric,
+body[data-domain] .statistics-summary-item,
+body[data-domain] .culture-detail-field {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .overview-metric strong,
+body[data-domain] .statistics-summary-item strong,
+body[data-domain] .culture-catalog-code { color: var(--workspace-accent); }
+body[data-domain] .overview-meter span,
+body[data-domain] .progress-bar { background: var(--workspace-accent); }
+body[data-domain] .overview-live,
+body[data-domain] .culture-catalog-count,
+body[data-domain] .shortcut-index {
+  color: var(--workspace-accent);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .overview-shortcut {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .overview-shortcut:hover:not(:disabled) {
+  color: var(--workspace-text);
+  border-color: var(--workspace-accent);
+  background: color-mix(in srgb,var(--workspace-panel-raised) 88%,var(--workspace-accent));
+}
+body[data-domain] .culture-catalog,
+body[data-domain] .sync-line { border-color: var(--workspace-border); }
+body[data-domain] .culture-catalog-row,
+body[data-domain] .culture-detail,
+body[data-domain] .culture-detail-field,
+body[data-domain] .culture-timeline-entry,
+body[data-domain] .measurement-entry,
+body[data-domain] .batch-item,
+body[data-domain] .stage,
+body[data-domain] .qc-row {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .culture-catalog-row:hover {
+  border-color: var(--workspace-accent);
+  box-shadow: 0 8px 22px rgba(0,0,0,.2);
+}
+body[data-domain] .culture-catalog-meta span:first-child {
+  color: var(--workspace-accent);
+  background: var(--workspace-control);
+}
+body[data-domain] .culture-catalog-action[data-culture-action=observe] {
+  color: #111B1D;
+  border-color: var(--workspace-accent);
+  background: var(--workspace-accent);
+}
+body[data-domain] .culture-catalog-action[data-culture-action=measure] {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel);
+}
+body[data-domain] .culture-catalog-action[data-culture-action=history] {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: transparent;
+}
+body[data-domain] .stage.active {
+  border-color: var(--workspace-accent);
+  background: color-mix(in srgb,var(--workspace-panel-raised) 86%,var(--workspace-accent));
+  box-shadow: inset 3px 0 var(--workspace-accent);
+}
+body[data-domain] .status-pulse { background: var(--workspace-accent); }
+body[data-domain] :is(.table-wrapper,.statistics-table-wrap) {
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel);
+}
+body[data-domain] :is(.table-wrapper,.statistics-table-wrap) thead th {
+  color: var(--workspace-muted);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] :is(.table-wrapper,.statistics-table-wrap) tbody td {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+}
+body[data-domain] :is(.table-wrapper,.statistics-table-wrap) tbody tr:hover td {
+  background: color-mix(in srgb,var(--workspace-panel-raised) 85%,var(--workspace-accent));
+}
+body[data-domain] .context-panel,
+body[data-domain] .quick-capture-tile {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .quick-capture-tile:hover,
+body[data-domain] .quick-capture-tile:focus-visible {
+  border-color: var(--workspace-accent);
+  background: var(--workspace-panel);
+}
+body[data-domain] :is(.measurement-history,.observation-details) {
+  color: var(--workspace-text);
+}
+body[data-domain] .measurement-history > *,
+body[data-domain] .observation-details > * {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .measurement-history-heading,
+body[data-domain] .context-title { color: var(--workspace-text); }
+body[data-domain] :is(button,a,input,select,textarea):focus-visible {
+  outline-color: var(--workspace-accent);
+}
+@media(max-width:600px) {
+  body[data-domain] .app-toolbar { background: rgba(17,27,29,.97); }
+  body[data-domain] .card { box-shadow: 0 6px 18px rgba(0,0,0,.13); }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] :is(.card,.culture-catalog-row,.overview-shortcut,.quick-capture-tile) {
+    transition:none!important; transform:none!important;
+  }
+}
