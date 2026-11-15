@@ -940,3 +940,10 @@ assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "empty", "Aucun
   "the analytical execution panel must distinguish an empty history");
 assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "error", "Chargement des exécutions analytiques impossible : "'),
   "analytical execution retrieval errors must use the shared error state");
+
+assert.ok(collectionJs.includes('renderCollectionFeedback(engineHistoryPanel, "info"'),
+  "clearing the authenticated workspace must reset analytical history to an informational state");
+assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "warning", "Actualisation des analyses momentanément indisponible.'),
+  "analytical polling failures must remain recoverable warnings");
+assert.ok(collectionJs.includes('panel.removeAttribute("data-feedback-state")') && collectionJs.includes('panel.removeAttribute("aria-busy")'),
+  "successful analytical history rendering must clear its loading state");
