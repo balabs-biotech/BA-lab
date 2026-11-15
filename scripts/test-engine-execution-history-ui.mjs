@@ -23,7 +23,6 @@ for (const label of [
   "observations biologiques",
   "événements : ",
   "événement : ",
-  "event_id",
   "Chronologie biologique",
   "Voir l’événement associé",
   "engine-biological-fact-timeline",
@@ -278,6 +277,11 @@ assert.match(loader, /select\("id,execution_id,engine_id,engine_version,result_t
 assert.match(renderer, /Identifiant du résultat persistant/);
 assert.match(renderer, /Cohérence ledger \/ résultat persisté/);
 assert.match(renderer, /DIVERGENCE : /);
+assert.match(biologicalRenderer, /event_id/);
+assert.match(biologicalRenderer, /Chronologie biologique/);
+assert.match(biologicalRenderer, /Voir l’événement associé/);
+assert.match(biologicalRenderer, /engine-biological-fact-timeline/);
+assert.match(biologicalRenderer, /engine-biological-fact-event-link/);
 console.log("✓ Persisted result identity, durable result ID and ledger parity are exposed in execution history");
 
 for (const contract of [
