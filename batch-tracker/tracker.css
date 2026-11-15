@@ -14307,3 +14307,266 @@ body[data-domain] .universe-home-link:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   body[data-domain] .section-nav a { transition: none; }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR SYSTEM — PASS 72
+   Keep the BA Labs editorial identity without flattening the
+   three dark scientific workspaces into generic white cards.
+   ============================================================ */
+body[data-domain] {
+  --ui-accent: var(--workspace-accent);
+  --ui-accent-strong: var(--workspace-accent);
+  --ui-accent-soft: color-mix(in srgb,var(--workspace-accent) 13%,var(--workspace-panel));
+  --ui-accent-line: color-mix(in srgb,var(--workspace-accent) 38%,var(--workspace-border));
+  --ui-ink: var(--workspace-text);
+  --ui-muted: var(--workspace-muted);
+  --ui-panel: var(--workspace-panel);
+  --ui-panel-soft: var(--workspace-panel-raised);
+  --ui-line: var(--workspace-border);
+  --ui-shadow: 0 10px 26px rgba(0,0,0,.14);
+}
+body[data-domain] .app-toolbar {
+  border-color: var(--workspace-border);
+  background: color-mix(in srgb,var(--workspace-panel) 94%,transparent);
+  box-shadow: 0 5px 18px rgba(0,0,0,.12);
+}
+body[data-domain] .brand-wordmark strong,
+body[data-domain] .toolbar-brand,
+body[data-domain] .toolbar-status { color: var(--workspace-text); }
+body[data-domain] .brand-wordmark small { color: var(--workspace-muted); }
+body[data-domain] .section-nav a { color: var(--workspace-muted); }
+body[data-domain] .section-nav a:hover,
+body[data-domain] .section-nav a[aria-current="page"] {
+  color: var(--workspace-text);
+  background: color-mix(in srgb,var(--workspace-accent) 13%,var(--workspace-panel));
+  border-color: color-mix(in srgb,var(--workspace-accent) 35%,var(--workspace-border));
+}
+body[data-domain] .universe-home-link { color: var(--workspace-accent); }
+body[data-domain] .card {
+  color: var(--workspace-text);
+  background: var(--workspace-panel) !important;
+  border-color: var(--workspace-border);
+  box-shadow: 0 9px 25px rgba(0,0,0,.13);
+}
+body[data-domain] .card h2,
+body[data-domain] .card h3,
+body[data-domain] .card h4,
+body[data-domain] .card legend,
+body[data-domain] .card label {
+  color: var(--workspace-text);
+}
+body[data-domain] .card h3 {
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .muted,
+body[data-domain] .card .hint,
+body[data-domain] .card small,
+body[data-domain] .card .field-hint {
+  color: var(--workspace-muted);
+}
+body[data-domain] .card input:not([type=checkbox]):not([type=radio]),
+body[data-domain] .card select,
+body[data-domain] .card textarea {
+  color: var(--workspace-text) !important;
+  background: var(--workspace-control) !important;
+  border-color: var(--workspace-border) !important;
+  color-scheme: dark;
+}
+body[data-domain] .card input::placeholder,
+body[data-domain] .card textarea::placeholder {
+  color: color-mix(in srgb,var(--workspace-muted) 76%,transparent);
+  opacity: 1;
+}
+body[data-domain] .card input:focus,
+body[data-domain] .card select:focus,
+body[data-domain] .card textarea:focus {
+  border-color: var(--workspace-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--workspace-accent) 19%,transparent);
+}
+body[data-domain] .card input:disabled,
+body[data-domain] .card select:disabled,
+body[data-domain] .card textarea:disabled {
+  color: var(--workspace-muted) !important;
+  background: color-mix(in srgb,var(--workspace-control) 70%,#000) !important;
+}
+body[data-domain] .card button:not(.secondary-button):not(.secondary):not(.overview-shortcut):not(.culture-catalog-action) {
+  color: #101711;
+  background: var(--workspace-accent);
+  border: 1px solid var(--workspace-accent);
+  box-shadow: 0 4px 12px color-mix(in srgb,var(--workspace-accent) 15%,transparent);
+}
+body[data-domain] .card button:not(:disabled):not(.secondary-button):not(.secondary):not(.overview-shortcut):hover {
+  filter: brightness(1.08);
+}
+body[data-domain] .card :is(.secondary-button,.secondary) {
+  color: var(--workspace-text);
+  background: var(--workspace-panel-raised);
+  border: 1px solid var(--workspace-border);
+  box-shadow: none;
+}
+body[data-domain] .card :is(.secondary-button,.secondary):hover:not(:disabled) {
+  border-color: var(--workspace-accent);
+  background: color-mix(in srgb,var(--workspace-accent) 10%,var(--workspace-panel-raised));
+}
+body[data-domain] .card .info,
+body[data-domain] .card .entry-intro,
+body[data-domain] .card .assisted-entry-panel,
+body[data-domain] .card .assisted-entry-help,
+body[data-domain] .card .consent-panel,
+body[data-domain] .card .consent-option,
+body[data-domain] .card .statistics-filters,
+body[data-domain] .card .overview-shortcuts,
+body[data-domain] .card .overview-activity {
+  color: var(--workspace-text);
+  background: var(--workspace-panel-raised);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .overview-metric,
+body[data-domain] .card .statistics-summary-item,
+body[data-domain] .card .culture-detail-field,
+body[data-domain] .card .culture-catalog-row,
+body[data-domain] .card .culture-detail,
+body[data-domain] .card .culture-timeline-entry,
+body[data-domain] .card .measurement-entry,
+body[data-domain] .card .batch-item,
+body[data-domain] .card .stage,
+body[data-domain] .card .qc-row {
+  color: var(--workspace-text);
+  background: var(--workspace-panel-raised);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .overview-metric strong,
+body[data-domain] .card .statistics-summary-item strong,
+body[data-domain] .card .culture-catalog-code,
+body[data-domain] .card .culture-detail-field strong {
+  color: var(--workspace-text);
+}
+body[data-domain] .card .overview-metric-label,
+body[data-domain] .card .overview-metric-note,
+body[data-domain] .card .statistics-footnote {
+  color: var(--workspace-muted);
+}
+body[data-domain] .card .overview-shortcut {
+  color: var(--workspace-text);
+  background: transparent;
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .overview-shortcut:hover:not(:disabled) {
+  color: var(--workspace-text);
+  background: color-mix(in srgb,var(--workspace-accent) 9%,var(--workspace-panel-raised));
+  border-color: var(--workspace-accent);
+}
+body[data-domain] .card .shortcut-index,
+body[data-domain] .card .culture-catalog-count,
+body[data-domain] .card .overview-live {
+  color: var(--workspace-accent);
+  background: color-mix(in srgb,var(--workspace-accent) 12%,var(--workspace-panel));
+  border-color: color-mix(in srgb,var(--workspace-accent) 38%,var(--workspace-border));
+}
+body[data-domain] .card .culture-catalog-meta span:first-child {
+  color: var(--workspace-accent);
+  background: color-mix(in srgb,var(--workspace-accent) 13%,var(--workspace-panel));
+}
+body[data-domain] .card .culture-catalog-action[data-culture-action=observe] {
+  color: #101711;
+  background: var(--workspace-accent);
+  border-color: var(--workspace-accent);
+}
+body[data-domain] .card .culture-catalog-action[data-culture-action=measure] {
+  color: var(--workspace-text);
+  background: color-mix(in srgb,var(--workspace-accent) 12%,var(--workspace-panel));
+  border-color: color-mix(in srgb,var(--workspace-accent) 38%,var(--workspace-border));
+}
+body[data-domain] .card .culture-catalog-action[data-culture-action=history] {
+  color: var(--workspace-text);
+  background: transparent;
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .culture-catalog-row:hover {
+  border-color: var(--workspace-accent);
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+body[data-domain] .card :is(.measurement-history,.culture-detail-timeline,.batch-event-list) > * {
+  color: var(--workspace-text);
+  background: var(--workspace-panel-raised);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card details {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card details > summary {
+  color: var(--workspace-text);
+  text-decoration-color: var(--workspace-accent);
+}
+body[data-domain] .card details > summary::marker {
+  color: var(--workspace-accent);
+}
+body[data-domain] .card .progress-track {
+  background: var(--workspace-control);
+  border: 1px solid var(--workspace-border);
+}
+body[data-domain] .card .progress-bar,
+body[data-domain] .card .overview-meter span {
+  background: var(--workspace-accent);
+}
+body[data-domain] .card .stage.active {
+  color: var(--workspace-text);
+  background: color-mix(in srgb,var(--workspace-accent) 14%,var(--workspace-panel));
+  border-color: var(--workspace-accent);
+}
+body[data-domain] .card :is(.table-wrapper,.statistics-table-wrap) {
+  background: var(--workspace-panel);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card :is(.table-wrapper,.statistics-table-wrap) thead th {
+  color: var(--workspace-muted);
+  background: var(--workspace-panel-raised);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card :is(.table-wrapper,.statistics-table-wrap) tbody td {
+  color: var(--workspace-text);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card :is(.table-wrapper,.statistics-table-wrap) tbody tr:hover td {
+  background: color-mix(in srgb,var(--workspace-accent) 8%,var(--workspace-panel));
+}
+body[data-domain] .card .statistics-chart {
+  background: var(--workspace-panel);
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .statistics-chart :is(text,tspan) {
+  fill: var(--workspace-muted);
+}
+body[data-domain] .card :is(.context-divider,.sync-line) {
+  border-color: var(--workspace-border);
+}
+body[data-domain] .card .context-eyebrow,
+body[data-domain] .card .section-kicker {
+  color: var(--workspace-accent);
+}
+body[data-domain] .card .kicker-line {
+  background: color-mix(in srgb,var(--workspace-accent) 45%,var(--workspace-border));
+}
+body[data-domain] .card :is(.error,.success,.warning) {
+  border-radius: 9px;
+}
+body[data-domain] .card :is(button,input,select,textarea,summary,a):focus-visible {
+  outline-color: var(--workspace-accent);
+}
+@media(max-width:700px) {
+  body[data-domain] .card { padding: 16px; }
+  body[data-domain] .card .grid,
+  body[data-domain] .card .bio-operation-form {
+    grid-template-columns: minmax(0,1fr);
+  }
+  body[data-domain] .card .statistics-summary {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:420px) {
+  body[data-domain] .card { padding: 13px; border-radius: 12px; }
+  body[data-domain] .card .statistics-summary { gap: 7px; }
+  body[data-domain] .card .statistics-summary-item { padding: 10px; }
+}
