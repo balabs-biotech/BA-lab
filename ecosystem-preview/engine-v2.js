@@ -499,7 +499,7 @@ function setupUI() {
   stage.addEventListener('pointercancel',onPointerCancel);
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
-  const rememberTouch=e=>{if(e.touches.length>1){multiTouchGesture=true;dragGesture=true;moved=true;touchFallback=null;return}if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
+  const rememberTouch=e=>{if(e.touches.length>1){multiTouchGesture=true;dragGesture=true;moved=true;touchFallback=null;return}if(e.touches.length===1){multiTouchGesture=false;const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>120)pickAt(p.clientX,p.clientY)};
   // Spatial pointer selection is handled exclusively by the WebGL canvas ray-pick.
   document.addEventListener('touchstart',rememberTouch,{capture:true,passive:true});
@@ -517,7 +517,7 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  if(pointers.size===0){multiTouchGesture=false;dragGesture=false;moved=false}
+  if(pointers.size===0){if(e.pointerType!=='touch'||!multiTouchGesture)multiTouchGesture=false;dragGesture=false;moved=false}
   if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
