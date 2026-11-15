@@ -12,6 +12,7 @@ import { resolveBiologicalContext } from "./biological-context-resolver.ts";
 const MAX_CONTEXTS = 500;
 const MAX_MEASUREMENTS = 1000;
 const MAX_BIOLOGICAL_OBSERVATIONS = 1000;
+const MAX_BIOLOGICAL_EVENTS = 1000;
 const MAX_WEATHER_OBSERVATIONS = 3000;
 
 function requireRows<T>(result: { data: T[] | null; error: unknown }, code: string): T[] {
@@ -44,7 +45,7 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
     throw new Error("culture_tenant_scope_mismatch");
   }
 
-  const [contextResult, measurementResult, observationResult] = await Promise.all([
+  const [contextResult, measurementResult, observationResult, eventResult] = await Promise.all([
     userClient.from("biological_contexts")
       .select("id,organization_id,domain,culture_id,environment_id,organism_kind,taxon_code,strain_code,cultivar_code,culture_stage,substrate_code,production_system,context_tags,valid_from,valid_to")
       .eq("organization_id", organizationId)
@@ -66,10 +67,19 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
       .lt("observed_at", window.end)
       .order("observed_at", { ascending: true })
       .limit(MAX_BIOLOGICAL_OBSERVATIONS + 1),
+    userClient.from("events")
+      .select("id,organization_id,event_type,occurred_at,culture_id,plant_culture_id,material_id,sample_id,experimental_unit_id,location_id,environment_id,payload")
+      .eq("organization_id", organizationId)
+      .eq("culture_id", cultureId)
+      .gte("occurred_at", window.start)
+      .lt("occurred_at", window.end)
+      .order("occurred_at", { ascending: true })
+      .limit(MAX_BIOLOGICAL_EVENTS + 1),
   ]);
   const contexts = requireRows(contextResult, "biological_contexts_unavailable");
   const measurements = requireRows(measurementResult, "culture_measurements_unavailable");
   const observations = requireRows(observationResult, "culture_observations_unavailable");
+  const events = requireRows(eventResult, "culture_events_unavailable");
   if (contexts.length > MAX_CONTEXTS) {
     throw new Error("biological_analysis_context_limit_exceeded");
   }
@@ -78,6 +88,9 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
   }
   if (observations.length > MAX_BIOLOGICAL_OBSERVATIONS) {
     throw new Error("biological_analysis_observation_limit_exceeded");
+  }
+  if (events.length > MAX_BIOLOGICAL_EVENTS) {
+    throw new Error("biological_analysis_event_limit_exceeded");
   }
 
   // Resolve strain codes only inside the caller's organization. The biological
@@ -177,6 +190,7 @@ export async function loadAuthenticatedBiologicalContextSnapshot(input: {
     environments,
     measurements,
     observations,
+    events,
     environmentalObservations,
     strainReferences,
     organisms,
@@ -238,10 +252,19 @@ export async function loadAuthenticatedPlantBiologicalContextSnapshot(input: {
       .lt("observed_at", window.end)
       .order("observed_at", { ascending: true })
       .limit(MAX_BIOLOGICAL_OBSERVATIONS + 1),
+    userClient.from("events")
+      .select("id,organization_id,event_type,occurred_at,culture_id,plant_culture_id,material_id,sample_id,experimental_unit_id,location_id,environment_id,payload")
+      .eq("organization_id", organizationId)
+      .eq("plant_culture_id", plantCultureId)
+      .gte("occurred_at", window.start)
+      .lt("occurred_at", window.end)
+      .order("occurred_at", { ascending: true })
+      .limit(MAX_BIOLOGICAL_EVENTS + 1),
   ]);
   const contexts = requireRows(contextResult, "biological_contexts_unavailable");
   const measurements = requireRows(measurementResult, "plant_culture_measurements_unavailable");
   const observations = requireRows(observationResult, "plant_culture_observations_unavailable");
+  const events = requireRows(eventResult, "plant_culture_events_unavailable");
   if (contexts.some((row: any) =>
     row.organization_id !== organizationId ||
     row.plant_culture_id !== plantCultureId ||
@@ -264,6 +287,13 @@ export async function loadAuthenticatedPlantBiologicalContextSnapshot(input: {
   )) {
     throw new Error("plant_culture_observation_scope_mismatch");
   }
+  if (events.some((row: any) =>
+    row.organization_id !== organizationId ||
+    row.plant_culture_id !== plantCultureId ||
+    row.culture_id !== null
+  )) {
+    throw new Error("plant_culture_event_scope_mismatch");
+  }
   if (contexts.length > MAX_CONTEXTS) {
     throw new Error("biological_analysis_context_limit_exceeded");
   }
@@ -272,6 +302,9 @@ export async function loadAuthenticatedPlantBiologicalContextSnapshot(input: {
   }
   if (observations.length > MAX_BIOLOGICAL_OBSERVATIONS) {
     throw new Error("biological_analysis_observation_limit_exceeded");
+  }
+  if (events.length > MAX_BIOLOGICAL_EVENTS) {
+    throw new Error("biological_analysis_event_limit_exceeded");
   }
 
   const environmentIds = [...new Set([
@@ -347,6 +380,7 @@ export async function loadAuthenticatedPlantBiologicalContextSnapshot(input: {
     environments,
     measurements,
     observations,
+    events,
     environmentalObservations,
     window,
   });
