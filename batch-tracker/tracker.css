@@ -3879,7 +3879,7 @@ body[data-domain] .culture-timeline-date {
 body[data-domain] .culture-linked-batches .culture-timeline-entry {
   grid-template-columns: minmax(0, 1fr) auto;
 }
-body[data-domain] .batch-list .batch-item {
+body[data-domain] #batchList .batch-item {
   display: block;
   min-width: 0;
   padding: 14px 16px;
@@ -3893,20 +3893,20 @@ body[data-domain] .batch-list .batch-item {
   overflow-wrap: anywhere;
   transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
-body[data-domain] .batch-list .batch-item strong {
+body[data-domain] #batchList .batch-item strong {
   display: block;
   margin-bottom: 5px;
   color: var(--text);
   font-size: 14px;
 }
-body[data-domain] .batch-list .batch-item .muted {
+body[data-domain] #batchList .batch-item .muted {
   display: block;
   color: var(--muted);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.6;
 }
-body[data-domain] .batch-list .batch-item:hover {
+body[data-domain] #batchList .batch-item:hover {
   border-color: var(--workspace-accent, var(--brand));
   background: var(--surface-2);
   box-shadow: 0 5px 15px rgba(0,0,0,.07);
@@ -4080,7 +4080,7 @@ html[dir="rtl"] body[data-domain] .measurement-entry .measurement-stamp {
 @media (prefers-reduced-motion: reduce) {
   body[data-domain] .culture-catalog-row,
   body[data-domain] .culture-catalog-action,
-  body[data-domain] .batch-list .batch-item {
+  body[data-domain] #batchList .batch-item {
     transition: none;
   }
 }
@@ -8826,7 +8826,7 @@ body[data-domain] .culture-timeline-entry p {
   color: var(--workspace-muted);
   line-height: 1.6;
 }
-body[data-domain] .batch-list .batch-item {
+body[data-domain] #batchList .batch-item {
   padding: 16px 17px;
   border-color: var(--workspace-border);
   border-inline-start-color: var(--workspace-accent);
@@ -8836,9 +8836,9 @@ body[data-domain] .batch-list .batch-item {
     var(--workspace-panel-raised);
   box-shadow: 0 5px 16px rgba(0,0,0,.12);
 }
-body[data-domain] .batch-list .batch-item + .batch-item { margin-top: 9px; }
-body[data-domain] .batch-list .batch-item strong { font-size: 14px; letter-spacing: -.01em; }
-body[data-domain] .batch-list .batch-item .muted { font-size: 11px; }
+body[data-domain] #batchList .batch-item + .batch-item { margin-top: 9px; }
+body[data-domain] #batchList .batch-item strong { font-size: 14px; letter-spacing: -.01em; }
+body[data-domain] #batchList .batch-item .muted { font-size: 11px; }
 body[data-domain] .qc-row,
 body[data-domain] .stage,
 body[data-domain] .batch-stat {
@@ -8964,7 +8964,7 @@ body[data-domain] :is(.statistics-table-wrap,.table-wrap)::-webkit-scrollbar-thu
 }
 @media (prefers-reduced-motion: reduce) {
   body[data-domain] .culture-catalog-action,
-  body[data-domain] .batch-list .batch-item { transition: none !important; }
+  body[data-domain] #batchList .batch-item { transition: none !important; }
 }
 
 
@@ -10307,10 +10307,12 @@ body[data-domain] .culture-timeline-entry p {
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
-body[data-domain] .batch-list {
+body[data-domain] #batchList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
   gap: 9px;
 }
-body[data-domain] .batch-list .batch-item {
+body[data-domain] #batchList .batch-item {
   display: block;
   min-width: 0;
   padding: 13px 15px;
@@ -10323,22 +10325,22 @@ body[data-domain] .batch-list .batch-item {
   line-height: 1.5;
   transition: border-color .16s ease, background .16s ease, transform .16s ease;
 }
-body[data-domain] .batch-list .batch-item br { display: none; }
-body[data-domain] .batch-list .batch-item strong {
+body[data-domain] #batchList .batch-item br { display: none; }
+body[data-domain] #batchList .batch-item strong {
   display: block;
   margin-bottom: 4px;
   color: var(--workspace-text) !important;
   font-size: 13px;
   letter-spacing: -.01em;
 }
-body[data-domain] .batch-list .batch-item .muted {
+body[data-domain] #batchList .batch-item .muted {
   display: block;
   color: var(--workspace-muted) !important;
   font-size: 10px;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-body[data-domain] .batch-list .batch-item:hover:not(:disabled) {
+body[data-domain] #batchList .batch-item:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--workspace-accent) 55%, var(--workspace-border)) !important;
   background: color-mix(in srgb, var(--workspace-accent) 7%, var(--workspace-panel-raised)) !important;
   transform: translateY(-1px);
@@ -10404,5 +10406,270 @@ body[data-domain] .qc-code {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  body[data-domain] .batch-list .batch-item { transition: none !important; }
+  body[data-domain] #batchList .batch-item { transition: none !important; }
+}
+
+
+/* ============================================================
+   PASS 51 — TARGETED LOT & HISTORY COMPONENTS
+   ============================================================ */
+body[data-domain] #batchInfo {
+  display: block;
+  padding: clamp(15px, 2vw, 22px);
+  border: 1px solid color-mix(in srgb, var(--workspace-accent) 26%, var(--workspace-border));
+  border-radius: 14px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--workspace-accent) 7%, var(--workspace-panel)), var(--workspace-panel));
+}
+body[data-domain] #batchInfo > strong {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--workspace-text);
+  font-size: 16px;
+  letter-spacing: .015em;
+}
+body[data-domain] #batchInfo .batch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 9px;
+}
+body[data-domain] #batchInfo .batch-stat {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--workspace-panel-raised) 88%, transparent);
+}
+body[data-domain] #batchInfo .batch-stat-label {
+  margin-bottom: 5px;
+  color: var(--workspace-muted);
+  font-size: 10px;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+body[data-domain] #batchInfo .batch-stat-value {
+  color: var(--workspace-text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #batchStageList {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+}
+body[data-domain] #batchStageList .stage {
+  display: grid;
+  grid-template-columns: 34px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 11px;
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] #batchStageList .stage.active {
+  border-color: color-mix(in srgb, var(--workspace-accent) 58%, var(--workspace-border));
+  background: color-mix(in srgb, var(--workspace-accent) 8%, var(--workspace-panel-raised));
+}
+body[data-domain] #batchStageList .stage.completed {
+  border-inline-start: 3px solid color-mix(in srgb, var(--workspace-accent) 78%, #65b98b);
+}
+body[data-domain] #batchStageList .stage.failed {
+  border-inline-start: 3px solid #d66c64;
+}
+body[data-domain] #batchStageList .stage-number {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 9px;
+  background: var(--workspace-panel);
+  color: var(--workspace-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+body[data-domain] #batchStageList .stage-name {
+  color: var(--workspace-text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+body[data-domain] #batchStageList .stage-status {
+  padding: 5px 8px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 999px;
+  font-size: 9px;
+  letter-spacing: .045em;
+  white-space: nowrap;
+}
+body[data-domain] #batchQcList {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+}
+body[data-domain] #batchQcList .qc-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(115px, auto) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 13px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] #batchQcList .qc-row select {
+  min-width: 115px;
+  min-height: 36px;
+  padding: 6px 9px;
+  font-size: 11px;
+}
+body[data-domain] #batchEventList {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+body[data-domain] #batchEventList .batch-event-item {
+  position: relative;
+  min-width: 0;
+  padding: 13px 15px 13px 18px;
+  border: 1px solid var(--workspace-border);
+  border-inline-start: 3px solid color-mix(in srgb, var(--workspace-accent) 70%, var(--workspace-border));
+  border-radius: 10px;
+  background: var(--workspace-panel-raised);
+  color: var(--workspace-text);
+}
+body[data-domain] #batchEventList .batch-event-item > strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+body[data-domain] #batchEventList .batch-event-item > div {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .culture-detail-timeline {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+body[data-domain] .culture-detail-timeline .culture-timeline-entry {
+  grid-template-columns: auto minmax(0,1fr);
+  align-items: start;
+}
+body[data-domain] .culture-detail-timeline .culture-timeline-date {
+  padding: 5px 8px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 8px;
+  color: var(--workspace-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+body[data-domain] .measurement-entry {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 8px 14px;
+  padding: 13px 14px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 10px;
+  background: var(--workspace-panel-raised);
+}
+body[data-domain] .measurement-entry > div:first-child { min-width: 0; }
+body[data-domain] .measurement-entry strong {
+  color: var(--workspace-text);
+  font-size: 12px;
+}
+body[data-domain] .measurement-meta,
+body[data-domain] .measurement-stamp {
+  color: var(--workspace-muted);
+  font-size: 10px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-value {
+  color: var(--workspace-text);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+body[data-domain] .measurement-stamp {
+  grid-column: 1 / -1;
+  padding-top: 7px;
+  border-top: 1px solid var(--workspace-border);
+}
+body[data-domain] .statistics-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid var(--workspace-border);
+  border-radius: 11px;
+  background: var(--workspace-panel);
+  scrollbar-width: thin;
+}
+body[data-domain] .statistics-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--workspace-text);
+  font-size: 11px;
+}
+body[data-domain] .statistics-table caption {
+  padding: 12px 14px;
+  color: var(--workspace-muted);
+  text-align: left;
+}
+body[data-domain] .statistics-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--workspace-border);
+  background: var(--workspace-panel-raised);
+  color: var(--workspace-muted);
+  font-size: 10px;
+  font-weight: 650;
+  text-align: left;
+  white-space: nowrap;
+}
+body[data-domain] .statistics-table td {
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--workspace-border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+body[data-domain] .statistics-table tbody tr:last-child td { border-bottom: 0; }
+@media (max-width: 600px) {
+  body[data-domain] #batchStageList .stage {
+    grid-template-columns: 30px minmax(0,1fr);
+  }
+  body[data-domain] #batchStageList .stage-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+  body[data-domain] #batchQcList .qc-row {
+    grid-template-columns: minmax(0,1fr) auto;
+  }
+  body[data-domain] #batchQcList .qc-row > div:first-child {
+    grid-column: 1 / -1;
+  }
+  body[data-domain] #batchQcList .qc-row select {
+    width: 100%;
+    min-width: 0;
+  }
+  body[data-domain] .culture-detail-timeline .culture-timeline-entry {
+    grid-template-columns: minmax(0,1fr);
+  }
+  body[data-domain] .culture-detail-timeline .culture-timeline-date {
+    justify-self: start;
+  }
+  body[data-domain] .measurement-entry {
+    grid-template-columns: minmax(0,1fr);
+  }
+  body[data-domain] .measurement-value { text-align: start; }
 }
