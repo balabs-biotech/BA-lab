@@ -7466,3 +7466,118 @@ body[data-domain] :is(.card, .batch-item, .info, .stage, .qc-row) {
     width: calc(100% - 258px);
   }
 }
+
+/* ============================================================
+   CULTUREOPS — passe 25
+   Dashboard: hiérarchie des indicateurs et responsive
+   ============================================================ */
+body[data-domain] #overviewCard {
+  padding: clamp(16px, 2vw, 26px);
+}
+body[data-domain] #overviewCard .overview-heading {
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid color-mix(in srgb, var(--workspace-accent, var(--brand)) 22%, var(--border));
+}
+body[data-domain] #overviewCard .overview-heading > div {
+  min-width: 0;
+}
+body[data-domain] #overviewCard .overview-heading p {
+  max-width: 720px;
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+body[data-domain] #overviewCard .overview-live {
+  border-color: color-mix(in srgb, var(--workspace-accent, var(--brand)) 28%, var(--border));
+}
+body[data-domain] #overviewCard .overview-metric {
+  min-height: 142px;
+  align-content: start;
+  gap: 10px;
+  border-top: 3px solid var(--workspace-accent, var(--brand));
+}
+body[data-domain] #overviewCard .overview-metric strong {
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 780;
+  letter-spacing: -.045em;
+}
+body[data-domain] #overviewCard .overview-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--workspace-accent, var(--brand)) 12%, var(--surface-2));
+}
+body[data-domain] #overviewCard .overview-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--workspace-accent, var(--brand));
+  transition: width .25s ease;
+}
+body[data-domain] #overviewCard .overview-lower {
+  align-items: start;
+}
+body[data-domain] #overviewCard .overview-shortcut {
+  min-height: 58px;
+  border-radius: 10px;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+body[data-domain] #overviewCard .overview-shortcut:focus-visible {
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  body[data-domain] #overviewCard .overview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 15px;
+  }
+  body[data-domain] #overviewCard .overview-metric {
+    min-height: 128px;
+    padding: 13px;
+  }
+  body[data-domain] #overviewCard .overview-lower {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+}
+@media (max-width: 460px) {
+  body[data-domain] #overviewCard {
+    padding: 14px;
+  }
+  body[data-domain] #overviewCard .overview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+  body[data-domain] #overviewCard .overview-live {
+    align-self: flex-start;
+  }
+  body[data-domain] #overviewCard .overview-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] #overviewCard .overview-metric {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  body[data-domain] #overviewCard .overview-metric strong {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 30px;
+  }
+  body[data-domain] #overviewCard .overview-meter,
+  body[data-domain] #overviewCard .overview-metric-note {
+    grid-column: 1 / -1;
+  }
+  body[data-domain] #overviewCard .overview-section-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] #overviewCard .overview-meter > span,
+  body[data-domain] #overviewCard .overview-shortcut {
+    transition: none;
+  }
+}
