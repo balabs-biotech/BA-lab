@@ -1,5 +1,6 @@
 name: Deploy Batch Tracker to GitHub Pages
 
+# GitHub Pages is the sole public deployment target for this repository.
 on:
   push:
     branches: [main]
