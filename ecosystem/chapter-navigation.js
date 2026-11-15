@@ -5,7 +5,7 @@
  const groups=[
   {id:'home',label:{fr:'Accueil',en:'Home',ar:'الرئيسية',pt:'Início'},sections:['accueil']},
   {id:'research',label:{fr:'Explorations',en:'Explorations',ar:'الاستكشاف',pt:'Exploração'},sections:['chantiers','a-la-une']},
-  {id:'network',label:{fr:'Univers',en:'Universe',ar:'العوالم',pt:'Universo'},sections:['universe','universes']},
+  {id:'network',label:{fr:'Univers',en:'Universe',ar:'العوالم',pt:'Universo'},sections:['universe','universes'],extras:['.universe-bridge']},
   {id:'catalogue',label:{fr:'Catalogue',en:'Catalogue',ar:'الكتالوج',pt:'Catálogo'},sections:['product-catalogue']},
   {id:'about',label:{fr:'BA Labs',en:'About BA Labs',ar:'حول BA Labs',pt:'Sobre BA Labs'},sections:['a-propos','demarche','value-principles']}
  ];
@@ -15,10 +15,12 @@
  groups.forEach((group,index)=>{
   const page=document.createElement('section');page.className='experience-page';page.dataset.chapter=group.id;page.id='chapter-'+group.id;page.setAttribute('aria-label',group.label.fr);
   const label=document.createElement('div');label.className='experience-page-label';label.dataset.chapterLabel=group.id;label.textContent=String(index+1).padStart(2,'0')+' / '+group.label.fr;page.append(label);
-  group.sections.forEach(id=>{const section=sections.get(id);if(section)page.append(section)});
+  group.sections.forEach(id=>{const section=sections.get(id);if(section)page.append(section)});(group.extras||[]).forEach(selector=>{const section=main.querySelector(selector);if(section)page.append(section)});
   track.append(page);pages.push(page);
  });
  const footer=app.querySelector(':scope > footer.foot');if(footer)pages[pages.length-1].append(footer);
+ // Preserve any future top-level section added to the source page instead of silently hiding it.
+ main.querySelectorAll(':scope > section').forEach(section=>{if(!section.closest('.experience-page'))pages[pages.length-1].append(section)});
  main.replaceChildren(track);main.classList.add('experience-main');main.dataset.chaptersReady='true';
  const progress=document.createElement('div');progress.className='experience-progress';progress.innerHTML='<span></span>';main.append(progress);
  const controls=document.createElement('div');controls.className='experience-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Navigation entre les espaces');
