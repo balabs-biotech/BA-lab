@@ -65,14 +65,16 @@
  let current=0;
  const lang=()=>document.documentElement.lang||'fr';
  const update=()=>{
-  const x=track.scrollLeft,idx=Math.max(0,Math.min(pages.length-1,Math.round(x/Math.max(1,track.clientWidth))));
+  const pageWidth=Math.max(1,track.clientWidth);
+  const rawProgress=Math.max(0,Math.min(pages.length-1,track.scrollLeft/pageWidth));
+  const idx=Math.round(rawProgress);
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
-  progress.firstElementChild.style.width=(idx/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[lang()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
+  progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[lang()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false');});
   rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
-  if(filamentLength)filament.style.strokeDashoffset=String(filamentLength*(1-idx/Math.max(1,pages.length-1)));
+  if(filamentLength)filament.style.strokeDashoffset=String(filamentLength*(1-rawProgress/Math.max(1,pages.length-1)));
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
