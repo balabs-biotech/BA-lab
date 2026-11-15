@@ -92,9 +92,7 @@ function clearAuthenticatedWorkspaceState() {
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
-  setButtonBusy(saveMeasurementButton, true);
   if (saveObservationButton) saveObservationButton.disabled = true;
-  setButtonBusy(saveObservationButton, true);
 }
 
 
