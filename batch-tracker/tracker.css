@@ -2948,3 +2948,37 @@ body[data-domain="laboratory"] .toolbar-status {
 body[data-domain="laboratory"] .status-pulse {
   background:#2b8b62;box-shadow:0 0 0 4px rgba(43,139,98,.13);
 }
+
+
+/* Domain-aware form controls: fields use the same surface, border and text
+   tokens as their workspace; semantic validation remains independent of hue. */
+body[data-domain] :is(input, select, textarea) {
+  color: var(--text);
+  background-color: var(--surface);
+  border-color: var(--border-strong);
+  caret-color: var(--brand);
+}
+body[data-domain] :is(input, select, textarea):hover:not(:disabled):not([aria-invalid="true"]) {
+  border-color: var(--brand);
+}
+body[data-domain] :is(input, select, textarea):disabled {
+  color: var(--muted);
+  background-color: var(--surface-2);
+  border-color: var(--border);
+  opacity: 1;
+  cursor: not-allowed;
+}
+body[data-domain] :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--brand);
+}
+body[data-domain] :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--err);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--err) 16%, transparent);
+}
+body[data-domain] :is(input, select, textarea)[aria-invalid="true"]:focus-visible {
+  outline-color: var(--err) !important;
+}
+body[data-domain] select option {
+  color: var(--text);
+  background: var(--surface);
+}
