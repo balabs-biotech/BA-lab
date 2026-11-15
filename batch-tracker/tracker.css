@@ -6927,3 +6927,207 @@ html[dir="rtl"] body[data-domain] .universe-home-link {
     transition: none !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — passe 19
+   Authentification, formulaires de création et retours d’enregistrement
+   ============================================================ */
+body[data-domain] #authCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+body[data-domain] #authCard > .section-kicker,
+body[data-domain] #authCard > h2,
+body[data-domain] #authCard > .muted {
+  min-width: 0;
+}
+body[data-domain] #authCard > .muted {
+  max-width: 76ch;
+  line-height: 1.65;
+}
+body[data-domain] #authCard label {
+  margin-top: 5px;
+  color: var(--text);
+  font-size: .9rem;
+  font-weight: 650;
+}
+body[data-domain] #authCard :is(input[type="email"], input[type="password"]) {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+}
+body[data-domain] #authCard :is(input[type="email"], input[type="password"]):focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 2px;
+}
+body[data-domain] #authCard :is(input[aria-invalid="true"], input:user-invalid) {
+  border-color: var(--danger, #d36b65);
+}
+body[data-domain] .auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-block: 7px;
+}
+body[data-domain] .auth-actions button {
+  min-height: 44px;
+  min-width: 142px;
+}
+body[data-domain] #authStatus {
+  min-width: 0;
+  margin-block: 3px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 8px;
+  background: var(--surface-2);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #authStatus:is(.success, .error, .warning, .info) {
+  border-inline-start-color: currentColor;
+}
+body[data-domain] #signOutButton {
+  justify-self: start;
+  min-height: 42px;
+}
+body[data-domain] :is(#createButton, #createBatchButton, #saveBioOperation, #savePlantCultureButton, #saveMeasurementButton, #saveObservationButton, #recordHarvestButton, #moveBatchButton, #releaseBatchButton) {
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.35;
+}
+body[data-domain] :is(#createButton, #createBatchButton, #saveBioOperation, #savePlantCultureButton, #saveMeasurementButton, #saveObservationButton):disabled {
+  cursor: not-allowed;
+  opacity: .58;
+  filter: saturate(.65);
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) {
+  min-width: 0;
+  align-items: start;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) > * {
+  min-width: 0;
+}
+body[data-domain] :is(#plantCultureForm, #bioOperationForm) :is(input, select, textarea) {
+  width: 100%;
+  max-width: 100%;
+}
+body[data-domain] #bioOperationForm .bio-operation-wide {
+  align-self: end;
+}
+body[data-domain] #bioOperationMessage,
+body[data-domain] #plantCultureStatus,
+body[data-domain] #syncStatus,
+body[data-domain] #smartEntryStatus,
+body[data-domain] #harvestStatus,
+body[data-domain] #moveBatchStatus {
+  display: block;
+  min-width: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #syncStatus {
+  padding: 8px 10px;
+  border-inline-start: 2px solid var(--workspace-accent, var(--brand));
+  background: var(--surface-2);
+  border-radius: 0 7px 7px 0;
+}
+body[data-domain] #retrySyncButton {
+  min-height: 40px;
+  margin-block: 5px;
+}
+body[data-domain] :is(#cultureCatalogList, #plantCultureList, #batchList) {
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+}
+body[data-domain] :is(#cultureCatalogList, #plantCultureList, #batchList) > :is(button, a, .batch-item) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+body[data-domain] :is(#cultureCatalogList, #plantCultureList) :is(button, a):focus-visible,
+body[data-domain] #batchList :is(button, a, .batch-item):focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 3px;
+}
+body[data-domain] #cultureDetailPanel {
+  min-width: 0;
+  scroll-margin-top: 100px;
+}
+body[data-domain] #cultureDetailPanel :is(button, a) {
+  min-height: 40px;
+}
+body[data-domain] #message > :is(.success, .error, .warning, .info) {
+  border: 1px solid currentColor;
+  border-inline-start-width: 4px;
+  background: var(--surface-2);
+  box-shadow: 0 5px 18px rgb(0 0 0 / .12);
+}
+body[data-domain] #message > .success { color: var(--success, #79b98b); }
+body[data-domain] #message > .warning { color: var(--warning, #d7ad61); }
+body[data-domain] #message > .error { color: var(--danger, #df817b); }
+body[data-domain] #message > .info { color: var(--workspace-accent, var(--brand)); }
+body[data-domain] #message :is(a, button) {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+html[dir="rtl"] body[data-domain] #authCard,
+html[dir="rtl"] body[data-domain] #authCard label {
+  text-align: start;
+}
+html[dir="rtl"] body[data-domain] .auth-actions {
+  direction: rtl;
+}
+html[dir="rtl"] body[data-domain] #syncStatus {
+  border-radius: 7px 0 0 7px;
+}
+@media (max-width: 680px) {
+  body[data-domain] .auth-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .auth-actions button {
+    min-width: 0;
+    width: 100%;
+  }
+  body[data-domain] :is(#createButton, #createBatchButton, #saveBioOperation, #savePlantCultureButton, #saveMeasurementButton, #saveObservationButton) {
+    width: 100%;
+  }
+  body[data-domain] #cultureDetailPanel {
+    scroll-margin-top: 80px;
+  }
+}
+@media (max-width: 420px) {
+  body[data-domain] .auth-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] #authCard {
+    gap: 8px;
+  }
+  body[data-domain] #authStatus {
+    padding: 10px;
+    font-size: .9rem;
+  }
+  body[data-domain] :is(#cultureCatalogList, #plantCultureList, #batchList) {
+    gap: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] #authCard,
+  body[data-domain] #cultureDetailPanel,
+  body[data-domain] #message > * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
