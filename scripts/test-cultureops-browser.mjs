@@ -21,7 +21,7 @@ function parseColor(value) {
     const raw = hex[1].length === 3 ? [...hex[1]].map(char => char + char).join("") : hex[1];
     return [0, 2, 4].map(index => parseInt(raw.slice(index, index + 2), 16));
   }
-  const rgb = value.match(/rgba?\\((\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)/i);
+  const rgb = value.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
   return rgb ? [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])] : null;
 }
 function luminance(value) {
