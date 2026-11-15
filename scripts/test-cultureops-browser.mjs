@@ -110,6 +110,21 @@ try {
           headingColor: headingStyle?.color || null,
           headingText: heading?.textContent?.trim() || null,
           authVisible: !!card && card.getBoundingClientRect().height > 0,
+          headingContrast: (() => {
+            if (!heading || !card) return 0;
+            const rgb = value => value.match(/[\\d.]+/g)?.map(Number) || [0, 0, 0];
+            const linear = value => {
+              const channel = value / 255;
+              return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+            };
+            const luminance = color => {
+              const [r, g, b] = rgb(color).map(linear);
+              return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            };
+            const foreground = luminance(getComputedStyle(heading).color);
+            const background = luminance(getComputedStyle(card).backgroundColor);
+            return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+          })(),
           navLinks: document.querySelectorAll(".section-nav a").length,
         };
       });
@@ -119,18 +134,27 @@ try {
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
       if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
+      if (metrics.headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${metrics.headingContrast.toFixed(2)}:1 is below WCAG AA`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       for (const language of ["en", "pt", "ar", "fr"]) {
         await page.locator("#languageSelect").selectOption(language);
+        const expectedSignIn = { fr: "Se connecter", en: "Sign in", pt: "Iniciar sessão", ar: "تسجيل الدخول" };
+        await page.waitForFunction(expected => (
+          document.documentElement.lang === expected.language &&
+          document.querySelector("#signInButton")?.textContent.trim() === expected.label
+        ), { language, label: expectedSignIn[language] }, { timeout: 7000 });
         const languageState = await page.evaluate(() => ({
           lang: document.documentElement.lang,
           dir: document.documentElement.dir,
+          width: document.documentElement.scrollWidth,
+          viewport: innerWidth,
         }));
         const expectedDirection = language === "ar" ? "rtl" : "ltr";
         if (languageState.lang !== language || languageState.dir !== expectedDirection) {
           failures.push(`${workspace.slug}/${viewport.name}: language ${language} produced ${JSON.stringify(languageState)}`);
         }
+        if (languageState.width > languageState.viewport + 1) failures.push(`${workspace.slug}/${viewport.name}/${language}: horizontal overflow ${languageState.width}px > ${languageState.viewport}px`);
       }
       await page.locator("#languageSelect").selectOption("fr");
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
