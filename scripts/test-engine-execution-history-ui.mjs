@@ -21,6 +21,7 @@ for (const label of [
   "Contexte manquant ou non résolu",
   "Faits observés et sources",
   "observations biologiques",
+  "événements : ",
   "événement : ",
   "event_id",
   "Caractéristiques calculées",
