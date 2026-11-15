@@ -1587,3 +1587,163 @@ html[lang="ar"] .product-open{right:auto;left:20px}
 .product-filter.is-active{background:#263b38;border-color:#b96b4d;color:#f0eee4}
 .product-catalogue-card[hidden]{display:none!important}
 @media(max-width:640px){.product-filters{gap:6px}.product-filter{padding:9px 10px;font-size:10px}}
+
+
+/* PHASE 9 — clear spatial viewport: remove opaque plaques from the living network. */
+#mainView.webgl-ready{
+  height:clamp(500px,68svh,740px)!important;
+  min-height:500px!important;
+  border-radius:0!important;
+}
+#mainView.webgl-ready>.webgl-stage{
+  min-height:0!important;
+}
+#mainView.webgl-ready .webgl-focus{
+  left:12px!important;
+  top:94px!important;
+  width:min(250px,calc(100% - 104px))!important;
+  max-height:34%!important;
+  padding:12px 13px!important;
+  border:1px solid rgba(209,208,197,.28)!important;
+  border-top:1px solid rgba(185,107,77,.72)!important;
+  border-radius:3px!important;
+  background:rgba(17,27,29,.48)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(5px)!important;
+}
+#mainView.webgl-ready .webgl-focus-kicker{
+  padding:0 0 6px!important;
+  border-bottom:1px solid rgba(209,208,197,.16)!important;
+  font-size:8px!important;
+}
+#mainView.webgl-ready .webgl-focus strong{
+  padding:8px 0 0!important;
+  font-size:clamp(15px,1.4vw,19px)!important;
+}
+#mainView.webgl-ready .webgl-focus small{
+  padding:0!important;
+  margin-top:5px!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions{
+  margin-top:7px!important;
+  padding:5px 0 0!important;
+}
+#mainView.webgl-ready .webgl-focus .webgl-focus-actions>*{
+  min-height:32px!important;
+  padding:6px 0!important;
+  font-size:10px!important;
+}
+#mainView.webgl-ready .webgl-path{
+  left:12px!important;
+  top:12px!important;
+  max-width:calc(100% - 180px)!important;
+  padding:5px 8px!important;
+  border:1px solid rgba(209,208,197,.24)!important;
+  border-radius:3px!important;
+  background:rgba(17,27,29,.38)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(4px)!important;
+}
+#mainView.webgl-ready .webgl-branch-dock{
+  left:12px!important;
+  right:12px!important;
+  bottom:38px!important;
+  z-index:18!important;
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-start!important;
+  align-content:center!important;
+  gap:6px!important;
+  max-height:58px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:6px 8px!important;
+  border:1px solid rgba(209,208,197,.22)!important;
+  border-radius:3px!important;
+  background:rgba(17,27,29,.42)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(5px)!important;
+  scrollbar-width:thin!important;
+}
+#mainView.webgl-ready .webgl-branch-dock .webgl-branch-item{
+  flex:0 0 auto!important;
+  min-height:34px!important;
+  max-width:240px!important;
+  padding:6px 10px!important;
+  border:1px solid rgba(209,208,197,.22)!important;
+  border-radius:2px!important;
+  background:rgba(38,59,56,.62)!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+}
+#mainView.webgl-ready .webgl-branch-dock .webgl-branch-item[aria-current="page"]{
+  background:rgba(185,107,77,.34)!important;
+  border-color:#B96B4D!important;
+}
+#mainView.webgl-ready .webgl-controls{gap:4px!important}
+#mainView.webgl-ready .webgl-controls button{
+  width:34px!important;height:34px!important;
+  border-radius:3px!important;
+  background:rgba(17,27,29,.46)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(4px)!important;
+}
+#mainView.webgl-ready .webgl-hint{
+  left:12px!important;bottom:8px!important;
+  max-width:calc(100% - 150px)!important;
+  padding:5px 8px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:rgba(17,27,29,.22)!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  font-size:8px!important;
+}
+#mainView.webgl-ready .webgl-status{right:12px!important;bottom:9px!important}
+@media(max-width:760px){
+  #mainView.webgl-ready{
+    height:clamp(420px,62svh,620px)!important;
+    min-height:420px!important;
+  }
+  #mainView.webgl-ready .webgl-stage{min-height:0!important}
+  #mainView.webgl-ready .webgl-focus{
+    top:58px!important;left:8px!important;
+    width:min(205px,calc(100% - 82px))!important;
+    max-height:30%!important;
+    padding:9px 10px!important;
+  }
+  #mainView.webgl-ready .webgl-focus strong{font-size:15px!important}
+  #mainView.webgl-ready .webgl-focus small{font-size:9px!important}
+  #mainView.webgl-ready .webgl-path{
+    left:8px!important;top:8px!important;
+    max-width:calc(100% - 116px)!important;
+    font-size:8px!important;
+  }
+  #mainView.webgl-ready .webgl-controls{right:8px!important;top:8px!important}
+  #mainView.webgl-ready .webgl-controls button{width:30px!important;height:30px!important}
+  #mainView.webgl-ready .webgl-branch-dock{
+    left:8px!important;right:8px!important;bottom:32px!important;
+    max-height:88px!important;flex-wrap:wrap!important;
+    overflow-y:auto!important;justify-content:flex-start!important;
+    align-content:flex-start!important;gap:5px!important;padding:5px!important;
+  }
+  #mainView.webgl-ready .webgl-branch-dock .webgl-branch-item{
+    min-height:30px!important;max-width:calc(50% - 4px)!important;
+    padding:5px 7px!important;font-size:10px!important;
+    white-space:normal!important;
+  }
+  #mainView.webgl-ready .webgl-hint{
+    left:8px!important;bottom:5px!important;
+    max-width:calc(100% - 120px)!important;
+    padding:3px 0!important;font-size:7px!important;
+    text-align:left!important;
+  }
+  #mainView.webgl-ready .webgl-status{right:8px!important;bottom:7px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #mainView.webgl-ready .webgl-focus,
+  #mainView.webgl-ready .webgl-branch-dock,
+  #mainView.webgl-ready .webgl-controls button{transition:none!important}
+}
