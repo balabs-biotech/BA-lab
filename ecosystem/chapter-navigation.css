@@ -21,7 +21,7 @@ body{overscroll-behavior:none}
 .experience-controls button:focus-visible,.experience-controls button:hover:not(:disabled){outline:2px solid #d1d0c5;outline-offset:2px;background:#385044}
 .experience-count{min-width:42px;text-align:center;color:#d1d0c5;font:700 10px/1.2 system-ui;font-variant-numeric:tabular-nums;letter-spacing:.08em}
 .experience-progress{position:absolute;z-index:70;inset-inline:0;top:0;height:2px;background:#78958a22;pointer-events:none}
-.experience-progress span{display:block;height:100%;width:20%;background:#b96b4d;transition:width .25s ease}
+.experience-progress span{display:block;height:100%;width:0%;background:#b96b4d;transition:width .25s ease}
 @media(max-width:760px){
  .wrap.balabs-ui{padding:10px 10px 6px}
  .top{padding-bottom:9px}
