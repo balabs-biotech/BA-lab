@@ -47,7 +47,7 @@ let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack =
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
-let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0, multiTouchGesture = false;
+let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0, multiTouchGesture = false, lastMultiTouchAt = 0;
 let canvasRect = null, cameraInitialized = false, lastPickAt = 0;
 let _hitWorld = null;
 
@@ -169,7 +169,7 @@ function createWorld() {
     const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
     const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
-    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{if(multiTouchGesture){e.preventDefault();e.stopImmediatePropagation();return;}e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
+    const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{if(multiTouchGesture||performance.now()-lastMultiTouchAt<900){e.preventDefault();e.stopImmediatePropagation();return;}e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
     for(let j=0;j<14;j++){
       const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
@@ -527,7 +527,7 @@ function setupUI() {
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
   const rememberTouch=e=>{
-    if(e.touches.length>1){multiTouchGesture=true;dragGesture=true;moved=true;touchFallback=null;return}
+    if(e.touches.length>1){multiTouchGesture=true;lastMultiTouchAt=performance.now();dragGesture=true;moved=true;touchFallback=null;return}
     if(e.touches.length!==1){touchFallback=null;return}
     // A new one-finger gesture clears the previous gesture's click-suppression latch.
     // The first pointerdown of a two-finger gesture must not clear the latch set by
@@ -540,7 +540,7 @@ function setupUI() {
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(e.target.closest?.('#mainView.webgl-ready')&&!e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro')&&(multiTouchGesture||performance.now()-lastBranchTouchActivationAt<800)){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(e.target.closest?.('#mainView.webgl-ready')&&!e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro')&&(multiTouchGesture||performance.now()-lastMultiTouchAt<900||performance.now()-lastBranchTouchActivationAt<800)){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
@@ -553,7 +553,7 @@ function onPointerDown(e) {
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   stage.setPointerCapture?.(e.pointerId);
   if(pointers.size>=2){
-    multiTouchGesture=true;
+    multiTouchGesture=true;lastMultiTouchAt=performance.now();
     const p=[...pointers.values()];
     pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
     pinchCenter={x:p.reduce((sum,v)=>sum+v.x,0)/p.length,y:p.reduce((sum,v)=>sum+v.y,0)/p.length};
