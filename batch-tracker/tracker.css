@@ -10227,34 +10227,34 @@ body[data-domain] #measurementCard .observation-details summary {
 /* PASS 48 — keep authentication actions visible on compact screens. */
 @media (max-width: 600px) {
   body[data-domain] #authCard {
-    padding: 16px 14px !important;
+    padding: 13px 14px !important;
   }
   body[data-domain] #authCard .section-kicker {
-    margin-bottom: 11px;
+    margin-bottom: 8px;
   }
   body[data-domain] #authCard h2 {
-    margin: 0 0 8px;
+    margin: 0 0 7px;
   }
   body[data-domain] #authCard > .muted {
-    margin: 6px 0 12px;
-    line-height: 1.55;
+    margin: 4px 0 8px;
+    line-height: 1.45;
   }
   body[data-domain] #authCard label {
-    margin: 10px 0 5px;
+    margin: 9px 0 4px;
   }
   body[data-domain] #authCard input {
-    min-height: 40px;
-    padding: 8px 11px;
+    min-height: 39px;
+    padding: 7px 11px;
   }
   body[data-domain] #authCard .auth-actions {
     gap: 8px;
-    margin: 13px 0 10px;
+    margin: 10px 0 8px;
   }
   body[data-domain] #authCard .auth-actions button {
-    min-height: 40px;
+    min-height: 39px;
   }
   body[data-domain] #authCard #authStatus {
-    min-height: 36px;
-    padding: 8px 10px;
+    min-height: 34px;
+    padding: 7px 10px;
   }
 }
