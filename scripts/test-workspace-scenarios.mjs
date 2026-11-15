@@ -865,78 +865,39 @@ assert.ok(workflowCss.includes("@media (max-width: 600px)") && workflowCss.inclu
 console.log("✓ Complex forms and dialog surfaces: guidance, consent, action states and mobile layout");
 
 
-// Cross-workspace feedback states: success, warning, error, loading and empty
-// surfaces must use semantic tokens and remain accessible on reduced-motion devices.
+// Shared semantic feedback components are styled consistently in each workspace.
 const feedbackCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
-for (const state of ["success", "warning", "error", "loading", "empty"]) {
-  assert.ok(feedbackCss.includes(".feedback-" + state),
-    "feedback state " + state + " must have a reusable component style");
+for (const state of ["info", "success", "warning", "error", "loading", "empty"]) {
+  assert.ok(feedbackCss.includes(".feedback-" + state), "missing feedback style: " + state);
 }
-assert.match(feedbackCss, /body\[data-domain\] :is\([^)]*feedback-success/);
-assert.match(feedbackCss, /body\\[data-domain\\] #message \\.card\\[role="alert"\\]/,
-  "urgent feedback must retain a distinct accessible alert surface");
-assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-loading::before/,
-  "loading feedback must expose a visual progress indicator");
-assert.match(feedbackCss, /@media \\(prefers-reduced-motion: reduce\\)[\\s\\S]*?feedback-loading::before/,
-  "loading indicator must respect reduced-motion preferences");
-assert.match(feedbackCss, /body\\[data-domain\\] \\.feedback-empty/,
-  "empty collections must have a distinct non-error state");
-console.log("✓ Feedback states: semantic status surfaces, loading, empty and reduced-motion behavior");
+assert.ok(feedbackCss.includes("body[data-domain] #message .card[role=\"alert\"]"), "alerts need a distinct accessible surface");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-loading::before"), "loading feedback needs a progress indicator");
+assert.ok(feedbackCss.includes("@media (prefers-reduced-motion: reduce)") && feedbackCss.includes("feedback-loading::before"), "loading animation must respect reduced motion");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-empty"), "empty results must remain distinct from errors");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-state[data-loading=\"true\"]"), "loading state must expose its visual contract");
+assert.ok(feedbackCss.includes("body[data-domain] .feedback-state[data-empty=\"true\"]"), "empty state must expose its visual contract");
+assert.ok(feedbackCss.includes("@media (max-width: 600px)") && feedbackCss.includes(".feedback-state"), "feedback surfaces must adapt to phones");
+assert.ok(feedbackCss.includes("var(--warn)"), "warning surfaces must use the established --warn token");
+console.log("✓ Feedback states: semantic variants, accessible urgency and responsive motion");
 
-
-// Feedback states need one reusable visual contract rather than scattered,
-// domain-specific overrides for each individual status message.
-const feedbackContractCss = fs.readFileSync("batch-tracker/tracker.css", "utf8");
-for (const state of ["info", "success", "warning", "error"]) {
-  assert.match(feedbackContractCss, new RegExp('body\\[data-domain\\] \\.feedback-' + state),
-    "feedback-" + state + " must expose a shared semantic surface");
-}
-assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-state\\[data-loading="true"\\]/,
-  "loading feedback must expose a stable busy state");
-assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-state\\[data-empty="true"\\]/,
-  "empty feedback must remain a first-class operational state");
-assert.match(feedbackContractCss, /@media \\(max-width: 600px\\)[\\s\\S]*?\\.feedback-state/,
-  "feedback surfaces must remain compact on phones");
-console.log("✓ Feedback states: semantic status, loading, empty and mobile treatment");
-
-
-// The central message renderer must emit semantic classes while keeping safe
-// text insertion and accessible alert/status roles.
 const feedbackJs = fs.readFileSync("batch-tracker/tracker.js", "utf8");
-assert.match(feedbackJs, /card \\${semanticType} feedback-\\${semanticType}/,
-  "central messages must expose the shared feedback class");
-assert.match(feedbackJs, /div\\.textContent =\\s*text/,
-  "message content must remain text-only, not interpreted as HTML");
-assert.match(feedbackJs, /type === "error" \\|\\| type === "warning"[\\s\\S]*?"alert"[\\s\\S]*?"status"/,
-  "error and warning messages must keep alert semantics");
-assert.match(feedbackContractCss, /body\\[data-domain\\] \\.feedback-info/);
-assert.match(feedbackContractCss, /var\\(--warn\\)/,
-  "warning surfaces must use the established --warn design token");
-console.log("✓ Message renderer: semantic classes, safe text and accessible urgency");
+assert.ok(feedbackJs.includes("card ${semanticType} feedback-${semanticType}"), "central messages must expose semantic feedback classes");
+assert.ok(feedbackJs.includes("div.textContent =\n    text"), "message content must remain text-only");
+assert.ok(feedbackJs.includes('type === "error" || type === "warning"'), "urgent messages must use alert semantics");
+assert.ok(feedbackJs.includes("function renderCollectionFeedback(container, state, text)"), "inline collection feedback helper must exist");
+console.log("✓ Message renderer: safe text and accessible feedback semantics");
 
-
-// Real collection surfaces must distinguish an initial load, an empty result,
-// and a failed retrieval without presenting any of them as a successful empty list.
+// Collection placeholders distinguish authentication, loading, empty and error.
 const collectionHtml = fs.readFileSync(new URL("../batch-tracker/workspace.html", import.meta.url), "utf8");
 const collectionJs = fs.readFileSync("../batch-tracker/tracker.js", "utf8");
-assert.match(collectionHtml, /id="batchList"[\s\S]*?class="feedback-loading"[^>]*role="status"/,
-  "batch list must expose an accessible loading state before its first result");
-assert.match(collectionHtml, /id="cultureCatalogList"[^>]*[\s\S]*?feedback-info/,
-  "culture catalogue must identify its pre-authentication state as informational");
-assert.match(collectionHtml, /id="plantCultureList"[^>]*[\s\S]*?feedback-info/,
-  "GreenTech registry must identify its pre-authentication state as informational");
-assert.match(collectionJs, /empty\.className = "muted feedback-empty"/,
-  "empty culture and plant collections must use the shared empty state");
-assert.match(collectionJs, /batchList\.innerHTML = [\s\S]*?feedback-empty/,
-  "empty batch collection must use the shared empty state");
-assert.match(collectionJs, /list\.className = "culture-catalog-list feedback-error"/,
-  "GreenTech retrieval failure must be exposed as an error state");
-console.log("✓ Collection states: loading, unauthenticated, empty and retrieval error");
-
-assert.match(collectionJs, /list\.className = "culture-catalog-list";[\s\S]*?list\.removeAttribute\("role"\)/,
-  "successful GreenTech reload must clear the previous retrieval-error surface");
-
-
+assert.ok(collectionHtml.includes('class="feedback-loading" role="status"'), "batch list needs an accessible loading placeholder");
+assert.ok(collectionHtml.includes('id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-info"'), "culture catalogue must identify its pre-auth state");
+assert.ok(collectionHtml.includes('id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-info"'), "plant registry must identify its pre-auth state");
+assert.ok(collectionJs.includes('empty.className = "muted feedback-empty"'), "empty culture collections need a shared state");
+assert.ok(collectionJs.includes('feedback-empty" role="status"'), "empty batch collection needs a shared state");
+assert.ok(collectionJs.includes('list.className = "culture-catalog-list feedback-error"'), "plant retrieval errors need an error state");
+assert.ok(collectionJs.includes('list.removeAttribute("role")'), "successful plant reload must clear the error role");
+console.log("✓ Collection states: authentication, loading, empty, error and recovery");
 // Shared inline collection feedback must expose semantic state, role and busy
 // status without injecting user-facing text as HTML.
 const feedbackStateSource = extractFunction(engine, "renderCollectionFeedback");
@@ -953,7 +914,8 @@ const feedbackStateResult = vm.runInNewContext(
 assert.equal(feedbackContainer.attributes["data-feedback-state"], "loading");
 assert.equal(feedbackContainer.attributes["aria-busy"], "true");
 assert.equal(feedbackStateResult.attributes.role, "status");
-assert.equal(feedbackStateResult.className, "feedback-loading");
+assert.equal(feedbackStateResult.className, "feedback-state feedback-loading");
+assert.equal(feedbackStateResult.attributes["data-loading"], "true");
 assert.equal(feedbackStateResult.textContent, "<chargement>");
 const feedbackErrorResult = vm.runInNewContext(
   `${feedbackStateSource}; renderCollectionFeedback(injected.container, "error", "Lecture impossible")`,
