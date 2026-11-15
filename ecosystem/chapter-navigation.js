@@ -34,6 +34,19 @@
  const railNodes=rail.querySelector('.chapter-rail-nodes');
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  main.append(rail);
+ // Reveal editorial imagery only when it enters its own chapter viewport.
+ if('IntersectionObserver' in window){
+  pages.forEach(page=>{
+   const images=page.querySelectorAll('.work-media img,.product-catalogue img,.universe-index-card img');
+   if(!images.length)return;
+   const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    if(!entry.isIntersecting)return;
+    entry.target.classList.add('rb-image-revealed');
+    revealObserver.unobserve(entry.target);
+   }),{root:page,threshold:.16,rootMargin:'0px 0px -5% 0px'});
+   images.forEach(img=>{img.classList.add('rb-image-armed');revealObserver.observe(img)});
+  });
+ }
  const filament=rail.querySelector('.filament-progress');let filamentLength=0;
  try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){}
  let current=0;
