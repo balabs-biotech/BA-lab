@@ -196,7 +196,34 @@ function createWorld() {
     const line=new THREE.Mesh(new THREE.TubeGeometry(curve,64,.009,5,false),new THREE.MeshBasicMaterial({color:0x8cae9b,transparent:true,opacity:.37}));
     line.userData={kind:'connection',a,b,curve};world.add(line);edges.push({curve,line,a,b});
     const pulse=new THREE.Mesh(new THREE.SphereGeometry(.045,8,6),new THREE.MeshBasicMaterial({color:0xd0d9c5,transparent:true,opacity:.9}));world.add(pulse);signalPoints.push({pulse,curve,offset:index/LINKS.length});
+  });  // Dense anastomosis layer: each domain-to-domain connection becomes a
+  // small bundle of irregular hyphae with lateral branches, not a single cable.
+  let hyphaSeed=41027;
+  const hyphaRand=()=>{hyphaSeed=(hyphaSeed*16807)%2147483647;return(hyphaSeed-1)/2147483646};
+  const hyphaMaterials=[0x78958a,0xb96b4d,0xd1d0c5,0x9db7a3];
+  LINKS.forEach(([a,b],index)=>{
+    const A=cells.get(a).position,B=cells.get(b).position,delta=B.clone().sub(A);
+    for(let strand=0;strand<3;strand++){
+      const side=new THREE.Vector3(-delta.y,delta.x,0).normalize();
+      const offset=(strand-1)*(.075+hyphaRand()*.045);
+      const start=A.clone().lerp(B,.12).addScaledVector(side,offset);
+      const finish=A.clone().lerp(B,.88).addScaledVector(side,offset*.6);
+      const mid=start.clone().lerp(finish,.5).add(new THREE.Vector3((hyphaRand()-.5)*.34,(hyphaRand()-.5)*.38,(hyphaRand()-.5)*.48));
+      const curve=new THREE.CatmullRomCurve3([start,mid,finish]);
+      const color=hyphaMaterials[(index+strand)%hyphaMaterials.length];
+      const fiber=new THREE.Mesh(new THREE.TubeGeometry(curve,36,.0028+strand*.0007,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.18+strand*.035,depthWrite:false}));
+      fiber.userData={kind:'anastomosis',a,b};world.add(fiber);
+      // Branches split off the parent filament and taper into the surrounding matrix.
+      for(let fork=0;fork<2;fork++){
+        const u=.28+fork*.38,root=curve.getPoint(u),direction=new THREE.Vector3((hyphaRand()-.5)*.7,(hyphaRand()-.5)*.9,(hyphaRand()-.5)*.65);
+        const tip=root.clone().add(direction).addScaledVector(side,(fork?1:-1)*(.2+hyphaRand()*.2));
+        const branch=new THREE.CatmullRomCurve3([root,root.clone().lerp(tip,.48).add(new THREE.Vector3(0,.045,.025)),tip]);
+        const twig=new THREE.Mesh(new THREE.TubeGeometry(branch,14,.0018,3,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.22,depthWrite:false}));
+        twig.userData={kind:'hypha-branch',a,b};world.add(twig);
+      }
+    }
   });
+
 }
 
 function cameraPosition() {
