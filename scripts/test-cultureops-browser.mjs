@@ -149,12 +149,12 @@ try {
         const unnamedControls = [...document.querySelectorAll("input:not([type=hidden]), select, textarea, button, a[href]")]
           .filter(element => {
             const text = element.innerText?.trim() || element.getAttribute("aria-label") || element.getAttribute("title") || element.value || "";
-            const labelledBy = (element.getAttribute("aria-labelledby") || "").split(/\\s+/).filter(Boolean);
+            const labelledBy = (element.getAttribute("aria-labelledby") || "").split(/\s+/).filter(Boolean);
             return !text && !element.labels?.length && !labelledBy.some(id => document.getElementById(id)?.textContent?.trim());
           })
           .map(element => ({ tag: element.tagName, id: element.id, type: element.type || null, href: element.getAttribute("href") }));
         const brokenDescriptions = [...document.querySelectorAll("[aria-describedby]")]
-          .flatMap(element => (element.getAttribute("aria-describedby") || "").split(/\\s+/))
+          .flatMap(element => (element.getAttribute("aria-describedby") || "").split(/\s+/))
           .filter(id => id && !document.getElementById(id));
         return { duplicateIds, missingHashTargets, unnamedControls, brokenDescriptions };
       });
