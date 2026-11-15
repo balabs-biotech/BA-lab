@@ -381,7 +381,7 @@
         <div><label for="cultureSearch">Rechercher</label><input id="cultureSearch" type="search" placeholder="Code ou type de culture" autocomplete="off"></div>
         <div><label for="cultureTypeFilter">Type de culture</label><select id="cultureTypeFilter"><option value="">Tous les types</option></select></div>
       </div>
-      <div id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-info">Connectez-vous pour charger les cultures.</p></div>
+      <div id="cultureCatalogList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-state feedback-info" role="status">Connectez-vous pour charger les cultures.</p></div>
       <section id="cultureDetailPanel" class="culture-detail hidden" aria-labelledby="cultureDetailTitle">
         <div class="culture-detail-heading"><div><span class="section-kicker-label">FICHE EXPÉRIMENTALE</span><h3 id="cultureDetailTitle">Culture</h3><p id="cultureDetailMeta" class="muted"></p></div><button id="closeCultureDetail" type="button" class="secondary-button small-button">Fermer la fiche</button></div>
         <div class="culture-detail-summary" id="cultureDetailSummary"></div>
@@ -531,7 +531,7 @@
     </form>
 
     <div class="overview-section-heading"><h3>Registre des cultures végétales</h3><span id="plantCultureCount" class="culture-catalog-count">0</span></div>
-    <div id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-info">Connectez-vous pour charger les cultures végétales.</p></div>
+    <div id="plantCultureList" class="culture-catalog-list" aria-live="polite"><p class="muted feedback-state feedback-info" role="status">Connectez-vous pour charger les cultures végétales.</p></div>
 
     <section class="biological-context-panel hidden" id="plantBiologicalContextPanel" aria-labelledby="plantBiologicalContextTitle">
       <div class="biological-context-heading">
@@ -732,8 +732,10 @@
       id="batchList"
       class="batch-list"
       aria-live="polite"
+      aria-busy="true"
+      data-feedback-state="loading"
     >
-      <p class="feedback-loading" role="status">Chargement des lots…</p>
+      <p class="feedback-state feedback-loading" data-loading="true" role="status">Chargement des lots…</p>
     </div>
 
     <section class="batch-compare-panel" aria-labelledby="batchCompareTitle">
@@ -974,7 +976,7 @@
       <button id="reloadMeasurementsButton" type="button" class="secondary">Actualiser</button>
     </div>
     <div id="measurementHistory" class="measurement-history" aria-live="polite">
-      <p class="muted">Les mesures apparaîtront ici après connexion.</p>
+      <p class="muted feedback-state feedback-info" role="status">Les mesures apparaîtront ici après connexion.</p>
     </div>
     <details class="observation-details">
       <summary>Ajouter une observation qualitative</summary>
@@ -1006,7 +1008,7 @@
       <button id="saveObservationButton" type="button">Enregistrer l’observation</button>
       <div class="context-divider"></div>
       <div class="context-eyebrow">OBSERVATIONS RÉCENTES</div>
-      <div id="observationHistory" class="measurement-history" aria-live="polite"><p class="muted">Les observations apparaîtront ici après connexion.</p></div>
+      <div id="observationHistory" class="measurement-history" aria-live="polite"><p class="muted feedback-state feedback-info" role="status">Les observations apparaîtront ici après connexion.</p></div>
     </details>
   </section>
 
