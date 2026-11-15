@@ -103,6 +103,7 @@ try {
         const firstLabel = card?.querySelector("label");
         const status = card?.querySelector("#authStatus");
         const toolbar = document.querySelector(".app-toolbar");
+        const container = document.querySelector(".container");
         const hero = document.querySelector(".app-hero");
         const languageLabel = document.querySelector("#languageLabel");
         return {
@@ -124,6 +125,9 @@ try {
           signInButtonBottom: document.querySelector("#signInButton")?.getBoundingClientRect().bottom ?? null,
           toolbarPosition: toolbar ? getComputedStyle(toolbar).position : null,
           toolbarTop: toolbar?.getBoundingClientRect().top ?? null,
+          toolbarRight: toolbar?.getBoundingClientRect().right ?? null,
+          contentLeft: container?.getBoundingClientRect().left ?? null,
+          contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           navLinks: document.querySelectorAll(".section-nav a").length,
@@ -131,6 +135,8 @@ try {
         };
       });
 
+      if (viewport.width >= 821 && metrics.contentLeft < metrics.toolbarRight + 16) failures.push(`${workspace.slug}/${viewport.name}: main content overlaps or crowds desktop navigation (${metrics.contentLeft}px vs rail end ${metrics.toolbarRight}px)`);
+      if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
