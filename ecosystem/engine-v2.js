@@ -529,6 +529,10 @@ function setupUI() {
   const rememberTouch=e=>{
     if(e.touches.length>1){multiTouchGesture=true;dragGesture=true;moved=true;touchFallback=null;return}
     if(e.touches.length!==1){touchFallback=null;return}
+    // A new one-finger gesture clears the previous gesture's click-suppression latch.
+    // The first pointerdown of a two-finger gesture must not clear the latch set by
+    // the document-capture touchstart that already sees both contacts.
+    multiTouchGesture=false;
     const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()};
   };
   const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback||e.touches.length!==0||e.changedTouches.length!==1)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
@@ -542,7 +546,7 @@ function setupUI() {
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  if(pointers.size===0){multiTouchGesture=false;dragGesture=false;moved=false}
+  if(pointers.size===0){if(e.pointerType!=='touch'||!multiTouchGesture)multiTouchGesture=false;dragGesture=false;moved=false}
   const blocked=e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-branch-dock');
   if(blocked||(e.pointerType!=='touch'&&e.target.closest('.webgl-hit-target')))return;
   stage?.focus({preventScroll:true});
