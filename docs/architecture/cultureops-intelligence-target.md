@@ -199,6 +199,7 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 ## 7. Feuille de route d'implémentation
 
 ### Phase 0 — Contrat et inventaire (en cours)
+- Les 92 SQL appliqués sont restaurés depuis le registre actif. Le replay à blanc a mis en évidence une dépendance historique manquante : la migration `20261022043824` référence `iot_devices` avant sa création enregistrée dans `20261022060000`. Ne pas modifier ni réordonner les migrations appliquées sans établir la provenance de cette table. Détail dans `supabase/migrations/RECONCILIATION.md`.
 - Documenter l'architecture et l'état réel des composants.
 - Établir la matrice des moteurs, versions, contrats, statuts, dépendances et tests.
 - Les 10 sources Edge déployées sont désormais versionnées ; conserver un contrôle de dérive avant chaque déploiement.
