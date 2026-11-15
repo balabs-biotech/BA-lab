@@ -120,6 +120,7 @@ try {
           statusColor: status ? getComputedStyle(status).color : null,
           authVisible: !!card && card.getBoundingClientRect().height > 0,
           authEmailPrefilled: !!document.querySelector("#authEmail")?.value,
+          signInButtonBottom: document.querySelector("#signInButton")?.getBoundingClientRect().bottom ?? null,
           toolbarPosition: toolbar ? getComputedStyle(toolbar).position : null,
           toolbarTop: toolbar?.getBoundingClientRect().top ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
@@ -141,6 +142,7 @@ try {
       if (viewport.name === "mobile" && metrics.languageLabelWraps) failures.push(`${workspace.slug}/${viewport.name}: language label wraps unexpectedly`);
             if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
+      if (viewport.name === "mobile" && metrics.signInButtonBottom > viewport.height) failures.push(`${workspace.slug}/${viewport.name}: sign-in action falls below the first viewport (${metrics.signInButtonBottom}px > ${viewport.height}px)`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
