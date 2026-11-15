@@ -7869,3 +7869,47 @@ body[data-domain="agronomy"] .brand-symbol { background: #26382b; color: #b4f477
     transition-duration: .01ms !important;
   }
 }
+
+
+/* BA LABS / MYCOLOGY — final dark-control override.
+   Overrides legacy light mycology form rules without changing GreenTech/Lab. */
+body[data-domain="mycology"] #authCard input,
+body[data-domain="mycology"] .card input:not([type="checkbox"]):not([type="radio"]),
+body[data-domain="mycology"] .card select,
+body[data-domain="mycology"] .card textarea {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+  caret-color: #d99a70 !important;
+  background: #171b19 !important;
+  background-color: #171b19 !important;
+  border: 1px solid #594538 !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.18) !important;
+}
+body[data-domain="mycology"] #authCard input::placeholder,
+body[data-domain="mycology"] .card input::placeholder,
+body[data-domain="mycology"] .card textarea::placeholder {
+  color: #a99688 !important;
+  -webkit-text-fill-color: #a99688 !important;
+  opacity: 1 !important;
+}
+body[data-domain="mycology"] #authStatus,
+body[data-domain="mycology"] #syncStatus,
+body[data-domain="mycology"] #batchList > .info,
+body[data-domain="mycology"] #message .card {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+  background: #202522 !important;
+  border-color: #594538 !important;
+}
+body[data-domain="mycology"] #authStatus.success {
+  color: #c5e2c9 !important;
+  -webkit-text-fill-color: #c5e2c9 !important;
+  background: #1d3327 !important;
+  border-color: #42664d !important;
+}
+body[data-domain="mycology"] #authStatus.error {
+  color: #f0c4bb !important;
+  -webkit-text-fill-color: #f0c4bb !important;
+  background: #3b2422 !important;
+  border-color: #87504a !important;
+}
