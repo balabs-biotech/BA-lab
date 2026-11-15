@@ -36,3 +36,4 @@ set domain = excluded.domain,
     max_attempts = excluded.max_attempts,
     status = excluded.status,
     updated_at = now();
+;

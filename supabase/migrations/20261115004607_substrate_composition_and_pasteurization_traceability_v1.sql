@@ -124,3 +124,4 @@ create policy substrate_treatment_readings_update on public.substrate_treatment_
 create policy substrate_treatment_readings_delete on public.substrate_treatment_readings for delete to authenticated using (private.is_org_writer(organization_id));
 
 grant select,insert,update,delete on public.batch_substrate_profiles, public.batch_substrate_components, public.substrate_treatment_runs, public.substrate_treatment_readings to authenticated, service_role;
+;

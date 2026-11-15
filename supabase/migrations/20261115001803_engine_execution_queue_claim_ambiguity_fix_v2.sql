@@ -121,3 +121,4 @@ end;
 $$;
 revoke all on function public.claim_engine_job(text, integer) from public, anon, authenticated;
 grant execute on function public.claim_engine_job(text, integer) to service_role;
+;

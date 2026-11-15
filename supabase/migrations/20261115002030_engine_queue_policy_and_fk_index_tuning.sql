@@ -15,3 +15,4 @@ create index if not exists engine_jobs_created_by_idx
 create index if not exists engine_jobs_parent_idx
   on public.engine_jobs(organization_id, parent_job_id)
   where parent_job_id is not null;
+;

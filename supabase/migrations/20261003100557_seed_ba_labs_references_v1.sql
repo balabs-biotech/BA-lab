@@ -88,3 +88,4 @@ and not exists (
  select 1 from public.protocol_versions pv
  where pv.organization_id=p.organization_id and pv.protocol_id=p.id and pv.version='1.0'
 );
+;

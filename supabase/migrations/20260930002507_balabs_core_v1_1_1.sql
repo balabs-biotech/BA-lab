@@ -167,3 +167,4 @@ create trigger measurements_context before insert or update on public.measuremen
 create or replace function private.enforce_event_actor() returns trigger language plpgsql set search_path = pg_catalog, public as $$
 begin if new.actor_user_id is not null and not exists (select 1 from public.organization_members om where om.organization_id=new.organization_id and om.user_id=new.actor_user_id) then raise exception 'Event actor is not a member of the organization'; end if; return new; end $$;
 create trigger events_actor before insert or update on public.events for each row execute function private.enforce_event_actor();
+;

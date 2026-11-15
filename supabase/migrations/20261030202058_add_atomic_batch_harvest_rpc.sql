@@ -84,3 +84,4 @@ $function$;
 
 revoke all on function public.record_batch_harvest(uuid, numeric, text, text) from public, anon;
 grant execute on function public.record_batch_harvest(uuid, numeric, text, text) to authenticated;
+;

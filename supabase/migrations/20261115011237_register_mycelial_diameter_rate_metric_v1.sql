@@ -17,3 +17,4 @@ on conflict(domain,variable_code) do update set category=excluded.category,
 update public.derived_formula_registry
 set output_metric_code='myc_colony_diameter_rate',updated_at=now()
 where organization_id is null and domain='mycology' and formula_code='mycology.colony_diameter_rate' and formula_version='1.0.0';
+;

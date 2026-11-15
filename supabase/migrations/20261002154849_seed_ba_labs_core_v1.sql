@@ -50,3 +50,4 @@ and not exists (
     and t.batch_type = v.batch_type
     and t.check_code = v.check_code
 );
+;

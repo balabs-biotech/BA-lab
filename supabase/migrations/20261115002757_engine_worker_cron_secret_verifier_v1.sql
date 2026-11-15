@@ -18,3 +18,4 @@ $$;
 
 revoke all on function public.verify_engine_worker_cron_secret(text) from public, anon, authenticated;
 grant execute on function public.verify_engine_worker_cron_secret(text) to service_role;
+;

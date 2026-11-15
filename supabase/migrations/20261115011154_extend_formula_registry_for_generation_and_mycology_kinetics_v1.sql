@@ -29,3 +29,4 @@ on conflict (organization_id,domain,formula_code,formula_version) do update set
  output_unit_code=excluded.output_unit_code,input_contract=excluded.input_contract,
  formula_definition=excluded.formula_definition,assumptions=excluded.assumptions,
  limitations=excluded.limitations,status=excluded.status,updated_at=now();
+;

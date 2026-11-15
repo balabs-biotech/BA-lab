@@ -56,3 +56,4 @@ drop trigger if exists environment_context_profile_sensors_draft_only on public.
 create trigger environment_context_profile_sensors_draft_only
 before insert or update or delete on public.environment_context_profile_sensors
 for each row execute function private.guard_profile_sensor_binding_draft_only();
+;

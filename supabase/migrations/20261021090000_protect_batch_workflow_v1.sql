@@ -63,7 +63,7 @@ begin
   end if;
   return new;
 end
-$$
+$$;
 create or replace function private.guard_batch_stages()
 returns trigger
 language plpgsql
@@ -101,7 +101,7 @@ begin
   end if;
   return new;
 end
-$$
+$$;
 create or replace function private.guard_batch_qc_checks()
 returns trigger
 language plpgsql
@@ -159,19 +159,19 @@ begin
   end if;
   return new;
 end
-$$
-drop trigger if exists batches_guard on public.batches
+$$;
+drop trigger if exists batches_guard on public.batches;
 create trigger batches_guard
   before insert or update or delete on public.batches
-  for each row execute function private.guard_batches()
-drop trigger if exists batch_stages_guard on public.batch_stages
+  for each row execute function private.guard_batches();
+drop trigger if exists batch_stages_guard on public.batch_stages;
 create trigger batch_stages_guard
   before insert or update or delete on public.batch_stages
-  for each row execute function private.guard_batch_stages()
-drop trigger if exists batch_qc_checks_guard on public.batch_qc_checks
+  for each row execute function private.guard_batch_stages();
+drop trigger if exists batch_qc_checks_guard on public.batch_qc_checks;
 create trigger batch_qc_checks_guard
   before insert or update or delete on public.batch_qc_checks
-  for each row execute function private.guard_batch_qc_checks()
+  for each row execute function private.guard_batch_qc_checks();
 -- ---------------------------------------------------------------------------
 -- 2. RPC du workflow : SECURITY DEFINER, contrôle d'organisation conservé
 -- ---------------------------------------------------------------------------
@@ -267,7 +267,7 @@ begin
 
   return v_batch;
 end;
-$$
+$$;
 create or replace function public.advance_batch_stage(
   p_batch_id uuid,
   p_expected_stage text
@@ -369,7 +369,7 @@ begin
       v_current.stage_code,null::text;
   end if;
 end;
-$$
+$$;
 create or replace function public.release_batch(p_batch_id uuid)
 returns public.batches
 language plpgsql
@@ -448,14 +448,14 @@ begin
 
   return v_batch;
 end;
-$$
+$$;
 -- ---------------------------------------------------------------------------
 -- 3. Droits d'exécution : plus d'accès anonyme ni PUBLIC
 -- ---------------------------------------------------------------------------
 
-revoke all on function public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamptz,numeric,text,text[]) from public, anon
-revoke all on function public.advance_batch_stage(uuid,text) from public, anon
-revoke all on function public.release_batch(uuid) from public, anon
-grant execute on function public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamptz,numeric,text,text[]) to authenticated, service_role
-grant execute on function public.advance_batch_stage(uuid,text) to authenticated, service_role
-grant execute on function public.release_batch(uuid) to authenticated, service_role
+revoke all on function public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamptz,numeric,text,text[]) from public, anon;
+revoke all on function public.advance_batch_stage(uuid,text) from public, anon;
+revoke all on function public.release_batch(uuid) from public, anon;
+grant execute on function public.create_batch_with_stages(uuid,text,text,text,uuid,uuid,uuid,uuid,uuid,timestamptz,numeric,text,text[]) to authenticated, service_role;
+grant execute on function public.advance_batch_stage(uuid,text) to authenticated, service_role;
+grant execute on function public.release_batch(uuid) to authenticated, service_role;

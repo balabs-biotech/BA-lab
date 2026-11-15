@@ -90,3 +90,4 @@ create trigger domain_interpretation_profiles_resolution_window
 before insert or update of organization_id, domain, status, valid_from, valid_to
 on public.domain_interpretation_profiles
 for each row execute function private.guard_domain_profile_resolution_window();
+;

@@ -56,3 +56,4 @@ on conflict (domain,variable_code) do update set
  comparison_policy=excluded.comparison_policy,
  metadata=excluded.metadata,
  status='active';
+;

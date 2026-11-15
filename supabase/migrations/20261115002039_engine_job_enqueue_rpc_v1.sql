@@ -88,3 +88,4 @@ $$;
 
 revoke all on function public.enqueue_engine_job(uuid,text,text,jsonb,text,smallint,uuid,uuid) from public, anon;
 grant execute on function public.enqueue_engine_job(uuid,text,text,jsonb,text,smallint,uuid,uuid) to authenticated;
+;

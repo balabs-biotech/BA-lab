@@ -67,3 +67,4 @@ end $$;
 create index if not exists cultures_biological_strain_profile_idx
 on public.cultures (organization_id, biological_strain_profile_id)
 where biological_strain_profile_id is not null;
+;

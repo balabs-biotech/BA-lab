@@ -105,3 +105,4 @@ create trigger biological_parameter_reference_evidence_validation_guard
   before insert or update of validation_status
   on public.biological_parameter_references
   for each row execute function public.enforce_parameter_reference_evidence_before_validation();
+;

@@ -81,3 +81,4 @@ create policy derived_metric_inputs_insert_member on public.derived_metric_input
 with check (exists (select 1 from public.organization_members om where om.organization_id=derived_metric_inputs.organization_id and om.user_id=(select auth.uid())));
 create policy derived_metric_inputs_delete_admin on public.derived_metric_inputs for delete to authenticated
 using (exists (select 1 from public.organization_members om where om.organization_id=derived_metric_inputs.organization_id and om.user_id=(select auth.uid())));
+;

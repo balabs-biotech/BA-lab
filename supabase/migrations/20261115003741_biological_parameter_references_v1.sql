@@ -49,3 +49,4 @@ drop policy if exists biological_parameter_references_delete on public.biologica
 create policy biological_parameter_references_delete on public.biological_parameter_references
  for delete to authenticated using (private.is_org_writer(organization_id));
 grant select,insert,update,delete on public.biological_parameter_references to authenticated;
+;

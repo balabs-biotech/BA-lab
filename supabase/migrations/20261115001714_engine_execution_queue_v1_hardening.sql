@@ -208,3 +208,4 @@ revoke all on function public.finish_engine_job(uuid, uuid, text, jsonb, jsonb, 
 grant execute on function public.claim_engine_job(text, integer) to service_role;
 grant execute on function public.heartbeat_engine_job(uuid, uuid, integer) to service_role;
 grant execute on function public.finish_engine_job(uuid, uuid, text, jsonb, jsonb, integer) to service_role;
+;

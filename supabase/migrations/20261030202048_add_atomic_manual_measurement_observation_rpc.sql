@@ -187,3 +187,4 @@ revoke all on function public.record_manual_measurement(jsonb, jsonb) from publi
 revoke all on function public.record_manual_observation(jsonb, jsonb) from public, anon;
 grant execute on function public.record_manual_measurement(jsonb, jsonb) to authenticated;
 grant execute on function public.record_manual_observation(jsonb, jsonb) to authenticated;
+;

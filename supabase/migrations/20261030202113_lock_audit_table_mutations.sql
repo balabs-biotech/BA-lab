@@ -11,3 +11,4 @@ alter function public.record_biological_operation(
 
 revoke insert, update, delete, truncate on table public.events, public.measurements, public.observations
   from public, anon, authenticated;
+;

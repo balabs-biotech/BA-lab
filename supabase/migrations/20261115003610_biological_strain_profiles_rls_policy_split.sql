@@ -10,3 +10,4 @@ with check (private.is_org_writer(organization_id));
 create policy biological_strain_profiles_delete on public.biological_strain_profiles
 for delete to authenticated
 using (private.is_org_writer(organization_id));
+;

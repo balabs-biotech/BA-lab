@@ -173,3 +173,4 @@ grant select, insert, update, delete on
   public.environment_context_profile_sensors,
   public.domain_interpretation_profiles
 to authenticated;
+;

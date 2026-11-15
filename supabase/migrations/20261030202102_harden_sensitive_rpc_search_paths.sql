@@ -6,3 +6,4 @@ alter function public.ingest_iot_payload(uuid, text, text, jsonb)
 alter function public.record_biological_operation(
   uuid, uuid, text, timestamptz, text, jsonb, text[]
 ) set search_path = pg_catalog;
+;

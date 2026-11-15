@@ -13,3 +13,4 @@ grant select, insert, update, delete on table
   public.environment_context_profile_sensors,
   public.domain_interpretation_profiles
 to authenticated;
+;

@@ -19,3 +19,4 @@ implementation_key=excluded.implementation_key,output_metric_code=excluded.outpu
 output_unit_code=excluded.output_unit_code,input_contract=excluded.input_contract,
 formula_definition=excluded.formula_definition,assumptions=excluded.assumptions,
 limitations=excluded.limitations,status='active',updated_at=now();
+;

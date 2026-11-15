@@ -21,3 +21,4 @@ alter table public.environment_context_profiles
 alter table public.domain_interpretation_profiles
   add constraint domain_interpretation_profiles_profile_version_valid
   check (length(profile_version) between 1 and 32);
+;

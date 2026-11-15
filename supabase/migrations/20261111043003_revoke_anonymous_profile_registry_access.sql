@@ -7,3 +7,4 @@ revoke all on table
   public.environment_context_profile_sensors,
   public.domain_interpretation_profiles
 from anon;
+;

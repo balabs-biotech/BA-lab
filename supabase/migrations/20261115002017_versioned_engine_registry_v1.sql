@@ -125,3 +125,4 @@ set domain = excluded.domain,
     max_attempts = excluded.max_attempts,
     updated_at = now();
 
+;
