@@ -25,8 +25,7 @@ for (const label of [
   "événement : ",
   "Chronologie biologique",
   "Voir l’événement associé",
-  "engine-biological-fact-timeline",
-  "engine-biological-fact-event-link",
+  "Observations liées : ",
   "Caractéristiques calculées",
   "Hypothèses à vérifier",
   "Lacunes temporelles"
