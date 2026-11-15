@@ -146,6 +146,8 @@ for (const [label, source] of [['public', engine], ['preview', previewEngine]]) 
   assert.ok(source.includes('function buildResources(id,parentNode=null,anchor=null)') && source.includes('currentNode.children||[]'),
     label + ' 3D explorer must build each navigable level from the active manifest hierarchy');
 }
+assert.ok(engine.includes('function buildOverviewResources()') && engine.includes("kind:'overview-page'") && engine.includes('enterDomain(domainId,item)'), 'Public 3D overview must render and select real Notion pages as radial nodes around each domain');
+assert.ok(engine.includes('clearOverviewResources();') && engine.includes('function clearOverviewResources()'), 'Overview Notion nodes must be removed on domain entry and restored on return');
 function domainRootFromEngine(source, domain, language) {
   const start = source.indexOf('const pages={');
   const end = source.indexOf('\n};', start);
