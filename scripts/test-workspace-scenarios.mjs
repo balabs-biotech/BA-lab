@@ -938,7 +938,7 @@ assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "loading", "Cha
   "the shared analytical execution panel must expose its loading state");
 assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "empty", "Aucune exécution analytique enregistrée pour cette organisation.")'),
   "the analytical execution panel must distinguish an empty history");
-assert.ok(collectionJs.includes('renderCollectionFeedback(panel, "error", "Chargement des exécutions analytiques impossible : "'),
+assert.ok(collectionJs.includes('const message = "Chargement des exécutions analytiques impossible : "') && collectionJs.includes('renderCollectionFeedback(panel, "error", message)'),
   "analytical execution retrieval errors must use the shared error state");
 
 assert.ok(collectionJs.includes('renderCollectionFeedback(engineHistoryPanel, "info"'),
