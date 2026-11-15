@@ -249,7 +249,11 @@ Une recommandation cite le signal déclencheur, le contexte, la source, le profi
 - Une sortie IA distingue faits, calculs, hypothèses et recommandations.
 - Aucun actionneur n'est commandé par un résultat IA ou une alerte sans circuit de sécurité indépendant.
 
-## 9. Priorité immédiate
+## 9. Revue du contrat de file d'exécution
+
+La revue détaillée des RPC, ACL, leases, retries, idempotence et limites observées est consignée dans `docs/architecture/engine-queue-contract-review.md`. Elle confirme les contrôles d'accès backend et le fencing par lease token. Les tests d'intégration de concurrence, d'expiration et de frontière de retry restent à ajouter avant toute extraction du worker.
+
+## 10. Priorité immédiate
 
 La prochaine unité de travail technique est **Phase 1 — fiabilité du moteur d'exécution**, en commençant par :
 1. inventorier les contrats et handlers réellement déployés ;
