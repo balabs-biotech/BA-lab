@@ -15195,3 +15195,321 @@ body[data-domain] #statisticsCard .statistics-table-wrap {
     transform:none!important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 74
+   Production batch detail, process stages and quality control
+   ============================================================ */
+body[data-domain] #batchCard #batchInfo {
+  display:grid;
+  gap:14px;
+  margin:14px 0;
+  padding:clamp(14px,2vw,21px);
+  border:1px solid var(--workspace-border);
+  border-radius:15px;
+  background:var(--workspace-panel);
+  color:var(--workspace-text);
+}
+body[data-domain] #batchCard #batchInfo > strong {
+  display:block;
+  padding-bottom:11px;
+  border-bottom:1px solid var(--workspace-border);
+  color:var(--workspace-accent);
+  font-size:1.05rem;
+  letter-spacing:-.025em;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .batch-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+}
+body[data-domain] #batchCard .batch-stat {
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:7px;
+  min-width:0;
+  min-height:70px;
+  padding:11px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .batch-stat-label {
+  color:var(--workspace-muted);
+  font-size:.61rem;
+  line-height:1.35;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+body[data-domain] #batchCard .batch-stat-value {
+  color:var(--workspace-text);
+  font-size:.78rem;
+  font-weight:650;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard #batchStages,
+body[data-domain] #batchCard #batchQc {
+  display:grid;
+  gap:13px;
+  margin-top:15px;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:15px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #batchCard #batchStages > h3,
+body[data-domain] #batchCard #batchQc > h3 {
+  margin:0;
+  color:var(--workspace-text);
+  font-size:.95rem;
+  letter-spacing:-.02em;
+}
+body[data-domain] #batchCard .progress {
+  display:grid;
+  gap:8px;
+  padding:12px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .progress-label {
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  font-weight:600;
+}
+body[data-domain] #batchCard .progress-track {
+  height:9px;
+  overflow:hidden;
+  border-radius:99px;
+  background:var(--workspace-border);
+}
+body[data-domain] #batchCard .progress-bar {
+  height:100%;
+  border-radius:inherit;
+  background:var(--workspace-accent);
+  transition:width .2s ease;
+}
+body[data-domain] #batchCard .stage-list {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+body[data-domain] #batchCard .stage {
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  padding:11px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .stage-number {
+  display:grid;
+  place-items:center;
+  width:29px;
+  height:29px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  color:var(--workspace-muted);
+  font-size:.7rem;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #batchCard .stage-name {
+  color:var(--workspace-text);
+  font-size:.74rem;
+  font-weight:650;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .stage .muted {
+  margin-top:3px;
+  color:var(--workspace-muted);
+  font-size:.59rem;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .stage-status {
+  padding:5px 7px;
+  border:1px solid var(--workspace-border);
+  border-radius:7px;
+  color:var(--workspace-muted);
+  font-size:.58rem;
+  font-weight:650;
+  text-align:center;
+  white-space:nowrap;
+}
+body[data-domain] #batchCard .stage.active {
+  border-color:var(--workspace-accent);
+  box-shadow:inset 3px 0 0 var(--workspace-accent);
+}
+body[data-domain] #batchCard .stage.active .stage-number,
+body[data-domain] #batchCard .stage-status.status-active {
+  border-color:var(--workspace-accent);
+  color:var(--workspace-accent);
+}
+body[data-domain] #batchCard .stage.completed .stage-number,
+body[data-domain] #batchCard .stage-status.status-completed {
+  border-color:var(--workspace-accent);
+  background:color-mix(in srgb,var(--workspace-accent) 12%,transparent);
+  color:var(--workspace-accent);
+}
+body[data-domain] #batchCard .stage.failed,
+body[data-domain] #batchCard .stage-status.status-failed {
+  border-color:#a95b55;
+}
+body[data-domain] #batchCard .stage-status.status-failed {
+  color:#e29a91;
+}
+body[data-domain] #batchCard .batch-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+body[data-domain] #batchCard .batch-actions button {
+  flex:1 1 180px;
+}
+body[data-domain] #batchCard #batchQc > .muted {
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.55;
+}
+body[data-domain] #batchCard .qc-list {
+  display:grid;
+  gap:8px;
+}
+body[data-domain] #batchCard .qc-row {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(125px,170px) auto;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .qc-label {
+  color:var(--workspace-text);
+  font-size:.75rem;
+  font-weight:650;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .qc-code {
+  display:block;
+  margin-top:4px;
+  color:var(--workspace-muted);
+  font-size:.6rem;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .qc-row select {
+  min-width:0;
+  margin:0;
+}
+body[data-domain] #batchCard .qc-row .qc-save {
+  min-width:88px;
+  margin:0;
+}
+body[data-domain] #batchCard #releaseBatchButton {
+  margin-top:12px;
+}
+body[data-domain] #batchCard #batchEvents {
+  margin-top:15px;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:15px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #batchCard #batchEvents > h3 {
+  color:var(--workspace-text);
+  font-size:.95rem;
+}
+body[data-domain] #batchCard .batch-harvest-entry {
+  margin-top:12px;
+  padding:14px;
+  border:1px solid var(--workspace-border);
+  border-radius:12px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #batchCard .batch-harvest-entry h4 {
+  margin:0 0 5px;
+  color:var(--workspace-text);
+  font-size:.8rem;
+}
+body[data-domain] #batchCard .batch-harvest-entry > .muted {
+  color:var(--workspace-muted);
+  font-size:.66rem;
+  line-height:1.5;
+}
+body[data-domain] #batchCard .batch-event-list {
+  display:grid;
+  gap:8px;
+  margin-top:13px;
+}
+body[data-domain] #batchCard .batch-event-item {
+  display:grid;
+  gap:5px;
+  margin:0;
+  padding:12px 14px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+}
+body[data-domain] #batchCard .batch-event-item strong {
+  color:var(--workspace-text);
+  font-size:.75rem;
+}
+body[data-domain] #batchCard .batch-event-item .muted {
+  color:var(--workspace-muted);
+  font-size:.62rem;
+}
+body[data-domain] #batchCard .batch-event-item > div:last-child:not(.muted) {
+  color:var(--workspace-text);
+  font-size:.68rem;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchCard .batch-compare-panel {
+  margin-top:15px;
+  padding:clamp(13px,2vw,19px);
+  border:1px solid var(--workspace-border);
+  border-radius:14px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #batchCard .batch-compare-panel h3 {
+  color:var(--workspace-text);
+}
+@media(max-width:760px) {
+  body[data-domain] #batchCard .batch-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain] #batchCard .stage-list {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:560px) {
+  body[data-domain] #batchCard .qc-row {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #batchCard .qc-row .qc-save {
+    width:100%;
+  }
+  body[data-domain] #batchCard .batch-actions {
+    flex-direction:column;
+  }
+  body[data-domain] #batchCard .batch-actions button {
+    width:100%;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #batchCard .progress-bar {
+    transition:none!important;
+  }
+}
