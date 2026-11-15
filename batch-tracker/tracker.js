@@ -92,7 +92,9 @@ function clearAuthenticatedWorkspaceState() {
 
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
+  setButtonBusy(saveMeasurementButton, true);
   if (saveObservationButton) saveObservationButton.disabled = true;
+  setButtonBusy(saveObservationButton, true);
 }
 
 
@@ -367,6 +369,13 @@ function showMessage(
     block: "nearest",
     behavior: reduceMotion ? "auto" : "smooth"
   });
+}
+
+
+function setButtonBusy(button, busy) {
+  if (!button) return;
+  if (busy) button.setAttribute("aria-busy", "true");
+  else button.removeAttribute("aria-busy");
 }
 
 
@@ -5258,6 +5267,7 @@ async function saveMeasurement() {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       saveMeasurementButton.disabled = false;
+      setButtonBusy(saveMeasurementButton, false);
       saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
     }
   }
@@ -5478,6 +5488,7 @@ async function saveObservation() {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       saveObservationButton.disabled = false;
+      setButtonBusy(saveObservationButton, false);
       saveObservationButton.textContent = cultureWorkflowText("saveObservation");
     }
   }
@@ -5754,7 +5765,7 @@ async function loadStatistics() {
   if (!loadOrganizationId) { status.textContent = L.login; return; }
   if (!variableCode) { status.textContent = L.variable; return; }
   const button = document.getElementById("loadStatisticsButton");
-  button.disabled = true; button.textContent = L.buttonLoading;
+  button.disabled = true; setButtonBusy(button, true); button.textContent = L.buttonLoading;
   status.textContent = L.loading; chart.innerHTML = '<p class="muted">' + L.loadingData + '</p>'; summary.innerHTML = ""; tbody.innerHTML = "";
   try {
     let batchEventIds = null;
@@ -5868,7 +5879,7 @@ async function loadStatistics() {
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">' + L.noRows + '</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
   } catch(error) { if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) || domain !== (document.body.dataset.domain || "mycology")) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
-  finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) && domain === (document.body.dataset.domain || "mycology")) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
+  finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) && domain === (document.body.dataset.domain || "mycology")) { button.disabled=false; setButtonBusy(button, false); button.textContent=L.buttonAnalyze; } }
 }
 
 function biologicalWorkflowText(key, count = 0) {
@@ -5946,7 +5957,7 @@ async function saveBiologicalOperation(event) {
   if (!dateValue) { message.textContent = biologicalWorkflowText("dateRequired"); return; }
   if (childCodes.length > 12) { message.textContent = biologicalWorkflowText("childLimit"); return; }
   if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
-  button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
+  button.disabled = true; setButtonBusy(button, true); button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
@@ -5974,6 +5985,7 @@ async function saveBiologicalOperation(event) {
   finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       button.disabled = false;
+      setButtonBusy(button, false);
       button.textContent = biologicalWorkflowText("save");
     }
   }
@@ -6760,6 +6772,7 @@ async function savePlantCulture(event) {
     return;
   }
   button.disabled = true;
+  setButtonBusy(button, true);
   const oldLabel = button.textContent;
   button.textContent = "Enregistrement…";
   if (status) status.textContent = "Enregistrement de la fiche végétale…";
@@ -6808,6 +6821,7 @@ async function savePlantCulture(event) {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       button.disabled = false;
+      setButtonBusy(button, false);
       button.textContent = oldLabel;
     }
   }
