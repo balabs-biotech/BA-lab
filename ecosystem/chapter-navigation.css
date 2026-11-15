@@ -30,7 +30,7 @@ body{overscroll-behavior:none}
  .experience-page>.hero{min-height:calc(100% - 12px);grid-template-columns:1fr;gap:18px}
  .experience-page>.hero .aside{max-width:440px}
  .experience-controls{inset-inline-end:10px;bottom:10px;padding:5px;gap:5px}
- .experience-controls button{width:40px;height:40px}
+ .experience-controls button{width:44px;height:44px;min-width:44px;min-height:44px}
  .experience-page-label{margin-bottom:10px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -120,3 +120,7 @@ body{overscroll-behavior:none}
  .experience-track{-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
  .experience-page{scroll-snap-stop:normal;touch-action:pan-y}
 }
+
+
+/* Keep chapter controls comfortably tappable on compact touch screens. */
+@media(max-width:760px){.experience-controls button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}}
