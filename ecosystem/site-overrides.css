@@ -1776,3 +1776,32 @@ html[lang="ar"] .product-open{right:auto;left:20px}
   #mainView.webgl-ready .webgl-focus strong{font-size:14px!important}
   #mainView.webgl-ready .webgl-focus small{font-size:9px!important;line-height:1.4!important}
 }
+
+
+/* Mobile 3D branch navigation: one slim, horizontally scrollable ribbon. */
+@media(max-width:760px){
+  #mainView.webgl-ready .webgl-branch-dock{
+    left:8px!important;right:8px!important;bottom:34px!important;
+    display:flex!important;flex-wrap:nowrap!important;
+    align-items:center!important;align-content:center!important;
+    justify-content:flex-start!important;
+    height:42px!important;max-height:42px!important;
+    overflow-x:auto!important;overflow-y:hidden!important;
+    padding:4px 6px!important;gap:5px!important;
+    background:rgba(17,27,29,.24)!important;
+    border-color:rgba(209,208,197,.15)!important;
+    -webkit-backdrop-filter:blur(2px)!important;
+    backdrop-filter:blur(2px)!important;
+    scrollbar-width:none!important;
+  }
+  #mainView.webgl-ready .webgl-branch-dock::-webkit-scrollbar{display:none!important}
+  #mainView.webgl-ready .webgl-branch-dock .webgl-branch-item{
+    flex:0 0 auto!important;width:auto!important;max-width:180px!important;
+    min-height:30px!important;white-space:nowrap!important;
+    padding:5px 9px!important;font-size:10px!important;
+  }
+  #mainView.webgl-ready .webgl-hint{
+    bottom:5px!important;max-width:calc(100% - 116px)!important;
+    white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  }
+}
