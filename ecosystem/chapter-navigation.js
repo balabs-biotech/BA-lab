@@ -32,11 +32,13 @@
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   progress.firstElementChild.style.width=((idx+1)/pages.length*100)+'%';
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
+  app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
  const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:pages[n].offsetLeft,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
  prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
  track.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
  track.addEventListener('keydown',e=>{if(e.target!==track)return;if(e.key==='ArrowRight'){e.preventDefault();go(current+1)}if(e.key==='ArrowLeft'){e.preventDefault();go(current-1)}});
+ document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;if(e.key==='PageDown'&&current<pages.length-1){e.preventDefault();go(current+1)}if(e.key==='PageUp'&&current>0){e.preventDefault();go(current-1)}});
  track.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY)||e.shiftKey){e.preventDefault();track.scrollBy({left:e.deltaX||e.deltaY,behavior:'auto'})}},{passive:false});
  app.addEventListener('click',e=>{
   const a=e.target.closest('a[href^="#"]');if(!a)return;
