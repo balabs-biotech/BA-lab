@@ -1014,7 +1014,7 @@ body[data-domain="mycology"] .guided-entry-step{border:2px solid var(--border-st
 body[data-domain="laboratory"] .guided-entry-step{background:#f3f8fd;border-color:#c9dbea}
 @media(max-width:600px){.guided-entry-step{padding:12px;margin:12px 0}.entry-intro p{font-size:12px}}
 
-/* Domain workspaces: one data platform{display:grid;grid-template-columns:minmax(190px,.72fr) minmax(0,2fr);gap:18px;align-items:center;margin:0 0 20px;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 5px 20px rgba(20,40,28,.06)}
+/* Domain workspaces: workspace-specific theme rules */
 body[data-domain="agronomy"]{--bg:#101714;--surface:#19231e;--surface-2:#222f28;--border:#35483d;--border-strong:#506657;--text:#f1f5ef;--muted:#a6b5aa;--brand:#a7f36a;--brand-hover:#c2ff91;--focus:#a7f36a;--ok:#a7f36a;--warn:#f3b64b;color-scheme:dark;background:var(--bg)}
 body[data-domain="agronomy"] .app-toolbar,body[data-domain="agronomy"] .card,body[data-domain="agronomy"] #contextPanel{background:var(--surface);border-color:var(--border);color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.17)}
 body[data-domain="agronomy"] .app-hero{background:linear-gradient(135deg,#192a21 0%,#101714 76%);border:1px solid #35483d;color:#f1f5ef}
