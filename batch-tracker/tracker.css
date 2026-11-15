@@ -5911,3 +5911,135 @@ html[dir="rtl"] body[data-domain] .batch-event-item {
     transition: none !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — démarrage à données vierges et vue générale
+   Passe 14 · états vides explicites, sans faux indicateurs
+   ============================================================ */
+body[data-domain] #overviewCard {
+  min-width: 0;
+}
+body[data-domain] .overview-heading > div,
+body[data-domain] .overview-lower > * {
+  min-width: 0;
+}
+body[data-domain] .overview-metric {
+  align-content: start;
+  min-height: 132px;
+}
+body[data-domain] .overview-meter {
+  position: relative;
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--surface-3, var(--border));
+}
+body[data-domain] .overview-meter > span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: var(--workspace-accent, var(--brand));
+  transition: width .2s ease;
+}
+body[data-domain] .overview-metric[hidden] {
+  display: none !important;
+}
+body[data-domain] .overview-activity {
+  min-width: 0;
+  padding: clamp(13px, 2vw, 18px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+body[data-domain] .overview-observations-details {
+  min-width: 0;
+}
+body[data-domain] .overview-observations-details > summary {
+  width: fit-content;
+  max-width: 100%;
+  padding: 9px 0;
+  color: var(--workspace-accent, var(--text));
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+body[data-domain] .overview-observations-details > summary:focus-visible {
+  outline: 2px solid var(--workspace-accent, var(--brand));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+body[data-domain] #overviewRecentObservations > p,
+body[data-domain] #cultureCatalogList > p,
+body[data-domain] #plantCultureList > p,
+body[data-domain] #batchList > .info {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 15px;
+  border: 1px dashed var(--border-strong, var(--border));
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+body[data-domain] #batchList > .info {
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+}
+body[data-domain] #cultureCatalogList,
+body[data-domain] #plantCultureList,
+body[data-domain] #batchList {
+  min-width: 0;
+}
+body[data-domain] #overviewRecentObservations:empty::before {
+  content: "Aucune observation chargée pour le moment.";
+  display: block;
+  padding: 14px 15px;
+  border: 1px dashed var(--border-strong, var(--border));
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+body[data-domain] .overview-footnote {
+  max-width: 88ch;
+  line-height: 1.7;
+}
+html[dir="rtl"] body[data-domain] #batchList > .info {
+  border-inline-start: 1px dashed var(--border-strong, var(--border));
+  border-inline-end: 3px solid var(--workspace-accent, var(--brand));
+}
+@media (max-width: 700px) {
+  body[data-domain] .overview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body[data-domain] .overview-lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .overview-shortcuts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 440px) {
+  body[data-domain] .overview-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .overview-metric {
+    min-height: 0;
+  }
+  body[data-domain] .overview-section-heading {
+    align-items: stretch;
+  }
+  body[data-domain] .overview-section-heading button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .overview-meter > span {
+    transition: none !important;
+  }
+}
