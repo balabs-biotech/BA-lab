@@ -220,6 +220,16 @@ try {
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
       if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);
 
+      // Reset test-only credentials and error messages before capturing clean UI.
+      await page.evaluate(() => {
+        const email = document.querySelector("#authEmail");
+        const password = document.querySelector("#authPassword");
+        if (email) email.value = "";
+        if (password) password.value = "";
+        const message = document.querySelector("#message");
+        if (message) message.replaceChildren();
+      });
+
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
 
@@ -227,10 +237,14 @@ try {
       // that the test Supabase stub has authenticated or loaded tenant data.
       if (viewport.name === "desktop" || viewport.name === "mobile") {
         await page.evaluate(() => {
+          const auth = document.querySelector("#authCard");
+          if (auth) auth.classList.add("hidden");
           const card = document.querySelector("#overviewCard");
           if (card) {
             card.classList.remove("hidden");
             document.body.classList.add("workspace-authenticated");
+            const live = card.querySelector(".overview-live");
+            if (live) live.textContent = "Aperçu visuel — données de test";
             const values = {
               overviewCultureCount: "12",
               overviewBatchCount: "8",
