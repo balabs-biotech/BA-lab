@@ -1747,3 +1747,32 @@ html[lang="ar"] .product-open{right:auto;left:20px}
   #mainView.webgl-ready .webgl-branch-dock,
   #mainView.webgl-ready .webgl-controls button{transition:none!important}
 }
+
+
+/* Focus overlay: keep the mycelium visible while preserving legible labels. */
+#mainView.webgl-ready .webgl-focus{
+  width:min(224px,calc(100% - 104px))!important;
+  max-height:30%!important;
+  background:linear-gradient(145deg,rgba(17,27,29,.36),rgba(17,27,29,.22))!important;
+  border-color:rgba(209,208,197,.24)!important;
+  border-top-color:rgba(185,107,77,.68)!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.12)!important;
+  -webkit-backdrop-filter:blur(4px)!important;
+  backdrop-filter:blur(4px)!important;
+}
+#mainView.webgl-ready .webgl-focus strong{
+  text-shadow:0 1px 8px rgba(0,0,0,.48)!important;
+}
+#mainView.webgl-ready .webgl-focus small{
+  text-shadow:0 1px 7px rgba(0,0,0,.62)!important;
+}
+@media(max-width:760px){
+  #mainView.webgl-ready .webgl-focus{
+    width:min(190px,calc(100% - 86px))!important;
+    max-height:26%!important;
+    padding:8px 9px!important;
+    background:linear-gradient(145deg,rgba(17,27,29,.42),rgba(17,27,29,.26))!important;
+  }
+  #mainView.webgl-ready .webgl-focus strong{font-size:14px!important}
+  #mainView.webgl-ready .webgl-focus small{font-size:9px!important;line-height:1.4!important}
+}
