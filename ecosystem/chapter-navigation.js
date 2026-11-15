@@ -9,7 +9,9 @@
   {id:'catalogue',label:{fr:'Catalogue',en:'Catalogue',ar:'الكتالوج',pt:'Catálogo'},sections:['product-catalogue']},
   {id:'about',label:{fr:'BA Labs',en:'About BA Labs',ar:'حول BA Labs',pt:'Sobre BA Labs'},sections:['a-propos','demarche','value-principles']}
  ];
- const sections=new Map([...main.querySelectorAll(':scope > section')].map(s=>[s.id,s]));
+ const directSections=[...main.querySelectorAll(':scope > section')];
+ const sections=new Map(directSections.filter(s=>s.id).map(s=>[s.id,s]));
+ const unassigned=directSections.filter(s=>!groups.some(g=>g.sections.includes(s.id)));
  const track=document.createElement('div');track.className='experience-track';track.id='experienceTrack';track.tabIndex=0;track.setAttribute('aria-label','BALabs — navigation horizontale');
  const pages=[];
  groups.forEach((group,index)=>{
@@ -18,6 +20,7 @@
   group.sections.forEach(id=>{const section=sections.get(id);if(section)page.append(section)});(group.extras||[]).forEach(selector=>{const section=main.querySelector(selector);if(section)page.append(section)});
   track.append(page);pages.push(page);
  });
+ unassigned.filter(s=>!s.classList.contains('universe-bridge')).forEach(s=>pages[pages.length-1].append(s));
  const footer=app.querySelector(':scope > footer.foot');if(footer)pages[pages.length-1].append(footer);
  // Preserve any future top-level section added to the source page instead of silently hiding it.
  main.querySelectorAll(':scope > section').forEach(section=>{if(!section.closest('.experience-page'))pages[pages.length-1].append(section)});
