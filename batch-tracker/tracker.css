@@ -5223,3 +5223,213 @@ html[dir="rtl"] body[data-domain] .overview-observation {
     transition: none;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS — surfaces générées par les moteurs existants
+   Passe 10 · détails de lots, QC, mesures et graphiques
+   ============================================================ */
+body[data-domain] .overview-observations-details {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+body[data-domain] .overview-observations-details > summary {
+  min-height: 42px;
+  padding: 12px 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 750;
+}
+body[data-domain] .overview-observations-details[open] > summary {
+  border-bottom: 1px solid var(--border);
+  color: var(--workspace-accent, var(--brand));
+}
+body[data-domain] .overview-observations {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+body[data-domain] .overview-observations > .muted {
+  margin: 0;
+  padding: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+body[data-domain] .batch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 13px;
+}
+body[data-domain] .batch-stat {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+body[data-domain] .batch-stat-label {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .025em;
+}
+body[data-domain] .batch-stat-value {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .qc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, .65fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+body[data-domain] .qc-label {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .qc-code {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .qc-row select {
+  min-width: 0;
+  min-height: 38px;
+  margin: 0;
+}
+body[data-domain] .qc-save {
+  width: auto;
+  min-height: 38px;
+  margin: 0;
+  padding-inline: 12px;
+}
+body[data-domain] .measurement-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(110px, .7fr);
+  gap: 7px 14px;
+  margin-top: 8px;
+  padding: 12px 13px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--workspace-accent, var(--brand));
+  border-radius: 10px;
+  background: var(--surface);
+}
+body[data-domain] .measurement-entry > div:first-child {
+  min-width: 0;
+}
+body[data-domain] .measurement-entry strong {
+  color: var(--text);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-value {
+  align-self: center;
+  justify-self: end;
+  color: var(--workspace-accent, var(--brand));
+  font-size: 16px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .measurement-stamp {
+  grid-column: 1 / -1;
+  padding-top: 7px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+body[data-domain] .statistics-demo-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 180px;
+  overflow: visible;
+  color: var(--text);
+}
+body[data-domain] .statistics-demo-svg text {
+  font-family: inherit;
+}
+body[data-domain] .statistics-demo-svg polyline {
+  vector-effect: non-scaling-stroke;
+}
+body[data-domain] #statisticsChart {
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+body[data-domain] #statisticsChart > svg {
+  min-width: 520px;
+}
+body[data-domain] #statisticsSummary,
+body[data-domain] #statisticsRows {
+  min-width: 0;
+}
+body[data-domain] #statisticsRows {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+body[data-domain] #batchCompareResults {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+html[dir="rtl"] body[data-domain] .measurement-entry {
+  text-align: right;
+}
+html[dir="rtl"] body[data-domain] .measurement-value {
+  justify-self: start;
+  text-align: start;
+}
+@media (max-width: 620px) {
+  body[data-domain] .qc-row {
+    grid-template-columns: minmax(0, 1fr) minmax(105px, .7fr);
+  }
+  body[data-domain] .qc-row > div:first-child {
+    grid-column: 1 / -1;
+  }
+  body[data-domain] .qc-save {
+    width: 100%;
+  }
+}
+@media (max-width: 440px) {
+  body[data-domain] .batch-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .measurement-entry {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-domain] .measurement-value {
+    justify-self: start;
+    text-align: start;
+  }
+  body[data-domain] .measurement-stamp {
+    grid-column: 1;
+  }
+}
