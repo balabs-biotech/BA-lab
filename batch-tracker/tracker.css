@@ -11313,3 +11313,401 @@ body[data-domain] #measurementCard .observation-details>label {
   body[data-domain] .culture-catalog-list>button { transition:none!important; }
   body[data-domain] .culture-catalog-list>button:hover { transform:none!important; }
 }
+
+
+/* ============================================================
+   PASS 55 — BATCH RECORD, STAGES & QUALITY CONTROL
+   ============================================================ */
+
+/* Selected lot identity and metadata: clear hierarchy, dense but calm. */
+body[data-domain] #batchInfo.info:not(.hidden) {
+  display:block;
+  margin:14px 0 12px;
+  padding:clamp(15px,2vw,21px);
+  overflow:hidden;
+  border:1px solid var(--vui-accent-line);
+  border-radius:15px;
+  background:
+    radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--workspace-accent) 10%,transparent),transparent 47%),
+    linear-gradient(145deg,color-mix(in srgb,var(--workspace-panel-raised) 92%,transparent),var(--workspace-panel));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 13px 28px rgba(0,0,0,.14);
+  color:var(--workspace-text);
+}
+body[data-domain] #batchInfo.info>strong {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:0 0 14px;
+  color:var(--workspace-text);
+  font-size:clamp(18px,2.2vw,24px);
+  font-weight:790;
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchInfo.info>strong::before {
+  content:"LOT";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:23px;
+  padding:2px 7px;
+  border:1px solid var(--vui-accent-line);
+  border-radius:6px;
+  background:var(--vui-accent-soft);
+  color:var(--workspace-accent);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.09em;
+}
+body[data-domain] #batchInfo .batch-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+body[data-domain] #batchInfo .batch-stat {
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  min-height:68px;
+  padding:11px 12px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:color-mix(in srgb,var(--workspace-panel-raised) 83%,transparent);
+}
+body[data-domain] #batchInfo .batch-stat-label {
+  color:var(--workspace-muted);
+  font-size:9px;
+  font-weight:760;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+}
+body[data-domain] #batchInfo .batch-stat-value {
+  color:var(--workspace-text);
+  font-size:12px;
+  font-weight:700;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Workflow sections retain a strong distinction between progression and QC. */
+body[data-domain] #batchStages:not(.hidden),
+body[data-domain] #batchQc:not(.hidden) {
+  margin:13px 0;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:14px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--workspace-panel-raised) 86%,transparent),var(--workspace-panel));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+body[data-domain] #batchStages>h3,
+body[data-domain] #batchQc>h3 {
+  margin:0 0 13px;
+  color:var(--workspace-text);
+  font-size:16px;
+  font-weight:760;
+  letter-spacing:-.02em;
+}
+body[data-domain] #stageProgress {
+  margin:0 0 14px;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:color-mix(in srgb,var(--workspace-panel) 88%,transparent);
+}
+body[data-domain] #stageProgressLabel {
+  margin-bottom:8px;
+  color:var(--workspace-muted);
+  font-size:10px;
+  font-weight:730;
+  letter-spacing:.055em;
+}
+body[data-domain] #stageProgressTrack {
+  height:8px;
+  overflow:hidden;
+  border:1px solid var(--workspace-border);
+  border-radius:999px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #stageProgressBar {
+  min-width:0;
+  border-radius:inherit;
+  box-shadow:0 0 13px color-mix(in srgb,var(--workspace-accent) 25%,transparent);
+}
+body[data-domain] #batchStageList.stage-list {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin:0;
+}
+body[data-domain] #batchStageList .stage {
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  margin:0;
+  padding:12px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:color-mix(in srgb,var(--workspace-panel-raised) 78%,transparent);
+  transition:border-color .2s var(--vui-ease),background .2s var(--vui-ease);
+}
+body[data-domain] #batchStageList .stage.active {
+  border-color:var(--vui-accent-line);
+  background:linear-gradient(115deg,var(--vui-accent-soft),transparent 75%),var(--workspace-panel-raised);
+  box-shadow:inset 3px 0 0 var(--workspace-accent);
+}
+body[data-domain] #batchStageList .stage.completed {
+  border-color:color-mix(in srgb,var(--workspace-accent) 28%,var(--workspace-border));
+}
+body[data-domain] #batchStageList .stage.failed {
+  border-color:color-mix(in srgb,#d66b61 45%,var(--workspace-border));
+  background:color-mix(in srgb,#d66b61 7%,var(--workspace-panel));
+}
+body[data-domain] #batchStageList .stage-number {
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:var(--workspace-panel);
+  color:var(--workspace-muted);
+  font-size:11px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #batchStageList .stage.active .stage-number {
+  border-color:var(--vui-accent-line);
+  background:var(--vui-accent-soft);
+  color:var(--workspace-accent);
+}
+body[data-domain] #batchStageList .stage.completed .stage-number {
+  color:var(--workspace-accent);
+}
+body[data-domain] #batchStageList .stage-name {
+  color:var(--workspace-text);
+  font-size:12px;
+  font-weight:740;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchStageList .stage>div:nth-child(2) .muted {
+  margin-top:3px;
+  font-size:9px;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchStageList .stage-status {
+  max-width:112px;
+  padding:5px 8px;
+  border:1px solid var(--workspace-border);
+  border-radius:999px;
+  background:var(--workspace-panel);
+  font-size:9px;
+  font-weight:760;
+  line-height:1.25;
+  text-align:center;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchStageList .stage-status.status-active {
+  border-color:var(--vui-accent-line);
+  background:var(--vui-accent-soft);
+  color:var(--workspace-accent);
+}
+body[data-domain] #batchStageList .stage-status.status-completed {
+  color:var(--workspace-text);
+}
+body[data-domain] #batchStageList .stage-status.status-failed {
+  border-color:color-mix(in srgb,#d66b61 45%,var(--workspace-border));
+  color:#e58b82;
+}
+body[data-domain] #batchStageList .stage-status.status-pending {
+  color:var(--workspace-muted);
+}
+body[data-domain] #batchStages .batch-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid var(--workspace-border);
+}
+body[data-domain] #batchStages .batch-actions button {
+  min-height:40px;
+}
+
+/* QC rows are decision units: label, code, status control, save action. */
+body[data-domain] #batchQc>.muted {
+  margin:-5px 0 14px;
+  line-height:1.6;
+}
+body[data-domain] #batchQcList.qc-list {
+  display:grid;
+  gap:8px;
+}
+body[data-domain] #batchQcList .qc-row {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(140px,.62fr) auto;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  margin:0;
+  padding:11px 12px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:color-mix(in srgb,var(--workspace-panel-raised) 80%,transparent);
+}
+body[data-domain] #batchQcList .qc-label {
+  color:var(--workspace-text);
+  font-size:12px;
+  font-weight:730;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchQcList .qc-code {
+  display:inline-block;
+  margin-top:4px;
+  color:var(--workspace-muted);
+  font-size:9px;
+  letter-spacing:.035em;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #batchQcList .qc-row select {
+  width:100%;
+  min-width:0;
+  min-height:38px;
+  border-radius:8px;
+}
+body[data-domain] #batchQcList .qc-row .qc-save {
+  min-height:38px;
+  padding-inline:13px;
+  white-space:nowrap;
+}
+
+/* Traceability timeline: event cards are chronological records, not alerts. */
+body[data-domain] #batchEvents:not(.hidden) {
+  margin-top:14px;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:14px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--workspace-panel-raised) 86%,transparent),var(--workspace-panel));
+}
+body[data-domain] #batchEvents>h3 {
+  margin:5px 0 7px;
+  color:var(--workspace-text);
+  font-size:17px;
+  letter-spacing:-.025em;
+}
+body[data-domain] #batchEvents>.muted {
+  max-width:780px;
+  line-height:1.65;
+}
+body[data-domain] #batchEventList.batch-event-list {
+  display:grid;
+  gap:8px;
+  margin-top:14px;
+}
+body[data-domain] #batchEventList .batch-event-item {
+  position:relative;
+  margin:0;
+  padding:12px 14px 12px 17px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:color-mix(in srgb,var(--workspace-panel-raised) 78%,transparent);
+  box-shadow:none;
+}
+body[data-domain] #batchEventList .batch-event-item::before {
+  content:"";
+  position:absolute;
+  inset:12px auto 12px 0;
+  width:3px;
+  border-radius:0 4px 4px 0;
+  background:var(--workspace-accent);
+  opacity:.75;
+}
+body[data-domain] #batchEventList .batch-event-item>strong {
+  display:block;
+  color:var(--workspace-text);
+  font-size:12px;
+  font-weight:750;
+}
+body[data-domain] #batchEventList .batch-event-item>.muted {
+  margin-top:4px;
+  color:var(--workspace-muted);
+  font-size:10px;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #batchEventList .batch-event-item>div:not(.muted) {
+  margin-top:7px;
+  color:var(--workspace-muted);
+  font-size:11px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+
+/* Measurement history uses a stable three-column reading order. */
+body[data-domain] #measurementCard .measurement-entry {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(105px,auto);
+  gap:7px 14px;
+  align-items:start;
+  margin:0;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:color-mix(in srgb,var(--workspace-panel-raised) 76%,transparent);
+}
+body[data-domain] #measurementCard .measurement-entry>div:first-child { min-width:0; }
+body[data-domain] #measurementCard .measurement-entry>div:first-child>strong {
+  color:var(--workspace-text);
+  font-size:12px;
+  font-weight:740;
+}
+body[data-domain] #measurementCard .measurement-meta {
+  color:var(--workspace-muted);
+  font-size:10px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #measurementCard .measurement-value {
+  color:var(--workspace-text);
+  font-size:15px;
+  font-weight:780;
+  text-align:end;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #measurementCard .measurement-stamp {
+  grid-column:1/-1;
+  padding-top:7px;
+  border-top:1px solid var(--workspace-border);
+  color:var(--workspace-muted);
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+
+@media(max-width:900px) {
+  body[data-domain] #batchInfo .batch-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  body[data-domain] #batchStageList.stage-list { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:640px) {
+  body[data-domain] #batchInfo .batch-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body[data-domain] #batchQcList .qc-row { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  body[data-domain] #batchQcList .qc-row>div:first-child { grid-column:1/-1; }
+  body[data-domain] #batchQcList .qc-row .qc-save { width:100%; }
+}
+@media(max-width:420px) {
+  body[data-domain] #batchInfo .batch-grid { grid-template-columns:minmax(0,1fr); }
+  body[data-domain] #batchStageList .stage { grid-template-columns:31px minmax(0,1fr); }
+  body[data-domain] #batchStageList .stage-status { grid-column:2; justify-self:start; }
+  body[data-domain] #batchEvents .batch-harvest-entry .grid { grid-template-columns:minmax(0,1fr); }
+  body[data-domain] #measurementCard .measurement-entry { grid-template-columns:minmax(0,1fr); }
+  body[data-domain] #measurementCard .measurement-value { text-align:start; }
+  body[data-domain] #measurementCard .measurement-stamp { grid-column:auto; }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #batchStageList .stage { transition:none!important; }
+}
