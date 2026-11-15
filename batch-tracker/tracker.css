@@ -7958,3 +7958,10 @@ body[data-domain="mycology"] #authCard label {
   color: #e9e2dc !important;
   -webkit-text-fill-color: #e9e2dc !important;
 }
+
+/* MYCOLOGY AUTH — override the legacy high-specificity light-theme label rule. */
+body[data-domain="mycology"] #authCard :is(label) {
+  color: #e9e2dc !important;
+  -webkit-text-fill-color: #e9e2dc !important;
+  opacity: 1 !important;
+}
