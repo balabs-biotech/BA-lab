@@ -321,3 +321,53 @@ html body[data-domain] #contextPanel { display:none !important; }
   html body[data-domain] { padding:8px 8px 24px !important; }
   html body[data-domain] .app-toolbar { min-height:54px !important; }
 }
+
+
+/* PASS 118 — constrain intrinsic desktop widths before they enlarge the document. */
+html body[data-domain],
+html body[data-domain] *,
+html body[data-domain] *::before,
+html body[data-domain] *::after {
+  box-sizing:border-box !important;
+}
+html body[data-domain] {
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:clip !important;
+}
+html body[data-domain] .container {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:1440px !important;
+  overflow-x:clip !important;
+}
+html body[data-domain] .container > * {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] .overview-metrics {
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] .overview-metric {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] :is(.overview-heading,.overview-metrics,.overview-panels,.overview-panel,.overview-chart,.overview-activity) {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+@media(max-width:900px) {
+  html body[data-domain] .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+@media(max-width:560px) {
+  html body[data-domain] .overview-metrics { grid-template-columns:minmax(0,1fr) !important; }
+}
