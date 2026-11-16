@@ -5920,18 +5920,60 @@ async function loadBiologicalLineage(cultureId) {
     while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
     const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
     while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
-    const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode"))); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing")); node.append(strong, small); return node; };
+    const renderNode = (row, label, role = 'related', depth = 0) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'culture-lineage-node';
+      node.dataset.lineageRole = role;
+      node.dataset.lineageDepth = String(depth);
+      node.addEventListener('click', () => loadCultureDetail(row.id));
+      node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode")));
+      const strong = document.createElement('strong');
+      strong.textContent = row.code || 'Culture sans code';
+      const small = document.createElement('small');
+      small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing"));
+      node.append(strong, small);
+      return node;
+    };
     target.replaceChildren();
-    const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
+    const makeGroup = (title, items, role = 'related') => {
+      const section = document.createElement('section');
+      section.dataset.lineageGroup = role;
+      const heading = document.createElement('p');
+      heading.className = 'muted';
+      heading.textContent = title;
+      section.appendChild(heading);
+      const list = document.createElement('div');
+      list.className = 'culture-lineage-list';
+      items.forEach((item, index) => {
+        if (index) {
+          const arrow = document.createElement('span');
+          arrow.className = 'culture-lineage-arrow';
+          arrow.setAttribute('aria-hidden', 'true');
+          arrow.textContent = '→';
+          list.appendChild(arrow);
+        }
+        list.appendChild(renderNode(item.row, item.label, role, item.depth || 0));
+      });
+      section.appendChild(list);
+      target.appendChild(section);
+    };
     if (materialChain.length) {
       const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = biologicalWorkflowText("materialOrigin"); section.appendChild(heading);
       const list = document.createElement('div'); list.className = 'culture-lineage-list';
       materialChain.forEach((material, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = material.material_code || biologicalWorkflowText("materialNoCode"); const small = document.createElement('small'); small.textContent = (material.material_type || biologicalWorkflowText("unknownType")) + (material.generation == null ? '' : ' · ' + biologicalWorkflowText("generation") + material.generation) + (material.state ? ' · ' + material.state : ''); node.append(strong,small); list.appendChild(node); });
       section.appendChild(list); target.appendChild(section);
     }
-    if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })));
-    makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
-    if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
+    if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })), 'ancestor');
+    makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }], 'current');
+    if (descendants.length) {
+      const generations = [...new Set(descendants.map(row => row.depth))].sort((a, b) => a - b);
+      generations.forEach(depth => {
+        const generationRows = descendants.filter(row => row.depth === depth);
+        makeGroup(biologicalWorkflowText("descendants") + ' · ' + biologicalWorkflowText("generation") + depth + ' (' + generationRows.length + ')',
+          generationRows.map(row => ({ row, label: biologicalWorkflowText("generation") + depth, depth })), 'descendant');
+      });
+    }
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
   } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
