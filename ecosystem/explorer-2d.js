@@ -12,7 +12,7 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
- const roots=tree.length,rootRadius=430;
+ const roots=tree.length,rootRadius=300;
  tree.forEach((root,i)=>{
   const angle=-Math.PI/2+i*Math.PI*2/roots,rx=Math.cos(angle)*rootRadius,ry=Math.sin(angle)*rootRadius;
   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,parent:null,angle};
@@ -36,9 +36,17 @@ function buildNetwork(){
  });
  // Inter-universe hyphae form a sparse, biologically plausible mesh.
  tree.forEach((root,i)=>{
-  const a=byId.get(root.id),b=byId.get(tree[(i+1)%roots].id);
+  const next=tree[(i+1)%roots];
+  const a=byId.get(root.id),b=byId.get(next.id);
   if(a&&b)edges.push({a,b,depth:0,cross:true,seed:i*97});
   if(i%2===0){const c=byId.get(tree[(i+3)%roots].id);if(c)edges.push({a,b:c,depth:0,cross:true,seed:i*131});}
+  const left=nodes.filter(n=>n.rootId===root.id&&n.level===1);
+  const right=nodes.filter(n=>n.rootId===next.id&&n.level===1);
+  const candidates=[];
+  left.forEach(na=>right.forEach(nb=>candidates.push({a:na,b:nb,d:Math.hypot(na.x-nb.x,na.y-nb.y)})));
+  candidates.sort((u,v)=>u.d-v.d);
+  const usedA=new Set(),usedB=new Set();let linked=0;
+  for(const pair of candidates){if(usedA.has(pair.a.id)||usedB.has(pair.b.id))continue;edges.push({a:pair.a,b:pair.b,depth:1,cross:true,seed:hash(pair.a.id+pair.b.id)});usedA.add(pair.a.id);usedB.add(pair.b.id);if(++linked===2)break;}
  });
  // Anastomoses connect nearby branches at each level without turning the map into a grid.
  const levels=new Map();nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
@@ -52,7 +60,7 @@ function strokeFilament(a,b,depth,seed,cross=false){
  ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.quadraticCurveTo(c.x,c.y,q.x,q.y);
  const rootColor=PALETTE[a.rootId]||"#91a99b",width=cross? .55:Math.max(.45,(depth===1?1.5:depth===2?1.15:.85)*Math.sqrt(scale));
  if(!cross&&depth<=2&&len>34){ctx.strokeStyle=rootColor+"18";ctx.lineWidth=width*3.4;ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.quadraticCurveTo(c.x,c.y,q.x,q.y);}
- ctx.strokeStyle=cross?"#b96b4d35":rootColor+(depth>=3?"55":depth===2?"85":"b0");ctx.lineWidth=width;ctx.lineCap="round";ctx.stroke();
+ ctx.strokeStyle=cross?(depth===0?"#b96b4d35":"#b96b4d75"):rootColor+(depth>=3?"55":depth===2?"85":"b0");ctx.lineWidth=width;ctx.lineCap="round";ctx.stroke();
  // Fine lateral hyphae and bifurcating tips.
  if(!cross&&len>24&&depth<5){
   const count=depth===1?5:depth===2?3:2,dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
@@ -63,7 +71,7 @@ function strokeFilament(a,b,depth,seed,cross=false){
  }
  return{p,q,c};
 }
-function levelOpacity(level){const thresholds=[0,.25,.62,1.45,2.8,5.0,7.8];const threshold=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-threshold*.72)/(threshold*.42),0,1);}
+function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1];const threshold=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-threshold*.72)/(threshold*.42),0,1);}
 function draw(){
  ctx.clearRect(0,0,w,h);
  const bg=ctx.createRadialGradient(w*.5,h*.48,0,w*.5,h*.48,Math.max(w,h)*.78);bg.addColorStop(0,"#1b302c");bg.addColorStop(.58,"#142320");bg.addColorStop(1,"#101719");ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
@@ -80,7 +88,7 @@ function draw(){
   ctx.closePath();ctx.fillStyle="#111b1d";ctx.strokeStyle=color+(n.level===0?"e0":n.level===1?"b0":"70");ctx.lineWidth=n.level===0?1.6:.9;ctx.fill();ctx.stroke();
   if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+7+Math.min(5,scale),0,Math.PI*2);ctx.strokeStyle="#e4e7dd";ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.stroke();ctx.setLineDash([]);}
   const show=n.level===0||alpha>.5&&scale>(n.level===1? .58:n.level===2?1.15:n.level===3?2.35:4.1)||selected?.id===n.id;
-  if(show){const font=clamp((n.level===0?12:10)*Math.sqrt(scale),8,14);ctx.font=(n.level===0?"650 ":"500 ")+font+"px system-ui";ctx.textAlign="center";ctx.textBaseline="top";ctx.lineWidth=3;ctx.strokeStyle="#111b1df0";ctx.strokeText(n.title,p.x,p.y+r+5,190);ctx.fillStyle=n.level===0?"#e4e7dd":"#c5d0c7";ctx.fillText(n.title,p.x,p.y+r+5,190);}
+  if(show){const font=clamp((n.level===0?12:10)*Math.sqrt(scale),8,14),maxWidth=Math.min(190,w-24),labelX=clamp(p.x,maxWidth/2+12,w-maxWidth/2-12);ctx.font=(n.level===0?"650 ":"500 ")+font+"px system-ui";ctx.textAlign="center";ctx.textBaseline="top";ctx.lineWidth=3;ctx.strokeStyle="#111b1df0";ctx.strokeText(n.title,labelX,p.y+r+5,maxWidth);ctx.fillStyle=n.level===0?"#e4e7dd":"#c5d0c7";ctx.fillText(n.title,labelX,p.y+r+5,maxWidth);}
   ctx.globalAlpha=1;
  });
 }
