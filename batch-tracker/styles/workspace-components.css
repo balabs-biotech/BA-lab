@@ -910,3 +910,102 @@ html body[data-domain] .card:not(.app-hero) input[type="number"]:user-invalid:fo
   html body[data-domain] #authCard .auth-actions { grid-template-columns:minmax(0,1fr) !important; }
   html body[data-domain] .card:not(.app-hero) .consent-option { padding:10px !important; }
 }
+
+
+/* PASS 141 — a shared internal-panel system for operational views.
+   Domain accents remain inherited from --workspace-accent; this only standardises
+   panel rhythm, heading hierarchy and responsive spacing. */
+html body[data-domain] .card:not(.app-hero) :is(
+  .bio-operation-panel,
+  .bio-lineage-panel,
+  .batch-create-panel,
+  .batch-compare-panel,
+  .statistics-chart,
+  .statistics-summary,
+  .measurement-history
+) {
+  min-width:0 !important;
+  margin-block:14px 0 !important;
+  padding:clamp(13px,1.7vw,19px) !important;
+  border:1px solid var(--border) !important;
+  border-radius:12px !important;
+  background:
+    linear-gradient(145deg,rgba(43,58,54,.52),rgba(17,27,29,.34)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(
+  .bio-operation-panel,
+  .bio-lineage-panel,
+  .batch-create-panel,
+  .batch-compare-panel
+) > :is(h2,h3,h4) {
+  margin:0 0 10px !important;
+  color:var(--paper) !important;
+  font-size:clamp(14px,1.35vw,17px) !important;
+  font-weight:760 !important;
+  letter-spacing:-.015em !important;
+  line-height:1.3 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(
+  .bio-operation-panel,
+  .bio-lineage-panel,
+  .batch-create-panel,
+  .batch-compare-panel
+) > .section-kicker {
+  margin:0 0 12px !important;
+  padding-bottom:9px !important;
+  border-bottom:1px solid var(--border) !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(
+  .bio-operation-panel,
+  .bio-lineage-panel,
+  .batch-create-panel,
+  .batch-compare-panel
+) :is(p,.muted,.hint) {
+  max-width:900px !important;
+  line-height:1.6 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(
+  .bio-operation-panel,
+  .bio-lineage-panel,
+  .batch-create-panel,
+  .batch-compare-panel
+) :is(.grid,.form-grid,.row) {
+  min-width:0 !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  padding:0 0 13px !important;
+  border-bottom:1px solid var(--border) !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-heading h3 {
+  margin:5px 0 4px !important;
+  font-size:clamp(18px,1.8vw,23px) !important;
+  line-height:1.2 !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-heading .muted {
+  margin:0 !important;
+  font-size:11px !important;
+}
+@media(max-width:620px) {
+  html body[data-domain] .card:not(.app-hero) :is(
+    .bio-operation-panel,
+    .bio-lineage-panel,
+    .batch-create-panel,
+    .batch-compare-panel,
+    .statistics-chart,
+    .statistics-summary,
+    .measurement-history
+  ) {
+    margin-block-start:11px !important;
+    padding:12px !important;
+    border-radius:10px !important;
+  }
+  html body[data-domain] .card:not(.app-hero) .culture-detail-heading {
+    align-items:stretch !important;
+    flex-direction:column !important;
+  }
+}
