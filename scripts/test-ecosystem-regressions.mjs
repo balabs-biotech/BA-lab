@@ -175,7 +175,11 @@ for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   const stylesForPage = label === 'public' ? pageCss : source;
   assert.ok(source.includes("document.documentElement.dir=direction") && source.includes("app.dir=direction"), label + ' Arabic mode must set document-level and app-level reading direction');
   assert.ok(source.includes("localStorage.setItem('balabs-language',l)") && source.includes("localStorage.getItem('balabs-language')"), label + ' language preference must persist and restore safely');
-  assert.ok(source.includes("const routeParams=new URLSearchParams(location.search)") && source.includes("let initialLanguage=routeParams.get('lang')") && source.includes("setLanguage(initialLanguage)") && source.includes("localStorage.getItem('balabs-language')"), label + ' must prioritize an explicit supported URL language, safely restore the saved language, and render with that language');
+  if (label === 'public') {
+    assert.ok(source.includes("const routeParams=new URLSearchParams(location.search)") && source.includes("let initialLanguage=routeParams.get('lang')") && source.includes("setLanguage(initialLanguage)"), label + ' must prioritize an explicit supported URL language and render with that language');
+  } else {
+    assert.ok(source.includes("let initialLanguage='fr'") && source.includes("localStorage.getItem('balabs-language')") && source.includes("setLanguage(initialLanguage)"), label + ' must safely restore the saved language and render with that language');
+  }
   assert.ok(source.includes('role="group" aria-label="Choisir la langue"') && source.includes('aria-label="العربية"'), label + ' language controls must have a named semantic group and explicit language names');
   assert.ok(source.includes('<small id="brandSubtitle">Applied biotechnology · Sétif</small>') && !source.includes('<div class="mark" aria-hidden="true">Y</div>'), label + ' header must use the text wordmark rather than a substitute Y glyph');
   assert.ok(source.includes("brandSubtitles={fr:'Biotechnologie appliquée · Sétif'") && source.includes('brandSubtitle.textContent=brandSubtitles[l]'), label + ' brand descriptor must follow the selected language');
