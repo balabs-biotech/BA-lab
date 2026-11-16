@@ -692,3 +692,91 @@ html body[data-domain="mycology"] #trackerCard .culture-linked-batches .culture-
     justify-self:start !important;
   }
 }
+
+
+/* PASS 120 — PixiJS lineage map with a semantic, keyboard-accessible record list. */
+html body[data-domain="mycology"] #trackerCard .lineage-graph-shell {
+  display:grid !important;
+  gap:10px !important;
+  min-width:0 !important;
+  margin:2px 0 12px !important;
+  padding:13px !important;
+  overflow:hidden !important;
+  border:1px solid rgba(201,130,89,.24) !important;
+  border-radius:11px !important;
+  background:linear-gradient(145deg,rgba(35,49,45,.96),rgba(23,34,32,.98)) !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-heading {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:6px 12px !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-heading > span {
+  color:#d99a76 !important;
+  font-size:9px !important;
+  font-weight:850 !important;
+  letter-spacing:.13em !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-heading > small {
+  color:#9fb0a6 !important;
+  font-size:10px !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-stage {
+  width:100% !important;
+  min-height:190px !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  border:1px solid rgba(126,151,140,.12) !important;
+  border-radius:8px !important;
+  background:
+    radial-gradient(circle at 1px 1px,rgba(151,174,160,.13) 1px,transparent 0) 0 0/18px 18px,
+    linear-gradient(180deg,rgba(9,16,15,.36),rgba(9,16,15,.16)) !important;
+  scrollbar-color:rgba(201,130,89,.48) rgba(18,28,26,.8) !important;
+  scrollbar-width:thin !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-canvas {
+  display:block !important;
+  max-width:none !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-status {
+  display:grid !important;
+  min-height:170px !important;
+  place-items:center !important;
+  margin:0 !important;
+  padding:18px !important;
+  color:#aebdb4 !important;
+  font-size:11px !important;
+  text-align:center !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-data-details {
+  margin-top:4px !important;
+  padding:10px 12px !important;
+  border:1px solid rgba(126,151,140,.18) !important;
+  border-radius:9px !important;
+  background:rgba(11,18,17,.22) !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-data-details > summary {
+  color:#d7a083 !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  cursor:pointer !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-data-details[open] > summary {
+  margin-bottom:12px !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-data-details .culture-lineage-list {
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr)) !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-data-details .culture-lineage-arrow {
+  display:none !important;
+}
+@media(max-width:600px) {
+  html body[data-domain="mycology"] #trackerCard .lineage-graph-shell { padding:10px !important; }
+  html body[data-domain="mycology"] #trackerCard .lineage-graph-heading { align-items:flex-start !important; flex-direction:column !important; }
+  html body[data-domain="mycology"] #trackerCard .lineage-graph-stage { min-height:160px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="mycology"] #trackerCard .lineage-graph-canvas { scroll-behavior:auto !important; }
+}
