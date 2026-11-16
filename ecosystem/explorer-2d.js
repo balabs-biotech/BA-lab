@@ -39,7 +39,7 @@ function layout(initial=false){
    const x=trunkX+lateral+sweep;
    const n={id:d.id,title:d.title,x,y,r:d.children?.length?6.5:4.5,level:1,data:d,rootId:parent.rootId};
    nodes.push(n);
-   edges.push({a:anchor,b:n,i:i+10});
+   edges.push({a:anchor,b:n,i:i+10,density:Math.min(1,(d.children?.length||0)/8)});
   });
   // Reveal a restrained preview of the next generation before entering a branch.
   kids.forEach((d,i)=>{
@@ -85,9 +85,11 @@ function draw(){
   // then split into two fine tips. Seeded by edge index so the network stays stable.
   if(!e.cross&&!e.tertiary&&len>85){
    const nx=-dy/len,ny=dx/len;
-   [.27,.57,.82].forEach((t,j)=>{
+   const density=e.density??.45;
+   const marks=density>.72?[.19,.37,.55,.73,.9]:density>.38?[.27,.57,.82]:[.38,.76];
+   marks.forEach((t,j)=>{
     const u=1-t,px=u*u*a.x+2*u*t*cx+t*t*b.x,py=u*u*a.y+2*u*t*cy+t*t*b.y;
-    const side=((e.i+j)%2?1:-1),reach=Math.min(48,Math.max(17,len*(.12+(j%2)*.025)));
+    const side=((e.i+j)%2?1:-1),reach=Math.min(48,Math.max(13,len*(.09+(j%2)*.025)))*(density<.38?.78:1);
     const ex=px+dx/len*reach*.58+nx*side*reach*.82,ey=py+dy/len*reach*.58+ny*side*reach*.82;
     const mx=(px+ex)/2+nx*side*reach*.18,my=(py+ey)/2+ny*side*reach*.18;
     ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(mx,my,ex,ey);
@@ -99,6 +101,14 @@ function draw(){
      ctx.strokeStyle="#9db5a044";ctx.lineWidth=.48;ctx.stroke();
     });
    });
+   if(density>.72){
+    [.31,.66].forEach((t,j)=>{
+     const u=1-t,px=u*u*a.x+2*u*t*cx+t*t*b.x,py=u*u*a.y+2*u*t*cy+t*t*b.y;
+     const side=((e.i+j)%2?1:-1),reach=12+((e.i+j*7)%9);
+     ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(px+nx*side*reach*.55,py+ny*side*reach*.55,px+dx/len*reach*.42+nx*side*reach,py+dy/len*reach*.42+ny*side*reach);
+     ctx.strokeStyle="#b9c8b766";ctx.lineWidth=.55;ctx.stroke();
+    });
+   }
   }
   curves.push({a,b,cx,cy,e});
  });
