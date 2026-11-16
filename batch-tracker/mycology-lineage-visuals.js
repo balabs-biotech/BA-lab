@@ -26,7 +26,6 @@
   let app = null;
   let frame = 0;
   let renderToken = 0;
-  let resizeObserver = null;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const colors = { ancestor: 0x83a7a0, current: 0xc98259, descendant: 0xb4f477, line: 0x657b70, text: 0xe9eee7, muted: 0xa8b9ad };
 
@@ -186,14 +185,9 @@
   };
   const observer = new MutationObserver(scheduleRender);
   observer.observe(target, { childList: true, subtree: true });
-  resizeObserver = new ResizeObserver(() => {
-    if (app && shell.dataset.graphState === "ready") scheduleRender();
-  });
-  resizeObserver.observe(stage);
   scheduleRender();
   window.addEventListener("pagehide", () => {
     observer.disconnect();
-    resizeObserver?.disconnect();
     if (app) app.destroy(true);
     app = null;
   }, { once: true });
