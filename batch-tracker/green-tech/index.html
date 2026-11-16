@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#11191a">
   <title>BA Labs CultureOps — Green Tech</title>
   <link rel="stylesheet" href="../tracker.css?v=20261116-ba-unified-110">
-  <link rel="stylesheet" href="../workspace-unified.css?v=20261116-ba-layout-114">
+  <link rel="stylesheet" href="../workspace-unified.css?v=20261116-ba-layout-115">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="agronomy">
@@ -24,6 +24,10 @@
       })
       .then(markup => {
         document.getElementById("workspace-root").innerHTML = markup;
+        const visualRuntime = document.createElement("script");
+        visualRuntime.src = "../workspace-visuals.js?v=20261116-origin-pixi-1";
+        visualRuntime.onerror = () => console.info("BA Labs: effets visuels optionnels indisponibles.");
+        document.body.appendChild(visualRuntime);
         const i18nScript = document.createElement("script");
         i18nScript.src = "../i18n.js?v=20261026-core-refresh-1";
         i18nScript.onload = () => {
