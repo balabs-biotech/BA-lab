@@ -1,0 +1,137 @@
+/* BA LABS CULTUREOPS — PASS 110
+   Shared structural contract for Green Tech, Mycology and Laboratory.
+   Domain identity remains limited to --domain-accent. */
+
+html body[data-domain] main#main {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  align-content:start !important;
+  gap:16px !important;
+  min-width:0 !important;
+}
+
+html body[data-domain] .app-hero {
+  display:grid !important;
+  grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr) !important;
+  align-items:center !important;
+  gap:24px !important;
+  min-height:260px !important;
+  padding:clamp(26px,5vw,54px) !important;
+  margin:0 0 2px !important;
+}
+
+html body[data-domain] .hero-copy {
+  min-width:0 !important;
+  max-width:700px !important;
+}
+
+html body[data-domain] .hero-art {
+  min-width:0 !important;
+  min-height:190px !important;
+  opacity:.82 !important;
+}
+
+html body[data-domain] main#main > .card {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:14px !important;
+  min-width:0 !important;
+  width:100% !important;
+  padding:clamp(19px,2.8vw,32px) !important;
+  margin:0 !important;
+}
+
+html body[data-domain] main#main > .card > .section-kicker {
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:100% !important;
+  min-width:0 !important;
+  padding:0 0 10px !important;
+  margin:0 0 2px !important;
+  border:0 !important;
+  border-bottom:1px solid var(--border) !important;
+  color:var(--muted) !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.13em !important;
+  line-height:1.4 !important;
+}
+
+html body[data-domain] main#main > .card > .section-kicker .kicker-line {
+  flex:1 1 auto !important;
+  min-width:18px !important;
+  height:1px !important;
+  background:var(--border-strong) !important;
+}
+
+html body[data-domain] .entry-intro {
+  display:grid !important;
+  gap:7px !important;
+  max-width:760px !important;
+  padding:5px 0 12px !important;
+}
+
+html body[data-domain] .entry-intro h2 {
+  margin:0 !important;
+  color:var(--paper) !important;
+  font-size:clamp(1.35rem,2.6vw,1.9rem) !important;
+}
+
+html body[data-domain] .entry-intro .muted {
+  max-width:66ch !important;
+  margin:0 !important;
+  color:var(--muted) !important;
+}
+
+html body[data-domain] .entry-step-mark {
+  display:inline-flex !important;
+  align-items:center !important;
+  width:max-content !important;
+  padding:5px 8px !important;
+  border:1px solid var(--workspace-accent-border) !important;
+  border-radius:6px !important;
+  background:var(--workspace-accent-soft) !important;
+  color:var(--domain-accent) !important;
+  font-size:.62rem !important;
+  font-weight:800 !important;
+  letter-spacing:.12em !important;
+}
+
+@media(max-width:760px) {
+  html body[data-domain] main#main { gap:12px !important; }
+
+  html body[data-domain] .app-hero {
+    grid-template-columns:minmax(0,1fr) !important;
+    min-height:0 !important;
+    gap:12px !important;
+    padding:20px !important;
+  }
+
+  html body[data-domain] .hero-art {
+    display:none !important;
+  }
+
+  html body[data-domain] main#main > .card {
+    gap:12px !important;
+    padding:16px !important;
+  }
+}
+
+@media(max-width:390px) {
+  html body[data-domain] .app-hero {
+    padding:16px !important;
+  }
+
+  html body[data-domain] main#main > .card {
+    padding:13px !important;
+    border-radius:12px !important;
+  }
+
+  html body[data-domain] main#main > .card > .section-kicker {
+    gap:7px !important;
+    font-size:9px !important;
+    letter-spacing:.1em !important;
+  }
+}
