@@ -313,8 +313,7 @@ try {
             }
             const visit = list => {
               for (const rule of list) {
-                if (rule.cssRules) visit([...rule.cssRules]);
-                else if (rule.selectorText) {
+                if (rule.selectorText) {
                   if (rule.selectorText.includes("batchList")) {
                     batchListRules.push({ selector: rule.selectorText, background: rule.style?.background, backgroundColor: rule.style?.backgroundColor, backgroundImage: rule.style?.backgroundImage });
                   }
@@ -324,6 +323,7 @@ try {
                     }
                   } catch {}
                 }
+                if (rule.cssRules?.length) visit([...rule.cssRules]);
               }
             };
             visit(rules);
