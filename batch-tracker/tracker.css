@@ -22101,3 +22101,23 @@ body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-co
     gap:10px !important;
   }
 }
+
+@media(max-width:700px) {
+  body[data-domain]:not(.workspace-authenticated) .app-hero .hero-description,
+  body[data-domain]:not(.workspace-authenticated) .app-hero .hero-tags,
+  body[data-domain]:not(.workspace-authenticated) .app-hero .hero-note {
+    display:none !important;
+  }
+  body[data-domain]:not(.workspace-authenticated) .app-hero {
+    padding:12px 16px !important;
+    margin-bottom:8px !important;
+  }
+  body[data-domain]:not(.workspace-authenticated) .app-hero h1 {
+    font-size:clamp(27px,7vw,33px) !important;
+    line-height:1.08 !important;
+  }
+  body[data-domain]:not(.workspace-authenticated) .app-toolbar {
+    padding:6px 9px !important;
+    margin-bottom:9px !important;
+  }
+}
