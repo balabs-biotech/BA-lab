@@ -44,19 +44,20 @@ function buildNetwork(){
   walk(root,rootNode,1,angle,[]);
  });
  // Inter-universe hyphae form a sparse, biologically plausible mesh.
- tree.forEach((root,i)=>{
-  const next=tree[(i+1)%roots];
-  const a=byId.get(root.id),b=byId.get(next.id);
-  if(a&&b)edges.push({a,b,depth:0,cross:true,seed:i*97});
-  if(i%2===0){const c=byId.get(tree[(i+3)%roots].id);if(c)edges.push({a,b:c,depth:0,cross:true,seed:i*131});}
-  const left=nodes.filter(n=>n.rootId===root.id&&n.level===1);
-  const right=nodes.filter(n=>n.rootId===next.id&&n.level===1);
-  const candidates=[];
-  left.forEach(na=>right.forEach(nb=>candidates.push({a:na,b:nb,d:Math.hypot(na.x-nb.x,na.y-nb.y)})));
-  candidates.sort((u,v)=>u.d-v.d);
+ // Connect each universe to its nearest spatial neighbours, not to the next item in a ring.
+ const rootNodes=tree.map(root=>byId.get(root.id)).filter(Boolean),rootPairs=[];
+ rootNodes.forEach((a,i)=>rootNodes.slice(i+1).forEach(b=>rootPairs.push({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})));
+ rootPairs.sort((a,b)=>a.d-b.d);
+ const rootDegree=new Map();
+ for(const pair of rootPairs){if((rootDegree.get(pair.a.id)||0)>=2||(rootDegree.get(pair.b.id)||0)>=2)continue;edges.push({a:pair.a,b:pair.b,depth:0,cross:true,seed:hash(pair.a.id+pair.b.id)});rootDegree.set(pair.a.id,(rootDegree.get(pair.a.id)||0)+1);rootDegree.set(pair.b.id,(rootDegree.get(pair.b.id)||0)+1);}
+ // Anastomose nearby first-generation hyphae across neighbouring universes.
+ for(const pair of rootPairs.slice(0,Math.min(rootPairs.length,roots+2))){
+  const left=nodes.filter(n=>n.rootId===pair.a.id&&n.level===1),right=nodes.filter(n=>n.rootId===pair.b.id&&n.level===1),candidates=[];
+  left.forEach(a=>right.forEach(b=>candidates.push({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})));
+  candidates.sort((a,b)=>a.d-b.d);
   const usedA=new Set(),usedB=new Set();let linked=0;
-  for(const pair of candidates){if(usedA.has(pair.a.id)||usedB.has(pair.b.id))continue;edges.push({a:pair.a,b:pair.b,depth:1,cross:true,seed:hash(pair.a.id+pair.b.id)});usedA.add(pair.a.id);usedB.add(pair.b.id);if(++linked===2)break;}
- });
+  for(const candidate of candidates){if(usedA.has(candidate.a.id)||usedB.has(candidate.b.id))continue;edges.push({a:candidate.a,b:candidate.b,depth:1,cross:true,seed:hash(candidate.a.id+candidate.b.id)});usedA.add(candidate.a.id);usedB.add(candidate.b.id);if(++linked===2)break;}
+ }
  // Anastomoses connect nearby branches at each level without turning the map into a grid.
  const levels=new Map();nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
  levels.forEach(group=>{group.forEach((n,i)=>{if(i%3===0&&group.length>3){const other=group[(i+2)%group.length];if(n.parent!==other.id&&other.parent!==n.id)edges.push({a:n,b:other,depth:n.level,cross:true,seed:hash(n.id+other.id)});}})});
