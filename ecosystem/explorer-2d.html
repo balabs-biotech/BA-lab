@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111B1D">
+<meta name="description" content="BA Labs — exploration biologique 2D expérimentale du réseau des huit univers.">
+<title>BA Labs — Explorateur 2D</title>
+<style>
+:root{color-scheme:dark;--ink:#111B1D;--forest:#263B38;--copper:#B96B4D;--mineral:#D1D0C5;--muted:#9eaaa2}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--mineral);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+body{background:radial-gradient(ellipse at 48% 48%,#1e302d 0%,#14211f 47%,#101719 100%)}
+#field{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#field.dragging{cursor:grabbing}
+.top{position:fixed;z-index:5;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(14px + env(safe-area-inset-top)) clamp(14px,3vw,34px) 12px;background:linear-gradient(#101819ed,transparent);pointer-events:none}
+.brand{pointer-events:auto;display:flex;align-items:center;gap:12px;color:#edf0e8;text-decoration:none}.brand b{font-size:13px;letter-spacing:.2em}.brand span{font-size:9px;letter-spacing:.15em;color:#a9b7ac}
+.actions{display:flex;gap:6px;pointer-events:auto}.actions button,.actions a{min-width:38px;height:38px;padding:0 11px;border:1px solid #82968a55;background:#172623d9;color:#e5e9df;border-radius:3px;font:600 11px system-ui;text-decoration:none;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px)}
+.actions button:hover,.actions a:hover{border-color:var(--copper);color:white}
+.crumbs{position:fixed;z-index:5;top:76px;left:clamp(14px,3vw,34px);right:clamp(14px,3vw,34px);display:flex;gap:7px;align-items:center;overflow:auto;white-space:nowrap;pointer-events:auto;scrollbar-width:none}
+.crumbs button{border:0;background:transparent;color:#b7c4b9;font:600 10px system-ui;letter-spacing:.08em;padding:6px 2px;cursor:pointer}.crumbs button.current{color:#e6e9df}.crumbs i{font-style:normal;color:#71877a;font-size:10px}
+.foot{position:fixed;z-index:5;bottom:0;left:0;right:0;padding:18px clamp(14px,3vw,34px) calc(14px + env(safe-area-inset-bottom));display:flex;align-items:end;justify-content:space-between;gap:14px;pointer-events:none;background:linear-gradient(transparent,#101819d9)}
+.identity{max-width:min(520px,70vw)}.kicker{font:700 9px system-ui;letter-spacing:.2em;color:#b96b4d;text-transform:uppercase}.identity h1{margin:5px 0 3px;font:500 clamp(18px,3vw,28px)/1.08 Georgia,serif;color:#edf0e8}.identity p{margin:0;color:#a9b6ad;font-size:11px;line-height:1.5}
+.hint{color:#a6b2a9;font:600 9px/1.6 system-ui;letter-spacing:.08em;text-align:right;max-width:220px}
+.status{position:fixed;right:clamp(14px,3vw,34px);top:126px;z-index:5;color:#83968a;font:600 9px system-ui;letter-spacing:.12em;text-align:right;pointer-events:none}
+#notice{position:fixed;left:50%;bottom:95px;transform:translateX(-50%);z-index:8;max-width:calc(100% - 28px);padding:9px 13px;background:#172522eF;border:1px solid #8ba08b55;color:#e3e8df;font-size:11px;display:none}
+@media(max-width:650px){.top{padding-top:calc(10px + env(safe-area-inset-top))}.brand span{display:none}.actions button,.actions a{height:35px;min-width:35px;padding:0 8px}.crumbs{top:61px}.status{top:104px;font-size:8px}.foot{align-items:end}.hint{max-width:125px;font-size:8px}.identity p{max-width:250px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<canvas id="field" aria-label="Réseau biologique interactif des huit univers BA Labs"></canvas>
+<header class="top">
+<a class="brand" href="./index.html"><b>BA LABS</b><span>FIELD ATLAS / 2D EXPERIMENT</span></a>
+<div class="actions"><button id="zoomOut" aria-label="Zoom arrière">−</button><button id="zoomIn" aria-label="Zoom avant">+</button><button id="reset" aria-label="Recentrer">◎</button><a id="back3d" href="./index.html">3D ↗</a></div>
+</header>
+<nav class="crumbs" id="crumbs" aria-label="Navigation du réseau"></nav>
+<div class="status" id="status">8 UNIVERS · 2D FIELD</div>
+<footer class="foot"><div class="identity"><div class="kicker" id="kicker">EXPLORATION / 01</div><h1 id="heading">Un réseau, huit univers.</h1><p id="description">Explorez les ramifications de BA Labs. Chaque nœud ouvre une branche ou une ressource documentée.</p></div><div class="hint" id="hint">GLISSER : DÉPLACER · PINCER : ZOOMER<br>TOUCHER UN NŒUD : EXPLORER</div></footer>
+<div id="notice" role="status"></div>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s),canvas=$('#field'),ctx=canvas.getContext('2d',{alpha:true});
+const ids=['bio','myco','soil','lab','products','iot','work','learn'];
+const palette={bio:'#79a991',myco:'#b18b9d',soil:'#b96b4d',lab:'#9eaaa0',products:'#c88773',iot:'#8aaea4',work:'#b5a58c',learn:'#b9b98d'};
+const copy={
+fr:{title:'Un réseau, huit univers.',desc:'Explorez les ramifications de BA Labs. Chaque nœud ouvre une branche ou une ressource documentée.',hint:'GLISSER : DÉPLACER · PINCER : ZOOMER<br>TOUCHER UN NŒUD : EXPLORER',back:'3D ↗',overview:'Vue d’ensemble',open:'Ouvrir la fiche Notion ↗',loading:'Chargement du réseau…',empty:'Aucune branche publique à ce niveau.',kicker:'EXPLORATION',status:'UNIVERS · RÉSEAU 2D',home:'HUIT UNIVERS'},
+en:{title:'One network, eight fields.',desc:'Explore BA Labs through its branches. Each node opens a branch or a documented resource.',hint:'DRAG: PAN · PINCH: ZOOM<br>TAP A NODE: EXPLORE',back:'3D ↗',overview:'Overview',open:'Open Notion page ↗',loading:'Loading network…',empty:'No public branch at this level.',kicker:'EXPLORATION',status:'FIELDS · 2D NETWORK',home:'EIGHT FIELDS'},
+ar:{title:'شبكة واحدة، ثمانية عوالم.',desc:'استكشف تفرعات BA Labs. كل عقدة تفتح فرعًا أو موردًا موثقًا.',hint:'السحب: تحريك · ضم الأصابع: تكبير<br>المس عقدة للاستكشاف',back:'3D ↗',overview:'نظرة عامة',open:'افتح صفحة Notion ↗',loading:'جارٍ تحميل الشبكة…',empty:'لا توجد فروع عامة في هذا المستوى.',kicker:'استكشاف',status:'عوالم · شبكة ثنائية الأبعاد',home:'العوالم الثمانية'},
+pt:{title:'Uma rede, oito universos.',desc:'Explore as ramificações da BA Labs. Cada nó abre um ramo ou um recurso documentado.',hint:'ARRASTAR: MOVER · PINÇA: ZOOM<br>TOCAR NUM NÓ: EXPLORAR',back:'3D ↗',overview:'Visão geral',open:'Abrir página Notion ↗',loading:'A carregar a rede…',empty:'Não existem ramos públicos neste nível.',kicker:'EXPLORAÇÃO',status:'UNIVERSOS · REDE 2D',home:'OITO UNIVERSOS'}
+};
+let lang=new URLSearchParams(location.search).get('lang');
+try{if(!['fr','en','ar','pt'].includes(lang))lang=localStorage.getItem('balabs-language')}catch(_){}
+if(!['fr','en','ar','pt'].includes(lang))lang='fr';
+document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+const t=copy[lang];
+$('#back3d').href='./index.html?lang='+lang;
+$('#back3d').textContent=t.back;
+$('#heading').textContent=t.title;$('#description').textContent=t.desc;$('#hint').innerHTML=t.hint;
+let tree=[],stack=[],nodes=[],edges=[],particles=[],w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},raf=0,last=0,pointers=new Map(),pinch=0,dragMoved=false,down=null;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function resize(){const r=canvas.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);layout();draw()}
+function current(){return stack.length?stack[stack.length-1]:null}
+function rootTitle(n){return n.title||n.id}
+function layout(){
+ const cx=0,cy=0;nodes=[];edges=[];
+ if(!stack.length){
+  const root={id:'__root',title:'BA LABS',x:0,y:0,r:13,kind:'core',color:'#D1D0C5',data:null,depth:0};nodes.push(root);
+  const rx=Math.min(390,Math.max(190,w*.34)),ry=Math.min(245,Math.max(145,h*.30));
+  tree.forEach((d,i)=>{const a=-Math.PI/2+i*Math.PI*2/8;const n={id:d.id,title:d.title,x:Math.cos(a)*rx,y:Math.sin(a)*ry,r:9,kind:'domain',color:palette[d.id]||'#9eaaa0',data:d,depth:1};nodes.push(n);edges.push({a:root,b:n,seed:i});});
+  const links=[['bio','myco'],['myco','soil'],['soil','lab'],['lab','iot'],['lab','products'],['products','work'],['work','iot'],['products','learn'],['bio','lab'],['myco','products'],['soil','work'],['bio','iot'],['myco','learn'],['soil','products']];
+  links.forEach((pair,i)=>{const a=nodes.find(n=>n.id===pair[0]),b=nodes.find(n=>n.id===pair[1]);if(a&&b)edges.push({a,b,seed:i+19,cross:true})});
+ }else{
+  const parent=current(),children=parent.children||[];
+  nodes.push({id:parent.id,title:parent.title,x:0,y:0,r:12,kind:'parent',color:palette[stack[0].id]||'#b96b4d',data:parent,depth:stack.length});
+  const radius=Math.min(320,Math.max(175,Math.min(w,h)*.38));
+  children.forEach((d,i)=>{const count=children.length,a=-Math.PI/2+i*Math.PI*2/Math.max(count,1);const spread=radius*(count>7?1.08:1);const n={id:d.id,title:d.title,x:Math.cos(a)*spread,y:Math.sin(a)*spread,r:d.children?.length?8:5.5,kind:'branch',color:palette[stack[0].id]||'#9eaaa0',data:d,depth:stack.length+1};nodes.push(n);edges.push({a:nodes[0],b:n,seed:i+1});});
+ }
+ const bounds=nodes.reduce((b,n)=>({x:Math.max(b.x,Math.abs(n.x)+70),y:Math.max(b.y,Math.abs(n.y)+60)}),{x:0,y:0});
+ const fit=Math.min((w-70)/(bounds.x*2),(h-190)/(bounds.y*2),1.25);
+ if(!stack.length||!scale){targetScale=Math.max(.55,fit);scale=targetScale;targetOffset={x:w/2,y:h/2};offset={...targetOffset}}
+ else{targetScale=Math.min(1.25,Math.max(.55,fit));targetOffset={x:w/2,y:h/2};}
+ particles=edges.map((e,i)=>({edge:e,t:(i*.137)%1,speed:.035+(i%4)*.008}));
+ updateCrumbs();updateInfo();
+}
+function updateCrumbs(){const el=$('#crumbs');el.replaceChildren();const add=(label,index,currentFlag)=>{const b=document.createElement('button');b.textContent=label;b.className=currentFlag?'current':'';b.addEventListener('click',()=>{stack=stack.slice(0,index);layout();});el.append(b)};add(t.overview,0,!stack.length);stack.forEach((n,i)=>{const sep=document.createElement('i');sep.textContent='／';el.append(sep);add(n.title,i+1,i===stack.length-1)});}
+function updateInfo(){const n=current();$('#kicker').textContent=t.kicker+' / '+String(stack.length+1).padStart(2,'0');$('#heading').textContent=n?n.title:t.title;$('#description').textContent=n?(n.description||((n.children||[]).length+' '+(lang==='fr'?'branches connectées':'connected branches'))):t.desc;$('#status').textContent=n?((n.children||[]).length+' '+(lang==='fr'?'BRANCHES':'BRANCHES')):t.status;}
+function point(n){return{x:w/2+offset.x+(n.x*scale),y:h/2+offset.y+(n.y*scale)}}
+function curve(e){const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y;const bend=e.cross?.12:.18;return{a,b,c1:{x:a.x+dx*.32-dy*bend,y:a.y+dy*.32+dx*bend},c2:{x:a.x+dx*.68-dy*bend,y:a.y+dy*.68+dx*bend}}}
+function draw(now=0){
+ ctx.clearRect(0,0,w,h);
+ const glow=ctx.createRadialGradient(w*.5,h*.5,5,w*.5,h*.5,Math.max(w,h)*.65);glow.addColorStop(0,'rgba(91,126,105,.10)');glow.addColorStop(1,'rgba(8,15,16,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+ // Fine background filaments: restrained, low-contrast and non-interactive.
+ for(let i=0;i<24;i++){const x=(i*173.7%w),y=(i*97.3%h),len=35+(i%5)*22;ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(x+len*.2,y-14,x+len*.7,y+17,x+len,y+4);ctx.strokeStyle='rgba(159,184,162,.055)';ctx.lineWidth=.7;ctx.stroke();}
+ edges.forEach((e,i)=>{const c=curve(e);ctx.beginPath();ctx.moveTo(c.a.x,c.a.y);ctx.bezierCurveTo(c.c1.x,c.c1.y,c.c2.x,c.c2.y,c.b.x,c.b.y);ctx.strokeStyle=e.cross?'rgba(185,107,77,.20)':'rgba(166,194,173,.40)';ctx.lineWidth=e.cross?.8:1.1;ctx.stroke();});
+ if(!reduced){particles.forEach(p=>{p.t=(p.t+p.speed*.016)%1;const c=curve(p.edge),t=p.t,u=1-t;const x=u*u*u*c.a.x+3*u*u*t*c.c1.x+3*u*t*t*c.c2.x+t*t*t*c.b.x,y=u*u*u*c.a.y+3*u*u*t*c.c1.y+3*u*t*t*c.c2.y+t*t*t*c.b.y;ctx.beginPath();ctx.arc(x,y,1.3,0,Math.PI*2);ctx.fillStyle='rgba(209,208,197,.75)';ctx.fill();});}
+ nodes.forEach(n=>{const p=point(n),r=Math.max(3,n.r*scale);const halo=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*4.5);halo.addColorStop(0,n.color+'66');halo.addColorStop(1,n.color+'00');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(p.x,p.y,r*4.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle=n.kind==='core'?'#D1D0C5':n.color;ctx.fill();ctx.strokeStyle='#e8eee477';ctx.lineWidth=.8;ctx.stroke();
+  const font=Math.max(8,Math.min(14,11+Math.log2(Math.max(.5,scale))*1.5));ctx.font='600 '+font+'px system-ui';ctx.textAlign='center';ctx.textBaseline='top';const label=n.title.length>34?n.title.slice(0,32)+'…':n.title;ctx.lineWidth=3;ctx.strokeStyle='rgba(13,22,22,.92)';ctx.strokeText(label,p.x,p.y+r+7);ctx.fillStyle='#e0e7df';ctx.fillText(label,p.x,p.y+r+7);
+  if(n.data?.children?.length){ctx.font='500 8px system-ui';ctx.fillStyle='#a9b8ad';ctx.fillText(n.data.children.length+' '+(lang==='fr'?'branches':'branches'),p.x,p.y+r+font+10);}
+ });
+ if(!reduced){const ease=.16;scale+=(targetScale-scale)*ease;offset.x+=(targetOffset.x-offset.x)*ease;offset.y+=(targetOffset.y-offset.y)*ease;}
+ raf=requestAnimationFrame(draw);
+}
+function hit(x,y){for(let i=nodes.length-1;i>=0;i--){const n=nodes[i],p=point(n),r=Math.max(19,n.r*scale+12);if(Math.hypot(x-p.x,y-p.y)<r)return n;}return null}
+function activate(n){if(!n)return;if(n.kind==='core'){stack=[];layout();return;}const d=n.data;if(d?.children?.length){stack.push(d);layout();return;}if(d?.url){window.open(d.url,'_blank','noopener,noreferrer');return;}showNotice(t.empty);}
+function showNotice(s){const el=$('#notice');el.textContent=s;el.style.display='block';clearTimeout(showNotice.timer);showNotice.timer=setTimeout(()=>el.style.display='none',2200)}
+function zoom(f,x=w/2,y=h/2){const next=Math.max(.45,Math.min(2.2,targetScale*f));const ratio=next/targetScale;targetOffset.x=x-(x-targetOffset.x)*ratio;targetOffset.y=y-(y-targetOffset.y)*ratio;targetScale=next}
+$('#zoomIn').onclick=()=>zoom(1.25);$('#zoomOut').onclick=()=>zoom(.8);$('#reset').onclick=()=>{targetScale=1;targetOffset={x:w/2,y:h/2};};
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});down={x:e.clientX,y:e.clientY,node:hit(e.clientX,e.clientY)};dragMoved=false;canvas.classList.add('dragging');if(pointers.size===2){const a=[...pointers.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
+canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const prev=pointers.get(e.pointerId),dx=e.clientX-prev.x,dy=e.clientY-prev.y;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1&&down){if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)dragMoved=true;if(dragMoved){targetOffset.x+=dx;targetOffset.y+=dy}}else if(pointers.size===2){const a=[...pointers.values()],dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch>0)zoom(dist/pinch,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2);pinch=dist}});
+function endPointer(e){pointers.delete(e.pointerId);if(!pointers.size){canvas.classList.remove('dragging');if(down&&!dragMoved){const n=hit(e.clientX,e.clientY);activate(n)}down=null;pinch=0}}
+canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.08:.92,e.clientX,e.clientY)},{passive:false});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&stack.length){stack.pop();layout()}if(e.key==='+'||e.key==='=')zoom(1.2);if(e.key==='-')zoom(.8)});
+async function start(){try{$('#heading').textContent=t.loading;const response=await fetch('./notion-tree.'+lang+'.json',{cache:'no-cache'});if(!response.ok)throw new Error('Tree HTTP '+response.status);const data=await response.json();tree=ids.map(id=>data.domains.find(d=>d.id===id)).filter(Boolean);if(tree.length!==8)throw new Error('Expected 8 universes; received '+tree.length);resize();}catch(error){console.error(error);showNotice('Network data could not be loaded.');$('#heading').textContent='BA Labs';$('#description').textContent='Unable to load the public universe registry.';}}
+window.addEventListener('resize',resize,{passive:true});start();
+})();
+</script>
+</body>
+</html>
