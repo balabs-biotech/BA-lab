@@ -137,7 +137,19 @@ function draw(){
    }
   });
  }
- nodes.forEach(n=>{const p=screen(n),r=Math.max(3,n.r*Math.sqrt(scale)),color=PALETTE[n.rootId]||"#d1d0c5";ctx.beginPath();ctx.arc(p.x,p.y,r+5,0,Math.PI*2);ctx.strokeStyle=color+"44";ctx.lineWidth=1;ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle="#111b1d";ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+10,0,Math.PI*2);ctx.setLineDash([2,4]);ctx.strokeStyle="#d1d0c5";ctx.stroke();ctx.setLineDash([])}
+ nodes.forEach(n=>{const p=screen(n),r=Math.max(2.2,n.r*Math.sqrt(scale)),color=PALETTE[n.rootId]||"#d1d0c5";
+   // Organic junction: a deterministic, softly lobed outline instead of a perfect circle.
+   let seed=0;for(let k=0;k<n.id.length;k++)seed=(seed*31+n.id.charCodeAt(k))>>>0;
+   const lobes=n.level===0?9:n.level===1?7:5,pts=[];
+   for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,variation=.78+(((seed>>>((k%4)*5))&31)/31)*.38;pts.push({x:p.x+Math.cos(a)*r*variation,y:p.y+Math.sin(a)*r*variation});}
+   ctx.beginPath();
+   pts.forEach((q,k)=>{const next=pts[(k+1)%pts.length],mx=(q.x+next.x)/2,my=(q.y+next.y)/2;if(k===0)ctx.moveTo(mx,my);ctx.quadraticCurveTo(q.x,q.y,mx,my);});
+   ctx.closePath();ctx.strokeStyle=color+"42";ctx.lineWidth=n.level===2?.8:1.2;ctx.stroke();
+   ctx.fillStyle="#111b1d";ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=n.level===2?.9:1.45;ctx.stroke();
+   if(n.level===0||n.level===1&&n.data?.children?.length>4){
+    ctx.beginPath();ctx.arc(p.x-r*.12,p.y-r*.08,Math.max(.8,r*.23),0,Math.PI*2);ctx.fillStyle=color+"aa";ctx.fill();
+   }
+   if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+10,0,Math.PI*2);ctx.setLineDash([2,4]);ctx.strokeStyle="#d1d0c5";ctx.stroke();ctx.setLineDash([])}
   // Labels follow camera zoom, with a readable minimum and a restrained maximum.
   // At overview scale, hide secondary labels to prevent collisions; selected nodes remain named.
   const showLabel=n.level===0||scale>=.68||selected?.id===n.id;
