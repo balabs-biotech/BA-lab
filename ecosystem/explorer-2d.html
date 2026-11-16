@@ -34,7 +34,7 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
  <nav class="crumbs breadcrumbs" aria-label="Navigation du réseau"><ul id="crumbs"><li><span>BA Labs</span></li></ul></nav>
  <div class="actions">
   <select class="select select-sm lang-select" id="language" aria-label="Choisir la langue"><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="ar">🇩🇿 العربية</option><option value="pt">🇵🇹 PT</option></select>
-  <span class="badge badge-outline">CONTINUOUS 2D</span>
+  <span class="badge badge-outline">PIXIJS · WEBGL 2D</span>
  </div>
 </header>
 <main class="stage">
@@ -47,5 +47,8 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
  <div class="loading" id="loading"><div class="card"><div class="card-body"><span class="loading loading-spinner loading-md"></span><p>Chargement du réseau…</p></div></div></div>
 </main>
 </div>
-<script type="module" src="./explorer-2d.js?v=3"></script>
+<script type="importmap">
+{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}
+</script>
+<script type="module" src="./explorer-2d.js?v=pixijs-2"></script>
 </body></html>
