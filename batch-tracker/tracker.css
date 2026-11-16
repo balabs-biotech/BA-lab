@@ -23009,3 +23009,24 @@ body[data-domain] #batchList .batch-item:hover {
 @media(max-width:700px) {
   body[data-domain] #batchList .batch-item { padding:12px !important; }
 }
+
+
+/* BA LABS CULTUREOPS — PASS 99
+   Explicit direct-child rule for the batch-history fixture and rendered entries. */
+html body[data-domain] #batchList > * {
+  min-width:0 !important;
+  color:var(--text) !important;
+  background-color:var(--surface-raised) !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+  padding:14px 16px !important;
+}
+html body[data-domain] #batchList > .batch-item {
+  border-inline-start:3px solid var(--domain-accent) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.16) !important;
+}
+html body[data-domain] #batchList > .batch-item strong { color:var(--paper) !important; }
+html body[data-domain] #batchList > .batch-item .muted { color:var(--muted) !important; }
+@media(max-width:700px) {
+  html body[data-domain] #batchList > * { padding:12px !important; }
+}
