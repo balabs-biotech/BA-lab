@@ -349,7 +349,7 @@ assert.ok(!engine.includes("open.dataset.resourceOpen='true'"), 'The obsolete re
 assert.ok(engine.includes("data-camera=\"back\""), 'The scene must expose a direct previous-level control');
 assert.ok(engine.includes("if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28)"), 'Zoom-out control must preserve the active hierarchy and allow continuous camera travel');
 assert.ok(engine.includes('renderPath()'), 'The active folder path must remain visible in the scene');
-assert.ok(engine.includes('window.enterSphere(id,false,true)'), 'Domain selection must synchronize the hidden Notion content source');
+assert.ok(engine.includes("const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json'") && engine.includes('currentNode=manifest?.domains?.find(d=>d.id===id)||null'), 'The active 3D engine must load the selected language Notion manifest as its sole content source');
 assert.ok(!html.includes("mainView.addEventListener('pointerdown',beginOrbit)"), 'Legacy orbit input must not compete with the clean engine');
 assert.ok(!html.includes("openUniverse.addEventListener('click',toggleUniverse)"), 'Legacy hub navigation must not compete with the clean engine');
 assert.ok(html.includes('if(!spatial3D&&mainView.classList.contains(\'universe-closed\'))toggleUniverse()'), 'The hidden content source must not change the new engine scene state');
