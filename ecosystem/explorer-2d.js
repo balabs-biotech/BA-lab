@@ -12,7 +12,7 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
- const roots=tree.length,rootRadius=570;
+ const roots=tree.length,rootRadius=430;
  tree.forEach((root,i)=>{
   const angle=-Math.PI/2+i*Math.PI*2/roots,rx=Math.cos(angle)*rootRadius,ry=Math.sin(angle)*rootRadius;
   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,parent:null,angle};
@@ -20,7 +20,7 @@ function buildNetwork(){
   const walk=(data,parent,depth,branchAngle,path)=>{
    const kids=data.children||[];if(!kids.length)return;
    const spread=Math.min(2.45,1.05+Math.log2(kids.length+1)*.42);
-   const dist=depth===1?220:depth===2?116:depth===3?67:Math.max(29,47-depth*2);
+   const dist=depth===1?195+Math.sqrt(kids.length)*12:depth===2?160+Math.sqrt(kids.length)*28:depth===3?86+Math.sqrt(kids.length)*16:Math.max(29,47-depth*2);
    kids.forEach((child,j)=>{
     const hsh=hash(child.id),fraction=kids.length===1?0:(j/(kids.length-1)-.5);
     const jitter=((hsh%1000)/1000-.5)*.3;
