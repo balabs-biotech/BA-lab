@@ -141,3 +141,264 @@ html body[data-domain] main#main > .card.hidden,
 html body[data-domain] main#main > .card[hidden] {
   display:none !important;
 }
+
+/* PASS 111 — shared interior form and data-module composition. */
+html body[data-domain] main#main .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  align-items:start !important;
+  gap:14px !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+
+html body[data-domain] main#main .grid > div {
+  display:grid !important;
+  align-content:start !important;
+  gap:7px !important;
+  min-width:0 !important;
+}
+
+html body[data-domain] main#main .grid label,
+html body[data-domain] main#main > .card > label {
+  margin:0 !important;
+  color:var(--paper) !important;
+  font-size:.82rem !important;
+  font-weight:650 !important;
+  line-height:1.45 !important;
+}
+
+html body[data-domain] main#main input:not([type="checkbox"]):not([type="radio"]),
+html body[data-domain] main#main select,
+html body[data-domain] main#main textarea {
+  box-sizing:border-box !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:44px !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:9px !important;
+  background:var(--surface-raised) !important;
+  color:var(--text) !important;
+  box-shadow:none !important;
+}
+
+html body[data-domain] main#main textarea {
+  min-height:104px !important;
+  padding:12px 13px !important;
+  line-height:1.55 !important;
+  resize:vertical !important;
+}
+
+html body[data-domain] main#main input:focus-visible,
+html body[data-domain] main#main select:focus-visible,
+html body[data-domain] main#main textarea:focus-visible {
+  outline:2px solid var(--domain-accent) !important;
+  outline-offset:2px !important;
+  border-color:var(--domain-accent) !important;
+}
+
+html body[data-domain] main#main .hint,
+html body[data-domain] main#main small.hint {
+  display:block !important;
+  color:var(--muted) !important;
+  font-size:.72rem !important;
+  line-height:1.5 !important;
+}
+
+html body[data-domain] main#main .guided-entry-step {
+  display:grid !important;
+  gap:12px !important;
+  min-width:0 !important;
+  padding:16px !important;
+  border:1px solid var(--border) !important;
+  border-radius:11px !important;
+  background:var(--surface-2) !important;
+}
+
+html body[data-domain] main#main .guided-entry-step[hidden],
+html body[data-domain] main#main [hidden] {
+  display:none !important;
+}
+
+html body[data-domain] main#main .batch-create-panel,
+html body[data-domain] main#main .batch-compare-panel,
+html body[data-domain] main#main .statistics-filters,
+html body[data-domain] main#main .quick-capture,
+html body[data-domain] main#main .batch-harvest-entry {
+  display:grid !important;
+  align-content:start !important;
+  gap:14px !important;
+  min-width:0 !important;
+  padding:16px !important;
+  border:1px solid var(--border) !important;
+  border-radius:12px !important;
+  background:var(--surface-2) !important;
+  box-shadow:none !important;
+}
+
+html body[data-domain] main#main .batch-create-heading,
+html body[data-domain] main#main .quick-capture-heading,
+html body[data-domain] main#main .culture-catalog-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  min-width:0 !important;
+}
+
+html body[data-domain] main#main .batch-create-heading h3,
+html body[data-domain] main#main .quick-capture-heading h3,
+html body[data-domain] main#main .culture-catalog-heading h3 {
+  margin:5px 0 !important;
+  color:var(--paper) !important;
+}
+
+html body[data-domain] main#main .batch-create-heading p,
+html body[data-domain] main#main .quick-capture-heading p,
+html body[data-domain] main#main .culture-catalog-heading p {
+  margin:0 !important;
+  color:var(--muted) !important;
+  line-height:1.55 !important;
+}
+
+html body[data-domain] main#main .quick-capture-grid {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:9px !important;
+}
+
+html body[data-domain] main#main .quick-capture-tile {
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-width:0 !important;
+  min-height:66px !important;
+  padding:11px !important;
+  border:1px solid var(--border) !important;
+  border-radius:9px !important;
+  background:var(--surface-raised) !important;
+  color:var(--text) !important;
+  text-align:left !important;
+}
+
+html body[data-domain] main#main .quick-capture-tile strong {
+  color:var(--paper) !important;
+}
+
+html body[data-domain] main#main .quick-capture-tile small {
+  color:var(--muted) !important;
+}
+
+html body[data-domain] main#main .statistics-filters {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+}
+
+html body[data-domain] main#main .statistics-filter-action {
+  display:flex !important;
+  align-items:end !important;
+}
+
+html body[data-domain] main#main .statistics-filter-action button {
+  width:100% !important;
+}
+
+html body[data-domain] main#main .culture-catalog-filters {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+
+html body[data-domain] main#main .culture-catalog-filters > div {
+  display:grid !important;
+  gap:7px !important;
+  min-width:0 !important;
+}
+
+html body[data-domain] main#main .culture-catalog-list,
+html body[data-domain] main#main .measurement-history,
+html body[data-domain] main#main .batch-list,
+html body[data-domain] main#main .stage-list,
+html body[data-domain] main#main .qc-list,
+html body[data-domain] main#main .batch-event-list {
+  display:grid !important;
+  gap:9px !important;
+  min-width:0 !important;
+}
+
+html body[data-domain] main#main .batch-actions {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
+}
+
+html body[data-domain] main#main .observation-details {
+  padding:14px !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+  background:var(--surface-2) !important;
+}
+
+html body[data-domain] main#main .observation-details > summary {
+  color:var(--paper) !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+}
+
+html body[data-domain] main#main .statistics-table-wrap {
+  width:100% !important;
+  min-width:0 !important;
+  overflow-x:auto !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+  background:var(--surface-raised) !important;
+}
+
+html body[data-domain] main#main .statistics-table {
+  min-width:560px !important;
+  border-collapse:collapse !important;
+}
+
+@media(max-width:760px) {
+  html body[data-domain] main#main .quick-capture-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media(max-width:560px) {
+  html body[data-domain] main#main .grid,
+  html body[data-domain] main#main .statistics-filters,
+  html body[data-domain] main#main .culture-catalog-filters {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+
+  html body[data-domain] main#main .guided-entry-step,
+  html body[data-domain] main#main .batch-create-panel,
+  html body[data-domain] main#main .batch-compare-panel,
+  html body[data-domain] main#main .statistics-filters,
+  html body[data-domain] main#main .quick-capture,
+  html body[data-domain] main#main .batch-harvest-entry {
+    padding:12px !important;
+    gap:11px !important;
+  }
+
+  html body[data-domain] main#main .batch-create-heading,
+  html body[data-domain] main#main .quick-capture-heading,
+  html body[data-domain] main#main .culture-catalog-heading {
+    flex-wrap:wrap !important;
+  }
+
+  html body[data-domain] main#main .quick-capture-tile {
+    min-height:62px !important;
+    padding:9px !important;
+  }
+
+  html body[data-domain] main#main .batch-actions > button {
+    flex:1 1 140px !important;
+  }
+}
+
+@media(max-width:360px) {
+  html body[data-domain] main#main .quick-capture-grid {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
