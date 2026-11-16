@@ -332,3 +332,102 @@ html body[data-domain] .ba-reactive-surface:hover::after {
     transition:none !important;
   }
 }
+
+
+/* PASS 127 — experimental capture: one consistent instrument-record workflow across domains. */
+html body[data-domain] #measurementCard {
+  display:grid !important;
+  gap:13px !important;
+}
+html body[data-domain] #measurementCard > .grid {
+  align-items:end !important;
+  gap:12px !important;
+  margin:0 !important;
+}
+html body[data-domain] #measurementCard > .grid > div {
+  display:grid !important;
+  align-content:start !important;
+  gap:6px !important;
+}
+html body[data-domain] #measurementCard :is(label,.grid label) {
+  color:#cbd7d0 !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.045em !important;
+}
+html body[data-domain] #measurementCard :is(input,select,textarea) {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:42px !important;
+  border:1px solid color-mix(in srgb,var(--workspace-accent) 22%,#40534d) !important;
+  border-radius:8px !important;
+  background:#121d1c !important;
+  color:#e8eee9 !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.14) !important;
+}
+html body[data-domain] #measurementCard textarea {
+  min-height:82px !important;
+  resize:vertical !important;
+}
+html body[data-domain] #measurementCard :is(input,select,textarea):focus-visible {
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 72%,white) !important;
+  outline-offset:2px !important;
+  border-color:var(--workspace-accent) !important;
+}
+html body[data-domain] #measurementCard > .muted,
+html body[data-domain] #measurementCard .quick-capture-tip {
+  max-width:78ch !important;
+  line-height:1.65 !important;
+}
+html body[data-domain] #measurementCard .measurement-history {
+  display:grid !important;
+  gap:8px !important;
+  min-height:54px !important;
+}
+html body[data-domain] #measurementCard .measurement-history > .muted,
+html body[data-domain] #measurementCard .measurement-history > p:only-child {
+  margin:0 !important;
+  padding:10px 12px !important;
+  border:1px dashed rgba(155,174,164,.2) !important;
+  border-radius:8px !important;
+  color:#9eafa5 !important;
+  background:rgba(9,16,15,.2) !important;
+  font-size:11px !important;
+  line-height:1.6 !important;
+}
+html body[data-domain] #measurementCard .measurement-history .measurement-entry {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:start !important;
+  gap:8px 14px !important;
+  min-width:0 !important;
+  padding:11px 12px !important;
+  border:1px solid rgba(155,174,164,.16) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:9px !important;
+  background:rgba(32,45,43,.72) !important;
+}
+html body[data-domain] #measurementCard .measurement-history .measurement-entry :is(strong,b) {
+  color:#e4ece6 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #measurementCard .measurement-history .measurement-entry :is(small,.muted) {
+  color:#9eafa5 !important;
+  font-size:10px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain] #measurementCard .observation-details > p {
+  color:#aab9b0 !important;
+  font-size:11px !important;
+  line-height:1.65 !important;
+}
+@media(max-width:620px) {
+  html body[data-domain] #measurementCard { gap:11px !important; }
+  html body[data-domain] #measurementCard > .grid {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:10px !important;
+  }
+  html body[data-domain] #measurementCard .measurement-history .measurement-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
