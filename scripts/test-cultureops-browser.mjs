@@ -148,6 +148,7 @@ try {
       if (descriptionContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth description contrast ${descriptionContrast.toFixed(2)}:1 is below 4.5:1`);
       if (labelContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth label contrast ${labelContrast.toFixed(2)}:1 is below 4.5:1`);
       if (viewport.name === "desktop" && (metrics.toolbarPosition !== "sticky" || metrics.heroTop < metrics.toolbarBottom + 8)) failures.push(`${workspace.slug}/${viewport.name}: desktop toolbar should remain sticky above the workspace content (position=${metrics.toolbarPosition}, toolbarBottom=${metrics.toolbarBottom}, heroTop=${metrics.heroTop})`);
+      if (viewport.name === "desktop" && metrics.heroTop > 220) failures.push(`${workspace.slug}/${viewport.name}: workspace hero starts too far below the top navigation (${metrics.heroTop}px > 220px)`);
       if (viewport.name === "mobile" && metrics.languageLabelWraps) failures.push(`${workspace.slug}/${viewport.name}: language label wraps unexpectedly`);
             if (!metrics.headingText || !metrics.authVisible) failures.push(`${workspace.slug}/${viewport.name}: auth content missing`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
