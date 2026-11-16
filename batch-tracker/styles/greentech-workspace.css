@@ -473,3 +473,114 @@ html body[data-domain="agronomy"] #environmentalCard .leaflet-control-attributio
   html body[data-domain="agronomy"] #plantCultureForm :is(input,select,textarea),
   html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row { transition:none !important; }
 }
+
+
+/* PASS 124 — Environmental intelligence: metrics, charts and agronomic interpretation. */
+html body[data-domain="agronomy"] #environmentalCard {
+  display:grid !important;
+  gap:14px !important;
+}
+html body[data-domain="agronomy"] #environmentalCard > #satelliteColorMapPanel,
+html body[data-domain="agronomy"] #environmentalCard > #vegetationTrendPanel,
+html body[data-domain="agronomy"] #environmentalCard > #agroSynthesisPanel,
+html body[data-domain="agronomy"] #environmentalCard > #uvComparisonPanel {
+  min-width:0 !important;
+  margin:0 !important;
+  padding:16px !important;
+  border:1px solid rgba(155,174,164,.18) !important;
+  border-radius:12px !important;
+  background:linear-gradient(145deg,rgba(34,49,42,.96),rgba(23,34,29,.98)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard > #satelliteColorMapPanel {
+  border-color:rgba(180,244,119,.2) !important;
+  background:radial-gradient(ellipse at 100% 0,rgba(180,244,119,.065),transparent 42%),linear-gradient(145deg,#202d27,#17221d) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard :is(#vegetationTrendPanel,#agroSynthesisPanel,#uvComparisonPanel) h3 {
+  margin:0 0 12px !important;
+  color:#e4eddf !important;
+  font-size:14px !important;
+  font-weight:760 !important;
+  letter-spacing:-.01em !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel svg {
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  height:auto !important;
+  overflow:visible !important;
+  color:#aab9ad !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #agroSynthesisPanel > div,
+html body[data-domain="agronomy"] #environmentalCard #uvComparisonPanel > div {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr)) !important;
+  gap:9px !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #agroSynthesisPanel > div > *,
+html body[data-domain="agronomy"] #environmentalCard #uvComparisonPanel > div > * {
+  min-width:0 !important;
+  padding:12px !important;
+  border:1px solid rgba(155,174,164,.14) !important;
+  border-radius:9px !important;
+  background:rgba(12,22,18,.42) !important;
+  color:#dfe9dc !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #agroSynthesisPanel p,
+html body[data-domain="agronomy"] #environmentalCard #uvComparisonPanel p {
+  color:#aebdb1 !important;
+  font-size:11px !important;
+  line-height:1.65 !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #agroSynthesisPanel small,
+html body[data-domain="agronomy"] #environmentalCard #uvComparisonPanel small {
+  display:block !important;
+  margin-top:12px !important;
+  color:#8fa397 !important;
+  font-size:10px !important;
+  line-height:1.6 !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #envSummary {
+  display:grid !important;
+  gap:10px !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #envSummary > div {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr)) !important;
+  gap:9px !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #envSummary > div > * {
+  min-width:0 !important;
+  padding:12px !important;
+  border:1px solid rgba(180,244,119,.14) !important;
+  border-radius:9px !important;
+  background:rgba(180,244,119,.045) !important;
+  color:#e1eadc !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #satelliteColorMapPanel > #envLocation {
+  width:100% !important;
+  max-width:460px !important;
+  border:1px solid rgba(180,244,119,.22) !important;
+  border-radius:8px !important;
+  background:#111b18 !important;
+  color:#e5ede3 !important;
+  padding:9px 11px !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #satelliteColorMapPanel > #satelliteMapStatus {
+  margin:10px 0 !important;
+  color:#b7c8b8 !important;
+  font-size:10px !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #satelliteColorMap {
+  height:clamp(260px,38vw,420px) !important;
+  min-height:260px !important;
+  border:1px solid rgba(155,174,164,.22) !important;
+  border-radius:10px !important;
+  overflow:hidden !important;
+}
+@media(max-width:620px) {
+  html body[data-domain="agronomy"] #environmentalCard > :is(#satelliteColorMapPanel,#vegetationTrendPanel,#agroSynthesisPanel,#uvComparisonPanel) {
+    padding:12px !important;
+  }
+  html body[data-domain="agronomy"] #environmentalCard #satelliteColorMap { height:270px !important; }
+}
