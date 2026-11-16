@@ -72,6 +72,16 @@ function layout(initial=false){
  updateUI();draw();
 }
 function fit(){const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const pad=w<650?100:160;targetScale=clamp(Math.min((w-pad*2)/Math.max(1,maxX-minX),(h-pad*2)/Math.max(1,maxY-minY)),.4,1.05);targetOffset={x:-(minX+maxX)/2*targetScale,y:-(minY+maxY)/2*targetScale};}
+function taperedHypha(x0,y0,cx,cy,x1,y1,width,color){
+ const steps=7;
+ for(let s=0;s<steps;s++){
+  const t0=s/steps,t1=(s+1)/steps,u0=1-t0,u1=1-t1;
+  const ax=u0*u0*x0+2*u0*t0*cx+t0*t0*x1,ay=u0*u0*y0+2*u0*t0*cy+t0*t0*y1;
+  const bx=u1*u1*x0+2*u1*t1*cx+t1*t1*x1,by=u1*u1*y0+2*u1*t1*cy+t1*t1*y1;
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);
+  ctx.strokeStyle=color;ctx.lineWidth=width*(1-.82*t1);ctx.lineCap="round";ctx.stroke();
+ }
+}
 function draw(){
  ctx.clearRect(0,0,w,h);
  for(let i=0;i<42;i++){const x=(i*137.5)%w,y=(i*83.7)%h;ctx.fillStyle=i%4===0?"#b96b4d20":"#d1d0c510";ctx.fillRect(x,y,1,1)}
@@ -100,13 +110,15 @@ function draw(){
     const side=((e.i+j)%2?1:-1),reach=Math.min(48,Math.max(13,len*(.09+(j%2)*.025)))*(density<.38?.78:1);
     const ex=px+dx/len*reach*.58+nx*side*reach*.82,ey=py+dy/len*reach*.58+ny*side*reach*.82;
     const mx=(px+ex)/2+nx*side*reach*.18,my=(py+ey)/2+ny*side*reach*.18;
-    ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(mx,my,ex,ey);
-    ctx.strokeStyle=density>.72?"#b9c8b788":"#9db5a05c";ctx.lineWidth=density>.72?.86:.68;ctx.stroke();
-    const tip=reach*.34;
-    [-1,1].forEach(fork=>{
-     const tx=ex+dx/len*tip*.28+nx*fork*tip*.72,ty=ey+dy/len*tip*.28+ny*fork*tip*.72;
-     ctx.beginPath();ctx.moveTo(ex,ey);ctx.quadraticCurveTo(ex+nx*fork*tip*.35,ey+ny*fork*tip*.35,tx,ty);
-     ctx.strokeStyle="#9db5a044";ctx.lineWidth=.48;ctx.stroke();
+    const branchColor=density>.72?"#b9c8b788":"#9db5a05c";
+    taperedHypha(px,py,mx,my,ex,ey,density>.72?.9:.7,branchColor);
+    const tip=reach*.34,dominant=((e.i+j)%3!==0);
+    [-1,1].forEach((fork,k)=>{
+     const bias=dominant?(k===0?1:.58):(k===1?1:.72);
+     const angle=fork*(.48+(((e.i+j*3+k)%5)*.055));
+     const tx=ex+dx/len*tip*.34+nx*fork*tip*bias,ty=ey+dy/len*tip*.34+ny*fork*tip*bias;
+     const bendX=ex+dx/len*tip*.12+nx*fork*tip*angle,bendY=ey+dy/len*tip*.12+ny*fork*tip*angle;
+     taperedHypha(ex,ey,bendX,bendY,tx,ty,.52,"#9db5a05c");
     });
    });
    if(density>.72){
