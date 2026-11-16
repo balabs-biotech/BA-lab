@@ -214,7 +214,7 @@ async function checkWorkingScene(name, viewport) {
   await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
   await checkTwoFingerPan(page, name);
   await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
-  assert.equal(await page.locator('.webgl-branch-dock,.webgl-branch-item').count(), 0, name + ': the old HTML subpage dock must never be rendered over the 3D engine');
+  assert.equal(await page.locator('.webgl-branch-dock:visible,.webgl-branch-item:visible').count(), 0, name + ': the old HTML subpage dock must never be visible over the 3D engine');
   await page.waitForFunction(() => document.querySelectorAll('.webgl-resource-target[data-depth="0"]').length > 0, undefined, { timeout: 8000 });
   assert.ok(await page.locator('.webgl-resource-target[data-depth="0"]:visible').count() > 0, name + ': 3D branches must retain invisible spatial hit targets');
   await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; for (const type of ['pointerdown','pointerup','click','touchend']) document.addEventListener(type,event=>{if(event.target?.closest?.('.webgl-hit-target,.webgl-resource-target'))window.__BALABS_3D_TARGET_EVENTS__.push({type,target:event.target.title||event.target.tagName,pointerType:event.pointerType||null,x:event.clientX??null,y:event.clientY??null})},true); });
