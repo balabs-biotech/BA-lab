@@ -5662,9 +5662,11 @@ function renderCultureCatalog() {
     const meta = document.createElement("div");
     meta.className = "culture-catalog-meta";
     const type = document.createElement("span");
+    type.className = "culture-catalog-kind";
     type.textContent = culture.culture_type || "Type non renseigné";
     meta.appendChild(type);
     const date = document.createElement("span");
+    date.className = "culture-catalog-started";
     date.textContent = culture.started_at
       ? "Démarrage : " + new Date(culture.started_at).toLocaleDateString("fr-FR")
       : "Date de démarrage non renseignée";
