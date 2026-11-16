@@ -23050,3 +23050,17 @@ html body[data-domain] #batchList > .batch-item {
   background-color:#293735 !important;
   background-image:none !important;
 }
+
+
+/* BA LABS CULTUREOPS — PASS 103
+   The browser smoke target is the batch-history container itself (#batchList),
+   not only its dynamically rendered children. Give the container the shared
+   opaque raised surface and remove legacy Mycology gradients. */
+html body[data-domain] #batchList {
+  color:var(--text) !important;
+  background:#293735 !important;
+  background-color:#293735 !important;
+  background-image:none !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+}
