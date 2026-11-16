@@ -314,3 +314,262 @@ html body[data-domain="laboratory"] #batchCard .batch-event-list > * {
     grid-template-columns:30px minmax(0,1fr) auto !important;
   }
 }
+
+
+/* PASS 122 — Laboratory culture register and experimental record. */
+html body[data-domain="laboratory"] #trackerCard {
+  gap:18px !important;
+}
+html body[data-domain="laboratory"] #trackerCard > .entry-intro {
+  position:relative !important;
+  display:grid !important;
+  gap:7px !important;
+  margin:0 0 4px !important;
+  padding:18px 20px 18px 22px !important;
+  overflow:hidden !important;
+  border:1px solid rgba(120,184,232,.22) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:12px !important;
+  background:radial-gradient(ellipse at 100% 0%,rgba(120,184,232,.12),transparent 48%),linear-gradient(145deg,#202d31,#192426) !important;
+}
+html body[data-domain="laboratory"] #trackerCard > .entry-intro h2 {
+  margin:0 !important;
+  color:var(--paper) !important;
+  font-size:clamp(21px,2.4vw,27px) !important;
+}
+html body[data-domain="laboratory"] #trackerCard > .entry-intro p {
+  max-width:68ch !important;
+  margin:0 !important;
+  color:#aebdc3 !important;
+  font-size:11px !important;
+  line-height:1.65 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .entry-step-mark {
+  color:#9bc9e6 !important;
+  font-size:9px !important;
+  font-weight:850 !important;
+  letter-spacing:.12em !important;
+}
+html body[data-domain="laboratory"] #trackerCard .assisted-entry-panel {
+  margin:4px 0 8px !important;
+  padding:17px !important;
+  border:1px solid rgba(120,184,232,.22) !important;
+  border-radius:12px !important;
+  background:linear-gradient(145deg,rgba(36,54,62,.92),rgba(24,37,42,.96)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .assisted-entry-heading h3 {
+  color:#e8edf0 !important;
+  font-size:16px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .assisted-entry-tag {
+  border-color:rgba(120,184,232,.24) !important;
+  color:#b7d5e8 !important;
+  background:rgba(120,184,232,.07) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .assisted-entry-panel textarea,
+html body[data-domain="laboratory"] #trackerCard .assisted-entry-help pre {
+  border:1px solid rgba(120,184,232,.2) !important;
+  border-radius:9px !important;
+  background:#152125 !important;
+  color:#e3eae8 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .guided-entry-step:not([hidden]) {
+  display:grid !important;
+  gap:11px !important;
+  margin:0 !important;
+  padding:16px !important;
+  border:1px solid rgba(120,184,232,.17) !important;
+  border-radius:11px !important;
+  background:linear-gradient(145deg,rgba(33,48,52,.86),rgba(24,36,39,.92)) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .guided-entry-step[data-entry-step="2"] .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+html body[data-domain="laboratory"] #trackerCard :is(label,.hint) {
+  color:#bdcbd0 !important;
+}
+html body[data-domain="laboratory"] #trackerCard :is(input,select,textarea) {
+  border-color:rgba(120,184,232,.2) !important;
+  background:#152125 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog {
+  display:grid !important;
+  gap:13px !important;
+  margin-top:12px !important;
+  padding:18px !important;
+  border:1px solid var(--border) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,#202d2b,#1b2525) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-heading h3 {
+  margin:0 0 5px !important;
+  color:var(--paper) !important;
+  font-size:15px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-heading p {
+  max-width:62ch !important;
+  margin:0 !important;
+  color:#aab9bd !important;
+  font-size:10px !important;
+  line-height:1.55 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-count {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:30px !important;
+  min-height:27px !important;
+  border:1px solid var(--workspace-accent-border) !important;
+  border-radius:7px !important;
+  color:var(--workspace-accent) !important;
+  background:var(--workspace-accent-soft) !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-filters {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+  padding:11px !important;
+  border:1px solid rgba(120,184,232,.14) !important;
+  border-radius:9px !important;
+  background:rgba(11,19,21,.24) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-list {
+  display:grid !important;
+  gap:9px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-list .culture-catalog-row {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:12px !important;
+  min-width:0 !important;
+  padding:13px !important;
+  border:1px solid rgba(120,184,232,.16) !important;
+  border-inline-start:3px solid rgba(120,184,232,.72) !important;
+  border-radius:10px !important;
+  background:linear-gradient(145deg,rgba(36,52,57,.88),rgba(25,38,41,.94)) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-main {
+  display:grid !important;
+  gap:8px !important;
+  min-width:0 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-code {
+  color:#e8eff0 !important;
+  font-size:12px !important;
+  font-weight:780 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-meta {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:6px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-meta span {
+  padding:5px 7px !important;
+  border:1px solid rgba(145,166,176,.14) !important;
+  border-radius:6px !important;
+  color:#b2c2c6 !important;
+  background:rgba(12,21,24,.3) !important;
+  font-size:9px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-actions {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-end !important;
+  gap:6px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-action {
+  min-height:32px !important;
+  padding:6px 9px !important;
+  border:1px solid rgba(120,184,232,.24) !important;
+  border-radius:7px !important;
+  color:#b8d8eb !important;
+  background:rgba(120,184,232,.08) !important;
+  font-size:9px !important;
+  font-weight:700 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-action:hover,
+html body[data-domain="laboratory"] #trackerCard .culture-catalog-action:focus-visible {
+  border-color:var(--workspace-accent) !important;
+  background:rgba(120,184,232,.16) !important;
+}
+html body[data-domain="laboratory"] #trackerCard #cultureDetailPanel {
+  display:grid !important;
+  gap:14px !important;
+  margin-top:8px !important;
+  padding:18px !important;
+  border:1px solid rgba(120,184,232,.24) !important;
+  border-radius:13px !important;
+  background:radial-gradient(ellipse at 0 0,rgba(120,184,232,.09),transparent 38%),linear-gradient(145deg,#202d31,#192426) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-detail-heading h3 {
+  color:#edf1ef !important;
+  font-size:22px !important;
+}
+html body[data-domain="laboratory"] #trackerCard #cultureDetailSummary {
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:8px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-detail-field {
+  min-width:0 !important;
+  min-height:66px !important;
+  padding:11px !important;
+  border:1px solid rgba(120,184,232,.16) !important;
+  border-radius:9px !important;
+  background:#25383d !important;
+}
+html body[data-domain="laboratory"] #trackerCard .bio-operation-panel,
+html body[data-domain="laboratory"] #trackerCard .bio-lineage-panel {
+  padding:15px !important;
+  border:1px solid rgba(120,184,232,.17) !important;
+  border-radius:11px !important;
+  background:linear-gradient(145deg,rgba(34,51,56,.94),rgba(24,37,41,.96)) !important;
+}
+html body[data-domain="laboratory"] #trackerCard .bio-operation-form {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+html body[data-domain="laboratory"] #trackerCard .bio-operation-form .bio-operation-wide {
+  grid-column:1/-1 !important;
+}
+html body[data-domain="laboratory"] #trackerCard .culture-detail-timeline {
+  padding:13px !important;
+  border:1px solid rgba(120,184,232,.16) !important;
+  border-radius:10px !important;
+  background:rgba(11,19,21,.24) !important;
+}
+@media(max-width:760px) {
+  html body[data-domain="laboratory"] #trackerCard .culture-catalog-list .culture-catalog-row {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain="laboratory"] #trackerCard .culture-catalog-actions {
+    justify-content:flex-start !important;
+  }
+  html body[data-domain="laboratory"] #trackerCard #cultureDetailSummary {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+@media(max-width:560px) {
+  html body[data-domain="laboratory"] #trackerCard .culture-catalog-filters,
+  html body[data-domain="laboratory"] #trackerCard .guided-entry-step[data-entry-step="2"] .grid,
+  html body[data-domain="laboratory"] #trackerCard .bio-operation-form {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain="laboratory"] #trackerCard .culture-catalog-action { flex:1 1 auto !important; }
+  html body[data-domain="laboratory"] #trackerCard #cultureDetailSummary { grid-template-columns:minmax(0,1fr) !important; }
+}
