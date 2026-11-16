@@ -22077,3 +22077,27 @@ body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-co
 @media(max-width:720px) {
   body[data-domain] .app-toolbar { position:relative; top:auto; flex-wrap:wrap; }
 }
+
+/* Mobile entry: keep the sign-in action in the first viewport. */
+@media(max-width:700px) {
+  body[data-domain] .app-hero {
+    grid-template-columns:minmax(0,1fr) !important;
+    min-height:0 !important;
+    gap:6px !important;
+    margin-bottom:12px !important;
+    padding:14px 18px !important;
+  }
+  body[data-domain] .app-hero .hero-art { display:none !important; }
+  body[data-domain] .app-hero .hero-description {
+    margin:7px 0 0 !important;
+    font-size:12px !important;
+    line-height:1.4 !important;
+  }
+  body[data-domain] .app-hero .hero-tags { margin-top:9px !important; gap:6px !important; }
+  body[data-domain] .app-toolbar {
+    min-height:0 !important;
+    margin:0 0 12px !important;
+    padding:8px 10px !important;
+    gap:10px !important;
+  }
+}
