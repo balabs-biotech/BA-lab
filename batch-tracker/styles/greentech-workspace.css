@@ -44,3 +44,214 @@ html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-
 }
 html body[data-domain="agronomy"] #plantCard .culture-catalog-code { color:var(--paper) !important; font-size:15px !important; overflow-wrap:anywhere !important; }
 html body[data-domain="agronomy"] #plantCard .culture-catalog-meta { display:grid !important; gap:5px !important; color:var(--muted) !important; font-size:11px !important; }
+
+
+/* PASS 119 — GreenTech registry and environmental intelligence surfaces. */
+html body[data-domain="agronomy"] #plantCard #plantCultureCount {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:32px !important;
+  min-height:28px !important;
+  padding:3px 9px !important;
+  border:1px solid var(--workspace-accent-border) !important;
+  border-radius:8px !important;
+  background:var(--workspace-accent-soft) !important;
+  color:var(--workspace-accent) !important;
+  font-variant-numeric:tabular-nums !important;
+  font-weight:800 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row {
+  position:relative !important;
+  overflow:hidden !important;
+  padding:17px 18px 16px 20px !important;
+  gap:12px !important;
+  background:linear-gradient(145deg,#202d2b 0%,#192322 100%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 8px 22px rgba(0,0,0,.12) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:0 0 auto auto !important;
+  width:74px !important;
+  height:74px !important;
+  pointer-events:none !important;
+  background:radial-gradient(circle at top right,color-mix(in srgb,var(--workspace-accent) 13%,transparent),transparent 72%) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-main {
+  display:grid !important;
+  gap:10px !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-code {
+  display:block !important;
+  width:fit-content !important;
+  max-width:100% !important;
+  padding:5px 8px !important;
+  border:1px solid rgba(180,244,119,.18) !important;
+  border-radius:6px !important;
+  background:rgba(180,244,119,.055) !important;
+  color:#e8f1df !important;
+  font-size:13px !important;
+  font-weight:760 !important;
+  letter-spacing:.025em !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-meta {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:7px 12px !important;
+  color:var(--muted) !important;
+  font-size:11px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-meta span {
+  min-width:0 !important;
+  padding:7px 9px !important;
+  border:1px solid rgba(155,174,164,.12) !important;
+  border-radius:7px !important;
+  background:rgba(8,15,14,.22) !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-meta span:first-child {
+  color:#dce8dc !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-meta span:nth-child(3) {
+  border-color:var(--workspace-accent-border) !important;
+  background:var(--workspace-accent-soft) !important;
+  color:var(--workspace-accent) !important;
+  font-weight:720 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row > p {
+  margin:0 !important;
+  padding:10px 12px !important;
+  border-inline-start:2px solid var(--workspace-accent-border) !important;
+  border-radius:0 7px 7px 0 !important;
+  background:rgba(8,15,14,.2) !important;
+  color:#aebeb4 !important;
+  font-size:11px !important;
+  line-height:1.6 !important;
+}
+
+/* Environmental intelligence: same card language, domain-specific signal colors. */
+html body[data-domain="agronomy"] #environmentalCard {
+  gap:16px !important;
+  min-width:0 !important;
+}
+html body[data-domain="agronomy"] #environmentalCard > .card,
+html body[data-domain="agronomy"] #environmentalCard > section {
+  min-width:0 !important;
+  padding:17px !important;
+  border:1px solid var(--border) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,#202d2b 0%,#192322 100%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard h3 {
+  margin:0 0 12px !important;
+  color:var(--paper) !important;
+  font-size:14px !important;
+  font-weight:760 !important;
+  letter-spacing:.01em !important;
+}
+html body[data-domain="agronomy"] #satelliteColorMapPanel {
+  display:grid !important;
+  gap:12px !important;
+  overflow:hidden !important;
+}
+html body[data-domain="agronomy"] #satelliteColorMap {
+  min-height:300px !important;
+  border:1px solid rgba(155,174,164,.2) !important;
+  border-radius:10px !important;
+  background:#11191a !important;
+}
+html body[data-domain="agronomy"] #vegetationTrendPanel {
+  min-height:140px !important;
+}
+html body[data-domain="agronomy"] #vegetationTrendPanel svg,
+html body[data-domain="agronomy"] .environmental-weather-chart svg {
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  height:auto !important;
+  overflow:visible !important;
+}
+html body[data-domain="agronomy"] #agroSynthesisPanel > .grid,
+html body[data-domain="agronomy"] #envWeatherCharts {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+  min-width:0 !important;
+}
+html body[data-domain="agronomy"] #agroSynthesisPanel > .grid > .card,
+html body[data-domain="agronomy"] #envWeatherCharts > .card {
+  min-width:0 !important;
+  margin:0 !important;
+  padding:13px !important;
+  border:1px solid rgba(155,174,164,.15) !important;
+  border-radius:10px !important;
+  background:rgba(10,17,16,.28) !important;
+  box-shadow:none !important;
+}
+html body[data-domain="agronomy"] #agroSynthesisPanel > .grid strong,
+html body[data-domain="agronomy"] #envWeatherCharts > .card strong {
+  display:block !important;
+  color:var(--muted) !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain="agronomy"] #agroSynthesisPanel > .grid p,
+html body[data-domain="agronomy"] #envWeatherCharts > .card p {
+  margin:8px 0 4px !important;
+  color:var(--paper) !important;
+  font-size:clamp(18px,2.3vw,25px) !important;
+  font-weight:780 !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain="agronomy"] #agroSynthesisPanel > .grid small,
+html body[data-domain="agronomy"] #envWeatherCharts > .card small {
+  display:block !important;
+  color:var(--muted) !important;
+  font-size:10px !important;
+  line-height:1.45 !important;
+}
+html body[data-domain="agronomy"] #agroSynthesisPanel > p,
+html body[data-domain="agronomy"] #environmentalCard > p {
+  max-width:100% !important;
+  padding:9px 11px !important;
+  border-inline-start:2px solid var(--workspace-accent-border) !important;
+  border-radius:0 7px 7px 0 !important;
+  background:rgba(8,15,14,.2) !important;
+  color:#b4c2b8 !important;
+  font-size:11px !important;
+  line-height:1.6 !important;
+}
+html body[data-domain="agronomy"] #environmentalCard .environmental-details,
+html body[data-domain="agronomy"] #environmentalCard .environmental-settings {
+  padding:12px 14px !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+  background:rgba(8,15,14,.2) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard :is(.environmental-details,.environmental-settings) > summary {
+  color:var(--workspace-accent) !important;
+  font-size:11px !important;
+  font-weight:720 !important;
+  cursor:pointer !important;
+}
+@media(max-width:760px) {
+  html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-meta {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain="agronomy"] #environmentalCard > :is(section,.card) { padding:13px !important; }
+  html body[data-domain="agronomy"] #satelliteColorMap { min-height:250px !important; }
+}
+@media(max-width:480px) {
+  html body[data-domain="agronomy"] #agroSynthesisPanel > .grid,
+  html body[data-domain="agronomy"] #envWeatherCharts {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row { transition:none !important; }
+}
