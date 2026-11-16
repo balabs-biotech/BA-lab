@@ -63,7 +63,7 @@ function strokeFilament(a,b,depth,seed,cross=false){
  }
  return{p,q,c};
 }
-function levelOpacity(level){const thresholds=[0,.43,.9,1.75,3.1,5.1,7.8];const threshold=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-threshold*.72)/(threshold*.42),0,1);}
+function levelOpacity(level){const thresholds=[0,.25,.62,1.45,2.8,5.0,7.8];const threshold=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-threshold*.72)/(threshold*.42),0,1);}
 function draw(){
  ctx.clearRect(0,0,w,h);
  const bg=ctx.createRadialGradient(w*.5,h*.48,0,w*.5,h*.48,Math.max(w,h)*.78);bg.addColorStop(0,"#1b302c");bg.addColorStop(.58,"#142320");bg.addColorStop(1,"#101719");ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
