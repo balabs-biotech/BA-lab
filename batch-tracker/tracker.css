@@ -23064,3 +23064,27 @@ html body[data-domain] #batchList {
   border:1px solid var(--border) !important;
   border-radius:10px !important;
 }
+
+
+/* BA LABS CULTUREOPS — PASS 107
+   Override the legacy two-ID Mycology batch selector with the shared dark
+   surface. The child is inside #batchCard in the live workspace DOM. */
+html body[data-domain] #batchCard #batchList .batch-item {
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  background-color:#293735 !important;
+  background-image:none !important;
+  border-color:var(--border) !important;
+  border-inline-start:3px solid var(--domain-accent) !important;
+  border-radius:10px !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.16) !important;
+}
+html body[data-domain] #batchCard #batchList .batch-item strong { color:var(--paper) !important; }
+html body[data-domain] #batchCard #batchList .batch-item .muted { color:var(--muted) !important; }
+html body[data-domain] #batchCard #batchList .batch-item:hover,
+html body[data-domain] #batchCard #batchList .batch-item:focus-visible {
+  background:var(--surface-2) !important;
+  background-color:#344541 !important;
+  background-image:none !important;
+  border-color:var(--border-strong) !important;
+}
