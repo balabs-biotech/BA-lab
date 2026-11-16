@@ -41,6 +41,17 @@ function layout(initial=false){
    nodes.push(n);
    edges.push({a:anchor,b:n,i:i+10});
   });
+  // Reveal a restrained preview of the next generation before entering a branch.
+  kids.forEach((d,i)=>{
+   const base=nodes[i+1],grand=(d.children||[]).slice(0,4),side=i%2===0?-1:1;
+   grand.forEach((g,j)=>{
+    const fan=(j-(grand.length-1)/2)*.72;
+    const angle=side<0?(-Math.PI/2+fan):(Math.PI/2+fan);
+    const length=48+((i*31+j*23+grand.length*7)%38);
+    const tip={id:g.id,title:g.title,x:base.x+Math.cos(angle)*length,y:base.y+Math.sin(angle)*length,r:2.7,level:2,data:g,rootId:parent.rootId};
+    nodes.push(tip);edges.push({a:base,b:tip,i:100+i*5+j,tertiary:true});
+   });
+  });
   // The main hypha runs through the attachment points; it is deliberately
   // segmented and slightly irregular rather than a straight diagram line.
   if(anchors.length){
@@ -51,7 +62,7 @@ function layout(initial=false){
   }
   }
   // Anastomoses connect non-adjacent branches into a resilient mycelial mesh.
-  const kidsOnly=nodes.slice(1);
+  const kidsOnly=nodes.filter(n=>n.level===1);
   kidsOnly.forEach((n,i)=>{
    if(count>2&&i%2===0)edges.push({a:n,b:kidsOnly[(i+1)%count],i:i+40,cross:true});
    if(count>4&&i%3===0)edges.push({a:n,b:kidsOnly[(i+3)%count],i:i+70,cross:true});
@@ -69,10 +80,10 @@ function draw(){
   const a=screen(e.a),b=screen(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
   const bend=Math.min(42,len*.17)*(e.i%2?1:-1),cx=(a.x+b.x)/2-dy/len*bend,cy=(a.y+b.y)/2+dx/len*bend;
   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(cx,cy,b.x,b.y);
-  ctx.strokeStyle=e.cross?"#b96b4d38":(PALETTE[e.a.rootId]||"#78958a")+"88";ctx.lineWidth=e.cross?.75:1.05;ctx.stroke();
+  ctx.strokeStyle=e.cross?"#b96b4d38":(PALETTE[e.a.rootId]||"#78958a")+"88";ctx.lineWidth=e.cross?.75:e.tertiary?.62:1.05;ctx.stroke();
   // Branching hyphae: primary filaments produce tapered-looking lateral growth,
   // then split into two fine tips. Seeded by edge index so the network stays stable.
-  if(!e.cross&&len>85){
+  if(!e.cross&&!e.tertiary&&len>85){
    const nx=-dy/len,ny=dx/len;
    [.27,.57,.82].forEach((t,j)=>{
     const u=1-t,px=u*u*a.x+2*u*t*cx+t*t*b.x,py=u*u*a.y+2*u*t*cy+t*t*b.y;
@@ -100,7 +111,7 @@ function draw(){
    const font=clamp((n.level===0?12:11)*Math.sqrt(scale),8,14);
    ctx.font=(n.level===0?"600 ":"500 ")+font.toFixed(1)+"px system-ui";
    ctx.textAlign="center";ctx.textBaseline="top";ctx.lineWidth=3;ctx.strokeStyle="#111b1df2";
-   ctx.strokeText(n.title,p.x,p.y+r+7,220);ctx.fillStyle=n.level===0?"#e3e7dd":"#c5d0c7";ctx.fillText(n.title,p.x,p.y+r+7,220);
+   if(n.level<2||selected?.id===n.id){ctx.strokeText(n.title,p.x,p.y+r+7,220);ctx.fillStyle=n.level===0?"#e3e7dd":"#c5d0c7";ctx.fillText(n.title,p.x,p.y+r+7,220);}
    if(n.data?.children?.length&&scale>=.82){ctx.font=clamp(9*Math.sqrt(scale),8,10)+"px system-ui";ctx.fillStyle="#8fa498";ctx.fillText(n.data.children.length+" "+t("children"),p.x,p.y+r+22,200)}
   }
  });
