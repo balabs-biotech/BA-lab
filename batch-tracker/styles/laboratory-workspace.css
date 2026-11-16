@@ -741,3 +741,15 @@ html body[data-domain="laboratory"] #batchCard .qc-row .qc-save:focus-visible {
   outline:2px solid #8bc5e8 !important;
   outline-offset:3px !important;
 }
+
+
+/* PASS 133 — explicit computed surface for the laboratory production-batch list. */
+html body[data-domain="laboratory"] #batchCard #batchList > .batch-item {
+  background-color:#26383d !important;
+  background-image:linear-gradient(145deg,#26383d 0%,#1c2a2e 100%) !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchList > .batch-item:hover,
+html body[data-domain="laboratory"] #batchCard #batchList > .batch-item:focus-visible {
+  background-color:#344541 !important;
+  background-image:linear-gradient(145deg,#344541 0%,#26383d 100%) !important;
+}
