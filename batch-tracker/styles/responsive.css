@@ -29,3 +29,24 @@
   html body[data-domain="mycology"] #trackerCard .culture-detail-heading { flex-direction:column !important; }
   html body[data-domain="mycology"] #trackerCard .culture-detail-heading button { width:100% !important; }
 }
+
+/* Authenticated compact header: the workspace title remains, the marketing hero collapses. */
+@media(max-width:700px) {
+  html body[data-domain].workspace-authenticated .app-hero {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    min-height:0 !important;
+    gap:4px !important;
+    margin:8px 0 !important;
+    padding:8px 14px !important;
+  }
+  html body[data-domain].workspace-authenticated .app-hero :is(.hero-art,.hero-description,.hero-tags,.hero-note) {
+    display:none !important;
+  }
+  html body[data-domain].workspace-authenticated .app-hero h1 {
+    margin:0 !important;
+    font-size:clamp(18px,4.5vw,24px) !important;
+    line-height:1.15 !important;
+  }
+  html body[data-domain].workspace-authenticated .app-hero h1 br { display:none !important; }
+}
