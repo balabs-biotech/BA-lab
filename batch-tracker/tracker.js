@@ -2748,39 +2748,29 @@ function renderBatchList() {
       "batch-item";
 
 
-    button.innerHTML = `
+    const heading = document.createElement("span");
+    heading.className = "batch-item-heading";
 
-      <strong>
-        ${escapeHtml(
-          batch.batch_code
-        )}
-      </strong>
+    const code = document.createElement("strong");
+    code.className = "batch-item-code";
+    code.textContent = batch.batch_code || "Lot sans code";
 
-      <br>
+    const status = document.createElement("span");
+    status.className = "batch-item-status";
+    status.textContent = batch.status || "Statut non renseigné";
 
-      <span class="muted">
-        ${escapeHtml(
-          batch.name ||
-          "Sans nom"
-        )}
-        —
-        ${escapeHtml(
-          batch.batch_type ||
-          "—"
-        )}
-        —
-        ${escapeHtml(
-          batch.current_stage ||
-          "—"
-        )}
-        —
-        ${escapeHtml(
-          batch.status ||
-          "—"
-        )}
-      </span>
+    heading.append(code, status);
 
-    `;
+    const meta = document.createElement("span");
+    meta.className = "batch-item-meta";
+    [batch.name || "Sans nom", batch.batch_type || "Type non renseigné", batch.current_stage || "Étape non renseignée"].forEach((value, index) => {
+      const part = document.createElement("span");
+      part.className = index === 0 ? "batch-item-name" : "batch-item-detail";
+      part.textContent = value;
+      meta.appendChild(part);
+    });
+
+    button.append(heading, meta);
 
 
     button.addEventListener(
