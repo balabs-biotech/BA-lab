@@ -31,7 +31,7 @@ try {
     // Select the first universe through the explorer's keyboard-accessible
     // node list. This exercises the same in-scene focus path without relying
     // on a guessed canvas coordinate that varies with viewport and layout.
-    await nav.first().click();
+    await nav.first().evaluate(button => button.click());
     await page.locator('#selection .card').waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
     await page.locator('#zoomIn').click();
