@@ -301,10 +301,11 @@ function syncResourceHitTargets() {
   object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
   const depth=Number(button.dataset.depth||0),forceEdge=button.classList.contains('webgl-domain-target'),visible=depth===0&&p.z>-1&&p.z<1&&(forceEdge||(p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12));
   button.hidden=!visible;button.style.display=visible?'block':'none';
-  if(!visible)return;
+  if(!visible)return false;
   projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
+  return true;
  };
- for(const {object,button} of domainHitTargets.values()){project(object,button);button.hidden=!opened||!!selected||button.hidden}
+ for(const {object,button} of domainHitTargets.values()){const visible=project(object,button);button.hidden=!opened||!!selected||!visible;button.style.display=button.hidden?'none':'block'}
  for(const [label,button] of resourceHitTargets)project(label,button);
  // Place labels in screen space, not directly on top of one another. This is
  // especially important on narrow mobile screens where projected branches cluster.
