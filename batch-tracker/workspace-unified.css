@@ -1,404 +1,55 @@
-/* BA LABS CULTUREOPS — PASS 110
-   Shared structural contract for Green Tech, Mycology and Laboratory.
-   Domain identity remains limited to --domain-accent. */
 
-html body[data-domain] main#main {
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) !important;
-  align-content:start !important;
-  gap:16px !important;
-  min-width:0 !important;
-}
 
-html body[data-domain] .app-hero {
-  display:grid !important;
-  grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr) !important;
-  align-items:center !important;
-  gap:24px !important;
-  min-height:260px !important;
-  padding:clamp(26px,5vw,54px) !important;
-  margin:0 0 2px !important;
-}
-
-html body[data-domain] .hero-copy {
-  min-width:0 !important;
-  max-width:700px !important;
-}
-
-html body[data-domain] .hero-art {
-  min-width:0 !important;
-  min-height:190px !important;
-  opacity:.82 !important;
-}
-
-html body[data-domain] main#main > .card:not(.hidden):not([hidden]) {
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:stretch !important;
-  gap:14px !important;
-  min-width:0 !important;
-  width:100% !important;
-  padding:clamp(19px,2.8vw,32px) !important;
-  margin:0 !important;
-}
-
-html body[data-domain] main#main > .card > .section-kicker {
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
-  width:100% !important;
-  min-width:0 !important;
-  padding:0 0 10px !important;
-  margin:0 0 2px !important;
-  border:0 !important;
-  border-bottom:1px solid var(--border) !important;
-  color:var(--muted) !important;
-  font-size:10px !important;
-  font-weight:750 !important;
-  letter-spacing:.13em !important;
-  line-height:1.4 !important;
-}
-
-html body[data-domain] main#main > .card > .section-kicker .kicker-line {
-  flex:1 1 auto !important;
-  min-width:18px !important;
-  height:1px !important;
-  background:var(--border-strong) !important;
-}
-
-html body[data-domain] .entry-intro {
-  display:grid !important;
-  gap:7px !important;
-  max-width:760px !important;
-  padding:5px 0 12px !important;
-}
-
-html body[data-domain] .entry-intro h2 {
-  margin:0 !important;
-  color:var(--paper) !important;
-  font-size:clamp(1.35rem,2.6vw,1.9rem) !important;
-}
-
-html body[data-domain] .entry-intro .muted {
-  max-width:66ch !important;
-  margin:0 !important;
-  color:var(--muted) !important;
-}
-
-html body[data-domain] .entry-step-mark {
-  display:inline-flex !important;
-  align-items:center !important;
-  width:max-content !important;
-  padding:5px 8px !important;
-  border:1px solid var(--workspace-accent-border) !important;
-  border-radius:6px !important;
-  background:var(--workspace-accent-soft) !important;
-  color:var(--domain-accent) !important;
-  font-size:.62rem !important;
-  font-weight:800 !important;
-  letter-spacing:.12em !important;
-}
-
-@media(max-width:760px) {
-  html body[data-domain] main#main { gap:12px !important; }
-
-  html body[data-domain] .app-hero {
-    grid-template-columns:minmax(0,1fr) !important;
-    min-height:0 !important;
-    gap:12px !important;
-    padding:20px !important;
-  }
-
-  html body[data-domain] .hero-art {
-    display:none !important;
-  }
-
-  html body[data-domain] main#main > .card {
-    gap:12px !important;
-    padding:16px !important;
-  }
-}
-
+/* PASS 112 — compact login viewport fit.
+   Keep the sign-in action visible on short 360px-wide devices. */
 @media(max-width:390px) {
-  html body[data-domain] .app-hero {
-    padding:16px !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard {
+    gap:5px !important;
+    padding:10px !important;
+    margin-bottom:8px !important;
   }
 
-  html body[data-domain] main#main > .card {
-    padding:13px !important;
-    border-radius:12px !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard > .section-kicker {
+    margin:0 0 1px !important;
+    padding-bottom:5px !important;
   }
 
-  html body[data-domain] main#main > .card > .section-kicker {
-    gap:7px !important;
-    font-size:9px !important;
-    letter-spacing:.1em !important;
-  }
-}
-
-/* Preserve application-controlled hidden states despite the shared card layout. */
-html body[data-domain] main#main > .card.hidden,
-html body[data-domain] main#main > .card[hidden] {
-  display:none !important;
-}
-
-/* PASS 111 — shared interior form and data-module composition. */
-html body[data-domain] main#main .grid {
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  align-items:start !important;
-  gap:14px !important;
-  width:100% !important;
-  min-width:0 !important;
-}
-
-html body[data-domain] main#main .grid > div {
-  display:grid !important;
-  align-content:start !important;
-  gap:7px !important;
-  min-width:0 !important;
-}
-
-html body[data-domain] main#main .grid label,
-html body[data-domain] main#main > .card > label {
-  margin:0 !important;
-  color:var(--paper) !important;
-  font-size:.82rem !important;
-  font-weight:650 !important;
-  line-height:1.45 !important;
-}
-
-html body[data-domain] main#main input:not([type="checkbox"]):not([type="radio"]),
-html body[data-domain] main#main select,
-html body[data-domain] main#main textarea {
-  box-sizing:border-box !important;
-  width:100% !important;
-  min-width:0 !important;
-  min-height:44px !important;
-  border:1px solid var(--border-strong) !important;
-  border-radius:9px !important;
-  background:var(--surface-raised) !important;
-  color:var(--text) !important;
-  box-shadow:none !important;
-}
-
-html body[data-domain] main#main textarea {
-  min-height:104px !important;
-  padding:12px 13px !important;
-  line-height:1.55 !important;
-  resize:vertical !important;
-}
-
-html body[data-domain] main#main input:focus-visible,
-html body[data-domain] main#main select:focus-visible,
-html body[data-domain] main#main textarea:focus-visible {
-  outline:2px solid var(--domain-accent) !important;
-  outline-offset:2px !important;
-  border-color:var(--domain-accent) !important;
-}
-
-html body[data-domain] main#main .hint,
-html body[data-domain] main#main small.hint {
-  display:block !important;
-  color:var(--muted) !important;
-  font-size:.72rem !important;
-  line-height:1.5 !important;
-}
-
-html body[data-domain] main#main .guided-entry-step {
-  display:grid !important;
-  gap:12px !important;
-  min-width:0 !important;
-  padding:16px !important;
-  border:1px solid var(--border) !important;
-  border-radius:11px !important;
-  background:var(--surface-2) !important;
-}
-
-html body[data-domain] main#main .guided-entry-step[hidden],
-html body[data-domain] main#main [hidden] {
-  display:none !important;
-}
-
-html body[data-domain] main#main .batch-create-panel,
-html body[data-domain] main#main .batch-compare-panel,
-html body[data-domain] main#main .statistics-filters,
-html body[data-domain] main#main .quick-capture,
-html body[data-domain] main#main .batch-harvest-entry {
-  display:grid !important;
-  align-content:start !important;
-  gap:14px !important;
-  min-width:0 !important;
-  padding:16px !important;
-  border:1px solid var(--border) !important;
-  border-radius:12px !important;
-  background:var(--surface-2) !important;
-  box-shadow:none !important;
-}
-
-html body[data-domain] main#main .batch-create-heading,
-html body[data-domain] main#main .quick-capture-heading,
-html body[data-domain] main#main .culture-catalog-heading {
-  display:flex !important;
-  align-items:flex-start !important;
-  justify-content:space-between !important;
-  gap:14px !important;
-  min-width:0 !important;
-}
-
-html body[data-domain] main#main .batch-create-heading h3,
-html body[data-domain] main#main .quick-capture-heading h3,
-html body[data-domain] main#main .culture-catalog-heading h3 {
-  margin:5px 0 !important;
-  color:var(--paper) !important;
-}
-
-html body[data-domain] main#main .batch-create-heading p,
-html body[data-domain] main#main .quick-capture-heading p,
-html body[data-domain] main#main .culture-catalog-heading p {
-  margin:0 !important;
-  color:var(--muted) !important;
-  line-height:1.55 !important;
-}
-
-html body[data-domain] main#main .quick-capture-grid {
-  display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:9px !important;
-}
-
-html body[data-domain] main#main .quick-capture-tile {
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
-  min-width:0 !important;
-  min-height:66px !important;
-  padding:11px !important;
-  border:1px solid var(--border) !important;
-  border-radius:9px !important;
-  background:var(--surface-raised) !important;
-  color:var(--text) !important;
-  text-align:left !important;
-}
-
-html body[data-domain] main#main .quick-capture-tile strong {
-  color:var(--paper) !important;
-}
-
-html body[data-domain] main#main .quick-capture-tile small {
-  color:var(--muted) !important;
-}
-
-html body[data-domain] main#main .statistics-filters {
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-}
-
-html body[data-domain] main#main .statistics-filter-action {
-  display:flex !important;
-  align-items:end !important;
-}
-
-html body[data-domain] main#main .statistics-filter-action button {
-  width:100% !important;
-}
-
-html body[data-domain] main#main .culture-catalog-filters {
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:12px !important;
-}
-
-html body[data-domain] main#main .culture-catalog-filters > div {
-  display:grid !important;
-  gap:7px !important;
-  min-width:0 !important;
-}
-
-html body[data-domain] main#main .culture-catalog-list,
-html body[data-domain] main#main .measurement-history,
-html body[data-domain] main#main .batch-list,
-html body[data-domain] main#main .stage-list,
-html body[data-domain] main#main .qc-list,
-html body[data-domain] main#main .batch-event-list {
-  display:grid !important;
-  gap:9px !important;
-  min-width:0 !important;
-}
-
-html body[data-domain] main#main .batch-actions {
-  display:flex !important;
-  flex-wrap:wrap !important;
-  gap:10px !important;
-}
-
-html body[data-domain] main#main .observation-details {
-  padding:14px !important;
-  border:1px solid var(--border) !important;
-  border-radius:10px !important;
-  background:var(--surface-2) !important;
-}
-
-html body[data-domain] main#main .observation-details > summary {
-  color:var(--paper) !important;
-  font-weight:700 !important;
-  cursor:pointer !important;
-}
-
-html body[data-domain] main#main .statistics-table-wrap {
-  width:100% !important;
-  min-width:0 !important;
-  overflow-x:auto !important;
-  border:1px solid var(--border) !important;
-  border-radius:10px !important;
-  background:var(--surface-raised) !important;
-}
-
-html body[data-domain] main#main .statistics-table {
-  min-width:560px !important;
-  border-collapse:collapse !important;
-}
-
-@media(max-width:760px) {
-  html body[data-domain] main#main .quick-capture-grid {
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  }
-}
-
-@media(max-width:560px) {
-  html body[data-domain] main#main .grid,
-  html body[data-domain] main#main .statistics-filters,
-  html body[data-domain] main#main .culture-catalog-filters {
-    grid-template-columns:minmax(0,1fr) !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard > h2 {
+    margin:0 0 1px !important;
+    font-size:1.18rem !important;
+    line-height:1.15 !important;
   }
 
-  html body[data-domain] main#main .guided-entry-step,
-  html body[data-domain] main#main .batch-create-panel,
-  html body[data-domain] main#main .batch-compare-panel,
-  html body[data-domain] main#main .statistics-filters,
-  html body[data-domain] main#main .quick-capture,
-  html body[data-domain] main#main .batch-harvest-entry {
-    padding:12px !important;
-    gap:11px !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard > .muted:not(#authStatus) {
+    margin:0 0 2px !important;
+    font-size:11px !important;
+    line-height:1.3 !important;
   }
 
-  html body[data-domain] main#main .batch-create-heading,
-  html body[data-domain] main#main .quick-capture-heading,
-  html body[data-domain] main#main .culture-catalog-heading {
-    flex-wrap:wrap !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard label {
+    margin:3px 0 1px !important;
+    line-height:1.15 !important;
   }
 
-  html body[data-domain] main#main .quick-capture-tile {
-    min-height:62px !important;
-    padding:9px !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard input {
+    min-height:36px !important;
+    padding:7px 9px !important;
   }
 
-  html body[data-domain] main#main .batch-actions > button {
-    flex:1 1 140px !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard .auth-actions {
+    gap:6px !important;
+    margin:3px 0 !important;
   }
-}
 
-@media(max-width:360px) {
-  html body[data-domain] main#main .quick-capture-grid {
-    grid-template-columns:minmax(0,1fr) !important;
+  html body[data-domain]:not(.workspace-authenticated) #authCard .auth-actions button {
+    min-height:38px !important;
+    padding:7px 6px !important;
+  }
+
+  html body[data-domain]:not(.workspace-authenticated) #authCard #authStatus {
+    min-height:34px !important;
+    margin:0 !important;
+    padding:6px 8px !important;
+    line-height:1.3 !important;
   }
 }
