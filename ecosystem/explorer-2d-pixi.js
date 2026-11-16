@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Text, TextStyle } from "https://cdn.jsdelivr.net/npm/pixi.js@8.9.1/+esm";
+import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PALETTE={bio:0x79a991,myco:0xb18fc2,soil:0xc19b73,lab:0x80aeb8,products:0xc88773,iot:0x7eaaa3,work:0xaa9cbb,learn:0xb5b58d};
