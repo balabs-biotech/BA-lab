@@ -117,7 +117,8 @@
           "children": []
         }
       ],
-      "notionParentId": "hub"
+      "notionParentId": "hub",
+      "description": "Biotecnologia aplicada a microrganismos, substratos biológicos, fermentação e sistemas de cultura vegetal. Explore os temas documentados e o respetivo contexto experimental."
     },
     {
       "id": "soil",
@@ -260,7 +261,8 @@
           "children": []
         }
       ],
-      "notionParentId": "language"
+      "notionParentId": "language",
+      "description": "Recursos biológicos públicos e protótipos de produtos, distinguindo claramente os itens do catálogo dos conceitos ainda em desenvolvimento."
     },
     {
       "id": "work",
@@ -293,7 +295,8 @@
           "children": []
         }
       ],
-      "notionParentId": "language"
+      "notionParentId": "language",
+      "description": "Investigação e desenvolvimento na BA Labs: trabalho documentado, questões experimentais, protótipos, medições e limites da evidência atual."
     },
     {
       "id": "learn",
