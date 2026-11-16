@@ -65,23 +65,21 @@
       levels.get(node.depth).push(node);
     });
     const maxDepth = Math.max(0, ...levels.keys());
-    const gapX = 226, gapY = 104, left = 34, top = 48;
+    const gapX = 226, gapY = 104, left = 34;
+    const maxCount = Math.max(1, ...[...levels.values()].map(items => items.length));
+    const height = Math.max(210, maxCount * gapY + 112);
     const currentX = left + ancestors.length * gapX;
     const positions = new Map();
     ancestors.forEach((node, index) => {
-      positions.set(node.id, { x: left + index * gapX, y: top + 40, node });
+      positions.set(node.id, { x: left + index * gapX, y: height / 2 - 34, node });
     });
-    if (current) positions.set(current.id, { x: currentX, y: top + 40, node: current });
+    if (current) positions.set(current.id, { x: currentX, y: height / 2 - 34, node: current });
     levels.forEach((items, depth) => {
       const totalHeight = Math.max(0, items.length - 1) * gapY;
       items.forEach((node, index) => {
-        positions.set(node.id, { x: currentX + depth * gapX, y: top + 40 + index * gapY - totalHeight / 2, node });
+        positions.set(node.id, { x: currentX + depth * gapX, y: height / 2 - totalHeight / 2 + index * gapY - 34, node });
       });
     });
-    // Center the complete graph vertically when generations contain many branches.
-    const maxCount = Math.max(1, ...[...levels.values()].map(items => items.length));
-    const height = Math.max(210, maxCount * gapY + 112);
-    positions.forEach(point => { point.y += Math.max(0, (height - (maxCount * gapY + 112)) / 2); });
     return { positions, width: Math.max(560, currentX + (maxDepth + 1) * gapX + 220), height };
   }
 
@@ -89,14 +87,14 @@
     const token = ++renderToken;
     const nodes = collectNodes();
     if (!nodes.length) {
-      if (app) { app.destroy(true); app = null; }
+      if (app) { app.destroy(true, true); app = null; }
       showFallback("La carte apparaîtra lorsqu’une culture sera sélectionnée.");
       return;
     }
     try {
       const pixi = await loadPixi();
       if (token !== renderToken) return;
-      if (app) { app.destroy(true); app = null; }
+      if (app) { app.destroy(true, true); app = null; }
       stage.replaceChildren();
       const graph = layout(nodes);
       const nextApp = new pixi.Application();
@@ -110,7 +108,7 @@
         autoStart: false,
         preference: "webgl"
       });
-      if (token !== renderToken) { nextApp.destroy(true); return; }
+      if (token !== renderToken) { nextApp.destroy(true, true); return; }
       app = nextApp;
       nextApp.canvas.className = "lineage-graph-canvas";
       nextApp.canvas.setAttribute("aria-hidden", "true");
@@ -190,7 +188,7 @@
   scheduleRender();
   window.addEventListener("pagehide", () => {
     observer.disconnect();
-    if (app) app.destroy(true);
+    if (app) app.destroy(true, true);
     app = null;
   }, { once: true });
 })();
