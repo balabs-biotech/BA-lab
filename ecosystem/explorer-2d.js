@@ -19,18 +19,35 @@ function layout(initial=false){
  }else{
   const parent={id:current.id,title:current.title,x:0,y:0,r:9,level:0,data:current,rootId:trail[0].id};nodes.push(parent);
   const kids=current.children||[],count=kids.length;
-  // Uneven radial growth: branches occupy different lengths instead of a perfect ring.
+  // A living trunk replaces the radial star: children emerge from staggered
+  // attachment points, alternating sides with deterministic organic variation.
+  const anchors=[];
+  const span=Math.max(1,count-1);
+  const startX=-245,step=count>6?86:count>3?112:138;
   kids.forEach((d,i)=>{
-   const angle=-Math.PI/2+i*2*Math.PI/Math.max(1,count)+(i%2?-.09:.07);
-   const radius=190+((i*67+count*23)%145)+(d.children?.length?24:0);
-   const n={id:d.id,title:d.title,x:Math.cos(angle)*radius,y:Math.sin(angle)*radius*.78,r:d.children?.length?6.5:4.5,level:1,data:d,rootId:parent.rootId};
-   nodes.push(n);edges.push({a:parent,b:n,i});
+   const side=i%2===0?-1:1;
+   const wave=Math.sin((i+1)*1.73)*24;
+   const trunkX=startX+i*step;
+   const anchor={x:trunkX,y:Math.sin(i*.91)*17,r:0};
+   anchors.push(anchor);
+   const reach=112+((i*53+count*19)%72)+(d.children?.length?22:0);
+   const y=anchor.y+side*(reach+wave);
+   const x=trunkX+48+((i*31)%37);
+   const n={id:d.id,title:d.title,x,y,r:d.children?.length?6.5:4.5,level:1,data:d,rootId:parent.rootId};
+   nodes.push(n);
+   edges.push({a:anchor,b:n,i:i+10});
   });
-  // Anastomoses between neighbouring branches form a mesh, not isolated spokes.
+  // The main hypha runs through the attachment points; it is deliberately
+  // segmented and slightly irregular rather than a straight diagram line.
+  if(anchors.length){
+   edges.push({a:parent,b:anchors[0],i:0});
+   for(let i=1;i<anchors.length;i++)edges.push({a:anchors[i-1],b:anchors[i],i:i+1});
+  }
+  // Anastomoses connect non-adjacent branches into a resilient mycelial mesh.
   const kidsOnly=nodes.slice(1);
   kidsOnly.forEach((n,i)=>{
-   if(count>2)edges.push({a:n,b:kidsOnly[(i+1)%count],i:i+40,cross:true});
-   if(count>4&&i%2===0)edges.push({a:n,b:kidsOnly[(i+3)%count],i:i+70,cross:true});
+   if(count>2&&i%2===0)edges.push({a:n,b:kidsOnly[(i+1)%count],i:i+40,cross:true});
+   if(count>4&&i%3===0)edges.push({a:n,b:kidsOnly[(i+3)%count],i:i+70,cross:true});
   });
  }
  if(initial){fit();scale=targetScale;offset={...targetOffset}}
