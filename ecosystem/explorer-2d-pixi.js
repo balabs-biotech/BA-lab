@@ -6,8 +6,9 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 
 export async function createPixiRenderer(canvas){
  const app=new Application();
- await app.init({canvas,backgroundAlpha:0,antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,1.75),powerPreference:"high-performance",preference:"webgl",clearBeforeRender:true});
+ await app.init({canvas,backgroundAlpha:0,antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,1.75),powerPreference:"high-performance",preference:"webgl",clearBeforeRender:true,autoStart:false});
  app.stage.eventMode="none";
+ canvas.dataset.renderer="pixijs-webgl";
  const field=new Graphics(),filaments=new Graphics(),junctions=new Graphics(),labels=new Container();
  app.stage.addChild(field,filaments,junctions,labels);
  const labelPool=new Map();
