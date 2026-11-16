@@ -22984,3 +22984,28 @@ body[data-domain] #batchList {
 @media(max-width:700px) {
   body[data-domain] #batchList { padding:10px !important; }
 }
+
+
+/* BA LABS CULTUREOPS — PASS 98
+   The batch history items are rendered inside the sibling #batchList node. */
+body[data-domain] #batchList .batch-item {
+  display:block !important;
+  min-width:0 !important;
+  padding:14px 16px !important;
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  border:1px solid var(--border) !important;
+  border-inline-start:3px solid var(--domain-accent) !important;
+  border-radius:10px !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.16) !important;
+}
+body[data-domain] #batchList .batch-item strong { color:var(--paper) !important; }
+body[data-domain] #batchList .batch-item .muted { color:var(--muted) !important; }
+body[data-domain] #batchList .batch-item:hover {
+  background:var(--surface-2) !important;
+  border-color:var(--border-strong) !important;
+  border-inline-start-color:var(--domain-accent) !important;
+}
+@media(max-width:700px) {
+  body[data-domain] #batchList .batch-item { padding:12px !important; }
+}
