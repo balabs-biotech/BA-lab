@@ -506,7 +506,7 @@ html body[data-domain="laboratory"] #trackerCard .culture-catalog-action:focus-v
   border-color:var(--workspace-accent) !important;
   background:rgba(120,184,232,.16) !important;
 }
-html body[data-domain="laboratory"] #trackerCard #cultureDetailPanel {
+html body[data-domain="laboratory"] #trackerCard #cultureDetailPanel:not(.hidden) {
   display:grid !important;
   gap:14px !important;
   margin-top:8px !important;
