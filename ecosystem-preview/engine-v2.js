@@ -173,17 +173,17 @@ function createWorld() {
     const branches=14;
     for(let j=0;j<branches;j++){
       const a=j/branches*Math.PI*2+IDS.indexOf(id)*.31;
-      const reach=1.0+(j%4)*.24;
+      const reach=.82+(j%4)*.27+(j%3)*.06;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
       const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
-      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
+      const mid=start.clone().lerp(end,.43).add(new THREE.Vector3(Math.cos(a+1.1)*(.22+(j%3)*.07),Math.sin(a+1.1)*(.18+(j%2)*.08),.16+(j%3)*.035));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
       const thickness=.0065+(j%3)*.0014;
       const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,thickness,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
-      for(let fork=0;fork<2;fork++){
-        const at=curve.getPoint(.48+fork*.22),side=fork===0?-1:1;
-        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.34+(j%3)*.08),Math.sin(a+side*.72)*(.28+(j%2)*.07),.07));
+      for(let fork=0;fork<3;fork++){
+        const at=curve.getPoint(.34+fork*.2),side=fork===1?1:-1;
+        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.22+(j%3)*.09+(fork===2?.13:0)),Math.sin(a+side*(.62+fork*.13))*(.19+(j%2)*.08+(fork===2?.1:0)),.07));
         const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
         group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
       }
@@ -606,10 +606,10 @@ function syncLabelScales() {
     const depth=label.userData.depth||0;
     const compact=window.innerWidth<760;
     const isDomain=label.userData.kind==='domain-label';
-    const basePixels=isDomain?(compact?15:17):label.userData.denseRoot?(compact?14:16):Math.max(compact?9:10,(compact?12:14)-depth*1.5);
+    const basePixels=isDomain?(compact?12:13):label.userData.denseRoot?(compact?10:11):Math.max(compact?8:9,(compact?10:11)-depth*1.1);
     const referenceDistance=isDomain?13.5:6.5;
     const zoomFactor=Math.pow(cameraDistance/referenceDistance,.55);
-    const targetPixels=THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:8,compact?19:22);
+    const targetPixels=THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:7,compact?15:17);
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*3.8,worldHeight,1);
   };
