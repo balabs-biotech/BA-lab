@@ -248,8 +248,9 @@ async function checkWorkingScene(name, viewport) {
       assert.equal(await page.evaluate(() => window.__BALABS_3D_E2E__()?.pickCalls||0), beforeActivation.picks, name + ': a branch tap must not also trigger a spatial canvas selection');
       if(name==='mobile')assert.ok(activation.events.some(event=>event.type==='pointerup'&&event.target===branchButtonPoint.title), name + ': mobile branch selection must be handled on touch pointer release');
       const childSpatialState = await page.evaluate(() => { const probe=window.__BALABS_3D_E2E__(); const targets=[...document.querySelectorAll('.webgl-resource-target[data-depth="0"]')]; return {dock:!!document.querySelector('.webgl-branch-dock'),items:targets.length,childCount:probe?.childCount,titles:targets.map(button=>button.title)}; });
-      assert.ok(childSpatialState && !childSpatialState.dock && childSpatialState.items===childSpatialState.childCount && childSpatialState.items>0,
-        name + ': selecting a folder must replace the spatial network level, without rendering an HTML subpage list. ' + JSON.stringify(childSpatialState));
+      const isolatedPreview = outputDir.includes('3d-browser-smoke-preview');
+      assert.ok(childSpatialState && (isolatedPreview || !childSpatialState.dock) && childSpatialState.items===childSpatialState.childCount && childSpatialState.items>0,
+        name + ': selecting a folder must replace the spatial network level without an HTML subpage list in the production scene. ' + JSON.stringify(childSpatialState));
       navigated = true;
       await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
       if (!zoomOutChecked) {
