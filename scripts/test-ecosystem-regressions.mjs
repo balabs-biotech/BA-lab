@@ -226,7 +226,7 @@ assert.ok(engine.includes('sourceItem:item') && previewEngine.includes('sourceIt
 assert.ok(previewEngine.includes('function renderBranchDock()') && previewEngine.includes('webgl-branch-dock') && previewEngine.includes('openResource(item)'), 'Preview engine must expose visible, recursively navigable branch and sub-branch controls');
 assert.ok(engine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && engine.includes('const blend=1-Math.exp(-dt*13)'), 'Public camera zoom must ease smoothly toward its target instead of stepping instantly');
 assert.ok(previewEngine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && previewEngine.includes('const blend=1-Math.exp(-dt*13)'), 'Preview camera zoom must use the same smooth easing');
-assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('Math.pow(cameraDistance/referenceDistance,.55)') && previewEngine.includes('THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:8,compact?19:22)') && previewEngine.includes('syncLabelScales();'), 'Preview labels must shrink with zoom and remain capped at a discreet screen size');
+assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('Math.pow(cameraDistance/referenceDistance,.55)') && previewEngine.includes('THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:7,compact?15:17)') && previewEngine.includes('syncLabelScales();'), 'Preview labels must shrink with zoom and remain capped at a discreet screen size');
 assert.ok(engine.includes('function panCameraByPixels(dx,dy)') && previewEngine.includes('function panCameraByPixels(dx,dy)'), 'Both 3D engines must translate the complete camera view when a two-finger gesture moves the map');
 assert.ok(previewEngine.includes("lastBranchTouchActivationAt=performance.now()") && previewEngine.includes("e.stopImmediatePropagation();return"), 'Preview touch branch activation must suppress its synthetic follow-up canvas click');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
@@ -282,9 +282,9 @@ for (const [language, tree, mycologyId, fungalId] of [
 assert.equal(ptTree.domains.find(domain => domain.id === 'bio').notionId, '40173152f1718120b45bf79f8e81120a', 'Portuguese biotechnology universe must point to the actual Biotecnologia page, not its parent hub');
 
 assert.ok(engine.includes('function createWorld()'), 'The new engine must build its own biological network scene');
-assert.ok(engine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), '3D labels must use enlarged, heavier glyphs that remain readable when zoomed');
+assert.ok(engine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), '3D labels must use crisp high-resolution glyph textures');
 assert.ok(engine.includes('lineHeight=210'), 'Multi-line 3D labels must retain sufficient vertical spacing at the larger font size');
-assert.ok(previewEngine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use the same enlarged, heavier glyphs');
+assert.ok(previewEngine.includes("ctx.font='700 '+(size*14)+'px Inter,system-ui,sans-serif'"), 'Preview 3D labels must use crisp high-resolution glyph textures');
 assert.ok(previewEngine.includes('lineHeight=210'), 'Preview multiline labels must use matching vertical spacing');
 assert.ok(engine.includes("e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target')") && !engine.includes('webgl-branch-dock'), 'Public spatial hit targets must keep native click dispatch outside stage pointer capture without a legacy branch dock');
 assert.ok(previewEngine.includes("e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock')"), 'Preview branch controls must keep native click dispatch outside stage pointer capture');
