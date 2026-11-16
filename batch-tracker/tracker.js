@@ -6737,7 +6737,8 @@ function renderPlantCultureList(rows) {
   const statusLabels = { planned: "Planifiée", active: "En culture", harvested: "Récoltée", lost: "Perdue / arrêtée", archived: "Archivée" };
   rows.forEach(row => {
     const article = document.createElement("article");
-    article.className = "culture-catalog-row";
+    article.className = "culture-catalog-row plant-culture-row";
+    article.dataset.plantStatus = row.status || "unknown";
     const main = document.createElement("div");
     main.className = "culture-catalog-main";
     const code = document.createElement("strong");
@@ -6753,7 +6754,10 @@ function renderPlantCultureList(rows) {
     const environment = batchEnvironmentOptions.find(item => item.id === row.environment_id);
     place.textContent = [location?.name, environment?.name, row.substrate].filter(Boolean).join(" · ") || "Emplacement / substrat non précisé";
     const status = document.createElement("span");
+    status.className = "plant-culture-status";
+    status.dataset.status = row.status || "unknown";
     status.textContent = statusLabels[row.status] || row.status || "État non renseigné";
+    status.setAttribute("aria-label", "État de la culture : " + status.textContent);
     meta.append(details, place, status);
     if (row.started_at) {
       const date = document.createElement("span");
