@@ -16012,3 +16012,340 @@ body[data-domain] #message > .card {
     transition:none!important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 77
+   Analytics workspace, overview metrics, searchable catalog and data tables
+   ============================================================ */
+body[data-domain] #statisticsCard {
+  display:grid;
+  gap:15px;
+  min-width:0;
+}
+body[data-domain] #statisticsCard > .section-kicker {
+  margin-bottom:0;
+}
+body[data-domain] #statisticsCard > h2 {
+  margin:0;
+}
+body[data-domain] #statisticsCard > .muted {
+  max-width:82ch;
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.7rem;
+  line-height:1.65;
+}
+body[data-domain] #statisticsCard .statistics-filters {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:0;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:14px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #statisticsCard .statistics-filters > div {
+  display:grid;
+  align-content:start;
+  gap:6px;
+  min-width:0;
+}
+body[data-domain] #statisticsCard .statistics-filters label {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.025em;
+}
+body[data-domain] #statisticsCard .statistics-filters select {
+  width:100%;
+  min-width:0;
+  min-height:42px;
+  padding:9px 11px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:var(--workspace-control);
+  color:var(--workspace-text);
+  font-size:.72rem;
+}
+body[data-domain] #statisticsCard .statistics-filter-action {
+  align-self:end;
+}
+body[data-domain] #statisticsCard #loadStatisticsButton {
+  width:100%;
+  min-height:42px;
+  margin:0;
+  font-size:.7rem;
+}
+body[data-domain] #statisticsCard #statisticsStatus {
+  margin:0;
+  padding:10px 12px;
+  border-left:2px solid var(--workspace-accent);
+  border-radius:0 9px 9px 0;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.55;
+}
+body[data-domain] #statisticsCard .statistics-summary {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin:0;
+}
+body[data-domain] #statisticsCard .statistics-summary-item {
+  display:grid;
+  align-content:space-between;
+  gap:7px;
+  min-width:0;
+  min-height:84px;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #statisticsCard .statistics-summary-item span {
+  color:var(--workspace-muted);
+  font-size:.62rem;
+  line-height:1.4;
+}
+body[data-domain] #statisticsCard .statistics-summary-item strong {
+  overflow-wrap:anywhere;
+  font-size:1.05rem;
+  line-height:1.2;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #statisticsCard .statistics-chart {
+  min-width:0;
+  min-height:110px;
+  margin:0;
+  padding:clamp(12px,2vw,18px);
+  overflow:hidden;
+  border:1px solid var(--workspace-border);
+  border-radius:13px;
+  background:linear-gradient(145deg,var(--workspace-panel-raised),var(--workspace-panel));
+}
+body[data-domain] #statisticsCard .statistics-chart > .muted {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.6;
+}
+body[data-domain] #statisticsCard .statistics-chart svg {
+  max-width:100%;
+  overflow:visible;
+}
+body[data-domain] #statisticsCard .statistics-table-wrap {
+  min-width:0;
+  margin:0;
+  overflow-x:auto;
+  border:1px solid var(--workspace-border);
+  border-radius:12px;
+  background:var(--workspace-panel);
+  scrollbar-width:thin;
+  scrollbar-color:var(--workspace-accent-border) transparent;
+}
+body[data-domain] #statisticsCard .statistics-table {
+  width:100%;
+  min-width:620px;
+  border-collapse:separate;
+  border-spacing:0;
+  color:var(--workspace-text);
+  font-size:.68rem;
+}
+body[data-domain] #statisticsCard .statistics-table caption {
+  padding:12px 14px;
+  color:var(--workspace-muted);
+  text-align:left;
+  font-size:.63rem;
+  font-weight:750;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+body[data-domain] #statisticsCard .statistics-table th {
+  padding:10px 12px;
+  border-top:1px solid var(--workspace-border);
+  border-bottom:1px solid var(--workspace-border);
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-muted);
+  text-align:left;
+  font-size:.6rem;
+  font-weight:750;
+  letter-spacing:.045em;
+  white-space:nowrap;
+}
+body[data-domain] #statisticsCard .statistics-table td {
+  padding:10px 12px;
+  border-bottom:1px solid var(--workspace-border);
+  color:var(--workspace-text);
+  line-height:1.5;
+  vertical-align:top;
+}
+body[data-domain] #statisticsCard .statistics-table tbody tr:last-child td {
+  border-bottom:0;
+}
+body[data-domain] #statisticsCard .statistics-table tbody tr:hover td {
+  background:color-mix(in srgb,var(--workspace-accent) 5%,var(--workspace-panel));
+}
+body[data-domain] #statisticsCard .statistics-footnote {
+  margin:0;
+  padding:10px 12px;
+  border:1px dashed var(--workspace-border);
+  border-radius:9px;
+  color:var(--workspace-muted);
+  font-size:.62rem;
+  line-height:1.6;
+}
+body[data-domain] #overviewCard .overview-metrics {
+  gap:11px;
+}
+body[data-domain] #overviewCard .overview-metric {
+  min-width:0;
+  padding:clamp(13px,1.8vw,18px);
+  border-radius:13px;
+  background:linear-gradient(145deg,var(--workspace-panel-raised),var(--workspace-panel));
+}
+body[data-domain] #overviewCard .overview-metric-label {
+  color:var(--workspace-muted);
+  font-size:.65rem;
+  line-height:1.4;
+}
+body[data-domain] #overviewCard .overview-metric strong {
+  font-size:clamp(1.35rem,3vw,1.8rem);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.04em;
+}
+body[data-domain] #overviewCard .overview-meter {
+  height:5px;
+  overflow:hidden;
+  border-radius:999px;
+  background:var(--workspace-border);
+}
+body[data-domain] #overviewCard .overview-meter span {
+  height:100%;
+  border-radius:inherit;
+}
+body[data-domain] #overviewCard .overview-metric-note {
+  color:var(--workspace-muted);
+  font-size:.61rem;
+  line-height:1.45;
+}
+body[data-domain] #overviewCard .overview-lower {
+  gap:13px;
+  margin-top:16px;
+}
+body[data-domain] #overviewCard .overview-activity,
+body[data-domain] #overviewCard .overview-shortcuts {
+  min-width:0;
+  padding:clamp(13px,1.8vw,18px);
+  border:1px solid var(--workspace-border);
+  border-radius:13px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #overviewCard .overview-section-heading {
+  color:var(--workspace-text);
+  font-size:.78rem;
+}
+body[data-domain] #overviewCard .overview-observations {
+  display:grid;
+  gap:8px;
+  min-width:0;
+}
+body[data-domain] #overviewCard .overview-observations > * {
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #trackerCard .culture-catalog-filters {
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) minmax(180px,.8fr);
+  gap:12px;
+  margin:0 0 14px;
+  padding:13px;
+  border:1px solid var(--workspace-border);
+  border-radius:12px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #trackerCard .culture-catalog-filters > div {
+  min-width:0;
+}
+body[data-domain] #trackerCard .culture-catalog-filters label {
+  margin:0 0 6px;
+  color:var(--workspace-muted);
+  font-size:.65rem;
+  font-weight:700;
+}
+body[data-domain] #trackerCard .culture-catalog-filters :is(input,select) {
+  width:100%;
+  min-width:0;
+  min-height:41px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:var(--workspace-control);
+  color:var(--workspace-text);
+  font-size:.72rem;
+}
+body[data-domain] #trackerCard .culture-catalog-list {
+  gap:8px;
+}
+body[data-domain] #trackerCard .culture-catalog-row {
+  min-width:0;
+  padding:13px 14px;
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #trackerCard .culture-catalog-row:focus-within {
+  border-color:var(--workspace-accent);
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 25%,transparent);
+  outline-offset:1px;
+}
+body[data-domain] #batchCard .batch-list {
+  gap:8px;
+}
+body[data-domain] #batchCard .batch-item {
+  min-width:0;
+  overflow-wrap:anywhere;
+  border-color:var(--workspace-border);
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+  text-align:left;
+}
+body[data-domain] #batchCard .batch-item:hover:not(:disabled) {
+  border-color:var(--workspace-accent);
+  background:var(--workspace-panel);
+}
+body[data-domain] :is(#statisticsCard,#batchCard,#trackerCard) :is(table, .statistics-table-wrap) {
+  max-width:100%;
+}
+@media(max-width:760px) {
+  body[data-domain] #statisticsCard .statistics-filters {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #statisticsCard .statistics-summary {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain] #trackerCard .culture-catalog-filters {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:460px) {
+  body[data-domain] #statisticsCard .statistics-summary {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #statisticsCard .statistics-summary-item {
+    min-height:68px;
+  }
+  body[data-domain] #statisticsCard .statistics-table {
+    min-width:570px;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #statisticsCard *,
+  body[data-domain] #overviewCard *,
+  body[data-domain] #trackerCard .culture-catalog-row {
+    scroll-behavior:auto!important;
+    transition:none!important;
+    animation:none!important;
+  }
+}
