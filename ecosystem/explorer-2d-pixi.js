@@ -17,7 +17,7 @@ export async function createPixiRenderer(canvas){
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
  const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
  let cameraScale=1;
- function render({nodes,edges,selected,scale,offset,width,height,reduced,time=performance.now()}){
+ function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now()}){
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
@@ -48,13 +48,35 @@ export async function createPixiRenderer(canvas){
   filaments.position.set(width/2+offset.x,height/2+offset.y);filaments.scale.set(scale);
   junctions.position.copyFrom(filaments.position);junctions.scale.set(scale);
   const live=new Set();
+  const shortRoots={
+   fr:{bio:"BIOTECH",myco:"MYCO",soil:"TECHNOSOIL",lab:"LABO",products:"PRODUITS",iot:"IOT",work:"R&D",learn:"RESSOURCES"},
+   en:{bio:"BIOTECH",myco:"MYCOLOGY",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUCTS",iot:"IOT",work:"PROJECTS",learn:"RESOURCES"},
+   ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",learn:"موارد"},
+   pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",learn:"RECURSOS"}
+  };
+  const candidates=[];
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
+   const show=n.level===0||(alpha>.5&&scale>(n.level===1?.72:n.level===2?1.3:n.level===3?2.55:4.3))||selected?.id===n.id;
+   if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:n.level===0?1:2});
+  }
+  candidates.sort((a,b)=>a.priority-b.priority);
+  const occupied=[];
+  for(const {n,alpha} of candidates){
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
-   const show=n.level===0||(alpha>.5&&scale>(n.level===1?.58:n.level===2?1.15:n.level===3?2.35:4.1))||selected?.id===n.id;
-   if(!show)continue;live.add(n.id);
-   let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});label.anchor.set(.5,0);labelPool.set(n.id,label);labels.addChild(label);}
-   label.text=n.title;label.style.fontSize=clamp((n.level===0?12:10)*Math.sqrt(scale),8,14);label.style.fontWeight=n.level===0?"650":"500";label.position.set(clamp(sx,100,width-100),sy+Math.max(1.25,n.r*scale)+5);label.alpha=alpha;label.visible=true;
+   let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
+   const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
+   const fontSize=clamp((n.level===0?11:9)*Math.sqrt(scale),n.level===0?8:7,n.level===0?13:12);
+   label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
+   const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
+   const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
+   const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
+   const x=clamp(sx+dx*radius,5,width-5),y=clamp(sy+dy*radius,64,height-18);
+   label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=alpha;label.visible=true;
+   const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
+   const collides=occupied.some(o=>box.left<o.right+5&&box.right>o.left-5&&box.top<o.bottom+4&&box.bottom>o.top-4);
+   if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
+   occupied.push(box);live.add(n.id);
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
   app.render();
