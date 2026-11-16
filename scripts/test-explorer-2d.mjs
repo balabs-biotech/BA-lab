@@ -13,7 +13,7 @@ try {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(base, { waitUntil: 'domcontentloaded' });
-    await page.locator('#loading[hidden]').waitFor({ timeout: 15000 });
+    await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
     await page.locator('#field').waitFor({ state: 'visible' });
     const canvasSize = await page.locator('#field').evaluate(el => ({ width: el.width, height: el.height, rect: el.getBoundingClientRect().toJSON() }));
     assert.ok(canvasSize.width > 0 && canvasSize.height > 0, 'Canvas must have a real drawing surface');
@@ -38,7 +38,7 @@ try {
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');
     for (const language of ['en', 'ar', 'pt', 'fr']) {
       await page.locator('#language').selectOption(language);
-      await page.locator('#loading[hidden]').waitFor({ timeout: 15000 });
+      await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
       await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
       assert.equal(await page.locator('#language').inputValue(), language);
     }
