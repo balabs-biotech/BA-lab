@@ -33,12 +33,20 @@ function buildNetwork(){
    kids.forEach((child,j)=>{
     const hsh=hash(child.id),fraction=kids.length===1?0:(j/(kids.length-1)-.5);
     const jitter=((hsh%1000)/1000-.5)*.3;
-    const a=branchAngle+fraction*spread+jitter;
-    const bend=dist*(.82+((hsh>>>8)%40)/100);
-    const x=parent.x+Math.cos(a)*bend,y=parent.y+Math.sin(a)*bend;
+    // A smooth, position-dependent curl field bends neighbouring hyphae in related,
+    // but not identical, directions. This avoids a repeated starburst at every node.
+    const fieldX=Math.sin(parent.x*.0021+parent.y*.0013+depth*.73);
+    const fieldY=Math.cos(parent.y*.0018-parent.x*.0011-depth*.51);
+    const curl=Math.atan2(fieldY,fieldX)*.22;
+    const a=branchAngle+curl+fraction*spread+jitter;
+    const bend=dist*(.72+((hsh>>>8)%56)/100);
+    const lateral=((hsh>>>17)&255)/255-.5;
+    const sway=depth>1?lateral*Math.min(22,dist*.16):0;
+    const x=parent.x+Math.cos(a)*bend-Math.sin(a)*sway,y=parent.y+Math.sin(a)*bend+Math.cos(a)*sway;
     const n={id:child.id,title:child.title,x,y,r:Math.max(2.1,8-depth*1.25),level:depth,data:child,rootId:root.id,parent:parent.id,angle:a};
     nodes.push(n);byId.set(n.id,n);edges.push({a:parent,b:n,depth,seed:hsh});
-    walk(child,n,depth+1,a+(fraction*.34)+jitter,path.concat(child.id));
+    const nextDrift=Math.sin((n.x+n.y)*.0017+hsh*.000001)*.16;
+    walk(child,n,depth+1,a+(fraction*.22)+jitter*.45+nextDrift,path.concat(child.id));
    });
   };
   walk(root,rootNode,1,angle,[]);
