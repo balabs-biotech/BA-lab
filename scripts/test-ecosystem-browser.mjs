@@ -53,8 +53,10 @@ async function checkTwoFingerPan(page, name) {
   const rect = await page.locator('#mainView .webgl-stage canvas').boundingBox();
   assert.ok(rect, name + ': canvas bounds are unavailable for the two-finger gesture');
   const session = await page.context().newCDPSession(page);
-  const x = Math.round(rect.x + rect.width * .5);
-  const y = Math.round(rect.y + rect.height * .5);
+  // Start in the open perimeter of the scene, away from projected node
+  // hit areas, so the gesture measures camera panning rather than node picking.
+  const x = Math.round(rect.x + rect.width * .82);
+  const y = Math.round(rect.y + rect.height * .78);
   await session.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
     touchPoints: [{ x: x - 34, y, id: 1 }, { x: x + 34, y, id: 2 }],
