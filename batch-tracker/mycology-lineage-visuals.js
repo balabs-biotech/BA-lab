@@ -169,8 +169,10 @@
         const point = byId.get(node.id);
         if (point) drawNode(node, point);
       });
-      if (reducedMotion) nextApp.stop();
-      else nextApp.start();
+      // The graph is static between culture selections: render once instead of
+      // running a permanent GPU ticker. Rebuild only when the lineage data changes.
+      nextApp.render();
+      nextApp.stop();
       shell.dataset.graphState = "ready";
     } catch (error) {
       console.info("BA Labs: carte PixiJS indisponible, liste de filiation conservée.", error);
