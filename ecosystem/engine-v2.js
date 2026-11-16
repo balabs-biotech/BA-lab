@@ -42,7 +42,7 @@ const t = key => (COPY[LANG()] || COPY.fr)[key] || COPY.fr[key];
 let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intro, status;
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
-let nav, branchDock, currentNode = null, currentAnchor = null, navigationStack = [];
+let nav, currentNode = null, currentAnchor = null, navigationStack = [];
 let selected = null, selectedBranch = null, manifest = null, transition = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
@@ -87,13 +87,7 @@ function addStyles() {
     #mainView .webgl-intro-orb b{font:700 33px system-ui;letter-spacing:-.1em;color:#e1e7dc}
     #mainView .webgl-intro-copy{color:#d6ded6;font:600 10px system-ui;letter-spacing:.17em}
     #mainView .webgl-intro-cta{border:1px solid #9eb7a2;border-radius:999px;padding:12px 17px;color:#f1f2e9;background:#21342edb;font:700 10px system-ui;letter-spacing:.1em}
-    #mainView .webgl-branch-dock{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:absolute;left:clamp(10px,2vw,24px);right:clamp(10px,2vw,24px);bottom:48px;z-index:2147483647!important;display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;max-height:178px;overflow:auto;padding:10px 12px;border:1px solid #78958a88;border-radius:16px;background:linear-gradient(145deg,#142321ed,#10191bf0);box-shadow:0 12px 34px #0007;backdrop-filter:blur(14px);scrollbar-width:thin}
-    #mainView .webgl-branch-dock[hidden]{display:none!important}
-    #mainView .webgl-branch-dock .webgl-branch-item{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:min(320px,100%);padding:9px 14px;border:1px solid #78958a99;border-radius:12px;background:#263b38;color:#f2f2e9;font:650 15px/1.25 system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer;touch-action:manipulation}
-    #mainView .webgl-branch-dock .webgl-branch-item[data-has-children="true"]:after{content:'›';color:#d69a7f;font-size:21px;line-height:1}
-    #mainView .webgl-branch-dock .webgl-branch-item:hover,#mainView .webgl-branch-dock .webgl-branch-item:focus-visible{background:#385044;border-color:#d1d0c5;outline:2px solid #d1d0c5;outline-offset:2px}
-    #mainView .webgl-branch-dock .webgl-branch-item[aria-current="page"]{background:#4a3a32;border-color:#b96b4d}
-    @media(max-width:600px){#mainView .webgl-branch-dock{left:8px;right:8px;bottom:46px;gap:6px;max-height:190px;padding:8px}#mainView .webgl-branch-dock .webgl-branch-item{flex:1 1 calc(50% - 6px);min-width:0;max-width:none;min-height:46px;padding:9px 10px;font-size:14px}}
+    @media(max-width:600px){#mainView {left:8px;right:8px;bottom:46px;gap:6px;max-height:190px;padding:8px}#mainView  .webgl-branch-item{flex:1 1 calc(50% - 6px);min-width:0;max-width:none;min-height:46px;padding:9px 10px;font-size:14px}}
     #mainView .webgl-stage.is-transitioning{cursor:progress}
     @media(max-width:600px){#mainView .webgl-path{left:9px;top:52px;max-width:min(260px,calc(100% - 78px));font-size:9px}#mainView .webgl-hint{left:9px;bottom:10px;max-width:calc(100% - 130px);font-size:7px;letter-spacing:.02em}#mainView .webgl-status{right:9px;bottom:12px;font-size:7px}#mainView .webgl-focus{left:9px;top:9px;padding:13px;width:min(270px,calc(100% - 78px))}#mainView .webgl-controls{right:9px;top:9px;gap:4px}#mainView .webgl-controls button{width:34px;height:34px}}
   `;
@@ -285,13 +279,13 @@ function makeResourceLabel(item,color,depth=0) {
 function addResourceHitTarget(label) {
  const data=label.userData||{},hasChildren=!!data.children?.length;
  const element=document.createElement(hasChildren?'button':'a');
- if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});openResource(data)});}
+ if(hasChildren){element.type='button';element.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});window.__BALABS_3D_LAST_OPEN__={title:data.title||data.name||'',source:e.detail===0?'keyboard':'spatial-hit',resolved:true,hasPosition:!!data.position,hasChildren:!!data.children?.length};window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;openResource(data)});}
  else {element.href=data.url||'#';element.target='_blank';element.rel='noopener noreferrer';element.addEventListener('click',e=>{if(!data.url)e.preventDefault();});}
  element.className='webgl-hit-target webgl-resource-target';
  element.textContent=data.title||data.name||'Ouvrir';
  const compact=window.innerWidth<760;
  const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
- Object.assign(element.style,{display:'block',opacity:'1',visibility:'visible',color:'#f4f5ed',background:'rgba(13,25,23,.96)',border:'1px solid rgba(185,107,77,.9)',borderRadius:'10px',boxShadow:'0 5px 18px rgba(0,0,0,.55)',font:'750 '+(compact?'16px':'18px')+'/1.2 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',padding:'0 11px',width:width+'px',height:compact?'50px':'52px',minWidth:compact?'128px':'150px',maxWidth:compact?'210px':'280px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
+ Object.assign(element.style,{display:'block',opacity:'0.015',visibility:'visible',color:'transparent',background:'transparent',border:'0',borderRadius:'50%',boxShadow:'none',font:'1px/1 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'clip',padding:'0',width:Math.max(76,Math.min(112,width*.48))+'px',height:'76px',minWidth:'64px',maxWidth:'112px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
@@ -343,48 +337,8 @@ function syncResourceHitTargets() {
   button.style.left=chosen.cx+'px';button.style.top=chosen.cy+'px';
  }
 }
-function renderBranchDock() {
-  if(!branchDock)return;branchDock.replaceChildren();
-  const children=currentNode?.children||[];branchDock.hidden=!selected||children.length===0;
-  if(!selected||!children.length)return;
-  children.forEach((item,index)=>{
-    const hasChildren=!!item.children?.length,hasUrl=!!item.url;
-    const el=document.createElement(!hasChildren&&hasUrl?'a':'button');
-    if(el.tagName==='BUTTON'){
-      el.type='button';
-      const activate=(event,source)=>{
-        event?.preventDefault?.();event?.stopPropagation?.();
-        const spatial=resourceObjects.find(object=>object.userData?.kind==='resource'&&object.userData?.sourceItem===item)?.userData;
-        window.__BALABS_3D_LAST_OPEN__={title:item.title||item.name||'',source,resolved:!!spatial,hasPosition:!!spatial?.position,hasChildren:!!spatial?.children?.length};
-        if(source==='touch-pointerup')lastBranchTouchActivationAt=performance.now();
-        window.__BALABS_3D_E2E_CLICKS=(window.__BALABS_3D_E2E_CLICKS||0)+1;
-        try{openResource(item);window.__BALABS_3D_LAST_OPEN_ERROR__=null}
-        catch(error){window.__BALABS_3D_LAST_OPEN_ERROR__={message:error?.message||String(error),stack:error?.stack||''}}
-      };
-      // Mobile browsers can synthesize a click inconsistently after multi-touch
-      // gestures. Activate on the touch pointer release, then suppress its
-      // compatibility click; mouse and keyboard continue through click.
-      el.addEventListener('pointerup',event=>{
-        if(event.pointerType!=='touch')return;
-        el.dataset.touchActivatedAt=String(performance.now());
-        activate(event,'touch-pointerup');
-      });
-      el.addEventListener('click',event=>{
-        const touchAt=Number(el.dataset.touchActivatedAt||0);
-        if(performance.now()-lastBranchTouchActivationAt<800){event.preventDefault();event.stopImmediatePropagation();return;}
-        if(touchAt&&performance.now()-touchAt<800){event.preventDefault();event.stopPropagation();return}
-        activate(event,event.detail===0?'keyboard':'click');
-      });
-    }
-    else{el.href=item.url;el.target='_blank';el.rel='noopener noreferrer'}
-    el.className='webgl-branch-item';el.textContent=item.title||item.name||('Branche '+(index+1));
-    el.title=item.title||item.name||'';el.dataset.branchIndex=String(index);el.dataset.hasChildren=String(hasChildren);el.dataset.resourceUrl=item.url||'';
-    el.setAttribute('aria-label',(item.title||item.name||'Branche')+(hasChildren?' — ouvrir les sous-branches':hasUrl?' — ouvrir la page':' — consulter'));
-    branchDock.append(el);
-  });
-}
 function renderPath() {
-  if(!nav)return;nav.replaceChildren();renderBranchDock();
+  if(!nav)return;nav.replaceChildren();
   const crumbs=[{title:t('overview'),action:goOverview}];
   if(selected)crumbs.push({title:LABELS[selected]?.title||selected,action:()=>{navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===selected)||null;currentAnchor=cells.get(selected).position.clone();buildResources(selected);smoothCamera(currentAnchor,7.5,650)}});
   navigationStack.slice(1).forEach((entry,index)=>crumbs.push({title:entry.node.title,action:()=>navigateToStack(index+1)}));
@@ -456,7 +410,7 @@ function goBackLevel() {
   if(selected)goOverview();
 }
 function goOverview() {
-  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;if(branchDock){branchDock.replaceChildren();branchDock.hidden=true}panel.hidden=true;panel.replaceChildren();
+  selected=null;selectedBranch=null;navigationStack=[];currentNode=null;currentAnchor=null;clearResources();nav?.replaceChildren();nav.hidden=true;panel.hidden=true;panel.replaceChildren();
   const mini=document.getElementById('miniView');if(mini){mini.hidden=true;mini.classList.remove('spatial-source-only')}
   const homeButton=document.getElementById('homeBtn');if(homeButton)homeButton.hidden=true;
   smoothCamera(new THREE.Vector3(0,0,0),13.5,850,()=>{status.textContent='BALABS / LIVING NETWORK'});
@@ -480,7 +434,6 @@ function setupUI() {
   intro.addEventListener('click',()=>{opened=true;intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');status.textContent='BALABS / LIVING NETWORK'});
   controls.addEventListener('click',e=>{const action=e.target.closest('button')?.dataset.camera;if(action==='back'){goBackLevel();return}if(action==='in')zoomTargetDistance=Math.max(1.25,zoomTargetDistance*.72);if(action==='out')zoomTargetDistance=Math.min(60,zoomTargetDistance*1.28);if(action==='reset'){goOverview();return}cameraPosition()});
   stage.append(hint,status,controls,nav,panel,intro);ROOT.append(stage);
-  branchDock=document.createElement('nav');branchDock.className='webgl-branch-dock';branchDock.setAttribute('aria-label','Branches et sous-branches');branchDock.hidden=true;ROOT.append(branchDock);
   document.getElementById('homeBtn')?.addEventListener('click',()=>{if(selected)goOverview()});
   stage.setAttribute('aria-keyshortcuts','ArrowUp ArrowDown ArrowLeft ArrowRight + - Escape Backspace Home');
   stage.addEventListener('keydown',e=>{
@@ -509,18 +462,18 @@ function setupUI() {
   // Direct stage touch fallback for mobile browsers that omit pointer events.
   let touchFallback=null;
   const rememberTouch=e=>{if(e.touches.length===1){const p=e.touches[0];touchFallback={x:p.clientX,y:p.clientY,at:performance.now()}}};
-  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target,.webgl-branch-dock')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
+  const finishTouch=e=>{if(e.target.closest?.('.webgl-hit-target')){touchFallback=null;return}if(!touchFallback)return;const p=e.changedTouches[0],start=touchFallback;touchFallback=null;if(!p||Math.hypot(p.clientX-start.x,p.clientY-start.y)>12)return;if(performance.now()-lastPickAt>450)pickAt(p.clientX,p.clientY)};
   stage.addEventListener('touchstart',rememberTouch,{passive:true});
   stage.addEventListener('touchend',finishTouch,{passive:true});
   stage.addEventListener('touchcancel',()=>{touchFallback=null},{passive:true});
 
-  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
+  document.addEventListener('click',e=>{if(performance.now()-lastBranchTouchActivationAt<800){e.preventDefault();e.stopImmediatePropagation();return;}if(!e.detail||dragGesture||!renderer)return;if(e.target.closest?.('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target'))return;const r=renderer.domElement.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;if(performance.now()-lastPickAt>450)pickAt(e.clientX,e.clientY)},true);
   stage.addEventListener('lostpointercapture',onLostCapture);
   stage.addEventListener('contextmenu',e=>e.preventDefault());
   window.addEventListener('resize',resize);
 }
 function onPointerDown(e) {
-  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target,.webgl-branch-dock'))return;
+  if(e.target.closest('.webgl-controls,.webgl-focus,.webgl-intro,.webgl-hit-target'))return;
   stage?.focus({preventScroll:true});
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   stage.setPointerCapture?.(e.pointerId);
