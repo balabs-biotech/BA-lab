@@ -15765,3 +15765,250 @@ body[data-domain] #batchCard :is(input,select,textarea):focus-visible {
     scroll-behavior:auto!important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 76
+   Measurement capture, qualitative observations and feedback
+   ============================================================ */
+body[data-domain] #measurementCard {
+  gap:14px;
+}
+body[data-domain] #measurementCard > .muted {
+  max-width:78ch;
+  line-height:1.65;
+}
+body[data-domain] #measurementCard > .grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+  margin:0;
+}
+body[data-domain] #measurementCard > .grid > div {
+  min-width:0;
+}
+body[data-domain] #measurementCard > label,
+body[data-domain] #measurementCard > .grid label,
+body[data-domain] #measurementCard .observation-details label {
+  display:block;
+  margin:0 0 6px;
+  color:var(--workspace-text);
+  font-size:.7rem;
+  font-weight:650;
+}
+body[data-domain] #measurementCard :is(input,select,textarea) {
+  width:100%;
+  min-width:0;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:var(--workspace-control);
+  color:var(--workspace-text);
+  font-size:.76rem;
+}
+body[data-domain] #measurementCard :is(input,select) {
+  min-height:41px;
+  padding:9px 11px;
+}
+body[data-domain] #measurementCard textarea {
+  min-height:76px;
+  padding:10px 11px;
+  line-height:1.55;
+  resize:vertical;
+}
+body[data-domain] #measurementCard :is(input,select,textarea)::placeholder {
+  color:var(--workspace-muted);
+  opacity:.75;
+}
+body[data-domain] #measurementCard :is(input,select,textarea):focus-visible {
+  border-color:var(--workspace-accent);
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 35%,transparent);
+  outline-offset:1px;
+}
+body[data-domain] #measurementCard #saveMeasurementButton,
+body[data-domain] #measurementCard #saveObservationButton {
+  justify-self:start;
+  min-width:205px;
+  margin-top:3px;
+}
+body[data-domain] #measurementCard .measurement-history-heading {
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:3px 0 0;
+}
+body[data-domain] #measurementCard .measurement-history-heading h3 {
+  margin:4px 0 0;
+  color:var(--workspace-text);
+  font-size:.88rem;
+  letter-spacing:-.02em;
+}
+body[data-domain] #measurementCard #reloadMeasurementsButton {
+  flex:none;
+  min-height:35px;
+  padding:7px 11px;
+  font-size:.66rem;
+}
+body[data-domain] #measurementCard .measurement-history {
+  min-width:0;
+  gap:9px;
+}
+body[data-domain] #measurementCard .measurement-history > .muted {
+  margin:0;
+  padding:15px;
+  border:1px dashed var(--workspace-border);
+  border-radius:10px;
+  background:var(--workspace-panel);
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.6;
+}
+body[data-domain] #measurementCard .measurement-entry {
+  align-items:start;
+  gap:8px 14px;
+  padding:13px 14px;
+  transition:border-color .18s ease,background .18s ease;
+}
+body[data-domain] #measurementCard .measurement-entry:hover {
+  border-color:var(--workspace-accent-border);
+  background:var(--workspace-panel);
+}
+body[data-domain] #measurementCard .measurement-entry > div:first-child {
+  display:grid;
+  gap:4px;
+}
+body[data-domain] #measurementCard .measurement-entry .measurement-meta {
+  overflow-wrap:anywhere;
+}
+body[data-domain] #measurementCard .measurement-entry .measurement-stamp {
+  color:var(--workspace-muted);
+  font-size:.62rem;
+}
+body[data-domain] #measurementCard .context-divider {
+  margin:5px 0;
+  border-color:var(--workspace-border);
+}
+body[data-domain] #measurementCard .observation-details {
+  display:grid;
+  gap:12px;
+  margin-top:3px;
+  padding:0;
+  overflow:hidden;
+  background:var(--workspace-panel);
+  transition:border-color .18s ease;
+}
+body[data-domain] #measurementCard .observation-details[open] {
+  padding-bottom:14px;
+}
+body[data-domain] #measurementCard .observation-details > summary {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:48px;
+  padding:12px 14px;
+  list-style:none;
+  color:var(--workspace-text);
+  font-size:.74rem;
+  font-weight:700;
+}
+body[data-domain] #measurementCard .observation-details > summary::-webkit-details-marker {
+  display:none;
+}
+body[data-domain] #measurementCard .observation-details > summary::after {
+  content:"+";
+  display:grid;
+  width:24px;
+  height:24px;
+  flex:none;
+  place-items:center;
+  border:1px solid var(--workspace-border);
+  border-radius:7px;
+  color:var(--workspace-accent);
+  font-size:1rem;
+  line-height:1;
+}
+body[data-domain] #measurementCard .observation-details[open] > summary {
+  border-bottom:1px solid var(--workspace-border);
+}
+body[data-domain] #measurementCard .observation-details[open] > summary::after {
+  content:"−";
+}
+body[data-domain] #measurementCard .observation-details > :not(summary) {
+  margin-right:14px;
+  margin-left:14px;
+}
+body[data-domain] #measurementCard .observation-details > p.muted {
+  color:var(--workspace-muted);
+  font-size:.67rem;
+  line-height:1.6;
+}
+body[data-domain] #measurementCard .observation-details .grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:0;
+}
+body[data-domain] #measurementCard .observation-details .grid > div {
+  min-width:0;
+}
+body[data-domain] #measurementCard #observationHistory {
+  margin-top:2px;
+}
+body[data-domain] #measurementCard #observationHistory .measurement-entry {
+  grid-template-columns:minmax(0,1fr) minmax(120px,auto);
+}
+body[data-domain] #resultCard #result {
+  padding:14px 15px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+  font-size:.74rem;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #message > .card {
+  animation:ba-message-in .18s ease-out both;
+}
+@keyframes ba-message-in {
+  from { opacity:0; transform:translateY(4px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media(max-width:700px) {
+  body[data-domain] #measurementCard > .grid,
+  body[data-domain] #measurementCard .observation-details .grid {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:560px) {
+  body[data-domain] #measurementCard #saveMeasurementButton,
+  body[data-domain] #measurementCard #saveObservationButton {
+    width:100%;
+    min-width:0;
+  }
+  body[data-domain] #measurementCard .measurement-history-heading {
+    align-items:flex-start;
+  }
+  body[data-domain] #measurementCard .measurement-history-heading .secondary {
+    max-width:110px;
+    white-space:normal;
+  }
+  body[data-domain] #measurementCard .measurement-entry,
+  body[data-domain] #measurementCard #observationHistory .measurement-entry {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #measurementCard .measurement-value {
+    text-align:left;
+  }
+  body[data-domain] #measurementCard .measurement-stamp {
+    grid-column:auto;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] #measurementCard *,
+  body[data-domain] #message > .card {
+    animation:none!important;
+    transition:none!important;
+  }
+}
