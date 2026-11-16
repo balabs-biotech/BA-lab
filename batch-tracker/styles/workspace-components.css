@@ -301,3 +301,34 @@ html body[data-domain] .card:not(.app-hero) .statistics-table th {
   }
 }
 
+
+
+/* PASS 121 — OriginKit-inspired reactive light and line work, adapted to vanilla UI. */
+html body[data-domain] .ba-reactive-surface {
+  position:relative !important;
+  isolation:isolate !important;
+}
+html body[data-domain] .ba-reactive-surface::after {
+  content:"" !important;
+  position:absolute !important;
+  z-index:1 !important;
+  inset:0 !important;
+  border:1px solid color-mix(in srgb,var(--workspace-accent) 8%,transparent) !important;
+  border-radius:inherit !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+  background:
+    radial-gradient(240px circle at var(--ba-pointer-x,50%) var(--ba-pointer-y,50%),color-mix(in srgb,var(--workspace-accent) 12%,transparent),transparent 72%),
+    linear-gradient(128deg,transparent 42%,color-mix(in srgb,var(--workspace-accent) 5%,transparent) 50%,transparent 58%) !important;
+  transition:opacity .22s ease,border-color .22s ease !important;
+}
+html body[data-domain] .ba-reactive-surface:hover::after {
+  opacity:1 !important;
+  border-color:color-mix(in srgb,var(--workspace-accent) 22%,transparent) !important;
+}
+@media(hover:none),(pointer:coarse),(prefers-reduced-motion:reduce) {
+  html body[data-domain] .ba-reactive-surface::after {
+    display:none !important;
+    transition:none !important;
+  }
+}
