@@ -1,10 +1,10 @@
-@import url("./styles/design-tokens.css?v=20261116-visual-refactor-4");
-@import url("./styles/workspace-components.css?v=20261116-visual-refactor-4");
-@import url("./styles/mycology-workspace.css?v=20261116-visual-refactor-4");
-@import url("./styles/laboratory-workspace.css?v=20261116-visual-refactor-4");
-@import url("./styles/greentech-workspace.css?v=20261116-visual-refactor-4");
-@import url("./styles/motion.css?v=20261116-visual-refactor-4");
-@import url("./styles/responsive.css?v=20261116-visual-refactor-4");
+@import url("./styles/design-tokens.css?v=20261116-interior-pass-1");
+@import url("./styles/workspace-components.css?v=20261116-interior-pass-1");
+@import url("./styles/mycology-workspace.css?v=20261116-interior-pass-1");
+@import url("./styles/laboratory-workspace.css?v=20261116-interior-pass-1");
+@import url("./styles/greentech-workspace.css?v=20261116-interior-pass-1");
+@import url("./styles/motion.css?v=20261116-interior-pass-1");
+@import url("./styles/responsive.css?v=20261116-interior-pass-1");
 
 /* Existing navigation refinements are retained while the shared component
    foundation is progressively extracted from the legacy stylesheet. */
