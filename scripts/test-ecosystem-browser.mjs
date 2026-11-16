@@ -48,8 +48,11 @@ async function tapSpatialTarget(page, name, x, y, selector) {
 
 async function checkTwoFingerPan(page, name) {
   if (name !== 'mobile') return;
-  const before = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraTarget);
+  const beforeState = await page.evaluate(() => window.__BALABS_3D_E2E__());
+  const before = beforeState?.cameraTarget;
+  const selectedBefore = beforeState?.selected;
   assert.ok(before, name + ': camera target probe is unavailable before the two-finger gesture');
+  assert.ok(selectedBefore, name + ': no selected universe before the two-finger gesture');
   const rect = await page.locator('#mainView .webgl-stage canvas').boundingBox();
   assert.ok(rect, name + ': canvas bounds are unavailable for the two-finger gesture');
   const session = await page.context().newCDPSession(page);
@@ -72,7 +75,7 @@ async function checkTwoFingerPan(page, name) {
   const moved = after && Math.hypot(after.x - before.x, after.y - before.y, after.z - before.z);
   assert.ok(moved > 0.02, name + ': dragging with two fingers must pan the complete 3D map without changing hierarchy');
   const state = await page.evaluate(() => window.__BALABS_3D_E2E__());
-  assert.ok(state?.selected === 'soil', name + ': two-finger panning must not change the selected universe');
+  assert.equal(state?.selected, selectedBefore, name + ': two-finger panning must preserve the selected universe (before=' + selectedBefore + ', after=' + state?.selected + ')');
   console.log(name + ': two-finger map pan moved camera target', { before, after });
 }
 
