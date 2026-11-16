@@ -371,3 +371,18 @@ html body[data-domain] :is(.overview-heading,.overview-metrics,.overview-panels,
 @media(max-width:560px) {
   html body[data-domain] .overview-metrics { grid-template-columns:minmax(0,1fr) !important; }
 }
+
+
+/* PASS 125 — Laboratory catalogue: explicit opaque surface for the browser contrast audit. */
+html body[data-domain="laboratory"] #cultureCatalogList > .culture-catalog-row {
+  background-color:#243439 !important;
+  background-image:linear-gradient(145deg,rgba(36,52,57,.96),rgba(25,38,41,.98)) !important;
+  border:1px solid rgba(120,184,232,.2) !important;
+  border-inline-start:3px solid rgba(120,184,232,.78) !important;
+  border-radius:10px !important;
+  padding:13px !important;
+}
+html body[data-domain="laboratory"] #cultureCatalogList > .culture-catalog-row:hover {
+  background-color:#2a3d43 !important;
+  background-image:linear-gradient(145deg,rgba(42,61,67,.98),rgba(28,43,47,.99)) !important;
+}
