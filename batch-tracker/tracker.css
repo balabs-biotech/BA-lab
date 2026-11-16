@@ -22969,3 +22969,18 @@ body[data-domain] .app-hero {
   color:var(--paper) !important;
   background:linear-gradient(125deg,#263633 0%,#1b2525 62%,#172020 100%) !important;
 }
+
+
+/* BA LABS CULTUREOPS — PASS 97
+   Batch history is a sibling of #batchCard in the shared workspace markup. */
+body[data-domain] #batchList {
+  min-width:0 !important;
+  padding:12px !important;
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border:1px solid var(--border) !important;
+  border-radius:11px !important;
+}
+@media(max-width:700px) {
+  body[data-domain] #batchList { padding:10px !important; }
+}
