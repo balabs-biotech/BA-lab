@@ -11,7 +11,7 @@
   if (!panel) return;
   const shell = document.createElement("div");
   shell.className = "lineage-graph-shell";
-  shell.innerHTML = '<div class="lineage-graph-heading"><span>CARTE DE FILIATION</span><small>Chaque nœud ouvre la fiche de la culture correspondante</small></div><div class="lineage-graph-stage" role="img" aria-label="Graphe interactif des cultures parentes, de la culture sélectionnée et de ses descendantes"><p class="lineage-graph-status">Préparation de la carte de filiation…</p></div>';
+  shell.innerHTML = '<div class="lineage-graph-heading"><span>CARTE DE FILIATION</span><small>Chaque nœud ouvre la fiche de la culture correspondante</small></div><div class="lineage-graph-legend" aria-label="Légende"><span data-kind="ancestor">Origines</span><span data-kind="current">Sélectionnée</span><span data-kind="descendant">Descendantes</span></div><div class="lineage-graph-stage" role="img" aria-label="Graphe interactif des cultures parentes, de la culture sélectionnée et de ses descendantes"><p class="lineage-graph-status">Préparation de la carte de filiation…</p></div>';
   const details = document.createElement("details");
   details.className = "lineage-data-details";
   const summary = document.createElement("summary");
