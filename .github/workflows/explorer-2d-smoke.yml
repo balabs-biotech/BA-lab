@@ -1,0 +1,55 @@
+name: BA Labs 2D explorer smoke test
+
+on:
+  pull_request:
+    paths:
+      - 'ecosystem/explorer-2d.html'
+      - 'ecosystem/explorer-2d.js'
+      - 'ecosystem/notion-tree.*.json'
+      - 'scripts/test-explorer-2d.mjs'
+      - '.github/workflows/explorer-2d-smoke.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ecosystem/explorer-2d.html'
+      - 'ecosystem/explorer-2d.js'
+      - 'ecosystem/notion-tree.*.json'
+      - 'scripts/test-explorer-2d.mjs'
+      - '.github/workflows/explorer-2d-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  explorer-2d:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve the 2D explorer
+        run: |
+          python3 -m http.server 8766 --directory ecosystem > /tmp/explorer-2d.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8766/explorer-2d.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/explorer-2d.log
+          exit 1
+      - name: Test continuous scene, branch selection, zoom and languages
+        run: node scripts/test-explorer-2d.mjs
+        env:
+          BALABS_EXPLORER_URL: http://127.0.0.1:8766/explorer-2d.html?lang=fr
+      - name: Upload desktop and mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balabs-explorer-2d-screenshots
+          path: artifacts/explorer-2d-*.png
+          if-no-files-found: ignore
+          retention-days: 14
