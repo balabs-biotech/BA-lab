@@ -48,13 +48,18 @@ async function tapSpatialTarget(page, name, x, y, selector) {
 
 async function checkTwoFingerPan(page, name) {
   if (name !== 'mobile') return;
-  const before = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraTarget);
+  const beforeState = await page.evaluate(() => window.__BALABS_3D_E2E__());
+  const before = beforeState?.cameraTarget;
+  const selectedBefore = beforeState?.selected;
   assert.ok(before, name + ': camera target probe is unavailable before the two-finger gesture');
+  assert.ok(selectedBefore, name + ': no selected universe before the two-finger gesture');
   const rect = await page.locator('#mainView .webgl-stage canvas').boundingBox();
   assert.ok(rect, name + ': canvas bounds are unavailable for the two-finger gesture');
   const session = await page.context().newCDPSession(page);
-  const x = Math.round(rect.x + rect.width * .5);
-  const y = Math.round(rect.y + rect.height * .5);
+  // Start in the open perimeter of the scene, away from projected node
+  // hit areas, so the gesture measures camera panning rather than node picking.
+  const x = Math.round(rect.x + rect.width * .82);
+  const y = Math.round(rect.y + rect.height * .78);
   await session.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
     touchPoints: [{ x: x - 34, y, id: 1 }, { x: x + 34, y, id: 2 }],
@@ -70,7 +75,7 @@ async function checkTwoFingerPan(page, name) {
   const moved = after && Math.hypot(after.x - before.x, after.y - before.y, after.z - before.z);
   assert.ok(moved > 0.02, name + ': dragging with two fingers must pan the complete 3D map without changing hierarchy');
   const state = await page.evaluate(() => window.__BALABS_3D_E2E__());
-  assert.ok(state?.selected === 'soil', name + ': two-finger panning must not change the selected universe');
+  assert.equal(state?.selected, selectedBefore, name + ': two-finger panning must preserve the selected universe (before=' + selectedBefore + ', after=' + state?.selected + ')');
   console.log(name + ': two-finger map pan moved camera target', { before, after });
 }
 
@@ -191,7 +196,9 @@ async function checkWorkingScene(name, viewport) {
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
   const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
   await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
-  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y, '.webgl-domain-target[data-domain-id="soil"]');
+  // The semantic button is intentionally hidden; test the real WebGL hit
+  // at the projected coordinate exposed by the scene probe.
+  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y);
   assert.equal(await page.evaluate(() => [document.querySelector('#mainView .webgl-stage'), document.querySelector('#mainView .webgl-stage canvas')].includes(document.activeElement)),
     true, name + ': pointer interaction must focus the interactive 3D stage so keyboard navigation is immediately available');
   await page.waitForFunction(() => {
