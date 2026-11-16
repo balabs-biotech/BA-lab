@@ -23041,3 +23041,12 @@ html body[data-domain] #batchList > * {
   background:#293735 !important;
   background-color:#293735 !important;
 }
+
+
+/* BA LABS CULTUREOPS — PASS 102
+   Neutralise legacy Mycology gradients on batch-history entries and apply
+   the same opaque raised surface used by the other workspaces. */
+html body[data-domain] #batchList > .batch-item {
+  background-color:#293735 !important;
+  background-image:none !important;
+}
