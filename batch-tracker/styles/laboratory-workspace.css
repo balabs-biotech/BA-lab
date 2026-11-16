@@ -1,0 +1,83 @@
+/* Laboratory interior — production lots, process stages and quality control. */
+html body[data-domain="laboratory"] #batchCard { gap:20px !important; }
+html body[data-domain="laboratory"] #batchCard > .muted { max-width:780px !important; line-height:1.65 !important; }
+html body[data-domain="laboratory"] #batchCard .batch-create-panel,
+html body[data-domain="laboratory"] #batchCard .batch-compare-panel {
+  display:grid !important;
+  gap:15px !important;
+  padding:20px !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  background:linear-gradient(145deg,#202d2b,#1b2525) !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  flex-wrap:wrap !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-heading h3 { margin:5px 0 !important; font-size:21px !important; }
+html body[data-domain="laboratory"] #batchCard .batch-create-heading p { max-width:650px !important; margin:0 !important; line-height:1.6 !important; }
+html body[data-domain="laboratory"] #batchCard .batch-required-note {
+  padding:7px 10px !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:8px !important;
+  color:var(--muted) !important;
+  background:var(--surface-raised) !important;
+  font-size:11px !important;
+}
+html body[data-domain="laboratory"] #batchCard .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:13px !important;
+  margin:0 !important;
+}
+html body[data-domain="laboratory"] #batchCard .grid > div { min-width:0 !important; }
+html body[data-domain="laboratory"] #batchCard #createBatchButton { justify-self:start !important; min-width:190px !important; }
+html body[data-domain="laboratory"] #batchCard #batchList {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)) !important;
+  gap:12px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchList > * {
+  min-width:0 !important;
+  padding:16px !important;
+  border:1px solid var(--border) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:12px !important;
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  box-shadow:none !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchList :is(strong,h3,h4) { color:var(--paper) !important; }
+html body[data-domain="laboratory"] #batchCard .batch-compare-panel { margin-top:8px !important; }
+html body[data-domain="laboratory"] #batchCard .batch-compare-panel h3 { margin:0 !important; }
+html body[data-domain="laboratory"] #batchCard #batchCompareSelect { min-height:132px !important; }
+html body[data-domain="laboratory"] #batchCard #batchStages {
+  display:grid !important;
+  gap:14px !important;
+  margin-top:16px !important;
+  padding:18px !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  background:var(--surface-2) !important;
+}
+html body[data-domain="laboratory"] #batchCard .stage-list,
+html body[data-domain="laboratory"] #batchCard .qc-list,
+html body[data-domain="laboratory"] #batchCard .batch-event-list {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)) !important;
+  gap:10px !important;
+}
+html body[data-domain="laboratory"] #batchCard :is(.stage-list > *, .qc-list > *, .batch-event-list > *) {
+  min-width:0 !important;
+  padding:13px !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+  background:var(--surface-raised) !important;
+  color:var(--text) !important;
+}
