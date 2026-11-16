@@ -1,12 +1,12 @@
-/* BA Labs CultureOps — restrained visual runtime.
-   tsParticles supplies the ambient field; PixiJS draws the hero instrument.
-   Both are progressive enhancements: the static SVG remains the fallback. */
+/* BA Labs CultureOps — progressive visual runtime.
+   tsParticles provides a low-density ambient field; PixiJS renders the hero instrument.
+   Both are optional enhancements. Static SVG remains the fallback. */
 (() => {
   "use strict";
 
   const hero = document.querySelector(".app-hero");
   const art = hero?.querySelector(".hero-art");
-  const particleCanvas = document.getElementById("ba-particle-field");
+  const particleLayer = document.getElementById("ba-particle-field");
   const core = hero?.querySelector(".hero-core");
   if (!hero || hero.dataset.visualRuntime === "ready") return;
   hero.dataset.visualRuntime = "ready";
@@ -26,39 +26,60 @@
     script.src = src;
     script.async = true;
     script.onload = resolve;
-    script.onerror = reject;
+    script.onerror = () => reject(new Error("Visual library failed to load"));
     document.head.appendChild(script);
   });
 
   async function startParticleField() {
-    if (!particleCanvas || reducedMotion || typeof window.particles === "function") {
-      if (typeof window.particles === "function" && particleCanvas && !reducedMotion) {
-        await window.particles("ba-particle-field", particleOptions());
-      }
-      return;
-    }
+    if (!particleLayer || reducedMotion) return;
 
     try {
-      await loadScript("https://cdn.jsdelivr.net/npm/@tsparticles/particles@4/tsparticles.particles.bundle.min.js");
-      if (typeof window.particles === "function") {
-        await window.particles("ba-particle-field", particleOptions());
+      if (!window.tsParticles?.load || typeof window.loadSlim !== "function") {
+        await loadScript("https://cdn.jsdelivr.net/npm/@tsparticles/slim@4/tsparticles.slim.bundle.min.js");
       }
-    } catch (error) {
-      console.info("BA Labs: le fond particulaire reste désactivé.", error);
-    }
-  }
+      if (!window.tsParticles?.load || typeof window.loadSlim !== "function") {
+        throw new Error("tsParticles v4 loader is unavailable");
+      }
 
-  function particleOptions() {
-    return {
-      count: compact ? 13 : 30,
-      color: accent,
-      linksColor: accent,
-      links: true,
-      linksWidth: 0.55,
-      radius: compact ? 1 : 1.35,
-      speed: 0.22,
-      opacity: 0.26
-    };
+      await window.loadSlim(window.tsParticles);
+      await window.tsParticles.load({
+        id: "ba-particle-field",
+        options: {
+          fullScreen: { enable: false },
+          detectRetina: true,
+          fpsLimit: 30,
+          pauseOnBlur: true,
+          pauseOnOutsideViewport: true,
+          particles: {
+            number: {
+              value: compact ? 12 : 24,
+              density: { enable: true, width: 800, height: 600 }
+            },
+            color: { value: accent },
+            links: {
+              enable: true,
+              color: accent,
+              distance: compact ? 92 : 128,
+              opacity: 0.16,
+              width: 0.65
+            },
+            move: {
+              enable: true,
+              speed: 0.22,
+              direction: "none",
+              random: false,
+              straight: false,
+              outModes: { default: "out" }
+            },
+            opacity: { value: { min: 0.12, max: 0.32 } },
+            size: { value: { min: 1, max: 2 } },
+            shape: { type: "circle" }
+          }
+        }
+      });
+    } catch (error) {
+      console.info("BA Labs: fond tsParticles désactivé, rendu statique conservé.", error);
+    }
   }
 
   async function startPixiCore() {
@@ -76,7 +97,8 @@
         antialias: true,
         autoDensity: true,
         resolution: Math.min(window.devicePixelRatio || 1, 1.5),
-        autoStart: false
+        autoStart: false,
+        preference: "webgl"
       });
 
       const canvas = app.canvas;
@@ -88,17 +110,16 @@
       app.stage.addChild(scene);
 
       const rings = new Graphics()
-        .circle(58, 58, 48).stroke({ color: accentNumber, alpha: 0.22, width: 1 })
-        .circle(58, 58, 34).stroke({ color: accentNumber, alpha: 0.34, width: 1 })
+        .circle(58, 58, 48).stroke({ color: accentNumber, alpha: 0.2, width: 1 })
+        .circle(58, 58, 34).stroke({ color: accentNumber, alpha: 0.32, width: 1 })
         .circle(58, 58, 12).fill({ color: accentNumber, alpha: 0.12 })
         .circle(58, 58, 5).fill({ color: accentNumber, alpha: 0.9 });
       scene.addChild(rings);
 
       const orbit = new Container();
       scene.addChild(orbit);
-      const nodeCount = 8;
-      for (let index = 0; index < nodeCount; index += 1) {
-        const angle = (Math.PI * 2 * index) / nodeCount;
+      for (let index = 0; index < 8; index += 1) {
+        const angle = (Math.PI * 2 * index) / 8;
         const radius = index % 2 === 0 ? 43 : 31;
         const node = new Graphics()
           .circle(0, 0, index % 2 === 0 ? 2.8 : 2)
@@ -107,10 +128,10 @@
         orbit.addChild(node);
       }
 
-      const corePulse = new Graphics()
+      const pulse = new Graphics()
         .circle(58, 58, 8)
         .stroke({ color: accentNumber, alpha: 0.5, width: 1 });
-      scene.addChild(corePulse);
+      scene.addChild(pulse);
 
       const fallbackSvg = core.querySelector("svg");
       if (fallbackSvg) fallbackSvg.hidden = true;
@@ -118,32 +139,34 @@
 
       app.ticker.add((ticker) => {
         orbit.rotation += 0.0018 * ticker.deltaTime;
-        corePulse.alpha = 0.48 + Math.sin(performance.now() / 850) * 0.2;
+        pulse.alpha = 0.48 + Math.sin(performance.now() / 850) * 0.2;
       });
-      app.start();
 
-      document.addEventListener("visibilitychange", () => {
+      const onVisibilityChange = () => {
         if (document.hidden) app.stop();
         else app.start();
-      });
+      };
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      window.addEventListener("pagehide", () => {
+        app.stop();
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+      }, { once: true });
+      if (!document.hidden) app.start();
     } catch (error) {
-      console.info("BA Labs: le noyau graphique conserve son rendu statique.", error);
+      console.info("BA Labs: noyau PixiJS indisponible, rendu SVG conservé.", error);
     }
   }
 
-  async function start() {
-    await Promise.allSettled([startParticleField(), startPixiCore()]);
-  }
-
+  const start = () => Promise.allSettled([startParticleField(), startPixiCore()]);
   if ("IntersectionObserver" in window && art) {
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
         observer.disconnect();
-        start();
+        void start();
       }
     }, { rootMargin: "120px" });
     observer.observe(art);
   } else {
-    start();
+    void start();
   }
 })();
