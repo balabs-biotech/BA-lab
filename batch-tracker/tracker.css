@@ -21843,3 +21843,52 @@ body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-co
   body[data-domain] .app-hero { padding:22px !important; border-radius:13px !important; }
   body[data-domain] .card { padding:15px !important; border-radius:11px !important; }
 }
+
+
+/* BA LABS CULTUREOPS — PASS 93: normalized domain accent + shared canvas */
+body[data-domain] {
+  --bg:#11191a !important;
+  --surface:#1b2525 !important;
+  --surface-2:#222f2e !important;
+  --border:#394846 !important;
+  --border-strong:#52645f !important;
+  --text:#e9eeea !important;
+  --muted:#aab8b1 !important;
+  background-color:#11191a !important;
+  color:#e9eeea !important;
+}
+body[data-domain="agronomy"] { --accent:#b4f477; --brand:#b4f477; --focus:#b4f477; }
+body[data-domain="mycology"] { --accent:#c98259; --brand:#c98259; --focus:#c98259; }
+body[data-domain="laboratory"] { --accent:#78b8e8; --brand:#78b8e8; --focus:#78b8e8; }
+body[data-domain] .app-toolbar,
+body[data-domain] .card,
+body[data-domain] #contextPanel {
+  background-color:#1b2525 !important;
+  color:#e9eeea !important;
+  border-color:#394846 !important;
+}
+body[data-domain] .app-hero {
+  background:linear-gradient(125deg,#263633 0%,#1b2525 62%,#172020 100%) !important;
+  color:#e9eeea !important;
+}
+body[data-domain] .app-hero h1,
+body[data-domain] .app-hero h1 span,
+body[data-domain] .card h2,
+body[data-domain] .card h3,
+body[data-domain] .card h4 { color:#edf1ed !important; }
+body[data-domain] .eyebrow,
+body[data-domain] .section-kicker,
+body[data-domain] .hero-art,
+body[data-domain] .measurement-value,
+body[data-domain] .measurement-history-heading,
+body[data-domain] .statistics-table caption { color:var(--accent) !important; }
+body[data-domain] .section-nav a[aria-current="page"] {
+  color:var(--accent) !important;
+  border-color:var(--border-strong) !important;
+  background:rgba(255,255,255,.055) !important;
+}
+body[data-domain] .card button:not(.secondary-button):not(:disabled),
+body[data-domain] .culture-catalog-action[data-culture-action="observe"] {
+  background:var(--accent) !important;
+  border-color:var(--accent) !important;
+}
