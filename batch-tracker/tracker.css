@@ -23225,3 +23225,101 @@ html body[data-domain] .info {
     .overview-metric,.overview-activity,.overview-shortcuts
   ) { border-radius:9px !important; }
 }
+
+
+/* BA LABS CULTUREOPS — PASS 109
+   Bring Mycology's bespoke interior modules onto the shared workspace
+   surface contract. Keep domain differentiation in --domain-accent only. */
+html body[data-domain] :is(
+  .assisted-entry-panel,
+  .batch-create-panel,
+  .quick-capture,
+  .culture-catalog,
+  .culture-detail,
+  .statistics-filters,
+  .observation-details,
+  .consent-panel
+) {
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border:1px solid var(--border) !important;
+  border-radius:12px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] :is(
+  .culture-detail-field,
+  .culture-lineage-node,
+  .stage-list > *,
+  .batch-event-list > *,
+  .qc-row,
+  .statistics-summary-item,
+  .measurement-entry,
+  .batch-event-item,
+  .batch-stat
+) {
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  border:1px solid var(--border) !important;
+  border-inline-start:2px solid var(--domain-accent) !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] :is(
+  .assisted-entry-heading h3,
+  .batch-create-heading h3,
+  .quick-capture-heading h3,
+  .culture-catalog-heading h3,
+  .culture-detail-heading h2,
+  .culture-detail-field strong,
+  .culture-lineage-node strong,
+  .qc-label,
+  .statistics-summary-item strong,
+  .measurement-entry strong
+) { color:var(--paper) !important; }
+html body[data-domain] :is(
+  .assisted-entry-help,
+  .assisted-entry-panel > p,
+  .batch-create-heading p,
+  .quick-capture-heading p,
+  .culture-catalog-meta,
+  .culture-detail-field span,
+  .culture-lineage-node small,
+  .measurement-meta,
+  .measurement-stamp,
+  .qc-code,
+  .statistics-summary-item span
+) { color:var(--muted) !important; }
+html body[data-domain] :is(
+  .assisted-entry-tag,
+  .culture-catalog-count
+) {
+  color:var(--domain-accent) !important;
+  background:var(--surface-raised) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:8px !important;
+}
+html body[data-domain] .culture-catalog-action,
+html body[data-domain] .culture-lineage-node,
+html body[data-domain] .observation-details > summary {
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  border-color:var(--border-strong) !important;
+}
+html body[data-domain] .culture-catalog-action[data-culture-action="observe"],
+html body[data-domain] :is(.primary-button,button[data-primary]) {
+  color:#11191a !important;
+  background:var(--domain-accent) !important;
+  border-color:var(--domain-accent) !important;
+}
+html body[data-domain] .progress { background:#11191a !important; }
+html body[data-domain] .progress-bar { background:var(--domain-accent) !important; }
+html body[data-domain] .statistics-table tbody tr:hover {
+  background:var(--surface-2) !important;
+}
+html body[data-domain] #resultCard #result,
+html body[data-domain] .info {
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border:1px solid var(--border) !important;
+  border-radius:9px !important;
+}
