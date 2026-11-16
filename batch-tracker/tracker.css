@@ -21543,3 +21543,303 @@ body[data-domain="mycology"] #resultCard #result {
     width:100%;
   }
 }
+
+
+/* BA LABS CULTUREOPS — SHARED DESIGN SYSTEM / PASS 92 */
+/* One application, three scientific domains. Structure, surfaces, typography,
+   controls and spacing stay identical; only the restrained domain accent changes. */
+body[data-domain] {
+  --bg:#11191a;
+  --surface:#1b2525;
+  --surface-2:#222f2e;
+  --surface-raised:#263432;
+  --border:#394846;
+  --border-strong:#52645f;
+  --line:#394846;
+  --text:#e9eeea;
+  --ink:#e9eeea;
+  --muted:#aab8b1;
+  --accent:#9db69f;
+  --brand:var(--accent);
+  --brand-hover:var(--accent);
+  --focus:var(--accent);
+  --ok:#9fbe9b;
+  --warn:#dfb77b;
+  --radius:14px;
+  color-scheme:dark;
+  color:var(--text);
+  background:var(--bg) !important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+}
+body[data-domain="agronomy"] { --accent:#9bb58f; }
+body[data-domain="mycology"] { --accent:#c18462; }
+body[data-domain="laboratory"] { --accent:#8baecb; }
+
+body[data-domain] .container {
+  width:min(100% - 40px,1440px) !important;
+  max-width:1440px !important;
+  margin-inline:auto !important;
+}
+body[data-domain] .app-toolbar,
+body[data-domain] .card,
+body[data-domain] #contextPanel {
+  color:var(--text) !important;
+  background:var(--surface) !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.16) !important;
+}
+body[data-domain] .app-toolbar {
+  min-height:62px;
+  padding:10px 16px !important;
+}
+body[data-domain] .app-hero {
+  min-height:250px;
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(210px,.75fr);
+  align-items:center;
+  gap:28px;
+  padding:clamp(26px,4vw,48px) !important;
+  color:var(--text) !important;
+  background:linear-gradient(125deg,#263633 0%,#1b2525 62%,#172020 100%) !important;
+  border:1px solid #465953 !important;
+  border-radius:18px !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.2) !important;
+}
+body[data-domain] .app-hero h1,
+body[data-domain] .app-hero h1 span,
+body[data-domain] .app-hero .eyebrow,
+body[data-domain] .app-hero .hero-description,
+body[data-domain] .app-hero .hero-note small {
+  color:#edf1ed !important;
+  font-family:inherit !important;
+  text-transform:none !important;
+  letter-spacing:normal;
+}
+body[data-domain] .app-hero h1 {
+  font-size:clamp(2rem,4vw,3.4rem) !important;
+  line-height:1.06;
+  font-weight:760 !important;
+  letter-spacing:-.045em !important;
+}
+body[data-domain] .app-hero .eyebrow {
+  color:var(--accent) !important;
+  font-size:.65rem;
+  font-weight:800;
+  letter-spacing:.14em;
+}
+body[data-domain] .hero-art { color:var(--accent) !important; }
+body[data-domain] .hero-tags span,
+body[data-domain] .hero-note {
+  color:#e9eeea !important;
+  background:#293936 !important;
+  border:1px solid #4a5d57 !important;
+  border-radius:8px !important;
+}
+body[data-domain] .card {
+  padding:clamp(18px,2.5vw,30px) !important;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+body[data-domain] .card h2,
+body[data-domain] .card h3,
+body[data-domain] .card h4 {
+  color:#edf1ed !important;
+  font-family:inherit !important;
+  font-weight:720 !important;
+  text-transform:none !important;
+  letter-spacing:-.02em !important;
+}
+body[data-domain] .card p,
+body[data-domain] .card li,
+body[data-domain] .card label,
+body[data-domain] .card legend,
+body[data-domain] .card strong,
+body[data-domain] .card .muted,
+body[data-domain] .hint {
+  color:var(--text);
+}
+body[data-domain] .card .muted,
+body[data-domain] .hint,
+body[data-domain] .hero-description { color:var(--muted) !important; }
+body[data-domain] .section-kicker {
+  color:var(--accent) !important;
+  border-color:var(--border) !important;
+  font-size:.63rem;
+  letter-spacing:.13em;
+}
+body[data-domain] .section-kicker .kicker-line { background:var(--border-strong) !important; }
+body[data-domain] .section-nav a {
+  color:#cbd6d0 !important;
+  border:1px solid transparent !important;
+  border-radius:8px !important;
+}
+body[data-domain] .section-nav a[aria-current="page"] {
+  color:var(--accent) !important;
+  background:rgba(255,255,255,.055) !important;
+  border-color:var(--border-strong) !important;
+}
+body[data-domain] .universe-home-link {
+  color:var(--muted) !important;
+  background:transparent !important;
+  border-color:var(--border) !important;
+  border-radius:8px !important;
+}
+body[data-domain] .card input,
+body[data-domain] .card select,
+body[data-domain] .card textarea,
+body[data-domain] .language-control select {
+  color:var(--text) !important;
+  background:#141e1e !important;
+  border:1px solid #52645f !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+  -webkit-text-fill-color:var(--text);
+}
+body[data-domain] .card input::placeholder,
+body[data-domain] .card textarea::placeholder { color:#91a29a !important; }
+body[data-domain] .card input:focus,
+body[data-domain] .card select:focus,
+body[data-domain] .card textarea:focus {
+  border-color:var(--accent) !important;
+  outline:2px solid color-mix(in srgb,var(--accent) 30%,transparent) !important;
+  outline-offset:1px;
+}
+body[data-domain] .card button,
+body[data-domain] .card .culture-catalog-action,
+body[data-domain] .card .secondary-button {
+  min-height:38px;
+  color:#e9eeea !important;
+  background:#293936 !important;
+  border:1px solid #52645f !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+  font-family:inherit !important;
+  font-weight:680 !important;
+  text-transform:none !important;
+}
+body[data-domain] .card button:not(.secondary-button):not(:disabled),
+body[data-domain] .card .culture-catalog-action[data-culture-action="observe"] {
+  color:#11191a !important;
+  background:var(--accent) !important;
+  border-color:var(--accent) !important;
+}
+body[data-domain] .card button:hover,
+body[data-domain] .card .culture-catalog-action:hover {
+  filter:brightness(1.08);
+}
+body[data-domain] .card button:disabled { opacity:.48; cursor:not-allowed; }
+body[data-domain] .guided-entry-step,
+body[data-domain] .assisted-entry-panel,
+body[data-domain] .batch-create-panel,
+body[data-domain] .quick-capture,
+body[data-domain] .culture-catalog,
+body[data-domain] .culture-detail,
+body[data-domain] .statistics-filters,
+body[data-domain] .observation-details,
+body[data-domain] .consent-panel,
+body[data-domain] .batch-compare-panel,
+body[data-domain] #batchQc,
+body[data-domain] #batchEvents,
+body[data-domain] #batchMovementEntry {
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border:1px solid var(--border) !important;
+  border-radius:11px !important;
+  box-shadow:none !important;
+}
+body[data-domain] .culture-catalog-row,
+body[data-domain] .culture-detail-field,
+body[data-domain] .culture-timeline-entry,
+body[data-domain] .measurement-entry,
+body[data-domain] .statistics-summary-item,
+body[data-domain] .statistics-chart,
+body[data-domain] .statistics-table-wrap,
+body[data-domain] .overview-metric,
+body[data-domain] .overview-activity,
+body[data-domain] .overview-shortcuts,
+body[data-domain] .batch-event-item,
+body[data-domain] .stage-list > *,
+body[data-domain] .qc-row {
+  color:var(--text) !important;
+  background:#202d2b !important;
+  border:1px solid var(--border) !important;
+  border-radius:9px !important;
+  box-shadow:none !important;
+}
+body[data-domain] .culture-catalog-code,
+body[data-domain] .culture-detail-field strong,
+body[data-domain] .measurement-entry strong,
+body[data-domain] .statistics-summary-item strong,
+body[data-domain] .overview-metric strong,
+body[data-domain] .overview-metric-label,
+body[data-domain] .overview-shortcuts h3,
+body[data-domain] .qc-label { color:#edf1ed !important; }
+body[data-domain] .culture-catalog-meta,
+body[data-domain] .measurement-meta,
+body[data-domain] .measurement-stamp,
+body[data-domain] .culture-detail-field span,
+body[data-domain] .statistics-summary-item span,
+body[data-domain] .qc-code { color:var(--muted) !important; }
+body[data-domain] .culture-catalog-meta span:first-child {
+  color:var(--accent) !important;
+  background:rgba(255,255,255,.06) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:6px !important;
+}
+body[data-domain] .culture-catalog-action[data-culture-action="history"] {
+  color:var(--accent) !important;
+  background:transparent !important;
+  border-color:var(--border-strong) !important;
+}
+body[data-domain] .statistics-table th {
+  color:#e9eeea !important;
+  background:#293936 !important;
+}
+body[data-domain] .statistics-table td {
+  color:#d4ded8 !important;
+  border-color:var(--border) !important;
+}
+body[data-domain] .statistics-table tbody tr:nth-child(even) { background:rgba(255,255,255,.025) !important; }
+body[data-domain] .statistics-table tbody tr:hover { background:rgba(255,255,255,.06) !important; }
+body[data-domain] #result,
+body[data-domain] #message {
+  color:var(--text) !important;
+}
+body[data-domain] .progress { background:#101818 !important; }
+body[data-domain] .progress-bar { background:var(--accent) !important; }
+body[data-domain] .entry-step-mark {
+  color:var(--accent) !important;
+  background:rgba(255,255,255,.045) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:6px !important;
+}
+body[data-domain] .guided-entry-step { border:1px solid var(--border) !important; box-shadow:none !important; }
+body[data-domain] .assisted-entry-heading h3,
+body[data-domain] .batch-create-heading h3,
+body[data-domain] .quick-capture-heading h3 { color:#edf1ed !important; }
+body[data-domain] .assisted-entry-tag { color:var(--accent) !important; border-color:var(--border-strong) !important; background:#293936 !important; }
+body[data-domain] .culture-lineage-node { color:var(--text) !important; background:#293936 !important; border:1px solid var(--border-strong) !important; border-radius:8px !important; }
+body[data-domain] .culture-lineage-arrow { color:var(--accent) !important; }
+body[data-domain] .measurement-value,
+body[data-domain] .measurement-history-heading,
+body[data-domain] .statistics-table caption { color:var(--accent) !important; }
+body[data-domain] .overview-meter { background:#101818 !important; }
+body[data-domain] .overview-meter span { background:var(--accent) !important; }
+body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-color:var(--accent) !important; }
+
+@media(max-width:900px) {
+  body[data-domain] .container { width:calc(100% - 28px) !important; }
+}
+@media(max-width:720px) {
+  body[data-domain] .app-hero { grid-template-columns:minmax(0,1fr); min-height:0; }
+  body[data-domain] .hero-art { display:none; }
+  body[data-domain] .app-toolbar { position:relative; top:auto; flex-wrap:wrap; }
+  body[data-domain] .card { padding:18px !important; }
+}
+@media(max-width:480px) {
+  body[data-domain] .container { width:calc(100% - 18px) !important; }
+  body[data-domain] .app-hero { padding:22px !important; border-radius:13px !important; }
+  body[data-domain] .card { padding:15px !important; border-radius:11px !important; }
+}
