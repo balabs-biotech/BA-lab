@@ -46,22 +46,39 @@ function draw(){
   const bend=Math.min(42,len*.17)*(e.i%2?1:-1),cx=(a.x+b.x)/2-dy/len*bend,cy=(a.y+b.y)/2+dx/len*bend;
   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(cx,cy,b.x,b.y);
   ctx.strokeStyle=e.cross?"#b96b4d38":(PALETTE[e.a.rootId]||"#78958a")+"88";ctx.lineWidth=e.cross?.75:1.05;ctx.stroke();
-  // Fine lateral hyphae branch off the main filament at two points.
-  if(!e.cross&&len>70){
-   [.34,.68].forEach((t,j)=>{
+  // Branching hyphae: primary filaments produce tapered-looking lateral growth,
+  // then split into two fine tips. Seeded by edge index so the network stays stable.
+  if(!e.cross&&len>85){
+   const nx=-dy/len,ny=dx/len;
+   [.27,.57,.82].forEach((t,j)=>{
     const u=1-t,px=u*u*a.x+2*u*t*cx+t*t*b.x,py=u*u*a.y+2*u*t*cy+t*t*b.y;
-    const side=(e.i+j)%2?1:-1,reach=Math.min(19,len*.09);
-    ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(px-dy/len*reach*side*.55,py+dx/len*reach*side*.55,px-dy/len*reach*side,py+dx/len*reach*side);
-    ctx.strokeStyle="#9db5a044";ctx.lineWidth=.65;ctx.stroke();
+    const side=((e.i+j)%2?1:-1),reach=Math.min(48,Math.max(17,len*(.12+(j%2)*.025)));
+    const ex=px+dx/len*reach*.58+nx*side*reach*.82,ey=py+dy/len*reach*.58+ny*side*reach*.82;
+    const mx=(px+ex)/2+nx*side*reach*.18,my=(py+ey)/2+ny*side*reach*.18;
+    ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(mx,my,ex,ey);
+    ctx.strokeStyle="#9db5a05c";ctx.lineWidth=.72;ctx.stroke();
+    const tip=reach*.34;
+    [-1,1].forEach(fork=>{
+     const tx=ex+dx/len*tip*.28+nx*fork*tip*.72,ty=ey+dy/len*tip*.28+ny*fork*tip*.72;
+     ctx.beginPath();ctx.moveTo(ex,ey);ctx.quadraticCurveTo(ex+nx*fork*tip*.35,ey+ny*fork*tip*.35,tx,ty);
+     ctx.strokeStyle="#9db5a044";ctx.lineWidth=.48;ctx.stroke();
+    });
    });
   }
   curves.push({a,b,cx,cy,e});
  });
  if(!reduced)curves.forEach((c,i)=>{const q=(performance.now()*.000025+i*.19)%1,u=1-q,x=u*u*c.a.x+2*u*q*c.cx+q*q*c.b.x,y=u*u*c.a.y+2*u*q*c.cy+q*q*c.b.y;ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fillStyle="#d1d0c5aa";ctx.fill()});
  nodes.forEach(n=>{const p=screen(n),r=Math.max(3,n.r*Math.sqrt(scale)),color=PALETTE[n.rootId]||"#d1d0c5";ctx.beginPath();ctx.arc(p.x,p.y,r+5,0,Math.PI*2);ctx.strokeStyle=color+"44";ctx.lineWidth=1;ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle="#111b1d";ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+10,0,Math.PI*2);ctx.setLineDash([2,4]);ctx.strokeStyle="#d1d0c5";ctx.stroke();ctx.setLineDash([])}
-  // Labels are screen-space text: font size is deliberately independent of camera zoom.
-  ctx.font=n.level===0?"600 12px system-ui":"500 11px system-ui";ctx.textAlign="center";ctx.textBaseline="top";ctx.lineWidth=3;ctx.strokeStyle="#111b1df2";ctx.strokeText(n.title,p.x,p.y+r+7,230);ctx.fillStyle=n.level===0?"#e3e7dd":"#c5d0c7";ctx.fillText(n.title,p.x,p.y+r+7,230);
-  if(n.data?.children?.length){ctx.font="9px system-ui";ctx.fillStyle="#8fa498";ctx.fillText(n.data.children.length+" "+t("children"),p.x,p.y+r+22,210)}
+  // Labels follow camera zoom, with a readable minimum and a restrained maximum.
+  // At overview scale, hide secondary labels to prevent collisions; selected nodes remain named.
+  const showLabel=n.level===0||scale>=.68||selected?.id===n.id;
+  if(showLabel){
+   const font=clamp((n.level===0?12:11)*Math.sqrt(scale),8,14);
+   ctx.font=(n.level===0?"600 ":"500 ")+font.toFixed(1)+"px system-ui";
+   ctx.textAlign="center";ctx.textBaseline="top";ctx.lineWidth=3;ctx.strokeStyle="#111b1df2";
+   ctx.strokeText(n.title,p.x,p.y+r+7,220);ctx.fillStyle=n.level===0?"#e3e7dd":"#c5d0c7";ctx.fillText(n.title,p.x,p.y+r+7,220);
+   if(n.data?.children?.length&&scale>=.82){ctx.font=clamp(9*Math.sqrt(scale),8,10)+"px system-ui";ctx.fillStyle="#8fa498";ctx.fillText(n.data.children.length+" "+t("children"),p.x,p.y+r+22,200)}
+  }
  });
 }
 function animate(){if(!reduced){scale+=(targetScale-scale)*.14;offset.x+=(targetOffset.x-offset.x)*.14;offset.y+=(targetOffset.y-offset.y)*.14;draw()}raf=requestAnimationFrame(animate)}
