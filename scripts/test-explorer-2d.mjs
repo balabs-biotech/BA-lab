@@ -1,5 +1,8 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
+import { mkdir } from 'node:fs/promises';
+
+await mkdir('artifacts', { recursive: true });
 
 const base = process.env.BALABS_EXPLORER_URL || 'http://127.0.0.1:8766/explorer-2d.html?lang=fr';
 const browser = await chromium.launch({ headless: true });
@@ -19,14 +22,25 @@ try {
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
     const visibleNodes = await nav.count();
     assert.ok(visibleNodes >= 8, 'At least the eight universe roots must be available');
-    await nav.first().click();
+    await page.locator('#field').evaluate((canvas) => {
+      const rect = canvas.getBoundingClientRect();
+      const pad = Math.min(150, Math.max(78, rect.width * .16));
+      const overviewScale = Math.max(.26, Math.min(.62,
+        (rect.width - pad * 2) / 1390,
+        (rect.height - pad * 2) / 1390,
+      ));
+      const x = rect.width / 2;
+      const y = rect.height / 2 - 570 * overviewScale;
+      canvas.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 71, pointerType: 'mouse', clientX: rect.left + x, clientY: rect.top + y, button: 0 }));
+      canvas.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 71, pointerType: 'mouse', clientX: rect.left + x, clientY: rect.top + y, button: 0 }));
+    });
     await page.locator('#selection .card').waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
     await page.locator('#zoomIn').click();
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');
     for (const language of ['en', 'ar', 'pt', 'fr']) {
       await page.locator('#language').selectOption(language);
-      await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true);
+      await page.locator('#loading[hidden]').waitFor({ timeout: 15000 });
       await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
       assert.equal(await page.locator('#language').inputValue(), language);
     }
