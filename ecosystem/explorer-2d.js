@@ -26,13 +26,17 @@ function layout(initial=false){
   const startX=-245,step=count>6?86:count>3?112:138;
   kids.forEach((d,i)=>{
    const side=i%2===0?-1:1;
-   const wave=Math.sin((i+1)*1.73)*24;
+   const phase=(i+1)*1.73;
+   const wave=Math.sin(phase)*24;
    const trunkX=startX+i*step;
-   const anchor={x:trunkX,y:Math.sin(i*.91)*17,r:0};
+   // The trunk itself meanders gently; attachment points are not on a ruler.
+   const anchor={x:trunkX,y:Math.sin(i*.91)*25+Math.cos(i*.47)*9,r:0};
    anchors.push(anchor);
-   const reach=112+((i*53+count*19)%72)+(d.children?.length?22:0);
+   const reach=104+((i*53+count*19)%88)+(d.children?.length?28:0);
+   const lateral=34+((i*29+count*11)%54);
+   const sweep=Math.sin(phase*.83)*31;
    const y=anchor.y+side*(reach+wave);
-   const x=trunkX+48+((i*31)%37);
+   const x=trunkX+lateral+sweep;
    const n={id:d.id,title:d.title,x,y,r:d.children?.length?6.5:4.5,level:1,data:d,rootId:parent.rootId};
    nodes.push(n);
    edges.push({a:anchor,b:n,i:i+10});
@@ -41,7 +45,10 @@ function layout(initial=false){
   // segmented and slightly irregular rather than a straight diagram line.
   if(anchors.length){
    edges.push({a:parent,b:anchors[0],i:0});
-   for(let i=1;i<anchors.length;i++)edges.push({a:anchors[i-1],b:anchors[i],i:i+1});
+   for(let i=1;i<anchors.length;i++){
+    const mid={x:(anchors[i-1].x+anchors[i].x)/2,y:(anchors[i-1].y+anchors[i].y)/2+Math.sin(i*1.2)*8,r:0};
+    edges.push({a:anchors[i-1],b:mid,i:i+1},{a:mid,b:anchors[i],i:i+2});
+  }
   }
   // Anastomoses connect non-adjacent branches into a resilient mycelial mesh.
   const kidsOnly=nodes.slice(1);
