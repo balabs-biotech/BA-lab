@@ -22154,7 +22154,6 @@ body[data-domain] {
   --interior-accent:var(--domain-accent);
 }
 body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
-  display:block;
   min-width:0;
   padding:clamp(16px,2.2vw,26px) !important;
   margin:0 0 var(--interior-card-gap) !important;
