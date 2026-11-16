@@ -515,3 +515,213 @@ html body[data-domain] .card:not(.app-hero) .statistics-table :is(th,td):focus-w
     padding:9px 10px !important;
   }
 }
+
+
+/* PASS 137 — operational overview: consistent hierarchy for the three workspace dashboards. */
+html body[data-domain] #overviewCard .overview-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+  margin:4px 0 20px !important;
+}
+html body[data-domain] #overviewCard .overview-heading h2 {
+  margin:0 0 7px !important;
+  color:var(--paper) !important;
+  font-size:clamp(24px,2.5vw,32px) !important;
+  line-height:1.12 !important;
+  letter-spacing:-.03em !important;
+}
+html body[data-domain] #overviewCard .overview-heading p {
+  max-width:760px !important;
+  margin:0 !important;
+  color:var(--muted) !important;
+  font-size:12px !important;
+  line-height:1.65 !important;
+}
+html body[data-domain] #overviewCard .overview-live {
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  flex:0 0 auto !important;
+  padding:8px 11px !important;
+  border:1px solid rgba(145,166,154,.2) !important;
+  border-radius:999px !important;
+  color:#c8d5cc !important;
+  background:rgba(13,22,20,.38) !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+  white-space:nowrap !important;
+}
+html body[data-domain] #overviewCard .overview-live > span {
+  width:7px !important;
+  height:7px !important;
+  border-radius:50% !important;
+  background:var(--workspace-accent) !important;
+  box-shadow:0 0 0 3px var(--workspace-accent-soft) !important;
+}
+html body[data-domain] #overviewCard .overview-metrics {
+  gap:12px !important;
+  margin:0 !important;
+}
+html body[data-domain] #overviewCard .overview-metric {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:9px !important;
+  min-height:142px !important;
+  padding:17px !important;
+  border:1px solid rgba(145,166,154,.2) !important;
+  border-radius:12px !important;
+  background:linear-gradient(150deg,rgba(38,54,51,.9),rgba(22,32,31,.96)) !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.025) !important;
+}
+html body[data-domain] #overviewCard .overview-metric-label {
+  color:#b9c8bf !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] #overviewCard .overview-metric > strong {
+  color:var(--paper) !important;
+  font-size:clamp(30px,3vw,39px) !important;
+  font-weight:680 !important;
+  line-height:1 !important;
+  letter-spacing:-.045em !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] #overviewCard .overview-meter {
+  height:5px !important;
+  margin-top:auto !important;
+  overflow:hidden !important;
+  border-radius:999px !important;
+  background:rgba(4,11,10,.58) !important;
+}
+html body[data-domain] #overviewCard .overview-meter > span {
+  display:block !important;
+  height:100% !important;
+  border-radius:inherit !important;
+  background:var(--workspace-accent) !important;
+  box-shadow:0 0 12px var(--workspace-accent-soft) !important;
+  transition:width .25s ease !important;
+}
+html body[data-domain] #overviewCard .overview-metric-note {
+  color:var(--muted) !important;
+  font-size:10px !important;
+  line-height:1.4 !important;
+}
+html body[data-domain] #overviewCard .overview-lower {
+  display:grid !important;
+  grid-template-columns:minmax(0,1.5fr) minmax(240px,.8fr) !important;
+  gap:13px !important;
+  margin-top:14px !important;
+}
+html body[data-domain] #overviewCard .overview-activity,
+html body[data-domain] #overviewCard .overview-shortcuts {
+  min-width:0 !important;
+  padding:16px !important;
+  border:1px solid var(--border) !important;
+  border-radius:12px !important;
+  background:rgba(13,21,21,.34) !important;
+}
+html body[data-domain] #overviewCard .overview-section-heading {
+  align-items:center !important;
+  margin-bottom:12px !important;
+}
+html body[data-domain] #overviewCard :is(.overview-activity h3,.overview-shortcuts h3) {
+  margin:0 !important;
+  color:var(--paper) !important;
+  font-size:14px !important;
+}
+html body[data-domain] #overviewCard .overview-observations-details {
+  padding:12px !important;
+  border:1px solid rgba(145,166,154,.16) !important;
+  border-radius:9px !important;
+  background:rgba(31,43,42,.56) !important;
+}
+html body[data-domain] #overviewCard .overview-observations-details > summary {
+  color:#d5ded8 !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+}
+html body[data-domain] #overviewCard .overview-observations-details[open] > summary {
+  margin-bottom:10px !important;
+  color:var(--workspace-accent) !important;
+}
+html body[data-domain] #overviewCard .overview-shortcuts {
+  display:flex !important;
+  flex-direction:column !important;
+  gap:8px !important;
+}
+html body[data-domain] #overviewCard .overview-shortcut {
+  display:grid !important;
+  grid-template-columns:30px minmax(0,1fr) 16px !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:58px !important;
+  padding:9px 10px !important;
+  border:1px solid rgba(145,166,154,.17) !important;
+  border-radius:9px !important;
+  background:rgba(35,49,47,.72) !important;
+  color:var(--text) !important;
+  text-align:start !important;
+}
+html body[data-domain] #overviewCard .overview-shortcut:hover {
+  border-color:var(--workspace-accent-border) !important;
+  background:var(--workspace-accent-soft) !important;
+}
+html body[data-domain] #overviewCard .shortcut-index {
+  display:grid !important;
+  place-items:center !important;
+  width:28px !important;
+  height:28px !important;
+  border-radius:8px !important;
+  color:var(--workspace-accent) !important;
+  background:var(--workspace-accent-soft) !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+}
+html body[data-domain] #overviewCard .overview-shortcut strong {
+  display:block !important;
+  color:var(--paper) !important;
+  font-size:11px !important;
+}
+html body[data-domain] #overviewCard .overview-shortcut small {
+  display:block !important;
+  margin-top:3px !important;
+  color:var(--muted) !important;
+  font-size:9px !important;
+}
+html body[data-domain] #overviewCard .overview-footnote {
+  margin:13px 0 0 !important;
+  padding-top:11px !important;
+  border-top:1px solid rgba(145,166,154,.14) !important;
+  color:var(--muted) !important;
+  font-size:10px !important;
+  line-height:1.55 !important;
+}
+html body[data-domain] #overviewCard :is(button,a,summary):focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:3px !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #overviewCard .overview-lower {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
+@media(max-width:560px) {
+  html body[data-domain] #overviewCard .overview-heading {
+    flex-direction:column !important;
+    gap:12px !important;
+  }
+  html body[data-domain] #overviewCard .overview-metric {
+    min-height:126px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] #overviewCard .overview-meter > span { transition:none !important; }
+}
