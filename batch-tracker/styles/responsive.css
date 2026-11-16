@@ -50,3 +50,51 @@
   }
   html body[data-domain].workspace-authenticated .app-hero h1 br { display:none !important; }
 }
+
+/* Interior parity: laboratory and GreenTech forms follow the same mobile
+   information hierarchy as Mycology instead of retaining desktop columns. */
+@media(max-width:760px) {
+  html body[data-domain="laboratory"] #batchCard .grid,
+  html body[data-domain="laboratory"] #batchCard .batch-create-panel,
+  html body[data-domain="laboratory"] #batchCard .batch-compare-panel {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain="laboratory"] #batchCard .batch-create-panel,
+  html body[data-domain="laboratory"] #batchCard .batch-compare-panel {
+    padding:15px !important;
+  }
+  html body[data-domain="laboratory"] #batchCard #createBatchButton {
+    width:100% !important;
+  }
+  html body[data-domain="laboratory"] #batchCard #batchStages {
+    padding:14px !important;
+  }
+
+  html body[data-domain="agronomy"] #plantCard #plantCultureForm {
+    grid-template-columns:minmax(0,1fr) !important;
+    padding:15px !important;
+  }
+  html body[data-domain="agronomy"] #plantCard #plantCultureForm .bio-operation-wide {
+    grid-column:1 !important;
+  }
+  html body[data-domain="agronomy"] #plantCard #savePlantCultureButton {
+    width:100% !important;
+  }
+}
+
+@media(max-width:480px) {
+  html body[data-domain="laboratory"] #batchCard .batch-create-heading {
+    flex-direction:column !important;
+    align-items:stretch !important;
+  }
+  html body[data-domain="laboratory"] #batchCard #batchList {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain="laboratory"] #batchCard :is(.stage-list,.qc-list,.batch-event-list) {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain="agronomy"] #plantCard #plantCultureList {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
+
