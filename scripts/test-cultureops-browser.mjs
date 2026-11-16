@@ -331,6 +331,7 @@ try {
           }
           checks.push({
             parentSelector,
+            fixtureSelector: parentSelector + ' > .' + className.split(' ').join('.'),
             background: style.backgroundColor,
             backgroundImage: style.backgroundImage,
             inlineStyle: fixture.getAttribute("style"),
@@ -355,7 +356,7 @@ try {
       for (const check of interiorState.checks) {
         if (check.missing) failures.push(`${workspace.slug}/${viewport.name}: interior fixture parent missing (${check.parentSelector})`);
         else if (check.background === "rgba(0, 0, 0, 0)" || check.radius === "0px" || check.padding === "0px") {
-          failures.push(`${workspace.slug}/${viewport.name}: interior component lacks applied surface treatment (${check.parentSelector}: ${JSON.stringify(check)})`);
+          failures.push(`${workspace.slug}/${viewport.name}: interior component lacks applied surface treatment (${check.fixtureSelector || check.parentSelector}: ${JSON.stringify(check)})`);
         }
       }
       if (interiorState.catalogLayout !== "grid" || interiorState.measurementLayout !== "grid") {
