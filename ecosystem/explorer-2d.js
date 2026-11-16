@@ -15,11 +15,15 @@ function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresh
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
- const roots=tree.length,rootRadius=300;
+ const roots=tree.length;
+ // Uneven biological field anchors: deliberately not an eight-spoke radial layout.
+ // Stable per-universe jitter keeps positions deterministic across reloads.
+ const anchors=[[-.62,-.34],[-.17,-.62],[.39,-.48],[.68,.08],[.24,.53],[-.34,.57],[-.70,.19],[.02,-.02]];
  tree.forEach((root,i)=>{
-  const angle=-Math.PI/2+i*Math.PI*2/roots+(((hash(root.id)%1000)/1000)-.5)*.22;
-  const radius=rootRadius+hash(root.id+":radius")%125-62;
-  const rx=Math.cos(angle)*radius,ry=Math.sin(angle)*radius*(.82+(hash(root.id+":axis")%20)/100);
+  const anchor=anchors[i%anchors.length],seed=hash(root.id);
+  const rx=anchor[0]*510+((seed&255)/255-.5)*58;
+  const ry=anchor[1]*430+(((seed>>>8)&255)/255-.5)*54;
+  const angle=Math.atan2(ry,rx)+(((seed>>>16)&255)/255-.5)*.34;
   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,parent:null,angle};
   nodes.push(rootNode);byId.set(root.id,rootNode);
   const walk=(data,parent,depth,branchAngle,path)=>{
