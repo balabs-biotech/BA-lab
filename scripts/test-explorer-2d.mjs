@@ -24,6 +24,14 @@ try {
     assert.ok(canvasSize.width > 0 && canvasSize.height > 0, 'Canvas must have a real drawing surface');
     assert.ok(canvasSize.rect.width >= canvasSize.stage.width * .98 && canvasSize.rect.height >= canvasSize.stage.height * .98, 'Pixi canvas must fill the actual stage instead of its intrinsic default size');
     assert.equal(await page.locator('#field').getAttribute('data-renderer'), 'pixijs-webgl', 'PixiJS WebGL renderer must initialize');
+    const topology = await page.locator('#field').evaluate(el => ({
+      universes: Number(el.dataset.universeCount || 0),
+      nodes: Number(el.dataset.nodeCount || 0),
+      edges: Number(el.dataset.edgeCount || 0)
+    }));
+    assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
+    assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
+    assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
     const initialUrl = page.url();
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
