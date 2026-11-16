@@ -399,3 +399,68 @@ html body[data-domain="laboratory"] #trackerCard #cultureCatalogList > .culture-
   background-color:#2a3d43 !important;
   background-image:linear-gradient(145deg,rgba(42,61,67,.98),rgba(28,43,47,.99)) !important;
 }
+
+
+/* PASS 140 — navigation feedback and module-to-module orientation. */
+html body[data-domain] .section-nav {
+  scrollbar-width:thin !important;
+  scrollbar-color:var(--workspace-accent-border) transparent !important;
+  overscroll-behavior-inline:contain !important;
+}
+html body[data-domain] .section-nav a {
+  position:relative !important;
+  isolation:isolate !important;
+  transition:color .18s ease,border-color .18s ease,background-color .18s ease !important;
+}
+html body[data-domain] .section-nav a::after {
+  content:"" !important;
+  position:absolute !important;
+  inset-inline:12px !important;
+  inset-block-end:3px !important;
+  height:2px !important;
+  border-radius:2px !important;
+  background:var(--workspace-accent) !important;
+  transform:scaleX(0) !important;
+  transform-origin:center !important;
+  opacity:0 !important;
+  transition:transform .18s ease,opacity .18s ease !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .section-nav a:hover {
+  color:var(--paper) !important;
+  border-color:var(--border) !important;
+  background:rgba(255,255,255,.035) !important;
+}
+html body[data-domain] .section-nav a[aria-current="page"]::after {
+  transform:scaleX(1) !important;
+  opacity:1 !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+  scroll-margin-block-start:18px !important;
+  scroll-margin-block-end:24px !important;
+}
+html body[data-domain] .overview-shortcut,
+html body[data-domain] .section-nav a,
+html body[data-domain] .universe-home-link {
+  -webkit-tap-highlight-color:transparent !important;
+}
+@media(max-width:420px) {
+  html body[data-domain].workspace-authenticated .section-nav {
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    scroll-snap-type:x proximity !important;
+    padding:2px 1px 5px !important;
+  }
+  html body[data-domain].workspace-authenticated .section-nav a {
+    flex:0 0 auto !important;
+    min-width:66px !important;
+    scroll-snap-align:start !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .section-nav a,
+  html body[data-domain] .section-nav a::after {
+    transition:none !important;
+  }
+}
