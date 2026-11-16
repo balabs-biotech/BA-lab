@@ -59,7 +59,7 @@ async function checkTwoFingerPan(page, name) {
   const moved = after && Math.hypot(after.x - before.x, after.y - before.y, after.z - before.z);
   assert.ok(moved > 0.02, name + ': dragging with two fingers must pan the complete 3D map without changing hierarchy');
   const state = await page.evaluate(() => window.__BALABS_3D_E2E__());
-  assert.ok(state?.selected === 'bio', name + ': two-finger panning must not change the selected universe');
+  assert.ok(state?.selected === 'soil', name + ': two-finger panning must not change the selected universe');
   console.log(name + ': two-finger map pan moved camera target', { before, after });
 }
 
@@ -180,7 +180,7 @@ async function checkWorkingScene(name, viewport) {
   const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
   const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
   await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
-  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y, '.webgl-domain-target[data-domain-id="bio"]');
+  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y, '.webgl-domain-target[data-domain-id="soil"]');
   assert.equal(await page.evaluate(() => [document.querySelector('#mainView .webgl-stage'), document.querySelector('#mainView .webgl-stage canvas')].includes(document.activeElement)),
     true, name + ': pointer interaction must focus the interactive 3D stage so keyboard navigation is immediately available');
   await page.waitForFunction(() => {
