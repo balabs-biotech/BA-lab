@@ -18406,3 +18406,387 @@ body[data-domain="mycology"] .card :is(.statistics-chart canvas,.statistics-char
     padding:15px !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 85
+   Mycology: culture, production and experimental-data workspaces
+   ============================================================ */
+body[data-domain="mycology"] :is(#trackerCard,#batchCard,#measurementCard,#statisticsCard) {
+  display:grid;
+  gap:15px;
+  min-width:0;
+  padding:clamp(15px,2.4vw,23px) !important;
+}
+body[data-domain="mycology"] :is(#trackerCard,#batchCard,#measurementCard,#statisticsCard) > h2 {
+  margin:0;
+  color:#f2f1e9 !important;
+  font-size:clamp(1.08rem,2.2vw,1.35rem);
+  line-height:1.25;
+}
+body[data-domain="mycology"] :is(#trackerCard,#batchCard,#measurementCard,#statisticsCard) > .muted {
+  max-width:82ch;
+  margin:-7px 0 2px;
+  color:#b5c1b8 !important;
+  font-size:.69rem;
+  line-height:1.6;
+}
+body[data-domain="mycology"] #batchCard .batch-create-panel {
+  display:grid;
+  gap:13px;
+  min-width:0;
+  padding:clamp(14px,2.2vw,20px);
+  border:1px solid #526258;
+  border-left:3px solid #b96b4d;
+  border-radius:11px;
+  background:linear-gradient(135deg,#202e28,#1a2722);
+}
+body[data-domain="mycology"] #batchCard .batch-create-heading {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+body[data-domain="mycology"] #batchCard .batch-create-heading h3 {
+  margin:4px 0;
+  color:#f2f1e9 !important;
+  font-size:.98rem;
+}
+body[data-domain="mycology"] #batchCard .batch-create-heading p {
+  margin:0;
+  color:#b5c1b8 !important;
+  font-size:.66rem;
+  line-height:1.55;
+}
+body[data-domain="mycology"] #batchCard .batch-required-note {
+  flex:0 0 auto;
+  padding:5px 8px;
+  border:1px solid #72523e;
+  border-radius:7px;
+  background:#34271f;
+  color:#d9a183 !important;
+  font-size:.59rem;
+}
+body[data-domain="mycology"] #batchCard .grid,
+body[data-domain="mycology"] #measurementCard > .grid {
+  gap:11px;
+  min-width:0;
+}
+body[data-domain="mycology"] #batchCard .hint {
+  color:#9eada1 !important;
+  font-size:.6rem;
+  line-height:1.45;
+}
+body[data-domain="mycology"] #batchCard #createBatchButton,
+body[data-domain="mycology"] #measurementCard #saveMeasurementButton,
+body[data-domain="mycology"] #measurementCard #saveObservationButton {
+  justify-self:start;
+  min-height:41px;
+  padding:9px 16px;
+  border:1px solid #c17a5b;
+  border-radius:8px;
+  background:#a95f43;
+  color:#fff4eb !important;
+  font-weight:750;
+}
+body[data-domain="mycology"] #batchCard > h3 {
+  margin:6px 0 -5px;
+  color:#f2f1e9 !important;
+  font-size:.92rem;
+}
+body[data-domain="mycology"] #batchList,
+body[data-domain="mycology"] #plantCultureList {
+  display:grid;
+  gap:9px;
+  min-width:0;
+}
+body[data-domain="mycology"] #batchList > *,
+body[data-domain="mycology"] #batchCard :is(.batch-item,.batch-row,.batch-card,.batch-entry) {
+  min-width:0;
+  border-color:#40534d !important;
+  border-radius:9px !important;
+  background:#202d27 !important;
+  color:#e6ebe4 !important;
+}
+body[data-domain="mycology"] #batchCard #batchStages {
+  display:grid;
+  gap:12px;
+  min-width:0;
+  padding:14px;
+  border:1px solid #526258;
+  border-radius:11px;
+  background:#192520;
+}
+body[data-domain="mycology"] #batchCard #batchStages > h3 {
+  margin:0;
+  color:#f2f1e9 !important;
+  font-size:.9rem;
+}
+body[data-domain="mycology"] #batchCard :is(.progress,.progress-track,#stageProgressTrack) {
+  overflow:hidden;
+  border-radius:20px;
+  background:#101a17 !important;
+}
+body[data-domain="mycology"] #batchCard :is(.progress-bar,#stageProgressBar) {
+  background:linear-gradient(90deg,#a85f43,#d69a78) !important;
+}
+body[data-domain="mycology"] #batchCard :is(.batch-compare-panel,#batchQc,#batchEvents,#batchMovementEntry) {
+  display:grid;
+  gap:10px;
+  min-width:0;
+  padding:14px;
+  border:1px solid #40534d !important;
+  border-radius:10px;
+  background:#202d27 !important;
+  color:#e6ebe4 !important;
+}
+body[data-domain="mycology"] #batchCard :is(.batch-compare-panel h3,#batchQc h3,#batchEvents h3) {
+  margin:0;
+  color:#f2f1e9 !important;
+  font-size:.88rem;
+}
+body[data-domain="mycology"] #batchCard :is(#batchCompareSelect,#batchCompareResults) {
+  min-width:0;
+  max-width:100%;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture {
+  display:grid;
+  gap:12px;
+  min-width:0;
+  margin:0;
+  padding:clamp(14px,2.2vw,19px);
+  border:1px solid #526258;
+  border-radius:11px;
+  background:linear-gradient(130deg,#202e28,#1b2823);
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-heading {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-heading h3 {
+  margin:4px 0;
+  color:#f2f1e9 !important;
+  font-size:.92rem;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-heading p {
+  margin:0;
+  color:#b5c1b8 !important;
+  font-size:.65rem;
+  line-height:1.5;
+}
+body[data-domain="mycology"] #measurementCard .context-eyebrow {
+  color:#d69a78 !important;
+  font-size:.59rem;
+  font-weight:850;
+  letter-spacing:.1em;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-tile {
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  min-height:65px;
+  margin:0;
+  padding:9px;
+  border:1px solid #40534d !important;
+  border-radius:9px;
+  background:#17231e !important;
+  color:#eee8df !important;
+  text-align:left;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-tile:hover {
+  border-color:#b96b4d !important;
+  background:#2b342c !important;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-icon {
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border:1px solid #72523e;
+  border-radius:8px;
+  background:#34271f;
+  color:#e0a183 !important;
+  font-size:.72rem;
+  font-weight:850;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-tile strong {
+  display:block;
+  color:#f2f1e9 !important;
+  font-size:.65rem;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-tile small {
+  display:block;
+  margin-top:2px;
+  color:#aebbb2 !important;
+  font-size:.57rem;
+  line-height:1.35;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-arrow {
+  display:none;
+}
+body[data-domain="mycology"] #measurementCard .quick-capture-tip {
+  margin:0;
+  color:#9eada1 !important;
+  font-size:.6rem;
+  line-height:1.5;
+}
+body[data-domain="mycology"] #measurementCard .context-divider {
+  height:1px;
+  margin:3px 0;
+  background:#40534d;
+}
+body[data-domain="mycology"] #measurementCard .measurement-history-heading {
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+body[data-domain="mycology"] #measurementCard .measurement-history-heading h3 {
+  margin:3px 0 0;
+  color:#f2f1e9 !important;
+  font-size:.9rem;
+}
+body[data-domain="mycology"] #measurementCard .measurement-history {
+  display:grid;
+  gap:8px;
+  min-width:0;
+}
+body[data-domain="mycology"] #measurementCard .measurement-history > * {
+  min-width:0;
+  margin:0;
+  padding:11px 13px;
+  border:1px solid #40534d;
+  border-radius:9px;
+  background:#202d27;
+  color:#d6ded5;
+  overflow-wrap:anywhere;
+}
+body[data-domain="mycology"] #measurementCard .observation-details {
+  min-width:0;
+  padding:13px;
+  border:1px solid #526258;
+  border-radius:10px;
+  background:#192520;
+  color:#e6ebe4;
+}
+body[data-domain="mycology"] #measurementCard .observation-details > summary {
+  color:#f2f1e9;
+  font-weight:750;
+  cursor:pointer;
+}
+body[data-domain="mycology"] #measurementCard .observation-details > p {
+  color:#b5c1b8 !important;
+  font-size:.66rem;
+  line-height:1.55;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-filters {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  min-width:0;
+  padding:13px;
+  border:1px solid #40534d !important;
+  border-radius:10px;
+  background:#202d27 !important;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-filters > div {
+  display:grid;
+  align-content:start;
+  gap:5px;
+  min-width:0;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-filters label {
+  color:#c2ccc3 !important;
+  font-size:.62rem;
+  font-weight:750;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-filter-action {
+  align-self:end;
+}
+body[data-domain="mycology"] #statisticsCard #loadStatisticsButton {
+  width:100%;
+  min-height:40px;
+  margin:0;
+  border-radius:8px;
+  background:#a95f43;
+  color:#fff4eb !important;
+}
+body[data-domain="mycology"] #statisticsCard #statisticsStatus {
+  margin:0;
+  color:#aebbb2 !important;
+  font-size:.65rem;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-summary {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-summary > * {
+  min-width:0;
+  padding:12px;
+  border:1px solid #40534d;
+  border-radius:9px;
+  background:#202d27;
+  color:#e6ebe4;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-chart {
+  min-width:0;
+  overflow:hidden;
+  padding:12px;
+  border:1px solid #40534d !important;
+  border-radius:10px;
+  background:#17231e !important;
+  color:#d6ded5 !important;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-table-wrap {
+  max-width:100%;
+  overflow-x:auto;
+  border:1px solid #40534d !important;
+  border-radius:10px;
+  background:#192520 !important;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-table {
+  min-width:620px;
+  width:100%;
+  border-collapse:collapse;
+}
+body[data-domain="mycology"] #statisticsCard .statistics-table caption {
+  padding:10px 12px;
+  color:#b5c1b8;
+  text-align:left;
+  font-size:.65rem;
+}
+@media(max-width:760px) {
+  body[data-domain="mycology"] #measurementCard .quick-capture-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain="mycology"] #statisticsCard .statistics-filters {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain="mycology"] #statisticsCard .statistics-summary {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:480px) {
+  body[data-domain="mycology"] #batchCard .batch-create-heading {
+    flex-direction:column;
+  }
+  body[data-domain="mycology"] #measurementCard .quick-capture-grid,
+  body[data-domain="mycology"] #statisticsCard .statistics-filters,
+  body[data-domain="mycology"] #statisticsCard .statistics-summary {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain="mycology"] #batchCard #createBatchButton,
+  body[data-domain="mycology"] #measurementCard #saveMeasurementButton,
+  body[data-domain="mycology"] #measurementCard #saveObservationButton {
+    width:100%;
+  }
+}
