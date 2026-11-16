@@ -16637,3 +16637,125 @@ body[data-domain] #cultureDetailTimeline > .muted {
     white-space:normal;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 79
+   Culture identity summary and event timeline
+   ============================================================ */
+body[data-domain] #cultureDetailSummary .culture-detail-field {
+  display:grid;
+  align-content:space-between;
+  gap:8px;
+  min-width:0;
+  min-height:76px;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #cultureDetailSummary .culture-detail-field span {
+  color:var(--workspace-muted);
+  font-size:.61rem;
+  font-weight:750;
+  letter-spacing:.035em;
+  line-height:1.4;
+  text-transform:uppercase;
+}
+body[data-domain] #cultureDetailSummary .culture-detail-field strong {
+  color:var(--workspace-text);
+  font-size:.77rem;
+  font-weight:750;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #cultureDetailTimeline .culture-linked-batches {
+  display:grid;
+  gap:9px;
+  min-width:0;
+}
+body[data-domain] #cultureDetailTimeline .culture-linked-batches h3 {
+  margin:0;
+  padding:0 0 8px;
+  border:0;
+  color:var(--workspace-text);
+  font-size:.8rem;
+}
+body[data-domain] #cultureDetailTimeline .culture-timeline-entry {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  padding:13px 14px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #cultureDetailTimeline .culture-timeline-entry > div {
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+body[data-domain] #cultureDetailTimeline .culture-timeline-entry strong {
+  color:var(--workspace-text);
+  font-size:.74rem;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailTimeline .culture-timeline-entry p {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.65rem;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailTimeline .culture-timeline-date {
+  display:block;
+  margin-bottom:3px;
+  color:var(--workspace-muted);
+  font-size:.59rem;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #cultureDetailTimeline .culture-catalog-action {
+  width:auto;
+  min-height:34px;
+  margin:0;
+  padding:7px 10px;
+  border:1px solid var(--workspace-border);
+  border-radius:8px;
+  background:var(--workspace-panel);
+  color:var(--workspace-text);
+  font-size:.63rem;
+  white-space:nowrap;
+  box-shadow:none;
+}
+body[data-domain] #cultureDetailTimeline .culture-catalog-action:hover {
+  border-color:var(--workspace-accent);
+  background:var(--workspace-panel-raised);
+  transform:translateY(-1px);
+}
+body[data-domain] #cultureDetailTimeline .info.warning {
+  margin:0;
+  padding:11px 13px;
+  border:1px solid color-mix(in srgb,var(--workspace-accent) 32%,var(--workspace-border));
+  border-radius:10px;
+  background:var(--workspace-panel);
+  color:var(--workspace-muted);
+  font-size:.66rem;
+  line-height:1.6;
+}
+@media(max-width:520px) {
+  body[data-domain] #cultureDetailTimeline .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr);
+    align-items:stretch;
+  }
+  body[data-domain] #cultureDetailTimeline .culture-catalog-action {
+    width:100%;
+  }
+  body[data-domain] #cultureDetailSummary .culture-detail-field {
+    min-height:68px;
+  }
+}
