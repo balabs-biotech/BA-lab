@@ -604,9 +604,14 @@ function syncLabelScales() {
     label.getWorldPosition(labelWorldPosition);
     const cameraDistance=Math.max(.1,camera.position.distanceTo(labelWorldPosition));
     const depth=label.userData.depth||0;
-    const compact=window.innerWidth<760;const targetPixels=label.userData.kind==='domain-label'?(compact?42:50):label.userData.denseRoot?(compact?38:44):Math.max(compact?34:40,(compact?44:50)-depth*2);
+    const compact=window.innerWidth<760;
+    const isDomain=label.userData.kind==='domain-label';
+    const basePixels=isDomain?(compact?15:17):label.userData.denseRoot?(compact?14:16):Math.max(compact?9:10,(compact?12:14)-depth*1.5);
+    const referenceDistance=isDomain?13.5:6.5;
+    const zoomFactor=Math.pow(cameraDistance/referenceDistance,.55);
+    const targetPixels=THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:8,compact?19:22);
     const worldHeight=cameraDistance*projection*targetPixels;
-    label.scale.set(worldHeight*4.25,worldHeight,1);
+    label.scale.set(worldHeight*3.8,worldHeight,1);
   };
   for(const item of cells.values())apply(item.label);
   for(const item of resourceObjects)if(item.userData?.kind==='resource-label')apply(item);
