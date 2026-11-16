@@ -16759,3 +16759,264 @@ body[data-domain] #cultureDetailTimeline .info.warning {
     min-height:68px;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS MYCOLOGY THEME CORRECTION — PASS 80
+   Remove legacy paper palette and restore BA Labs dark workspace
+   ============================================================ */
+body[data-domain="mycology"] {
+  color-scheme:dark !important;
+  --bg:#111715 !important;
+  --surface:#1b2420 !important;
+  --surface-2:#222e28 !important;
+  --border:#405148 !important;
+  --border-strong:#72523e !important;
+  --text:#eee8df !important;
+  --muted:#b9c2b9 !important;
+  --brand:#b96b4d !important;
+  --brand-hover:#ca8060 !important;
+  --focus:#d18a69 !important;
+  --workspace-bg:#111715 !important;
+  --workspace-panel:#1b2420 !important;
+  --workspace-panel-raised:#25312b !important;
+  --workspace-control:#141d18 !important;
+  --workspace-border:#405148 !important;
+  --workspace-text:#eee8df !important;
+  --workspace-muted:#b9c2b9 !important;
+  --workspace-accent:#c98259 !important;
+  background:#111715 !important;
+  color:#eee8df !important;
+}
+body[data-domain="mycology"] :is(html,main,.container,#workspace-root) {
+  color:#eee8df;
+}
+body[data-domain="mycology"] .container {
+  background:transparent !important;
+}
+body[data-domain="mycology"] .card,
+body[data-domain="mycology"] #authCard,
+body[data-domain="mycology"] #contextPanel,
+body[data-domain="mycology"] #message .card {
+  background:#1b2420 !important;
+  border:1px solid #405148 !important;
+  border-radius:15px !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.2) !important;
+  color:#eee8df !important;
+}
+body[data-domain="mycology"] #authCard {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  gap:9px !important;
+  max-width:760px !important;
+  margin:0 auto !important;
+  padding:clamp(17px,3vw,25px) !important;
+}
+body[data-domain="mycology"] #authCard :is(h1,h2,h3,strong) {
+  color:#f2ede5 !important;
+  -webkit-text-fill-color:#f2ede5 !important;
+}
+body[data-domain="mycology"] #authCard :is(.section-kicker,label,.muted,small,p) {
+  color:#b9c2b9 !important;
+  -webkit-text-fill-color:#b9c2b9 !important;
+  opacity:1 !important;
+}
+body[data-domain="mycology"] #authCard .section-kicker span:first-child {
+  color:#d69a78 !important;
+  -webkit-text-fill-color:#d69a78 !important;
+}
+body[data-domain="mycology"] #authCard .section-kicker span:last-child {
+  color:#d5cec3 !important;
+  -webkit-text-fill-color:#d5cec3 !important;
+}
+body[data-domain="mycology"] #authCard > .muted {
+  max-width:62ch;
+  margin:0 0 5px !important;
+  font-size:.82rem !important;
+  line-height:1.6 !important;
+}
+body[data-domain="mycology"] #authCard label {
+  display:block;
+  margin:4px 0 0 !important;
+  font-size:.76rem !important;
+  font-weight:700 !important;
+}
+body[data-domain="mycology"] #authCard :is(input,select,textarea) {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:47px !important;
+  padding:11px 13px !important;
+  border:1px solid #526258 !important;
+  border-radius:9px !important;
+  background:#121a16 !important;
+  color:#f0ece4 !important;
+  -webkit-text-fill-color:#f0ece4 !important;
+  caret-color:#d69a78 !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.22) !important;
+  color-scheme:dark !important;
+}
+body[data-domain="mycology"] #authCard :is(input,textarea)::placeholder {
+  color:#8f9c91 !important;
+  -webkit-text-fill-color:#8f9c91 !important;
+  opacity:1 !important;
+}
+body[data-domain="mycology"] #authCard .auth-actions {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+  margin:7px 0 !important;
+}
+body[data-domain="mycology"] #authCard button,
+body[data-domain="mycology"] #authCard .auth-actions button {
+  min-width:0 !important;
+  min-height:45px !important;
+  margin:0 !important;
+  padding:10px 13px !important;
+  border:1px solid #a95f42 !important;
+  border-radius:9px !important;
+  background:#a95f42 !important;
+  color:#fff4eb !important;
+  -webkit-text-fill-color:#fff4eb !important;
+  box-shadow:none !important;
+  font-size:.75rem !important;
+  font-weight:750 !important;
+}
+body[data-domain="mycology"] #authCard button:hover:not(:disabled) {
+  background:#bd7555 !important;
+  border-color:#bd7555 !important;
+}
+body[data-domain="mycology"] #authCard #authStatus {
+  display:flex !important;
+  align-items:center !important;
+  min-width:0 !important;
+  min-height:46px !important;
+  margin:4px 0 !important;
+  padding:11px 13px !important;
+  border:1px solid #405148 !important;
+  border-radius:9px !important;
+  background:#25312b !important;
+  color:#d7e0d6 !important;
+  -webkit-text-fill-color:#d7e0d6 !important;
+  font-size:.72rem !important;
+  line-height:1.55 !important;
+  opacity:1 !important;
+  overflow-wrap:anywhere !important;
+}
+body[data-domain="mycology"] #authCard #authStatus.success,
+body[data-domain="mycology"] #message .success {
+  border-color:#416d53 !important;
+  background:#1c3327 !important;
+  color:#c5e4ce !important;
+  -webkit-text-fill-color:#c5e4ce !important;
+}
+body[data-domain="mycology"] #authCard #authStatus.error,
+body[data-domain="mycology"] #message .error {
+  border-color:#82514a !important;
+  background:#382321 !important;
+  color:#f0c5bc !important;
+  -webkit-text-fill-color:#f0c5bc !important;
+}
+body[data-domain="mycology"] #authCard #signOutButton {
+  width:100% !important;
+  margin-top:2px !important;
+  background:#34453b !important;
+  border-color:#52685a !important;
+  color:#e6eee6 !important;
+  -webkit-text-fill-color:#e6eee6 !important;
+}
+body[data-domain="mycology"] :is(#syncStatus,#message .card,.info,.success,.warning,.error) {
+  opacity:1 !important;
+}
+body[data-domain="mycology"] #message .success,
+body[data-domain="mycology"] .info.success {
+  background:#1c3327 !important;
+  border-color:#416d53 !important;
+  color:#c5e4ce !important;
+}
+body[data-domain="mycology"] .card :is(.muted,.hint,small,label) {
+  color:#b9c2b9 !important;
+  -webkit-text-fill-color:#b9c2b9 !important;
+  opacity:1 !important;
+}
+body[data-domain="mycology"] .card :is(input,select,textarea) {
+  background:#141d18 !important;
+  border-color:#526258 !important;
+  color:#eee8df !important;
+  -webkit-text-fill-color:#eee8df !important;
+  color-scheme:dark !important;
+}
+body[data-domain="mycology"] .card :is(input,select,textarea)::placeholder {
+  color:#8f9c91 !important;
+  -webkit-text-fill-color:#8f9c91 !important;
+  opacity:1 !important;
+}
+body[data-domain="mycology"] .app-toolbar {
+  background:#18211c !important;
+  border-color:#405148 !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.18) !important;
+}
+body[data-domain="mycology"] .section-nav a {
+  color:#c4cec4 !important;
+}
+body[data-domain="mycology"] .section-nav a[aria-current="page"] {
+  background:#70452f !important;
+  border-color:#956247 !important;
+  color:#fff1e7 !important;
+}
+body[data-domain="mycology"] .entry-intro,
+body[data-domain="mycology"] .quick-capture-tile,
+body[data-domain="mycology"] .statistics-filters,
+body[data-domain="mycology"] #batchCard :is(.batch-create-panel,.batch-compare-panel,#batchStages,#batchQc,#batchEvents) {
+  background:#222d27 !important;
+  border-color:#46584c !important;
+  color:#eee8df !important;
+  box-shadow:none !important;
+  border-radius:11px !important;
+}
+body[data-domain="mycology"] #batchCard :is(.batch-required-note,.batch-harvest-entry) {
+  background:#1a241e !important;
+  border-color:#46584c !important;
+  color:#eee8df !important;
+}
+body[data-domain="mycology"] #batchCard :is(.batch-create-panel input,.batch-create-panel select,#batchCompareSelect,.batch-harvest-entry input,.batch-harvest-entry select,.batch-harvest-entry textarea) {
+  background:#141d18 !important;
+  border-color:#526258 !important;
+  color:#eee8df !important;
+}
+body[data-domain="mycology"] :is(.culture-catalog-row,.culture-detail-field,.culture-timeline-entry,.statistics-summary-item,.statistics-chart,.statistics-table-wrap,.overview-metric,.overview-activity,.overview-shortcuts,.quick-capture,.quick-capture-tile,.bio-operation-panel,.bio-lineage-panel,.guided-entry-step,.consent-panel,.batch-stat,.stage,.qc-row) {
+  background:#222d27 !important;
+  border-color:#405148 !important;
+  color:#eee8df !important;
+  box-shadow:none !important;
+}
+body[data-domain="mycology"] :is(.statistics-table th,.statistics-table td) {
+  border-color:#405148 !important;
+  color:#eee8df !important;
+}
+body[data-domain="mycology"] .statistics-table th {
+  background:#2b3931 !important;
+  color:#c6d0c6 !important;
+}
+body[data-domain="mycology"] :is(.culture-catalog-code,.culture-catalog-row strong,.culture-detail-field strong,.culture-timeline-entry strong) {
+  color:#f0ece4 !important;
+}
+body[data-domain="mycology"] .culture-catalog-meta span:first-child {
+  background:#3a2a21 !important;
+  color:#d69a78 !important;
+  border-color:#72523e !important;
+}
+@media(max-width:700px) {
+  body[data-domain="mycology"] {
+    padding:10px 9px 34px !important;
+  }
+  body[data-domain="mycology"] #authCard {
+    gap:8px !important;
+    padding:17px 15px !important;
+  }
+  body[data-domain="mycology"] #authCard .auth-actions {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  body[data-domain="mycology"] #authCard #authStatus {
+    min-height:42px !important;
+  }
+}
