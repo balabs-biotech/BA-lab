@@ -16349,3 +16349,291 @@ body[data-domain] :is(#statisticsCard,#batchCard,#trackerCard) :is(table, .stati
     animation:none!important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 78
+   Biological record, lineage graph and operation capture
+   ============================================================ */
+body[data-domain="mycology"] #cultureDetailPanel,
+body[data-domain="laboratory"] #cultureDetailPanel {
+  display:grid;
+  gap:16px;
+  min-width:0;
+  padding:clamp(16px,2.5vw,26px);
+  border:1px solid var(--workspace-border);
+  border-radius:18px;
+  background:var(--workspace-panel);
+}
+body[data-domain] #cultureDetailPanel > .culture-detail-header {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  min-width:0;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--workspace-border);
+}
+body[data-domain] #cultureDetailPanel #cultureDetailTitle {
+  min-width:0;
+  margin:0;
+  overflow-wrap:anywhere;
+  color:var(--workspace-text);
+  font-size:clamp(1.05rem,2.5vw,1.4rem);
+  line-height:1.25;
+}
+body[data-domain] #cultureDetailPanel #cultureDetailMeta {
+  margin:7px 0 0;
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.6;
+}
+body[data-domain] #cultureDetailPanel #closeCultureDetail {
+  flex:0 0 auto;
+  min-height:36px;
+  padding:7px 11px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+  font-size:.66rem;
+}
+body[data-domain] #cultureDetailSummary {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  min-width:0;
+}
+body[data-domain] #cultureDetailSummary > * {
+  min-width:0;
+  padding:12px 13px;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel-raised);
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel :is(.bio-operation-panel,.bio-lineage-panel) {
+  display:grid;
+  gap:12px;
+  min-width:0;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--workspace-border);
+  border-radius:14px;
+  background:var(--workspace-panel-raised);
+}
+body[data-domain] #cultureDetailPanel :is(.bio-operation-panel,.bio-lineage-panel) h4 {
+  margin:0;
+  padding:0;
+  border:0;
+  color:var(--workspace-text);
+  font-size:.88rem;
+  letter-spacing:-.01em;
+}
+body[data-domain] #cultureDetailPanel .bio-operation-panel > .muted {
+  max-width:78ch;
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.68rem;
+  line-height:1.65;
+}
+body[data-domain] #bioOperationForm {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  min-width:0;
+}
+body[data-domain] #bioOperationForm > div {
+  display:grid;
+  align-content:start;
+  gap:6px;
+  min-width:0;
+}
+body[data-domain] #bioOperationForm > .bio-operation-wide {
+  grid-column:1/-1;
+}
+body[data-domain] #bioOperationForm label {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.66rem;
+  font-weight:750;
+  line-height:1.45;
+}
+body[data-domain] #bioOperationForm :is(input,select,textarea) {
+  width:100%;
+  min-width:0;
+  min-height:42px;
+  margin:0;
+  padding:9px 11px;
+  border:1px solid var(--workspace-border);
+  border-radius:9px;
+  background:var(--workspace-control);
+  color:var(--workspace-text);
+  font-size:.72rem;
+}
+body[data-domain] #bioOperationForm textarea {
+  min-height:92px;
+  resize:vertical;
+  line-height:1.55;
+}
+body[data-domain] #bioOperationForm small {
+  color:var(--workspace-muted);
+  font-size:.62rem;
+  line-height:1.55;
+}
+body[data-domain] #bioOperationForm :is(input,select,textarea):focus-visible {
+  border-color:var(--workspace-accent);
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 24%,transparent);
+  outline-offset:1px;
+}
+body[data-domain] #bioOperationForm #saveBioOperation {
+  width:100%;
+  min-height:44px;
+  margin:0;
+}
+body[data-domain] #bioOperationForm #bioOperationMessage {
+  min-height:1.4em;
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.67rem;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #bioChildCodesField[hidden] {
+  display:none!important;
+}
+body[data-domain] #cultureLineage {
+  display:grid;
+  gap:13px;
+  min-width:0;
+}
+body[data-domain] #cultureLineage > section {
+  display:grid;
+  gap:8px;
+  min-width:0;
+}
+body[data-domain] #cultureLineage > section > .muted {
+  margin:0;
+  color:var(--workspace-muted);
+  font-size:.63rem;
+  font-weight:800;
+  letter-spacing:.045em;
+  line-height:1.5;
+  text-transform:uppercase;
+}
+body[data-domain] #cultureLineage .culture-lineage-list {
+  display:flex;
+  align-items:stretch;
+  gap:8px;
+  min-width:0;
+  padding:11px;
+  overflow-x:auto;
+  border:1px solid var(--workspace-border);
+  border-radius:11px;
+  background:var(--workspace-panel);
+  scrollbar-width:thin;
+  scrollbar-color:var(--workspace-accent-border) transparent;
+}
+body[data-domain] #cultureLineage .culture-lineage-node {
+  display:grid;
+  align-content:center;
+  gap:5px;
+  flex:0 0 auto;
+  min-width:150px;
+  max-width:240px;
+  min-height:66px;
+  margin:0;
+  padding:11px 12px;
+  border:1px solid var(--workspace-border);
+  border-radius:10px;
+  background:var(--workspace-panel-raised);
+  color:var(--workspace-text);
+  text-align:left;
+  box-shadow:none;
+  white-space:normal;
+}
+body[data-domain] #cultureLineage button.culture-lineage-node {
+  cursor:pointer;
+}
+body[data-domain] #cultureLineage button.culture-lineage-node:hover {
+  border-color:var(--workspace-accent);
+  background:var(--workspace-panel);
+  transform:translateY(-1px);
+}
+body[data-domain] #cultureLineage .culture-lineage-node strong {
+  color:var(--workspace-text);
+  font-size:.72rem;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureLineage .culture-lineage-node small {
+  color:var(--workspace-muted);
+  font-size:.6rem;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureLineage .culture-lineage-arrow {
+  display:grid;
+  place-items:center;
+  flex:0 0 18px;
+  align-self:center;
+  color:var(--workspace-accent);
+  font-size:1rem;
+  font-weight:800;
+}
+body[data-domain] #cultureLineage > .muted {
+  margin:0;
+  padding:13px;
+  border:1px dashed var(--workspace-border);
+  border-radius:10px;
+  color:var(--workspace-muted);
+  font-size:.67rem;
+  line-height:1.65;
+}
+body[data-domain] #cultureDetailTimeline {
+  display:grid;
+  gap:9px;
+  min-width:0;
+}
+body[data-domain] #cultureDetailTimeline > * {
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+body[data-domain] #cultureDetailPanel > h4:not(:first-child) {
+  margin:4px 0 -5px;
+  padding:12px 0 0;
+  border-top:1px solid var(--workspace-border);
+  color:var(--workspace-text);
+  font-size:.84rem;
+}
+body[data-domain] #cultureDetailTimeline > .muted {
+  margin:0;
+  padding:13px;
+  border:1px dashed var(--workspace-border);
+  border-radius:10px;
+  color:var(--workspace-muted);
+  font-size:.67rem;
+  line-height:1.6;
+}
+@media(max-width:680px) {
+  body[data-domain] #cultureDetailSummary {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain] #bioOperationForm {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #bioOperationForm > .bio-operation-wide {
+    grid-column:auto;
+  }
+  body[data-domain] #cultureDetailPanel > .culture-detail-header {
+    align-items:flex-start;
+  }
+}
+@media(max-width:420px) {
+  body[data-domain] #cultureDetailSummary {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain] #cultureDetailPanel #closeCultureDetail {
+    max-width:90px;
+    white-space:normal;
+  }
+}
