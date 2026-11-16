@@ -303,20 +303,31 @@ try {
           parent.appendChild(fixture);
           const style = getComputedStyle(fixture);
           const matchedBackgroundRules = [];
+          const batchListRules = [];
+          const stylesheetDiagnostics = [];
           for (const sheet of [...document.styleSheets]) {
             let rules;
-            try { rules = [...sheet.cssRules]; } catch { continue; }
+            try { rules = [...sheet.cssRules]; } catch (error) {
+              stylesheetDiagnostics.push({ href: sheet.href, error: String(error) });
+              continue;
+            }
             const visit = list => {
               for (const rule of list) {
                 if (rule.cssRules) visit([...rule.cssRules]);
-                else if (rule.selectorText && rule.style?.background && fixture.matches(rule.selectorText)) {
-                  matchedBackgroundRules.push({ href: sheet.href, selector: rule.selectorText, background: rule.style.background, important: rule.style.getPropertyPriority("background") });
-                } else if (rule.selectorText && rule.style?.backgroundColor && fixture.matches(rule.selectorText)) {
-                  matchedBackgroundRules.push({ href: sheet.href, selector: rule.selectorText, backgroundColor: rule.style.backgroundColor, important: rule.style.getPropertyPriority("background-color") });
+                else if (rule.selectorText) {
+                  if (rule.selectorText.includes("batchList")) {
+                    batchListRules.push({ selector: rule.selectorText, background: rule.style?.background, backgroundColor: rule.style?.backgroundColor, backgroundImage: rule.style?.backgroundImage });
+                  }
+                  try {
+                    if (fixture.matches(rule.selectorText) && (rule.style?.background || rule.style?.backgroundColor || rule.style?.backgroundImage)) {
+                      matchedBackgroundRules.push({ href: sheet.href, selector: rule.selectorText, background: rule.style.background, backgroundColor: rule.style.backgroundColor, backgroundImage: rule.style.backgroundImage, important: rule.style.getPropertyPriority("background") || rule.style.getPropertyPriority("background-color") });
+                    }
+                  } catch {}
                 }
               }
             };
             visit(rules);
+            stylesheetDiagnostics.push({ href: sheet.href, ruleCount: rules.length });
           }
           checks.push({
             parentSelector,
@@ -327,6 +338,9 @@ try {
             radius: style.borderTopLeftRadius,
             padding: style.padding,
             matchedBackgroundRules,
+            batchListRules: parentSelector === "#batchList" ? batchListRules : undefined,
+            stylesheetDiagnostics,
+            parentMatchesScopedSelector: parentSelector === "#batchList" ? parent.matches("html body[data-domain] #batchList") : undefined,
             stylesheets: [...document.styleSheets].map(sheet => sheet.href),
           });
           fixture.remove();
