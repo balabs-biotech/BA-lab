@@ -112,7 +112,23 @@ function draw(){
   }
   curves.push({a,b,cx,cy,e});
  });
- if(!reduced)curves.forEach((c,i)=>{const q=(performance.now()*.000025+i*.19)%1,u=1-q,x=u*u*c.a.x+2*u*q*c.cx+q*q*c.b.x,y=u*u*c.a.y+2*u*q*c.cy+q*q*c.b.y;ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fillStyle="#d1d0c5aa";ctx.fill()});
+ if(!reduced){
+  const time=performance.now()*.00012;
+  curves.forEach((c,i)=>{
+   if(c.e.cross)return;
+   const density=c.e.density??(c.e.tertiary?.25:.45);
+   const count=c.e.tertiary?1:density>.72?3:density>.38?2:1;
+   for(let p=0;p<count;p++){
+    const speed=c.e.tertiary?.48:.62+density*.22;
+    const q=(time*speed+i*.173+p/count)%1,u=1-q;
+    const x=u*u*c.a.x+2*u*q*c.cx+q*q*c.b.x,y=u*u*c.a.y+2*u*q*c.cy+q*q*c.b.y;
+    const tx=2*u*(c.cx-c.a.x)+2*q*(c.b.x-c.cx),ty=2*u*(c.cy-c.a.y)+2*q*(c.b.y-c.cy),angle=Math.atan2(ty,tx),tail=5+2*density;
+    ctx.beginPath();ctx.moveTo(x-Math.cos(angle)*tail,y-Math.sin(angle)*tail);ctx.lineTo(x,y);
+    ctx.strokeStyle=c.e.tertiary?"#d1d0c544":"#d1d0c588";ctx.lineWidth=c.e.tertiary?.7:1;ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,c.e.tertiary?1:1.25,0,Math.PI*2);ctx.fillStyle=c.e.tertiary?"#c5d0c7aa":"#e1e4d8dd";ctx.fill();
+   }
+  });
+ }
  nodes.forEach(n=>{const p=screen(n),r=Math.max(3,n.r*Math.sqrt(scale)),color=PALETTE[n.rootId]||"#d1d0c5";ctx.beginPath();ctx.arc(p.x,p.y,r+5,0,Math.PI*2);ctx.strokeStyle=color+"44";ctx.lineWidth=1;ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle="#111b1d";ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+10,0,Math.PI*2);ctx.setLineDash([2,4]);ctx.strokeStyle="#d1d0c5";ctx.stroke();ctx.setLineDash([])}
   // Labels follow camera zoom, with a readable minimum and a restrained maximum.
   // At overview scale, hide secondary labels to prevent collisions; selected nodes remain named.
