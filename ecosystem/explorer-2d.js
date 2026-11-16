@@ -61,6 +61,9 @@ function buildNetwork(){
  // Anastomoses connect nearby branches at each level without turning the map into a grid.
  const levels=new Map();nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
  levels.forEach(group=>{group.forEach((n,i)=>{if(i%3===0&&group.length>3){const other=group[(i+2)%group.length];if(n.parent!==other.id&&other.parent!==n.id)edges.push({a:n,b:other,depth:n.level,cross:true,seed:hash(n.id+other.id)});}})});
+ canvas.dataset.universeCount=String(roots);
+ canvas.dataset.nodeCount=String(nodes.length);
+ canvas.dataset.edgeCount=String(edges.length);
 }
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
