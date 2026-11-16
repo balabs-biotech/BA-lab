@@ -58,7 +58,7 @@ function strokeFilament(a,b,depth,seed,cross=false){
   const count=depth===1?5:depth===2?3:2,dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
   for(let i=0;i<count;i++){const u=(i+1)/(count+1),x=(1-u)*(1-u)*p.x+2*(1-u)*u*c.x+u*u*q.x,y=(1-u)*(1-u)*p.y+2*(1-u)*u*c.y+u*u*q.y,side=((seed+i)%2?1:-1),reach=Math.min(30,Math.max(7,len*(.13-(depth*.012))));const ex=x+dx/L*reach*.35+nx*side*reach,ey=y+dy/L*reach*.35+ny*side*reach,mx=(x+ex)/2+nx*side*reach*.2,my=(y+ey)/2+ny*side*reach*.2;
    ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(mx,my,ex,ey);ctx.strokeStyle=rootColor+(depth===1?"70":"48");ctx.lineWidth=Math.max(.38,.78-depth*.08);ctx.stroke();
-   if(depth<=2){for(let f=-1;f<=1;f+=2){const tx=ex+dx/L*reach*.2+nx*f*reach*.34,ty=ey+dy/L*reach*.2+ny*f*reach*.34;ctx.beginPath();ctx.moveTo(ex,ey);ctx.quadraticCurveTo((ex+tx)/2+nx*f*4,(ey+ty)/2+ny*f*4,tx,ty);ctx.strokeStyle=rootColor+"50";ctx.lineWidth:.48;ctx.stroke();}}
+   if(depth<=2){for(let f=-1;f<=1;f+=2){const tx=ex+dx/L*reach*.2+nx*f*reach*.34,ty=ey+dy/L*reach*.2+ny*f*reach*.34;ctx.beginPath();ctx.moveTo(ex,ey);ctx.quadraticCurveTo((ex+tx)/2+nx*f*4,(ey+ty)/2+ny*f*4,tx,ty);ctx.strokeStyle=rootColor+"50";ctx.lineWidth=.48;ctx.stroke();}}
   }
  }
  return{p,q,c};
@@ -68,7 +68,7 @@ function draw(){
  ctx.clearRect(0,0,w,h);
  const bg=ctx.createRadialGradient(w*.5,h*.48,0,w*.5,h*.48,Math.max(w,h)*.78);bg.addColorStop(0,"#1b302c");bg.addColorStop(.58,"#142320");bg.addColorStop(1,"#101719");ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
  // Fine suspended spores give the field depth without a decorative starfield.
- for(let i=0;i<230;i++){const x=((i*137.51)%w),y=((i*83.71)%h),alpha=i%5===0?".19":".07";ctx.fillStyle=i%7===0?"#b96b4d"+alpha:"#d1d0c5"+alpha;ctx.fillRect(x,y,i%9===0?1.6:1,1);}
+ for(let i=0;i<230;i++){const x=((i*137.51)%w),y=((i*83.71)%h),alpha=i%5===0?"30":"12";ctx.fillStyle=i%7===0?"#b96b4d"+alpha:"#d1d0c5"+alpha;ctx.fillRect(x,y,i%9===0?1.6:1,1);}
  const visibleEdges=edges.filter(e=>levelOpacity(Math.max(e.a.level,e.b.level))>.015);
  visibleEdges.forEach(e=>{const alpha=levelOpacity(Math.max(e.a.level,e.b.level));ctx.globalAlpha=alpha;const c=strokeFilament(e.a,e.b,e.depth,e.seed,e.cross);if(!reduced&&!e.cross&&alpha>.2){const phase=performance.now()*.00012+(e.seed%100)*.013,q=(phase*(e.depth===1? .7:.48))%1,u=1-q,x=u*u*c.p.x+2*u*q*c.c.x+q*q*c.q.x,y=u*u*c.p.y+2*u*q*c.c.y+q*q*c.q.y;ctx.beginPath();ctx.arc(x,y,Math.max(.8,1.2*scale**.15),0,Math.PI*2);ctx.fillStyle="#dce5d9";ctx.fill();}ctx.globalAlpha=1;});
  nodes.forEach(n=>{
