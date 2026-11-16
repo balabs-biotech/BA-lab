@@ -5926,6 +5926,8 @@ async function loadBiologicalLineage(cultureId) {
       node.className = 'culture-lineage-node';
       node.dataset.lineageRole = role;
       node.dataset.lineageDepth = String(depth);
+      node.dataset.cultureId = row.id || '';
+      node.dataset.parentCultureId = row.parent_culture_id || '';
       node.addEventListener('click', () => loadCultureDetail(row.id));
       node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode")));
       const strong = document.createElement('strong');
