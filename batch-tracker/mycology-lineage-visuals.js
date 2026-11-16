@@ -41,13 +41,13 @@
     }));
   }
 
-  function showFallback(message) {
+  function showFallback(message, revealList = false) {
     stage.replaceChildren();
     const note = document.createElement("p");
     note.className = "lineage-graph-status";
     note.textContent = message;
     stage.appendChild(note);
-    details.open = true;
+    if (revealList) details.open = true;
   }
 
   async function loadPixi() {
@@ -175,7 +175,7 @@
     } catch (error) {
       console.info("BA Labs: carte PixiJS indisponible, liste de filiation conservée.", error);
       shell.dataset.graphState = "fallback";
-      showFallback("La visualisation graphique est indisponible. La liste détaillée reste accessible ci-dessous.");
+      showFallback("La visualisation graphique est indisponible. La liste détaillée reste accessible ci-dessous.", true);
     }
   }
 
