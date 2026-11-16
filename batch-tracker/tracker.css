@@ -21892,3 +21892,156 @@ body[data-domain] .culture-catalog-action[data-culture-action="observe"] {
   background:var(--accent) !important;
   border-color:var(--accent) !important;
 }
+
+
+/* ============================================================
+   BA LABS CULTUREOPS — PASS 94
+   Canonical shared visual language. Domain accents only.
+   This block intentionally overrides legacy domain-specific themes.
+   ============================================================ */
+body[data-domain] {
+  --bg:#111B1D !important;
+  --surface:#263B38 !important;
+  --surface-2:#304743 !important;
+  --surface-raised:#38524C !important;
+  --control-bg:#182725 !important;
+  --border:#40534D !important;
+  --border-strong:#60766D !important;
+  --line:#40534D !important;
+  --text:#D1D0C5 !important;
+  --ink:#D1D0C5 !important;
+  --muted:#9BAEA4 !important;
+  --paper:#F2F1E9 !important;
+  --brand:var(--domain-accent) !important;
+  --accent:var(--domain-accent) !important;
+  --focus:var(--domain-accent) !important;
+  --ok:#A9C5A5 !important;
+  --warn:#E0B879 !important;
+  --err:#D98C80 !important;
+  color-scheme:dark !important;
+  color:#D1D0C5 !important;
+  background:#111B1D !important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+}
+body[data-domain="agronomy"] { --domain-accent:#B4F477 !important; }
+body[data-domain="mycology"] { --domain-accent:#C98259 !important; }
+body[data-domain="laboratory"] { --domain-accent:#78B8E8 !important; }
+
+body[data-domain] .container { color:var(--text) !important; }
+body[data-domain] :is(.app-toolbar,.card,#contextPanel,.panel,.auth-card) {
+  color:var(--text) !important;
+  background:var(--surface) !important;
+  border-color:var(--border) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.18) !important;
+}
+body[data-domain] .app-toolbar,
+body[data-domain] .card { border-radius:14px !important; }
+body[data-domain] .app-hero {
+  color:var(--paper) !important;
+  background:linear-gradient(125deg,#304743 0%,#263B38 58%,#1B2B29 100%) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:16px !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.2) !important;
+  font-family:inherit !important;
+}
+body[data-domain] .app-hero :is(h1,h2,h3,span,p,small,.eyebrow,.hero-description,.hero-note) {
+  color:var(--paper) !important;
+  font-family:inherit !important;
+}
+body[data-domain] .app-hero :is(.eyebrow,.hero-art) { color:var(--domain-accent) !important; }
+body[data-domain] .card :is(h1,h2,h3,h4,legend) {
+  color:var(--paper) !important;
+  font-family:inherit !important;
+  text-transform:none !important;
+}
+body[data-domain] :is(p,li,label,legend,dt,dd,th,td,.muted,.hint,small,.description) {
+  color:var(--text);
+}
+body[data-domain] :is(.muted,.hint,small,.measurement-meta,.measurement-stamp,.culture-catalog-meta,.statistics-footnote,.qc-code) {
+  color:var(--muted) !important;
+}
+body[data-domain] :is(.section-kicker,.eyebrow,.section-kicker-label,.shortcut-index,.culture-catalog-code,.measurement-value,.measurement-history-heading,.statistics-table caption,.culture-lineage-arrow) {
+  color:var(--domain-accent) !important;
+}
+body[data-domain] :is(.section-nav a,.universe-home-link) {
+  color:var(--text) !important;
+  border-color:transparent !important;
+  background:transparent !important;
+  border-radius:8px !important;
+}
+body[data-domain] .section-nav a[aria-current="page"] {
+  color:var(--domain-accent) !important;
+  background:rgba(255,255,255,.055) !important;
+  border-color:var(--border-strong) !important;
+}
+body[data-domain] :is(.guided-entry-step,.assisted-entry-panel,.assisted-entry-help,.batch-create-panel,.batch-compare-panel,.quick-capture,.culture-catalog,.culture-detail,.statistics-filters,.observation-details,.consent-panel,.consent-option,.bio-operation-panel,.bio-lineage-panel,#batchQc,#batchEvents,#batchMovementEntry,.context-panel) {
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border:1px solid var(--border) !important;
+  border-radius:11px !important;
+  box-shadow:none !important;
+}
+body[data-domain] :is(.culture-catalog-row,.culture-detail-field,.culture-timeline-entry,.measurement-entry,.statistics-summary-item,.statistics-chart,.statistics-table-wrap,.overview-metric,.overview-activity,.overview-shortcuts,.overview-shortcut,.batch-event-item,.batch-item,.stage,.qc-row,.batch-stat,.quick-capture-tile,.overview-observation,.culture-lineage-node,.data-flow li) {
+  color:var(--text) !important;
+  background:#1D302D !important;
+  border:1px solid var(--border) !important;
+  border-radius:9px !important;
+  box-shadow:none !important;
+}
+body[data-domain] :is(.culture-detail-field strong,.culture-timeline-entry strong,.statistics-summary-item strong,.overview-metric strong,.overview-shortcuts h3,.quick-capture-tile strong,.culture-catalog-row strong,.qc-label) {
+  color:var(--paper) !important;
+}
+body[data-domain] :is(.culture-catalog-meta span:first-child,.assisted-entry-tag,.entry-step-mark) {
+  color:var(--domain-accent) !important;
+  background:rgba(255,255,255,.045) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:6px !important;
+}
+body[data-domain] :is(input,select,textarea,.language-control select) {
+  color:var(--paper) !important;
+  background:var(--control-bg) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+  -webkit-text-fill-color:var(--paper) !important;
+  color-scheme:dark !important;
+}
+body[data-domain] :is(input,textarea)::placeholder { color:#9BAEA4 !important; opacity:1; }
+body[data-domain] :is(input,select,textarea):focus {
+  border-color:var(--domain-accent) !important;
+  outline:2px solid color-mix(in srgb,var(--domain-accent) 28%,transparent) !important;
+  outline-offset:1px;
+}
+body[data-domain] :is(button,.button,.secondary-button,.culture-catalog-action) {
+  color:var(--paper) !important;
+  background:#304743 !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+  font-family:inherit !important;
+  text-transform:none !important;
+}
+body[data-domain] :is(button,.button,.culture-catalog-action)[data-primary],
+body[data-domain] .card button:not(.secondary-button):not(:disabled),
+body[data-domain] .culture-catalog-action[data-culture-action="observe"] {
+  color:#111B1D !important;
+  background:var(--domain-accent) !important;
+  border-color:var(--domain-accent) !important;
+}
+body[data-domain] :is(button,.button,.culture-catalog-action):disabled { opacity:.48; }
+body[data-domain] :is(.statistics-table th,.hero-tags span,.hero-note) {
+  color:var(--paper) !important;
+  background:#304743 !important;
+  border-color:var(--border) !important;
+}
+body[data-domain] .statistics-table td { color:var(--text) !important; border-color:var(--border) !important; }
+body[data-domain] :is(.progress,.overview-meter) { background:#182725 !important; }
+body[data-domain] :is(.progress-bar,.overview-meter span) { background:var(--domain-accent) !important; }
+body[data-domain] :is(.culture-catalog-row:hover,.overview-shortcut:hover,.quick-capture-tile:hover,.batch-item:hover) {
+  border-color:var(--domain-accent) !important;
+}
+body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-color:var(--domain-accent) !important; }
+
+@media(max-width:720px) {
+  body[data-domain] .app-toolbar { position:relative; top:auto; flex-wrap:wrap; }
+}
