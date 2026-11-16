@@ -123,3 +123,86 @@ html body[data-domain] .universe-home-link:focus-visible {
     display:none !important;
   }
 }
+
+
+/* PASS 114 — restrained motion language inspired by OriginKit.
+   Shared across workspaces; only the domain accent changes. */
+body[data-domain] .app-hero {
+  isolation: isolate;
+}
+body[data-domain] .hero-copy,
+body[data-domain] .hero-art {
+  z-index: 1;
+}
+body[data-domain] .hero-particle-field {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: .62;
+  pointer-events: none;
+}
+body[data-domain] .hero-core {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+body[data-domain] .hero-core svg[hidden] {
+  display: none !important;
+}
+body[data-domain] .hero-pixi-canvas {
+  position: absolute !important;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  pointer-events: none;
+}
+body[data-domain] .app-hero h1 span {
+  color: var(--workspace-accent, #b4f477);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--workspace-accent, #b4f477) 24%, transparent);
+}
+body[data-domain] .card {
+  transition:
+    transform 220ms cubic-bezier(.2,.75,.25,1),
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease;
+}
+body[data-domain] button:not(:disabled),
+body[data-domain] [role="button"]:not([aria-disabled="true"]) {
+  transition:
+    transform 160ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  body[data-domain] .card:not(.hidden):hover {
+    transform: translateY(-2px);
+  }
+  body[data-domain] button:not(:disabled):hover,
+  body[data-domain] [role="button"]:not([aria-disabled="true"]):hover {
+    transform: translateY(-1px);
+  }
+}
+@media (max-width: 640px) {
+  body[data-domain] .hero-particle-field {
+    opacity: .42;
+  }
+  body[data-domain] .card {
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .card,
+  body[data-domain] button,
+  body[data-domain] [role="button"] {
+    transition: none !important;
+    transform: none !important;
+  }
+}
