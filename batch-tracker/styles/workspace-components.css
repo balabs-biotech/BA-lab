@@ -828,3 +828,85 @@ html body[data-domain] .card:not(.app-hero) :is(.req,[aria-required="true"]) {
     transition:none !important;
   }
 }
+
+
+/* PASS 139 — consent, authentication and numeric-entry controls. */
+html body[data-domain] #authCard {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:10px !important;
+  max-width:760px !important;
+  margin-inline:auto !important;
+}
+html body[data-domain] #authCard > label { margin:8px 0 0 !important; }
+html body[data-domain] #authCard .auth-actions {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+  margin-top:8px !important;
+}
+html body[data-domain] #authCard .auth-actions button { min-height:44px !important; }
+html body[data-domain] #authCard #authStatus {
+  margin-top:8px !important;
+  padding:12px 14px !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  line-height:1.55 !important;
+}
+html body[data-domain] .card:not(.app-hero) .consent-panel {
+  display:grid !important;
+  gap:12px !important;
+  padding:16px !important;
+}
+html body[data-domain] .card:not(.app-hero) .consent-panel > strong {
+  color:var(--paper) !important;
+  font-size:12px !important;
+  letter-spacing:.02em !important;
+}
+html body[data-domain] .card:not(.app-hero) .consent-option {
+  display:grid !important;
+  grid-template-columns:18px minmax(0,1fr) !important;
+  align-items:start !important;
+  gap:11px !important;
+  min-width:0 !important;
+  padding:12px !important;
+  border:1px solid rgba(145,166,154,.18) !important;
+  border-radius:9px !important;
+  background:rgba(13,22,20,.3) !important;
+}
+html body[data-domain] .card:not(.app-hero) .consent-option input[type="checkbox"] {
+  width:16px !important;
+  height:16px !important;
+  min-height:16px !important;
+  margin:2px 0 0 !important;
+}
+html body[data-domain] .card:not(.app-hero) .consent-option label {
+  margin:0 !important;
+  color:#cbd7d0 !important;
+  font-size:11px !important;
+  font-weight:500 !important;
+  line-height:1.6 !important;
+  letter-spacing:0 !important;
+  cursor:pointer !important;
+}
+html body[data-domain] .card:not(.app-hero) .consent-option label strong {
+  display:block !important;
+  margin-top:4px !important;
+  color:var(--workspace-accent) !important;
+  font-size:10px !important;
+}
+html body[data-domain] .card:not(.app-hero) input[type="number"] {
+  font-variant-numeric:tabular-nums lining-nums !important;
+  text-align:start !important;
+}
+html body[data-domain] .card:not(.app-hero) input[type="number"]:out-of-range,
+html body[data-domain] .card:not(.app-hero) input[type="number"]:user-invalid {
+  border-color:#d98278 !important;
+}
+html body[data-domain] .card:not(.app-hero) input[type="number"]:user-invalid:focus-visible {
+  box-shadow:0 0 0 3px rgba(217,130,120,.14) !important;
+}
+@media(max-width:620px) {
+  html body[data-domain] #authCard .auth-actions { grid-template-columns:minmax(0,1fr) !important; }
+  html body[data-domain] .card:not(.app-hero) .consent-option { padding:10px !important; }
+}
