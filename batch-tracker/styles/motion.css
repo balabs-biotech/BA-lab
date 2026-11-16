@@ -1,0 +1,46 @@
+/* Restrained motion patterns inspired by OriginKit; no framework runtime. */
+html body[data-domain] .hero-particle-field {
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  opacity:.58 !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .hero-core { position:relative !important; isolation:isolate !important; overflow:visible !important; }
+html body[data-domain] .hero-core svg[hidden] { display:none !important; }
+html body[data-domain] .hero-pixi-canvas {
+  position:absolute !important;
+  inset:0 !important;
+  z-index:2 !important;
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  border-radius:50% !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .card,
+html body[data-domain] .culture-catalog-row,
+html body[data-domain] .culture-lineage-node {
+  transition:border-color 180ms ease,box-shadow 180ms ease,background-color 180ms ease,transform 180ms ease !important;
+}
+@media(hover:hover) and (pointer:fine) {
+  html body[data-domain] .culture-catalog-row:hover {
+    transform:translateY(-2px) !important;
+    border-color:var(--workspace-accent-border) !important;
+    box-shadow:0 12px 24px rgba(0,0,0,.18) !important;
+  }
+  html body[data-domain] .culture-lineage-node:hover { border-color:var(--workspace-accent) !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] *,
+  html body[data-domain] *::before,
+  html body[data-domain] *::after {
+    scroll-behavior:auto !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+}
