@@ -677,3 +677,67 @@ html body[data-domain="laboratory"] #batchCard #batchList > .batch-item.is-selec
   border-color:rgba(120,184,232,.42) !important;
   background:rgba(120,184,232,.17) !important;
 }
+
+
+/* PASS 132 — QC states remain legible without changing their underlying workflow values. */
+html body[data-domain="laboratory"] #batchCard #batchQcList .qc-row {
+  position:relative !important;
+  border-inline-start:3px solid rgba(145,166,154,.35) !important;
+  transition:background .16s ease,border-color .16s ease,box-shadow .16s ease !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchQcList .qc-row[data-qc-status="pending"] {
+  border-inline-start-color:#b9a56f !important;
+  background:linear-gradient(120deg,rgba(185,165,111,.075),rgba(17,27,29,.48) 62%) !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchQcList .qc-row[data-qc-status="pass"] {
+  border-inline-start-color:#8fb78f !important;
+  background:linear-gradient(120deg,rgba(143,183,143,.09),rgba(17,27,29,.48) 62%) !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchQcList .qc-row[data-qc-status="fail"] {
+  border-inline-start-color:#c77c70 !important;
+  background:linear-gradient(120deg,rgba(199,124,112,.11),rgba(17,27,29,.48) 62%) !important;
+}
+html body[data-domain="laboratory"] #batchCard #batchQcList .qc-row[data-qc-status="waived"] {
+  border-inline-start-color:#9d9ac7 !important;
+  background:linear-gradient(120deg,rgba(157,154,199,.09),rgba(17,27,29,.48) 62%) !important;
+}
+html body[data-domain="laboratory"] #batchCard .qc-state-indicator {
+  display:inline-flex !important;
+  align-items:center !important;
+  width:max-content !important;
+  max-width:100% !important;
+  margin-top:8px !important;
+  padding:4px 8px !important;
+  border:1px solid rgba(145,166,154,.22) !important;
+  border-radius:5px !important;
+  color:#c3d0c8 !important;
+  background:rgba(145,166,154,.08) !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  letter-spacing:.035em !important;
+}
+html body[data-domain="laboratory"] #batchCard .qc-row[data-qc-status="pending"] .qc-state-indicator {
+  color:#ddc88e !important;
+  border-color:rgba(185,165,111,.3) !important;
+  background:rgba(185,165,111,.1) !important;
+}
+html body[data-domain="laboratory"] #batchCard .qc-row[data-qc-status="pass"] .qc-state-indicator {
+  color:#b9d9b6 !important;
+  border-color:rgba(143,183,143,.3) !important;
+  background:rgba(143,183,143,.1) !important;
+}
+html body[data-domain="laboratory"] #batchCard .qc-row[data-qc-status="fail"] .qc-state-indicator {
+  color:#efaaa0 !important;
+  border-color:rgba(199,124,112,.34) !important;
+  background:rgba(199,124,112,.12) !important;
+}
+html body[data-domain="laboratory"] #batchCard .qc-row[data-qc-status="waived"] .qc-state-indicator {
+  color:#c4c1e7 !important;
+  border-color:rgba(157,154,199,.32) !important;
+  background:rgba(157,154,199,.1) !important;
+}
+html body[data-domain="laboratory"] #batchCard .qc-row select:focus-visible,
+html body[data-domain="laboratory"] #batchCard .qc-row .qc-save:focus-visible {
+  outline:2px solid #8bc5e8 !important;
+  outline-offset:3px !important;
+}
