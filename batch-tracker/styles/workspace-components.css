@@ -431,3 +431,87 @@ html body[data-domain] #measurementCard .observation-details > p {
     grid-template-columns:minmax(0,1fr) !important;
   }
 }
+
+
+/* PASS 136 — shared analytical tables: readable density, stable headers and safe horizontal navigation. */
+html body[data-domain] .card:not(.app-hero) .statistics-table-wrap {
+  position:relative !important;
+  max-width:100% !important;
+  overflow:auto !important;
+  overscroll-behavior-inline:contain !important;
+  scrollbar-width:thin !important;
+  scrollbar-color:var(--border-strong) transparent !important;
+  border:1px solid rgba(145,166,154,.18) !important;
+  border-radius:10px !important;
+  background:rgba(13,21,21,.32) !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table {
+  width:100% !important;
+  min-width:760px !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  table-layout:auto !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table caption {
+  padding:13px 15px !important;
+  color:var(--muted) !important;
+  text-align:start !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.045em !important;
+  caption-side:top !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table thead th {
+  position:sticky !important;
+  top:0 !important;
+  z-index:2 !important;
+  padding:11px 13px !important;
+  border-bottom:1px solid rgba(145,166,154,.24) !important;
+  background:#263633 !important;
+  color:#dce5dd !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  line-height:1.45 !important;
+  letter-spacing:.065em !important;
+  text-align:start !important;
+  text-transform:uppercase !important;
+  white-space:nowrap !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table tbody td {
+  padding:11px 13px !important;
+  border-bottom:1px solid rgba(145,166,154,.11) !important;
+  background:rgba(31,43,42,.58) !important;
+  color:#cbd5ce !important;
+  font-size:11px !important;
+  line-height:1.5 !important;
+  vertical-align:top !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table tbody tr:nth-child(even) td {
+  background:rgba(38,54,51,.56) !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table tbody tr:hover td {
+  background:color-mix(in srgb,var(--workspace-accent) 8%,#202d2b) !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table tbody tr:last-child td {
+  border-bottom:0 !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table :is(th,td):first-child {
+  border-inline-start:2px solid color-mix(in srgb,var(--workspace-accent) 55%,transparent) !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table :is(th,td):focus-within {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:-2px !important;
+}
+@media (max-width:680px) {
+  html body[data-domain] .card:not(.app-hero) .statistics-table-wrap {
+    margin-inline:-4px !important;
+    border-radius:8px !important;
+  }
+  html body[data-domain] .card:not(.app-hero) .statistics-table {
+    min-width:700px !important;
+  }
+  html body[data-domain] .card:not(.app-hero) .statistics-table :is(th,td) {
+    padding:9px 10px !important;
+  }
+}
