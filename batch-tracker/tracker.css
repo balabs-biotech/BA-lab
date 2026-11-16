@@ -22893,3 +22893,79 @@ body[data-domain] #cultureDetailPanel button[data-primary] {
     padding:10px !important;
   }
 }
+
+
+/* BA LABS CULTUREOPS — PASS 96
+   Final token contract: shared surfaces and hierarchy, domain accent only.
+   This block intentionally follows all legacy domain rules. */
+body[data-domain] {
+  --bg:#11191a !important;
+  --surface:#1b2525 !important;
+  --surface-2:#222f2e !important;
+  --surface-raised:#263432 !important;
+  --control-bg:#121b1a !important;
+  --border:#394846 !important;
+  --border-strong:#52645f !important;
+  --line:#394846 !important;
+  --text:#e9eeea !important;
+  --ink:#e9eeea !important;
+  --muted:#aab8b1 !important;
+  --paper:#f2f1e9 !important;
+  --workspace-bg:#11191a !important;
+  --workspace-surface:#1b2525 !important;
+  --workspace-panel:#222f2e !important;
+  --workspace-panel-raised:#263432 !important;
+  --workspace-text:#e9eeea !important;
+  --workspace-heading:#f2f1e9 !important;
+  --workspace-muted:#aab8b1 !important;
+  --workspace-border:#394846 !important;
+  --workspace-border-strong:#52645f !important;
+  color-scheme:dark !important;
+  color:var(--text) !important;
+  background:var(--bg) !important;
+  background-color:var(--bg) !important;
+}
+body[data-domain="agronomy"] {
+  --domain-accent:#b4f477 !important;
+  --workspace-accent:#b4f477 !important;
+  --workspace-accent-soft:rgba(180,244,119,.12) !important;
+  --workspace-accent-border:rgba(180,244,119,.42) !important;
+  --brand:#b4f477 !important;
+  --brand-hover:#c5fa91 !important;
+  --accent:#b4f477 !important;
+  --focus:#b4f477 !important;
+}
+body[data-domain="mycology"] {
+  --domain-accent:#c98259 !important;
+  --workspace-accent:#c98259 !important;
+  --workspace-accent-soft:rgba(201,130,89,.12) !important;
+  --workspace-accent-border:rgba(201,130,89,.42) !important;
+  --brand:#c98259 !important;
+  --brand-hover:#d99570 !important;
+  --accent:#c98259 !important;
+  --focus:#c98259 !important;
+}
+body[data-domain="laboratory"] {
+  --domain-accent:#78b8e8 !important;
+  --workspace-accent:#78b8e8 !important;
+  --workspace-accent-soft:rgba(120,184,232,.12) !important;
+  --workspace-accent-border:rgba(120,184,232,.42) !important;
+  --brand:#78b8e8 !important;
+  --brand-hover:#91c7ef !important;
+  --accent:#78b8e8 !important;
+  --focus:#78b8e8 !important;
+}
+body[data-domain] .app-toolbar,
+body[data-domain] .card,
+body[data-domain] #contextPanel,
+body[data-domain] .panel,
+body[data-domain] .auth-card,
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
+  color:var(--text) !important;
+  background-color:var(--surface) !important;
+  border-color:var(--border) !important;
+}
+body[data-domain] .app-hero {
+  color:var(--paper) !important;
+  background:linear-gradient(125deg,#263633 0%,#1b2525 62%,#172020 100%) !important;
+}
