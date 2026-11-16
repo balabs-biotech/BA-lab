@@ -22135,3 +22135,653 @@ body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-co
     display:none !important;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR WORKSTATION — PASS 95
+   Shared information hierarchy for culture, batch and observation
+   screens. Domain palettes remain supplied by data-domain tokens.
+   ============================================================ */
+body[data-domain] {
+  --interior-card-gap:18px;
+  --interior-radius:12px;
+  --interior-line:var(--border);
+  --interior-panel:var(--surface);
+  --interior-panel-raised:var(--surface-2);
+  --interior-panel-deep:var(--control-bg);
+  --interior-text:var(--text);
+  --interior-muted:var(--muted);
+  --interior-accent:var(--domain-accent);
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
+  display:block;
+  min-width:0;
+  padding:clamp(16px,2.2vw,26px) !important;
+  margin:0 0 var(--interior-card-gap) !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:16px !important;
+  background:var(--interior-panel) !important;
+  color:var(--interior-text) !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16) !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > .section-kicker {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:0 0 13px !important;
+  color:var(--interior-muted) !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.13em !important;
+  line-height:1.4;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > .section-kicker .kicker-line {
+  flex:1;
+  height:1px;
+  min-width:18px;
+  background:var(--interior-line) !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > h2,
+body[data-domain] #trackerCard .entry-intro h2 {
+  margin:0 0 8px !important;
+  color:var(--interior-text) !important;
+  font-size:clamp(21px,2.2vw,28px) !important;
+  font-weight:760 !important;
+  letter-spacing:-.035em !important;
+  line-height:1.15 !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > .muted,
+body[data-domain] #trackerCard .entry-intro > .muted {
+  max-width:78ch;
+  color:var(--interior-muted) !important;
+  font-size:13px !important;
+  line-height:1.65 !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(h3,h4) {
+  color:var(--interior-text) !important;
+  font-family:inherit !important;
+  letter-spacing:-.015em !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(label,.hint,small) {
+  color:var(--interior-muted) !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(input:not([type=checkbox]):not([type=radio]),select,textarea) {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  min-height:42px;
+  padding:10px 12px !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:9px !important;
+  background:var(--control-bg) !important;
+  color:var(--text) !important;
+  font:inherit;
+  font-size:14px;
+  box-shadow:none !important;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) textarea {
+  min-height:92px;
+  line-height:1.55;
+  resize:vertical;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(input,select,textarea)::placeholder {
+  color:var(--muted) !important;
+  opacity:.78;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(input,select,textarea):focus {
+  border-color:var(--domain-accent) !important;
+  outline:2px solid color-mix(in srgb,var(--domain-accent) 24%,transparent) !important;
+  outline-offset:1px;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) .grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px 16px;
+  align-items:start;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) .grid > div {
+  min-width:0;
+}
+body[data-domain] #trackerCard .entry-intro {
+  margin:0 0 17px;
+  padding:0 0 15px;
+  border-bottom:1px solid var(--interior-line);
+}
+body[data-domain] #trackerCard .entry-step-mark {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--interior-accent) !important;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+body[data-domain] #smartEntryPanel,
+body[data-domain] .assisted-entry-panel,
+body[data-domain] .batch-create-panel,
+body[data-domain] .batch-compare-panel,
+body[data-domain] .bio-operation-panel,
+body[data-domain] .bio-lineage-panel,
+body[data-domain] .quick-capture,
+body[data-domain] .observation-details,
+body[data-domain] .statistics-filters {
+  min-width:0;
+  margin:16px 0 !important;
+  padding:clamp(13px,1.8vw,19px) !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:var(--interior-radius) !important;
+  background:var(--interior-panel-raised) !important;
+  color:var(--interior-text) !important;
+  box-shadow:none !important;
+}
+body[data-domain] #smartEntryPanel .assisted-entry-heading,
+body[data-domain] .culture-catalog-heading,
+body[data-domain] .culture-detail-heading,
+body[data-domain] .batch-create-heading,
+body[data-domain] .measurement-history-heading,
+body[data-domain] .overview-section-heading {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  min-width:0;
+}
+body[data-domain] .culture-catalog {
+  margin-top:20px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+body[data-domain] .culture-catalog-heading {
+  align-items:center;
+  margin:0 0 13px;
+}
+body[data-domain] .culture-catalog-heading h3,
+body[data-domain] .culture-detail-heading h3 {
+  margin:0 0 5px !important;
+  font-size:17px !important;
+  font-weight:740 !important;
+}
+body[data-domain] .culture-catalog-heading p {
+  margin:0;
+  max-width:68ch;
+  font-size:12px;
+  line-height:1.55;
+  color:var(--interior-muted) !important;
+}
+body[data-domain] .culture-catalog-count {
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:32px;
+  min-height:30px;
+  padding:3px 9px;
+  border:1px solid var(--interior-line);
+  border-radius:8px;
+  background:var(--interior-panel-raised);
+  color:var(--interior-accent) !important;
+  font-size:12px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] .culture-catalog-filters {
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(180px,1fr);
+  gap:12px;
+  margin:0 0 12px;
+  padding:13px;
+  border:1px solid var(--interior-line);
+  border-radius:11px;
+  background:var(--interior-panel-raised);
+}
+body[data-domain] .culture-catalog-filters > div { min-width:0; }
+body[data-domain] .culture-catalog-list {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  min-width:0;
+}
+body[data-domain] .culture-catalog-list > .muted {
+  grid-column:1/-1;
+  margin:0;
+  padding:18px;
+  border:1px dashed var(--interior-line);
+  border-radius:10px;
+  text-align:center;
+  line-height:1.6;
+}
+body[data-domain] .culture-catalog-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-width:0;
+  padding:13px 14px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:11px !important;
+  background:var(--interior-panel-raised) !important;
+  transition:border-color .16s ease,transform .16s ease,background .16s ease;
+}
+body[data-domain] .culture-catalog-row:hover {
+  border-color:color-mix(in srgb,var(--interior-accent) 65%,var(--interior-line)) !important;
+  background:color-mix(in srgb,var(--interior-accent) 5%,var(--interior-panel-raised)) !important;
+  transform:translateY(-1px);
+}
+body[data-domain] .culture-catalog-main { flex:1 1 auto; min-width:0; }
+body[data-domain] .culture-catalog-code {
+  display:block;
+  overflow-wrap:anywhere;
+  color:var(--interior-text) !important;
+  font-size:13px;
+  font-weight:780;
+  line-height:1.4;
+}
+body[data-domain] .culture-catalog-meta {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:5px 8px;
+  margin-top:7px;
+  color:var(--interior-muted) !important;
+  font-size:10px;
+  line-height:1.45;
+}
+body[data-domain] .culture-catalog-meta span:first-child {
+  display:inline-flex;
+  padding:3px 7px;
+  border:1px solid var(--interior-line);
+  border-radius:6px;
+  background:color-mix(in srgb,var(--interior-accent) 10%,var(--interior-panel));
+  color:var(--interior-accent) !important;
+  font-weight:700;
+}
+body[data-domain] .culture-catalog-actions {
+  display:flex;
+  flex:0 0 auto;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px;
+}
+body[data-domain] .culture-catalog-action {
+  min-height:34px;
+  padding:6px 9px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:7px !important;
+  background:var(--interior-panel) !important;
+  color:var(--interior-text) !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  white-space:nowrap;
+}
+body[data-domain] .culture-catalog-action[data-culture-action="observe"] {
+  border-color:var(--interior-accent) !important;
+  background:var(--interior-accent) !important;
+  color:#151a16 !important;
+}
+body[data-domain] .culture-detail {
+  margin-top:16px;
+  padding:16px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:13px !important;
+  background:var(--interior-panel) !important;
+}
+body[data-domain] .culture-detail-heading {
+  align-items:center;
+  padding-bottom:13px;
+  border-bottom:1px solid var(--interior-line);
+}
+body[data-domain] .culture-detail-summary {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin:14px 0;
+}
+body[data-domain] .culture-detail-field {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+  padding:11px 12px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:9px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] .culture-detail-field span {
+  color:var(--interior-muted) !important;
+  font-size:10px;
+  font-weight:650;
+  letter-spacing:.035em;
+}
+body[data-domain] .culture-detail-field strong {
+  color:var(--interior-text) !important;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+body[data-domain] .bio-operation-panel > h4,
+body[data-domain] .bio-lineage-panel > h4 {
+  margin:0 0 7px !important;
+  font-size:14px !important;
+}
+body[data-domain] .bio-operation-panel > p {
+  margin:0 0 13px;
+  color:var(--interior-muted) !important;
+  font-size:12px;
+  line-height:1.55;
+}
+body[data-domain] .bio-operation-form {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+body[data-domain] .bio-operation-form > div { min-width:0; }
+body[data-domain] .bio-operation-form .bio-operation-wide { grid-column:1/-1; }
+body[data-domain] .culture-lineage {
+  min-width:0;
+  overflow-x:auto;
+  padding:10px;
+  border:1px solid var(--interior-line);
+  border-radius:9px;
+  background:var(--interior-panel);
+}
+body[data-domain] .culture-detail-timeline {
+  display:grid;
+  gap:9px;
+  margin-top:12px;
+}
+body[data-domain] .culture-linked-batches {
+  display:grid;
+  gap:8px;
+  margin-bottom:12px;
+}
+body[data-domain] .culture-linked-batches > h3 {
+  margin:0 0 3px !important;
+  font-size:13px !important;
+}
+body[data-domain] .culture-timeline-entry {
+  display:grid;
+  grid-template-columns:minmax(130px,190px) minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+  min-width:0;
+  padding:12px 13px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:9px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] .culture-timeline-date {
+  color:var(--interior-muted) !important;
+  font-size:10px;
+  line-height:1.5;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] .culture-timeline-entry strong {
+  color:var(--interior-text) !important;
+  font-size:12px;
+}
+body[data-domain] .culture-timeline-entry p {
+  margin:4px 0 0;
+  color:var(--interior-muted) !important;
+  font-size:11px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+body[data-domain] .batch-create-heading { margin-bottom:15px; }
+body[data-domain] .batch-create-heading h3 {
+  margin:5px 0 !important;
+  font-size:17px !important;
+}
+body[data-domain] .batch-create-heading p {
+  margin:0;
+  max-width:65ch;
+  color:var(--interior-muted) !important;
+  font-size:12px;
+  line-height:1.55;
+}
+body[data-domain] .batch-list {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin:12px 0;
+}
+body[data-domain] .batch-item {
+  min-width:0;
+  padding:13px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:10px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] .batch-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+body[data-domain] .batch-stat {
+  min-width:0;
+  padding:10px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:8px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] .batch-stat-label {
+  color:var(--interior-muted) !important;
+  font-size:10px;
+  line-height:1.4;
+}
+body[data-domain] .batch-stat-value {
+  margin-top:4px;
+  color:var(--interior-text) !important;
+  font-size:12px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+body[data-domain] .stage-list {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:12px 0;
+}
+body[data-domain] .stage {
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  padding:10px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:9px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] .stage.active {
+  border-color:var(--interior-accent) !important;
+  background:color-mix(in srgb,var(--interior-accent) 10%,var(--interior-panel-raised)) !important;
+  box-shadow:inset 3px 0 var(--interior-accent) !important;
+}
+body[data-domain] .stage-name { color:var(--interior-text) !important; font-size:12px; font-weight:700; }
+body[data-domain] .stage-status { font-size:10px; }
+body[data-domain] .batch-event-list {
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+body[data-domain] .batch-event-item {
+  display:grid;
+  gap:5px;
+  min-width:0;
+  padding:11px 13px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:9px !important;
+  background:var(--interior-panel-raised) !important;
+  color:var(--interior-text) !important;
+  overflow-wrap:anywhere;
+}
+body[data-domain] .batch-event-item strong { color:var(--interior-text) !important; font-size:12px; }
+body[data-domain] .batch-event-item > div { color:var(--interior-muted) !important; font-size:11px; line-height:1.5; }
+body[data-domain] .batch-harvest-entry {
+  margin:12px 0;
+  padding:13px;
+  border:1px solid var(--interior-line);
+  border-radius:10px;
+  background:var(--interior-panel-raised);
+}
+body[data-domain] .batch-harvest-entry h4 { margin:0 0 5px !important; font-size:13px !important; }
+body[data-domain] .batch-harvest-entry p { color:var(--interior-muted) !important; font-size:11px; line-height:1.5; }
+body[data-domain] .quick-capture-heading { display:flex; justify-content:space-between; gap:12px; }
+body[data-domain] .quick-capture-heading h3 { margin:4px 0 !important; font-size:16px !important; }
+body[data-domain] .quick-capture-heading p { margin:0; color:var(--interior-muted) !important; font-size:12px; line-height:1.5; }
+body[data-domain] .quick-capture-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+  margin-top:13px;
+}
+body[data-domain] .quick-capture-tile {
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) 12px;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  min-height:65px;
+  padding:10px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:9px !important;
+  background:var(--interior-panel) !important;
+  color:var(--interior-text) !important;
+  text-align:left;
+}
+body[data-domain] .quick-capture-icon {
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border:1px solid var(--interior-line);
+  border-radius:8px;
+  background:var(--interior-panel-raised);
+  color:var(--interior-accent) !important;
+  font-size:11px;
+  font-weight:800;
+}
+body[data-domain] .quick-capture-tile strong { display:block; color:var(--interior-text) !important; font-size:11px; }
+body[data-domain] .quick-capture-tile small { display:block; margin-top:3px; color:var(--interior-muted) !important; font-size:9px; line-height:1.4; }
+body[data-domain] .quick-capture-arrow { color:var(--interior-accent) !important; }
+body[data-domain] #measurementCard .measurement-history {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  min-width:0;
+}
+body[data-domain] #measurementCard .measurement-entry {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:7px 12px;
+  min-width:0;
+  padding:12px 13px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:10px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] .measurement-entry strong { color:var(--interior-text) !important; font-size:12px; }
+body[data-domain] .measurement-meta,
+body[data-domain] .measurement-stamp { color:var(--interior-muted) !important; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+body[data-domain] .measurement-value {
+  color:var(--interior-accent) !important;
+  font-size:17px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+body[data-domain] .measurement-stamp { grid-column:1/-1; padding-top:6px; border-top:1px solid var(--interior-line); }
+body[data-domain] .measurement-history-heading { align-items:center; margin:16px 0 10px; }
+body[data-domain] .measurement-history-heading h3 { margin:3px 0 0 !important; font-size:15px !important; }
+body[data-domain] #measurementCard .observation-details {
+  display:block;
+  margin-top:18px !important;
+}
+body[data-domain] #measurementCard .observation-details > summary {
+  color:var(--interior-text);
+  font-size:13px;
+  font-weight:740;
+  cursor:pointer;
+}
+body[data-domain] #statisticsCard .statistics-summary {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+}
+body[data-domain] #statisticsCard .statistics-summary-item {
+  min-width:0;
+  padding:12px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:9px !important;
+  background:var(--interior-panel-raised) !important;
+}
+body[data-domain] #statisticsCard .statistics-summary-item strong {
+  color:var(--interior-text) !important;
+  font-size:18px;
+  font-variant-numeric:tabular-nums;
+}
+body[data-domain] #statisticsCard .statistics-summary-item span {
+  color:var(--interior-muted) !important;
+  font-size:10px;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) :is(button,.button) {
+  min-height:38px;
+  border-radius:8px !important;
+  font-size:12px;
+  font-weight:700;
+}
+body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) .secondary-button {
+  border:1px solid var(--interior-line) !important;
+  background:var(--interior-panel) !important;
+  color:var(--interior-text) !important;
+  box-shadow:none !important;
+}
+@media(max-width:1050px) {
+  body[data-domain] .culture-catalog-list { grid-template-columns:minmax(0,1fr); }
+  body[data-domain] .quick-capture-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body[data-domain] .batch-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:700px) {
+  body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
+    padding:14px !important;
+    border-radius:13px !important;
+  }
+  body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) .grid,
+  body[data-domain] .bio-operation-form {
+    grid-template-columns:minmax(0,1fr);
+    gap:10px;
+  }
+  body[data-domain] .bio-operation-form .bio-operation-wide { grid-column:auto; }
+  body[data-domain] .culture-catalog-filters { grid-template-columns:minmax(0,1fr); padding:10px; }
+  body[data-domain] .culture-catalog-row {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:9px;
+    padding:12px !important;
+  }
+  body[data-domain] .culture-catalog-actions { justify-content:flex-start; }
+  body[data-domain] .culture-catalog-action { flex:1 1 auto; }
+  body[data-domain] .culture-detail-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body[data-domain] .culture-detail-heading { align-items:flex-start; }
+  body[data-domain] .culture-timeline-entry { grid-template-columns:minmax(0,1fr); gap:4px; }
+  body[data-domain] .batch-list,
+  body[data-domain] .stage-list,
+  body[data-domain] #measurementCard .measurement-history { grid-template-columns:minmax(0,1fr); }
+  body[data-domain] .stage { grid-template-columns:28px minmax(0,1fr) auto; }
+  body[data-domain] #statisticsCard .statistics-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body[data-domain] .quick-capture-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:380px) {
+  body[data-domain] .culture-detail-summary,
+  body[data-domain] .batch-grid,
+  body[data-domain] .quick-capture-grid { grid-template-columns:minmax(0,1fr); }
+  body[data-domain] .culture-detail-heading { flex-direction:column; }
+  body[data-domain] .culture-detail-heading button { width:100%; }
+  body[data-domain] .stage { grid-template-columns:26px minmax(0,1fr); }
+  body[data-domain] .stage-status { grid-column:2; }
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-domain] .culture-catalog-row { transition:none; }
+}
