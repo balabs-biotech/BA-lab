@@ -267,12 +267,23 @@ async function checkWorkingScene(name, viewport) {
     assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
     const terminalPoint = await page.evaluate((title) => { const button=[...document.querySelectorAll('.webgl-resource-target[data-depth="0"][data-has-children="false"][data-resource-url]')].find(item=>item.title===title&&getComputedStyle(item).display!=='none'); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; }, branchTarget.title);
     assert.ok(terminalPoint, name + ': at least one page must expose an unobstructed DOM hit target');
-    const popupPromise = page.context().waitForEvent('page', { timeout: 10000 });
+    const notionRequest = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(name + ': terminal branch did not request its Notion destination')), 10000);
+      page.context().on('page', popup => {
+        popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {}).then(() => {
+          if (/notion\.(so|site|com)/i.test(popup.url())) { clearTimeout(timer); resolve(popup); }
+        });
+      });
+      page.on('request', request => {
+        if (/https?:\/\/(?:www\.)?notion\.(?:so|site|com)\//i.test(request.url())) {
+          clearTimeout(timer); resolve({ url: () => request.url(), close: async () => {} });
+        }
+      });
+    });
     await tapSpatialTarget(page, name, terminalPoint.x, terminalPoint.y, '.webgl-resource-target[data-depth="0"][data-has-children="false"][title='+JSON.stringify(terminalPoint.title)+']');
-    const popup = await popupPromise;
-    await popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {});
-    assert.match(popup.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
-    await popup.close();
+    const destination = await notionRequest;
+    assert.match(destination.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
+    await destination.close();
     openedNotion = true;
     break;
   }
