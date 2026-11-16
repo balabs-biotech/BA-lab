@@ -22784,3 +22784,23 @@ body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#stati
 @media(prefers-reduced-motion:reduce) {
   body[data-domain] .culture-catalog-row { transition:none; }
 }
+
+/* CULTUREOPS — PASS 96: shared containers for catalogue and batch lists */
+body[data-domain] :is(#cultureCatalogList,#plantCultureList,#batchList) {
+  min-width:0;
+  padding:12px !important;
+  border:1px solid var(--interior-line) !important;
+  border-radius:11px !important;
+  background:var(--interior-panel) !important;
+  color:var(--interior-text) !important;
+}
+body[data-domain] #cultureCatalogList,
+body[data-domain] #batchList {
+  gap:10px !important;
+}
+@media(max-width:700px) {
+  body[data-domain] :is(#cultureCatalogList,#plantCultureList,#batchList) {
+    padding:10px !important;
+    border-radius:10px !important;
+  }
+}
