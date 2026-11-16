@@ -281,6 +281,54 @@ try {
           failures.push(`${workspace.slug}/${viewport.name}: dashboard overview preview failed ${JSON.stringify(overviewState)}`);
         }
       }
+      const interiorState = await page.evaluate(() => {
+        const fixtures = [
+          ["#cultureCatalogList", "culture-catalog-row", "Culture P80"],
+          ["#cultureDetailSummary", "culture-detail-field", "Identifiant"],
+          ["#measurementHistory", "measurement-entry", "Température"],
+          ["#batchList", "batch-item", "Lot de test"],
+          ["#batchStageList", "stage active", "Incubation"],
+        ];
+        const checks = [];
+        for (const [parentSelector, className, label] of fixtures) {
+          const parent = document.querySelector(parentSelector);
+          if (!parent) {
+            checks.push({ parentSelector, missing: true });
+            continue;
+          }
+          const fixture = document.createElement("article");
+          fixture.className = className;
+          fixture.textContent = label;
+          parent.appendChild(fixture);
+          const style = getComputedStyle(fixture);
+          checks.push({
+            parentSelector,
+            background: style.backgroundColor,
+            border: style.borderTopColor,
+            radius: style.borderTopLeftRadius,
+            padding: style.padding,
+            accent: style.borderTopColor === getComputedStyle(document.body).getPropertyValue("--domain-accent").trim(),
+          });
+          fixture.remove();
+        }
+        return {
+          checks,
+          catalogLayout: getComputedStyle(document.querySelector("#cultureCatalogList")).display,
+          measurementLayout: getComputedStyle(document.querySelector("#measurementHistory")).display,
+          detailGrid: getComputedStyle(document.querySelector("#cultureDetailSummary")).gridTemplateColumns,
+        };
+      });
+      for (const check of interiorState.checks) {
+        if (check.missing) failures.push(`${workspace.slug}/${viewport.name}: interior fixture parent missing (${check.parentSelector})`);
+        else if (check.background === "rgba(0, 0, 0, 0)" || check.radius === "0px" || check.padding === "0px") {
+          failures.push(`${workspace.slug}/${viewport.name}: interior component lacks applied surface treatment (${check.parentSelector}: ${JSON.stringify(check)})`);
+        }
+      }
+      if (interiorState.catalogLayout !== "grid" || interiorState.measurementLayout !== "grid") {
+        failures.push(`${workspace.slug}/${viewport.name}: interior list layout not applied (${JSON.stringify(interiorState)})`);
+      }
+      if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
+      if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);
       console.log(JSON.stringify({ workspace: workspace.slug, viewport: viewport.name, metrics, pageErrors, badResponses, screenshot: screenshotPath }));
       await context.close();
     }
