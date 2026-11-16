@@ -327,7 +327,7 @@ try {
               }
             };
             visit(rules);
-            stylesheetDiagnostics.push({ href: sheet.href, ruleCount: rules.length });
+            stylesheetDiagnostics.push({ href: sheet.href, ruleCount: rules.length, lastRules: rules.slice(-18).map(rule => rule.selectorText || rule.cssText?.slice(0,180)) });
           }
           checks.push({
             parentSelector,
