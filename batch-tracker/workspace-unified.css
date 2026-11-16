@@ -1,3 +1,11 @@
+@import url("./styles/design-tokens.css");
+@import url("./styles/workspace-components.css");
+@import url("./styles/mycology-workspace.css");
+@import url("./styles/motion.css");
+@import url("./styles/responsive.css");
+
+/* Existing navigation refinements are retained while the shared component
+   foundation is progressively extracted from the legacy stylesheet. */
 
 
 /* PASS 113 — one navigation system across all three workspaces. */
