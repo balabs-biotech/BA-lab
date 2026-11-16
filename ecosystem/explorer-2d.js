@@ -18,9 +18,20 @@ function layout(initial=false){
   pairs.forEach(([a,b],i)=>{const A=nodes.find(n=>n.id===a),B=nodes.find(n=>n.id===b);if(A&&B)edges.push({a:A,b:B,i,cross:true})});
  }else{
   const parent={id:current.id,title:current.title,x:0,y:0,r:9,level:0,data:current,rootId:trail[0].id};nodes.push(parent);
-  const kids=current.children||[],radius=kids.length>9?360:285;
-  kids.forEach((d,i)=>{const angle=-Math.PI/2+i*2*Math.PI/Math.max(1,kids.length),ring=kids.length>14&&i>=14?1.45:1;const n={id:d.id,title:d.title,x:Math.cos(angle)*radius*ring,y:Math.sin(angle)*radius*.76*ring,r:d.children?.length?6.5:4.5,level:1,data:d,rootId:parent.rootId};nodes.push(n);edges.push({a:parent,b:n,i})});
-  const kidsOnly=nodes.slice(1);kidsOnly.forEach((n,i)=>{if(i%3===0&&kidsOnly.length>4)edges.push({a:n,b:kidsOnly[(i+2)%kidsOnly.length],i:i+40,cross:true})});
+  const kids=current.children||[],count=kids.length;
+  // Uneven radial growth: branches occupy different lengths instead of a perfect ring.
+  kids.forEach((d,i)=>{
+   const angle=-Math.PI/2+i*2*Math.PI/Math.max(1,count)+(i%2?-.09:.07);
+   const radius=190+((i*67+count*23)%145)+(d.children?.length?24:0);
+   const n={id:d.id,title:d.title,x:Math.cos(angle)*radius,y:Math.sin(angle)*radius*.78,r:d.children?.length?6.5:4.5,level:1,data:d,rootId:parent.rootId};
+   nodes.push(n);edges.push({a:parent,b:n,i});
+  });
+  // Anastomoses between neighbouring branches form a mesh, not isolated spokes.
+  const kidsOnly=nodes.slice(1);
+  kidsOnly.forEach((n,i)=>{
+   if(count>2)edges.push({a:n,b:kidsOnly[(i+1)%count],i:i+40,cross:true});
+   if(count>4&&i%2===0)edges.push({a:n,b:kidsOnly[(i+3)%count],i:i+70,cross:true});
+  });
  }
  if(initial){fit();scale=targetScale;offset={...targetOffset}}
  updateUI();draw();
@@ -30,7 +41,22 @@ function draw(){
  ctx.clearRect(0,0,w,h);
  for(let i=0;i<42;i++){const x=(i*137.5)%w,y=(i*83.7)%h;ctx.fillStyle=i%4===0?"#b96b4d20":"#d1d0c510";ctx.fillRect(x,y,1,1)}
  const curves=[];
- edges.forEach(e=>{const a=screen(e.a),b=screen(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,bend=Math.min(34,len*.13)*(e.i%2?1:-1),cx=(a.x+b.x)/2-dy/len*bend,cy=(a.y+b.y)/2+dx/len*bend;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(cx,cy,b.x,b.y);ctx.strokeStyle=e.cross?"#b96b4d35":(PALETTE[e.a.rootId]||"#78958a")+"88";ctx.lineWidth=e.cross?.8:1.1;ctx.stroke();curves.push({a,b,cx,cy,e})});
+ edges.forEach(e=>{
+  const a=screen(e.a),b=screen(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+  const bend=Math.min(42,len*.17)*(e.i%2?1:-1),cx=(a.x+b.x)/2-dy/len*bend,cy=(a.y+b.y)/2+dx/len*bend;
+  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+  ctx.strokeStyle=e.cross?"#b96b4d38":(PALETTE[e.a.rootId]||"#78958a")+"88";ctx.lineWidth=e.cross?.75:1.05;ctx.stroke();
+  // Fine lateral hyphae branch off the main filament at two points.
+  if(!e.cross&&len>70){
+   [.34,.68].forEach((t,j)=>{
+    const u=1-t,px=u*u*a.x+2*u*t*cx+t*t*b.x,py=u*u*a.y+2*u*t*cy+t*t*b.y;
+    const side=(e.i+j)%2?1:-1,reach=Math.min(19,len*.09);
+    ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(px-dy/len*reach*side*.55,py+dx/len*reach*side*.55,px-dy/len*reach*side,py+dx/len*reach*side);
+    ctx.strokeStyle="#9db5a044";ctx.lineWidth=.65;ctx.stroke();
+   });
+  }
+  curves.push({a,b,cx,cy,e});
+ });
  if(!reduced)curves.forEach((c,i)=>{const q=(performance.now()*.000025+i*.19)%1,u=1-q,x=u*u*c.a.x+2*u*q*c.cx+q*q*c.b.x,y=u*u*c.a.y+2*u*q*c.cy+q*q*c.b.y;ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fillStyle="#d1d0c5aa";ctx.fill()});
  nodes.forEach(n=>{const p=screen(n),r=Math.max(3,n.r*Math.sqrt(scale)),color=PALETTE[n.rootId]||"#d1d0c5";ctx.beginPath();ctx.arc(p.x,p.y,r+5,0,Math.PI*2);ctx.strokeStyle=color+"44";ctx.lineWidth=1;ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle="#111b1d";ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+10,0,Math.PI*2);ctx.setLineDash([2,4]);ctx.strokeStyle="#d1d0c5";ctx.stroke();ctx.setLineDash([])}
   // Labels are screen-space text: font size is deliberately independent of camera zoom.
