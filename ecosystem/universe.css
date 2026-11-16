@@ -55,3 +55,8 @@ a:focus-visible{outline:2px solid #d18a6b;outline-offset:3px}
 .search-results[hidden]{display:none!important}
 .result-path{margin:0 0 8px!important;color:#d18a6b!important;font-size:10px!important;letter-spacing:.03em}
 .search-results .node{min-height:145px}
+
+/* Unpublished entries are visible but never masquerade as active links. */
+.node[data-kind="planned"]{border-style:dashed;border-color:#52665b;background:linear-gradient(145deg,#202b28,#18221f);cursor:default;opacity:.82}
+.node[data-kind="planned"]:hover{transform:none;border-color:#718579;background:linear-gradient(145deg,#202b28,#18221f)}
+.node[data-kind="planned"] .number,.node[data-kind="planned"] .open{color:#a9b5aa}
