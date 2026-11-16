@@ -22,18 +22,16 @@ try {
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
     const visibleNodes = await nav.count();
     assert.ok(visibleNodes >= 8, 'At least the eight universe roots must be available');
-    await page.locator('#field').evaluate((canvas) => {
+    const target = await page.locator('#field').evaluate((canvas) => {
       const rect = canvas.getBoundingClientRect();
       const pad = Math.min(150, Math.max(78, rect.width * .16));
       const overviewScale = Math.max(.26, Math.min(.62,
         (rect.width - pad * 2) / 1390,
         (rect.height - pad * 2) / 1390,
       ));
-      const x = rect.width / 2;
-      const y = rect.height / 2 - 570 * overviewScale;
-      canvas.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 71, pointerType: 'mouse', clientX: rect.left + x, clientY: rect.top + y, button: 0 }));
-      canvas.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 71, pointerType: 'mouse', clientX: rect.left + x, clientY: rect.top + y, button: 0 }));
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 - 570 * overviewScale };
     });
+    await page.mouse.click(target.x, target.y);
     await page.locator('#selection .card').waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
     await page.locator('#zoomIn').click();
