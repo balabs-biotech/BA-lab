@@ -3516,13 +3516,16 @@ function renderBatchQc(
       );
 
 
-    row.className =
-      "qc-row";
+    row.className = "qc-row";
 
-
-    const status =
-      check.status ||
-      "pending";
+    const status = check.status || "pending";
+    const statusLabels = {
+      pending: "En attente",
+      pass: "Conforme",
+      fail: "Échec",
+      waived: "Dérogation"
+    };
+    row.dataset.qcStatus = status;
 
 
     row.innerHTML = `
@@ -3540,6 +3543,10 @@ function renderBatchQc(
           ${escapeHtml(
             check.check_code
           )}
+        </span>
+
+        <span class="qc-state-indicator" data-qc-state-label>
+          ${escapeHtml(statusLabels[status] || "Statut non reconnu")}
         </span>
 
       </div>
@@ -3598,9 +3605,14 @@ function renderBatchQc(
     `;
 
 
-    batchQcList.appendChild(
-      row
-    );
+    batchQcList.appendChild(row);
+
+    const statusSelect = row.querySelector("[data-qc-status]");
+    statusSelect?.addEventListener("change", () => {
+      row.dataset.qcStatus = statusSelect.value;
+      const indicator = row.querySelector("[data-qc-state-label]");
+      if (indicator) indicator.textContent = statusLabels[statusSelect.value] || "Statut non reconnu";
+    });
 
   }
 
