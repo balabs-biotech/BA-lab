@@ -101,7 +101,8 @@
           "children": []
         }
       ],
-      "notionParentId": "hub"
+      "notionParentId": "hub",
+      "description": "Applied biotechnology across microorganisms, biological substrates, fermentation and plant-culture systems. Explore the documented topics and their experimental context."
     },
     {
       "id": "soil",
@@ -260,7 +261,8 @@
           "children": []
         }
       ],
-      "notionParentId": "language"
+      "notionParentId": "language",
+      "description": "Public biological resources and product prototypes, with clear distinctions between available catalogue items and concepts still under development."
     },
     {
       "id": "work",
@@ -293,7 +295,8 @@
           "children": []
         }
       ],
-      "notionParentId": "language"
+      "notionParentId": "language",
+      "description": "Research and development at BA Labs: documented work, experimental questions, prototypes, measurements and the limits of current evidence."
     },
     {
       "id": "learn",
