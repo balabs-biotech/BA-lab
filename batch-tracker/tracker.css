@@ -23016,7 +23016,10 @@ body[data-domain] #batchList .batch-item:hover {
 html body[data-domain] #batchList > * {
   min-width:0 !important;
   color:var(--text) !important;
-  background-color:var(--surface-raised) !important;
+  /* Use a concrete shared surface here: legacy Mycology background shorthands
+     were still winning in the browser fixture despite the token cascade. */
+  background:#293735 !important;
+  background-color:#293735 !important;
   border:1px solid var(--border) !important;
   border-radius:10px !important;
   padding:14px 16px !important;
@@ -23029,4 +23032,12 @@ html body[data-domain] #batchList > .batch-item strong { color:var(--paper) !imp
 html body[data-domain] #batchList > .batch-item .muted { color:var(--muted) !important; }
 @media(max-width:700px) {
   html body[data-domain] #batchList > * { padding:12px !important; }
+}
+
+
+/* BA LABS CULTUREOPS — PASS 100
+   Lock the batch-history child surface to the shared opaque graphite panel. */
+html body[data-domain] #batchList > * {
+  background:#293735 !important;
+  background-color:#293735 !important;
 }
