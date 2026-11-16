@@ -50,7 +50,7 @@ function curve(a,b,seed){const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,be
 function strokeFilament(a,b,depth,seed,cross=false){
  const p=screen(a),q=screen(b),c=curve(p,q,seed),len=Math.hypot(q.x-p.x,q.y-p.y);
  ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.quadraticCurveTo(c.x,c.y,q.x,q.y);
- const rootColor=PALETTE[a.rootId]||"#91a99b",width=cross?.55:Math.max(.45,(depth===1?1.5:depth===2?1.15:.85)*Math.sqrt(scale));
+ const rootColor=PALETTE[a.rootId]||"#91a99b",width=cross? .55:Math.max(.45,(depth===1?1.5:depth===2?1.15:.85)*Math.sqrt(scale));
  if(!cross&&depth<=2&&len>34){ctx.strokeStyle=rootColor+"18";ctx.lineWidth=width*3.4;ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.quadraticCurveTo(c.x,c.y,q.x,q.y);}
  ctx.strokeStyle=cross?"#b96b4d35":rootColor+(depth>=3?"55":depth===2?"85":"b0");ctx.lineWidth=width;ctx.lineCap="round";ctx.stroke();
  // Fine lateral hyphae and bifurcating tips.
@@ -70,7 +70,7 @@ function draw(){
  // Fine suspended spores give the field depth without a decorative starfield.
  for(let i=0;i<230;i++){const x=((i*137.51)%w),y=((i*83.71)%h),alpha=i%5===0?".19":".07";ctx.fillStyle=i%7===0?"#b96b4d"+alpha:"#d1d0c5"+alpha;ctx.fillRect(x,y,i%9===0?1.6:1,1);}
  const visibleEdges=edges.filter(e=>levelOpacity(Math.max(e.a.level,e.b.level))>.015);
- visibleEdges.forEach(e=>{const alpha=levelOpacity(Math.max(e.a.level,e.b.level));ctx.globalAlpha=alpha;const c=strokeFilament(e.a,e.b,e.depth,e.seed,e.cross);if(!reduced&&!e.cross&&alpha>.2){const phase=performance.now()*.00012+(e.seed%100)*.013,q=(phase*(e.depth===1?.7:.48))%1,u=1-q,x=u*u*c.p.x+2*u*q*c.c.x+q*q*c.q.x,y=u*u*c.p.y+2*u*q*c.c.y+q*q*c.q.y;ctx.beginPath();ctx.arc(x,y,Math.max(.8,1.2*scale**.15),0,Math.PI*2);ctx.fillStyle="#dce5d9";ctx.fill();}ctx.globalAlpha=1;});
+ visibleEdges.forEach(e=>{const alpha=levelOpacity(Math.max(e.a.level,e.b.level));ctx.globalAlpha=alpha;const c=strokeFilament(e.a,e.b,e.depth,e.seed,e.cross);if(!reduced&&!e.cross&&alpha>.2){const phase=performance.now()*.00012+(e.seed%100)*.013,q=(phase*(e.depth===1? .7:.48))%1,u=1-q,x=u*u*c.p.x+2*u*q*c.c.x+q*q*c.q.x,y=u*u*c.p.y+2*u*q*c.c.y+q*q*c.q.y;ctx.beginPath();ctx.arc(x,y,Math.max(.8,1.2*scale**.15),0,Math.PI*2);ctx.fillStyle="#dce5d9";ctx.fill();}ctx.globalAlpha=1;});
  nodes.forEach(n=>{
   const alpha=levelOpacity(n.level);if(alpha<.015)return;const p=screen(n),r=Math.max(1.25,n.r*Math.sqrt(scale)),color=PALETTE[n.rootId]||"#d1d0c5";ctx.globalAlpha=alpha;
   if(n.level===0||n.level===1){ctx.beginPath();ctx.arc(p.x,p.y,r*3.3,0,Math.PI*2);ctx.fillStyle=color+"12";ctx.fill();}
@@ -79,7 +79,7 @@ function draw(){
   for(let k=0;k<=lobes;k++){const a=k/lobes*Math.PI*2,variation=.78+(((seed>>>((k%4)*5))&31)/31)*.42,x=p.x+Math.cos(a)*r*variation,y=p.y+Math.sin(a)*r*variation;if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
   ctx.closePath();ctx.fillStyle="#111b1d";ctx.strokeStyle=color+(n.level===0?"e0":n.level===1?"b0":"70");ctx.lineWidth=n.level===0?1.6:.9;ctx.fill();ctx.stroke();
   if(selected?.id===n.id){ctx.beginPath();ctx.arc(p.x,p.y,r+7+Math.min(5,scale),0,Math.PI*2);ctx.strokeStyle="#e4e7dd";ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.stroke();ctx.setLineDash([]);}
-  const show=n.level===0||alpha>.5&&scale>(n.level===1?.58:n.level===2?1.15:n.level===3?2.35:4.1)||selected?.id===n.id;
+  const show=n.level===0||alpha>.5&&scale>(n.level===1? .58:n.level===2?1.15:n.level===3?2.35:4.1)||selected?.id===n.id;
   if(show){const font=clamp((n.level===0?12:10)*Math.sqrt(scale),8,14);ctx.font=(n.level===0?"650 ":"500 ")+font+"px system-ui";ctx.textAlign="center";ctx.textBaseline="top";ctx.lineWidth=3;ctx.strokeStyle="#111b1df0";ctx.strokeText(n.title,p.x,p.y+r+5,190);ctx.fillStyle=n.level===0?"#e4e7dd":"#c5d0c7";ctx.fillText(n.title,p.x,p.y+r+5,190);}
   ctx.globalAlpha=1;
  });
