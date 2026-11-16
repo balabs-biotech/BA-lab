@@ -78,8 +78,8 @@ function layout(){
  }
  const bounds=nodes.reduce((b,n)=>({x:Math.max(b.x,Math.abs(n.x)+70),y:Math.max(b.y,Math.abs(n.y)+60)}),{x:0,y:0});
  const fit=Math.min((w-70)/(bounds.x*2),(h-190)/(bounds.y*2),1.25);
- if(!stack.length||!scale){targetScale=Math.max(.55,fit);scale=targetScale;targetOffset={x:w/2,y:h/2};offset={...targetOffset}}
- else{targetScale=Math.min(1.25,Math.max(.55,fit));targetOffset={x:w/2,y:h/2};}
+ if(!stack.length||!scale){targetScale=Math.max(.28,fit);scale=targetScale;targetOffset={x:0,y:0};offset={...targetOffset}}
+ else{targetScale=Math.min(1.25,Math.max(.55,fit));targetOffset={x:0,y:0};}
  particles=edges.map((e,i)=>({edge:e,t:(i*.137)%1,speed:.035+(i%4)*.008}));
  updateCrumbs();updateInfo();
 }
@@ -104,8 +104,8 @@ function draw(now=0){
 function hit(x,y){for(let i=nodes.length-1;i>=0;i--){const n=nodes[i],p=point(n),r=Math.max(19,n.r*scale+12);if(Math.hypot(x-p.x,y-p.y)<r)return n;}return null}
 function activate(n){if(!n)return;if(n.kind==='core'){stack=[];layout();return;}const d=n.data;if(d?.children?.length){stack.push(d);layout();return;}if(d?.url){window.open(d.url,'_blank','noopener,noreferrer');return;}showNotice(t.empty);}
 function showNotice(s){const el=$('#notice');el.textContent=s;el.style.display='block';clearTimeout(showNotice.timer);showNotice.timer=setTimeout(()=>el.style.display='none',2200)}
-function zoom(f,x=w/2,y=h/2){const next=Math.max(.45,Math.min(2.2,targetScale*f));const ratio=next/targetScale;targetOffset.x=x-(x-targetOffset.x)*ratio;targetOffset.y=y-(y-targetOffset.y)*ratio;targetScale=next}
-$('#zoomIn').onclick=()=>zoom(1.25);$('#zoomOut').onclick=()=>zoom(.8);$('#reset').onclick=()=>{targetScale=1;targetOffset={x:w/2,y:h/2};};
+function zoom(f,x=w/2,y=h/2){const next=Math.max(.45,Math.min(2.2,targetScale*f));const ratio=next/targetScale;const ax=x-w/2,ay=y-h/2;targetOffset.x=ax-(ax-targetOffset.x)*ratio;targetOffset.y=ay-(ay-targetOffset.y)*ratio;targetScale=next}
+$('#zoomIn').onclick=()=>zoom(1.25);$('#zoomOut').onclick=()=>zoom(.8);$('#reset').onclick=()=>{targetScale=1;targetOffset={x:0,y:0};};
 canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});down={x:e.clientX,y:e.clientY,node:hit(e.clientX,e.clientY)};dragMoved=false;canvas.classList.add('dragging');if(pointers.size===2){const a=[...pointers.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
 canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const prev=pointers.get(e.pointerId),dx=e.clientX-prev.x,dy=e.clientY-prev.y;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1&&down){if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)dragMoved=true;if(dragMoved){targetOffset.x+=dx;targetOffset.y+=dy}}else if(pointers.size===2){const a=[...pointers.values()],dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch>0)zoom(dist/pinch,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2);pinch=dist}});
 function endPointer(e){pointers.delete(e.pointerId);if(!pointers.size){canvas.classList.remove('dragging');if(down&&!dragMoved){const n=hit(e.clientX,e.clientY);activate(n)}down=null;pinch=0}}
