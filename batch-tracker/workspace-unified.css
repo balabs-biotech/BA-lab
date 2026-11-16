@@ -1,6 +1,8 @@
 @import url("./styles/design-tokens.css");
 @import url("./styles/workspace-components.css");
 @import url("./styles/mycology-workspace.css");
+@import url("./styles/laboratory-workspace.css");
+@import url("./styles/greentech-workspace.css");
 @import url("./styles/motion.css");
 @import url("./styles/responsive.css");
 
