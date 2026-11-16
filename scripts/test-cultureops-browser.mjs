@@ -301,12 +301,32 @@ try {
           fixture.textContent = label;
           parent.appendChild(fixture);
           const style = getComputedStyle(fixture);
+          const matchedBackgroundRules = [];
+          for (const sheet of [...document.styleSheets]) {
+            let rules;
+            try { rules = [...sheet.cssRules]; } catch { continue; }
+            const visit = list => {
+              for (const rule of list) {
+                if (rule.cssRules) visit([...rule.cssRules]);
+                else if (rule.selectorText && rule.style?.background && fixture.matches(rule.selectorText)) {
+                  matchedBackgroundRules.push({ href: sheet.href, selector: rule.selectorText, background: rule.style.background, important: rule.style.getPropertyPriority("background") });
+                } else if (rule.selectorText && rule.style?.backgroundColor && fixture.matches(rule.selectorText)) {
+                  matchedBackgroundRules.push({ href: sheet.href, selector: rule.selectorText, backgroundColor: rule.style.backgroundColor, important: rule.style.getPropertyPriority("background-color") });
+                }
+              }
+            };
+            visit(rules);
+          }
           checks.push({
             parentSelector,
             background: style.backgroundColor,
+            backgroundImage: style.backgroundImage,
+            inlineStyle: fixture.getAttribute("style"),
             border: style.borderTopColor,
             radius: style.borderTopLeftRadius,
             padding: style.padding,
+            matchedBackgroundRules,
+            stylesheets: [...document.styleSheets].map(sheet => sheet.href),
           });
           fixture.remove();
         }
