@@ -296,7 +296,8 @@ try {
             checks.push({ parentSelector, missing: true });
             continue;
           }
-          const fixture = document.createElement("article");
+          const fixture = document.createElement(className === "batch-item" ? "button" : "article");
+          if (fixture.tagName === "BUTTON") fixture.type = "button";
           fixture.className = className;
           fixture.textContent = label;
           parent.appendChild(fixture);
