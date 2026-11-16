@@ -19669,3 +19669,333 @@ body[data-domain="laboratory"] .workspace-inactive {
     flex:1 1 auto;
   }
 }
+
+
+/* ============================================================
+   CULTUREOPS INTERIOR REFINEMENT — PASS 88
+   GreenTech + Laboratory responsive navigation and dashboard
+   ============================================================ */
+body[data-domain="agronomy"] .toolbar-brand,
+body[data-domain="laboratory"] .toolbar-brand {
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .brand-wordmark strong,
+body[data-domain="laboratory"] .brand-wordmark strong {
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .brand-wordmark small,
+body[data-domain="laboratory"] .brand-wordmark small,
+body[data-domain="agronomy"] .toolbar-status,
+body[data-domain="laboratory"] .toolbar-status {
+  color:var(--workspace-muted) !important;
+}
+body[data-domain="agronomy"] .brand-symbol,
+body[data-domain="laboratory"] .brand-symbol {
+  border:1px solid var(--workspace-border) !important;
+  border-radius:9px !important;
+  background:var(--workspace-panel) !important;
+  color:var(--workspace-accent) !important;
+}
+body[data-domain="agronomy"] .section-nav a,
+body[data-domain="laboratory"] .section-nav a {
+  border:1px solid transparent !important;
+  border-radius:8px !important;
+  color:var(--workspace-muted) !important;
+  background:transparent !important;
+}
+body[data-domain="agronomy"] .section-nav a:hover,
+body[data-domain="laboratory"] .section-nav a:hover,
+body[data-domain="agronomy"] .section-nav a[aria-current="page"],
+body[data-domain="laboratory"] .section-nav a[aria-current="page"] {
+  border-color:var(--workspace-accent-border) !important;
+  background:var(--workspace-accent-soft) !important;
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .nav-number,
+body[data-domain="laboratory"] .nav-number {
+  border:1px solid var(--workspace-border);
+  background:var(--workspace-panel-raised) !important;
+  color:var(--workspace-accent) !important;
+}
+body[data-domain="agronomy"] .section-nav a[aria-current="page"] .nav-number,
+body[data-domain="laboratory"] .section-nav a[aria-current="page"] .nav-number {
+  border-color:var(--workspace-accent-border);
+  background:var(--workspace-accent-soft) !important;
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .toolbar-status,
+body[data-domain="laboratory"] .toolbar-status {
+  border:1px solid var(--workspace-border);
+  border-radius:8px;
+  background:var(--workspace-panel) !important;
+}
+body[data-domain="agronomy"] .universe-home-link,
+body[data-domain="laboratory"] .universe-home-link {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  width:max-content;
+  max-width:100%;
+  padding:7px 10px;
+  border:1px solid var(--workspace-border);
+  border-radius:7px;
+  background:var(--workspace-panel);
+  color:var(--workspace-muted) !important;
+  font-size:.68rem;
+  text-decoration:none;
+}
+body[data-domain="agronomy"] .universe-home-link:hover,
+body[data-domain="laboratory"] .universe-home-link:hover {
+  border-color:var(--workspace-accent-border);
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .overview-heading,
+body[data-domain="laboratory"] .overview-heading {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  min-width:0;
+}
+body[data-domain="agronomy"] .overview-heading > div,
+body[data-domain="laboratory"] .overview-heading > div {
+  min-width:0;
+}
+body[data-domain="agronomy"] .overview-heading .muted,
+body[data-domain="laboratory"] .overview-heading .muted {
+  max-width:780px;
+  color:var(--workspace-muted) !important;
+  line-height:1.6;
+}
+body[data-domain="agronomy"] .overview-live,
+body[data-domain="laboratory"] .overview-live {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  padding:6px 9px;
+  border:1px solid var(--workspace-border);
+  border-radius:7px;
+  background:var(--workspace-panel);
+  color:var(--workspace-muted) !important;
+  font-size:.61rem;
+  font-weight:700;
+}
+body[data-domain="agronomy"] .overview-live > span,
+body[data-domain="laboratory"] .overview-live > span {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#83aa83;
+  box-shadow:0 0 0 3px rgba(131,170,131,.12);
+}
+body[data-domain="agronomy"] .overview-metric-note,
+body[data-domain="laboratory"] .overview-metric-note {
+  color:var(--workspace-muted) !important;
+  font-size:.62rem;
+}
+body[data-domain="agronomy"] .overview-activity,
+body[data-domain="laboratory"] .overview-activity {
+  min-width:0;
+  padding:14px;
+}
+body[data-domain="agronomy"] .overview-activity :is(summary,button),
+body[data-domain="laboratory"] .overview-activity :is(summary,button) {
+  color:var(--workspace-text);
+}
+body[data-domain="agronomy"] .overview-observation,
+body[data-domain="laboratory"] .overview-observation {
+  border-color:var(--workspace-border);
+  border-radius:8px;
+  background:var(--workspace-surface);
+}
+body[data-domain="agronomy"] .overview-observation strong,
+body[data-domain="laboratory"] .overview-observation strong {
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .overview-observation p,
+body[data-domain="laboratory"] .overview-observation p,
+body[data-domain="agronomy"] .overview-observation time,
+body[data-domain="laboratory"] .overview-observation time {
+  color:var(--workspace-muted) !important;
+}
+body[data-domain="agronomy"] .overview-shortcut,
+body[data-domain="laboratory"] .overview-shortcut {
+  border-color:var(--workspace-border) !important;
+  border-radius:8px !important;
+  background:var(--workspace-surface) !important;
+  color:var(--workspace-text) !important;
+}
+body[data-domain="agronomy"] .overview-shortcut:hover,
+body[data-domain="laboratory"] .overview-shortcut:hover {
+  border-color:var(--workspace-accent-border) !important;
+  background:var(--workspace-panel-raised) !important;
+}
+body[data-domain="agronomy"] .overview-shortcut small,
+body[data-domain="laboratory"] .overview-shortcut small {
+  color:var(--workspace-muted) !important;
+}
+body[data-domain="agronomy"] .shortcut-index,
+body[data-domain="laboratory"] .shortcut-index {
+  border:1px solid var(--workspace-accent-border);
+  background:var(--workspace-accent-soft) !important;
+  color:var(--workspace-accent) !important;
+}
+body[data-domain="agronomy"] .overview-footnote,
+body[data-domain="laboratory"] .overview-footnote {
+  border-color:var(--workspace-border);
+  color:var(--workspace-muted) !important;
+}
+body[data-domain="agronomy"] .card :is(.entry-intro,.batch-required-note,.hint),
+body[data-domain="laboratory"] .card :is(.entry-intro,.batch-required-note,.hint) {
+  color:var(--workspace-muted) !important;
+}
+body[data-domain="agronomy"] .card :is(.guided-entry-step,.consent-panel,.sync-line),
+body[data-domain="laboratory"] .card :is(.guided-entry-step,.consent-panel,.sync-line) {
+  border-color:var(--workspace-border) !important;
+  border-radius:9px !important;
+  background:var(--workspace-panel) !important;
+  color:var(--workspace-text) !important;
+}
+body[data-domain="agronomy"] .card :is(.guided-entry-step h3,.consent-panel strong),
+body[data-domain="laboratory"] .card :is(.guided-entry-step h3,.consent-panel strong) {
+  color:var(--workspace-heading) !important;
+}
+body[data-domain="agronomy"] .card :is(button:disabled,input:disabled,select:disabled,textarea:disabled),
+body[data-domain="laboratory"] .card :is(button:disabled,input:disabled,select:disabled,textarea:disabled) {
+  opacity:.55;
+  cursor:not-allowed;
+}
+body[data-domain="agronomy"] :is(a,button,input,select,textarea):focus-visible,
+body[data-domain="laboratory"] :is(a,button,input,select,textarea):focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:3px;
+}
+@media(max-width:820px) {
+  body[data-domain="agronomy"],
+  body[data-domain="laboratory"] {
+    padding:10px 10px calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated .app-toolbar,
+  body[data-domain="laboratory"].workspace-authenticated .app-toolbar {
+    position:fixed !important;
+    z-index:100 !important;
+    inset:auto 9px calc(8px + env(safe-area-inset-bottom)) 9px !important;
+    width:auto !important;
+    min-height:64px !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:stretch !important;
+    justify-content:center !important;
+    gap:0 !important;
+    padding:7px !important;
+    overflow:visible !important;
+    border:1px solid var(--workspace-border-strong) !important;
+    border-radius:14px !important;
+    background:rgba(17,27,29,.97) !important;
+    box-shadow:0 12px 34px rgba(0,0,0,.42) !important;
+    -webkit-backdrop-filter:blur(16px);
+    backdrop-filter:blur(16px);
+  }
+  body[data-domain="agronomy"].workspace-authenticated .toolbar-brand,
+  body[data-domain="laboratory"].workspace-authenticated .toolbar-brand,
+  body[data-domain="agronomy"].workspace-authenticated .toolbar-divider,
+  body[data-domain="laboratory"].workspace-authenticated .toolbar-divider,
+  body[data-domain="agronomy"].workspace-authenticated .toolbar-status,
+  body[data-domain="laboratory"].workspace-authenticated .toolbar-status {
+    display:none !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated .section-nav,
+  body[data-domain="laboratory"].workspace-authenticated .section-nav {
+    display:flex !important;
+    flex:1 1 100% !important;
+    flex-direction:row !important;
+    align-items:stretch !important;
+    justify-content:space-around !important;
+    gap:4px !important;
+    min-width:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    overflow:visible !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated .section-nav a,
+  body[data-domain="laboratory"].workspace-authenticated .section-nav a {
+    display:flex !important;
+    flex:1 1 0 !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
+    min-width:0 !important;
+    min-height:48px !important;
+    padding:5px 3px !important;
+    border:1px solid transparent !important;
+    border-radius:9px !important;
+    font-size:clamp(9px,2.6vw,11px) !important;
+    font-weight:700 !important;
+    line-height:1.2 !important;
+    text-align:center !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated .section-nav .nav-number,
+  body[data-domain="laboratory"].workspace-authenticated .section-nav .nav-number {
+    display:grid !important;
+    place-items:center !important;
+    width:19px !important;
+    height:17px !important;
+    flex:0 0 17px !important;
+    border-radius:5px !important;
+    font-size:8px !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated .section-nav a[hidden],
+  body[data-domain="laboratory"].workspace-authenticated .section-nav a[hidden] {
+    display:none !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard),
+  body[data-domain="laboratory"].workspace-authenticated :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+    scroll-margin-top:12px !important;
+    scroll-margin-bottom:108px !important;
+  }
+  body[data-domain="agronomy"] .overview-metrics,
+  body[data-domain="laboratory"] .overview-metrics {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-domain="agronomy"] .overview-lower,
+  body[data-domain="laboratory"] .overview-lower {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain="agronomy"] #contextPanel,
+  body[data-domain="laboratory"] #contextPanel {
+    position:static;
+  }
+}
+@media(max-width:480px) {
+  body[data-domain="agronomy"] .overview-heading,
+  body[data-domain="laboratory"] .overview-heading {
+    flex-direction:column;
+  }
+  body[data-domain="agronomy"] .overview-metrics,
+  body[data-domain="laboratory"] .overview-metrics {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain="agronomy"] #authCard,
+  body[data-domain="laboratory"] #authCard {
+    grid-template-columns:minmax(0,1fr);
+  }
+  body[data-domain="agronomy"] #authCard > *,
+  body[data-domain="laboratory"] #authCard > * {
+    grid-column:1 !important;
+  }
+}
+@media(max-width:380px) {
+  body[data-domain="agronomy"].workspace-authenticated .section-nav a,
+  body[data-domain="laboratory"].workspace-authenticated .section-nav a {
+    font-size:9px !important;
+    padding-inline:2px !important;
+  }
+  body[data-domain="agronomy"].workspace-authenticated .section-nav .nav-number,
+  body[data-domain="laboratory"].workspace-authenticated .section-nav .nav-number {
+    display:none !important;
+  }
+}
