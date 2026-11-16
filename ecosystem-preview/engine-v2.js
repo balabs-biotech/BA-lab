@@ -275,7 +275,7 @@ function syncResourceHitTargets() {
  const projected=[];
  const project=(object,button)=>{
   object.getWorldPosition(_hitWorld);const p=_hitWorld.clone().project(camera);
-  const depth=Number(button.dataset.depth||0),visible=depth===0&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12;
+  const depth=Number(button.dataset.depth||0),forceEdge=button.classList.contains('webgl-domain-target'),visible=forceEdge||(depth===0&&p.z>-1&&p.z<1&&p.x>=-1.12&&p.x<=1.12&&p.y>=-1.12&&p.y<=1.12);
   button.hidden=!visible;button.style.display=visible?'block':'none';
   if(!visible)return;
   projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
