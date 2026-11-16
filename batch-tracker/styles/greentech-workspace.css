@@ -584,3 +584,75 @@ html body[data-domain="agronomy"] #environmentalCard #satelliteColorMap {
   }
   html body[data-domain="agronomy"] #environmentalCard #satelliteColorMap { height:270px !important; }
 }
+
+
+/* PASS 134 — plant registry lifecycle is readable at a glance and uses stored states only. */
+html body[data-domain="agronomy"] #plantCard #plantCultureList > .plant-culture-row {
+  min-width:0 !important;
+  background-color:#1d2a25 !important;
+  background-image:linear-gradient(145deg,rgba(35,51,43,.96),rgba(24,36,31,.98)) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList > .plant-culture-row:hover {
+  background-color:#273a2e !important;
+  background-image:linear-gradient(145deg,rgba(39,58,46,.98),rgba(25,39,32,.98)) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .plant-culture-status {
+  display:inline-flex !important;
+  align-items:center !important;
+  width:max-content !important;
+  max-width:100% !important;
+  margin-top:3px !important;
+  padding:5px 9px !important;
+  border:1px solid rgba(155,174,164,.24) !important;
+  border-radius:999px !important;
+  background:rgba(155,174,164,.09) !important;
+  color:#c4d0c7 !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  letter-spacing:.035em !important;
+  line-height:1.25 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-row[data-plant-status="planned"] {
+  border-inline-start-color:#c6ad70 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-status[data-status="planned"] {
+  border-color:rgba(198,173,112,.32) !important;
+  background:rgba(198,173,112,.1) !important;
+  color:#e0cb91 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-row[data-plant-status="active"] {
+  border-inline-start-color:#b4f477 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-status[data-status="active"] {
+  border-color:rgba(180,244,119,.3) !important;
+  background:rgba(180,244,119,.1) !important;
+  color:#c8ef9e !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-row[data-plant-status="harvested"] {
+  border-inline-start-color:#82b8d8 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-status[data-status="harvested"] {
+  border-color:rgba(130,184,216,.32) !important;
+  background:rgba(130,184,216,.1) !important;
+  color:#b4d9ef !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-row[data-plant-status="lost"] {
+  border-inline-start-color:#c77c70 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-status[data-status="lost"] {
+  border-color:rgba(199,124,112,.34) !important;
+  background:rgba(199,124,112,.11) !important;
+  color:#efaaa0 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-row[data-plant-status="archived"] {
+  border-inline-start-color:#8d9b94 !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-status[data-status="archived"] {
+  border-color:rgba(141,155,148,.3) !important;
+  background:rgba(141,155,148,.1) !important;
+  color:#b6c1ba !important;
+}
+html body[data-domain="agronomy"] #plantCard .plant-culture-row:focus-within {
+  outline:2px solid rgba(180,244,119,.5) !important;
+  outline-offset:2px !important;
+}
