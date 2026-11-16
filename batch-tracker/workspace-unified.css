@@ -31,7 +31,7 @@ html body[data-domain] .hero-art {
   opacity:.82 !important;
 }
 
-html body[data-domain] main#main > .card {
+html body[data-domain] main#main > .card:not(.hidden):not([hidden]) {
   display:flex !important;
   flex-direction:column !important;
   align-items:stretch !important;
@@ -134,4 +134,10 @@ html body[data-domain] .entry-step-mark {
     font-size:9px !important;
     letter-spacing:.1em !important;
   }
+}
+
+/* Preserve application-controlled hidden states despite the shared card layout. */
+html body[data-domain] main#main > .card.hidden,
+html body[data-domain] main#main > .card[hidden] {
+  display:none !important;
 }
