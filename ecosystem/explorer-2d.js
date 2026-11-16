@@ -17,7 +17,9 @@ function buildNetwork(){
  nodes=[];edges=[];byId.clear();
  const roots=tree.length,rootRadius=300;
  tree.forEach((root,i)=>{
-  const angle=-Math.PI/2+i*Math.PI*2/roots,rx=Math.cos(angle)*rootRadius,ry=Math.sin(angle)*rootRadius;
+  const angle=-Math.PI/2+i*Math.PI*2/roots+(((hash(root.id)%1000)/1000)-.5)*.22;
+  const radius=rootRadius+hash(root.id+":radius")%125-62;
+  const rx=Math.cos(angle)*radius,ry=Math.sin(angle)*radius*(.82+(hash(root.id+":axis")%20)/100);
   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,parent:null,angle};
   nodes.push(rootNode);byId.set(root.id,rootNode);
   const walk=(data,parent,depth,branchAngle,path)=>{
@@ -57,7 +59,7 @@ function buildNetwork(){
 }
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
-function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,time:performance.now()});}
+function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function focusNode(n,zoomTo){if(!n)return;previousView={scale:targetScale,offset:{...targetOffset}};const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;updateSelection();draw();}
 function hit(x,y){let found=null,best=22;for(const n of nodes){if(levelOpacity(n.level)<.12)continue;const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);if(d<limit){best=d;found=n;}}return found;}
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
