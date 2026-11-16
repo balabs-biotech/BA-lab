@@ -43,7 +43,7 @@ let THREE, renderer, scene, camera, raycaster, pointer, stage, panel, hint, intr
 let world, cells = new Map(), pickables = [], resourceObjects = [], edges = [], signalPoints = [];
 let resourceHitTargets = new Map(), domainHitTargets = new Map();
 let nav, currentNode = null, currentAnchor = null, navigationStack = [];
-let selected = null, selectedBranch = null, manifest = null, transition = null;
+let selected = null, selectedBranch = null, manifest = null, transition = null, pendingDomain = null;
 let distance = 13.5, zoomTargetDistance = 13.5, theta = .22, phi = 1.27, target = null, targetGoal = null;
 let opened = false, raf = 0, lastFrame = 0, dragging = false, moved = false, dragGesture = false;
 let lastPointer = null, pointers = new Map(), pinchStart = 0, pinchDistance = 0, pinchCenter = null, hoverId = null , lastBranchTouchActivationAt = 0;
@@ -624,7 +624,10 @@ async function init() {
     stage.prepend(renderer.domElement);renderer.domElement.setAttribute('tabindex','0');renderer.domElement.setAttribute('role','application');renderer.domElement.setAttribute('aria-label','BA Labs 3D network. Use arrow keys to rotate, plus and minus to zoom, Escape to go back, and Home for overview.');
     scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(46,1,.1,180);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();target=new THREE.Vector3();
     createWorld();resize();cameraInitialized=true;
-    const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor)}}).catch(()=>{});loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+    const routeDomain=new URLSearchParams(location.search).get('domain');
+     const loadManifest=()=>fetch('./notion-tree.'+LANG()+'.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{if(data?.version===1&&Array.isArray(data.domains)){manifest=data;if(selected&&!transition)buildResources(selected,currentNode,currentAnchor);const requested=pendingDomain||routeDomain;if(requested&&IDS.includes(requested)){pendingDomain=null;enterDomain(requested)}}}).catch(error=>{window.__BALABS_3D_ROUTE_ERROR__=error?.message||String(error)});
+     window.__BALABS_3D_ENTER_DOMAIN__=id=>{if(!IDS.includes(id))return false;if(!manifest){pendingDomain=id;return true}enterDomain(id);return true};
+     loadManifest();new MutationObserver(()=>{hint.textContent=t('hint');loadManifest()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     window.__BALABS_3D_E2E__=()=>{
       const rect=renderer.domElement.getBoundingClientRect();
       const project=obj=>{const p=obj.getWorldPosition(new THREE.Vector3()).project(camera);return{x:rect.left+(p.x+1)*rect.width/2,y:rect.top+(1-p.y)*rect.height/2,z:p.z,title:obj.userData.title||obj.userData.id,hasChildren:!!obj.userData.hasChildren,depth:obj.userData.depth??0,url:obj.userData.url||null}};
