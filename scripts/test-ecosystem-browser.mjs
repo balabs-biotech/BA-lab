@@ -18,18 +18,29 @@ const browser = await chromium.launch({
 });
 
 async function tapSpatialTarget(page, name, x, y, selector) {
-  // Prefer the real semantic hit target whenever one is supplied. Coordinate-only
-  // canvas taps can select a neighbouring domain on narrow mobile viewports.
+  // Hit targets can overlap in projected 3D space. Find a point that is
+  // genuinely exposed to the requested target instead of clicking its center
+  // (which may be covered by a neighbouring transparent hit surface).
   if (selector) {
     const target = page.locator(selector).first();
     await target.waitFor({ state: 'visible', timeout: 5000 });
-    if (name === 'mobile') {
-      await target.scrollIntoViewIfNeeded();
-      const rect = await target.boundingBox();
-      assert.ok(rect && rect.width >= 40 && rect.height >= 40, name + ': branch dock target must have a real touch area after scrolling it into view');
-      return target.tap({ timeout: 5000 });
-    }
-    return target.click();
+    if (name === 'mobile') await target.scrollIntoViewIfNeeded();
+    const point = await target.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width < 40 || rect.height < 40) return null;
+      for (let row = 1; row <= 9; row++) {
+        for (let col = 1; col <= 9; col++) {
+          const px = rect.left + rect.width * col / 10;
+          const py = rect.top + rect.height * row / 10;
+          const hit = document.elementFromPoint(px, py);
+          if (hit && (hit === el || el.contains(hit))) return { x: px, y: py };
+        }
+      }
+      return null;
+    });
+    assert.ok(point, name + ': requested spatial target is fully occluded by another hit surface: ' + selector);
+    if (name === 'mobile') return page.touchscreen.tap(point.x, point.y);
+    return page.mouse.click(point.x, point.y);
   }
   if (name !== 'mobile') return page.mouse.click(x, y);
   return page.touchscreen.tap(x, y);
