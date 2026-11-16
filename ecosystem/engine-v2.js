@@ -374,7 +374,32 @@ function buildResources(id,parentNode=null,anchor=null) {
    }
  }
 };
- if(children.length>16){const golden=Math.PI*(3-Math.sqrt(5)),mobile=window.innerWidth<760,outer=mobile?3.55:4.35;children.forEach((item,k)=>{const ang=-Math.PI/2+k*golden,rad=1.35+outer*Math.sqrt((k+.5)/children.length),p=currentAnchor.clone().add(new THREE.Vector3(Math.cos(ang)*rad,Math.sin(ang)*rad,.18*Math.sin(k*1.7)));drawNode(item,p,0,currentNode,ang,k)});}else{children.forEach((item,k)=>{const ang=k/Math.max(1,children.length)*Math.PI*2-Math.PI/2+(k%2)*.11,rad=2.15+(k%3)*.16,p=currentAnchor.clone().add(new THREE.Vector3(Math.cos(ang)*rad,Math.sin(ang)*rad*.78,Math.sin(ang*1.6)*.34));drawNode(item,p,0,currentNode,ang,k)});}
+ // Organic axial growth: first-level branches extend from the selected universe
+ // as one continuous mycelial field, never as a ring or a second constellation.
+ const mobile=window.innerWidth<760,span=mobile?2.25:3.15,depthSpread=mobile?.72:1.05;
+ const count=children.length,positions=[];
+ children.forEach((item,k)=>{
+   const u=count===1?0:(k/(count-1)-.5)*2;
+   const wave=Math.sin(k*1.73+.4),cross=Math.cos(k*2.31+.8);
+   const x=u*span + Math.sin(k*2.07)*.34;
+   const y=wave*depthSpread + cross*.24 + (k%2?-.16:.16);
+   const z=Math.sin(k*1.19)*.48 + (k%3-1)*.12;
+   const p=currentAnchor.clone().add(new THREE.Vector3(x,y,z));
+   const angle=Math.atan2(y,x||.001);
+   positions.push({item,pos:p,angle});
+ });
+ // Draw every branch, then add non-adjacent anastomoses across the field.
+ positions.forEach(({item,pos,angle},k)=>drawNode(item,pos,0,currentNode,angle,k));
+ const meshColor=baseColor.clone().lerp(accent,.38);
+ for(let k=0;k<positions.length;k++){
+   for(const jump of [2,3]){
+     const next=k+jump;if(next>=positions.length)continue;
+     const A=positions[k].pos,B=positions[next].pos,delta=B.clone().sub(A);
+     const normal=new THREE.Vector3(-delta.y,delta.x,.12).normalize();
+     const mid=A.clone().lerp(B,.5).addScaledVector(normal,(k%2?-.22:.22)).add(new THREE.Vector3(0,0,.16));
+     filament([A.clone(),A.clone().lerp(mid,.52),mid,B.clone()],meshColor,.0026,.2);
+   }
+ }
  status.textContent=(currentNode.title||domain.title).toUpperCase()+' · '+children.length+' '+t('children').toUpperCase();
 }
 // Resolve raw Notion nodes to their positioned 3D counterparts before camera navigation.
@@ -402,8 +427,9 @@ function showDomainPanel(id,message='') {if(message)status.textContent=message;r
 function enterDomain(id) {
   if(!cells.has(id))return;selected=id;selectedBranch=null;opened=true;navigationStack=[];currentNode=manifest?.domains?.find(d=>d.id===id)||null;currentAnchor=cells.get(id).position.clone();
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
-  if(typeof window.enterSphere==='function')window.enterSphere(id,false,true); // Populate the hidden legacy content source only; the old engine no longer owns #mainView events.
-  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?20.5:11.5):7.5;smoothCamera(cells.get(id).position,initialDistance,900,()=>buildResources(id));
+  // Stay inside the primary Three.js scene: the manifest is the sole content source.
+  // Do not invoke the legacy sphere renderer or rebuild its HTML view.
+  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?12.5:10.5):5.8;smoothCamera(cells.get(id).position,initialDistance,1050,()=>buildResources(id));
 }
 function goBackLevel() {
   if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
