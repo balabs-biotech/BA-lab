@@ -304,7 +304,7 @@ function syncResourceHitTargets() {
   projected.push({object,button,p,x:rect.left+(p.x+1)*rect.width/2-stageRect.left,y:rect.top+(1-p.y)*rect.height/2-stageRect.top,depth});
   return true;
  };
- for(const {object,button} of domainHitTargets.values()){const visible=project(object,button);button.hidden=!opened||!!selected||!visible;button.style.display=button.hidden?'none':'block'}
+ for(const {object,button} of domainHitTargets.values()){project(object,button);const gatewayOpen=ROOT.classList.contains('universe-open');button.hidden=!gatewayOpen||!!selected;button.style.display=button.hidden?'none':'block'}
  for(const [label,button] of resourceHitTargets)project(label,button);
  // Place labels in screen space, not directly on top of one another. This is
  // especially important on narrow mobile screens where projected branches cluster.
