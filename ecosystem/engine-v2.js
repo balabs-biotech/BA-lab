@@ -58,7 +58,7 @@ function addStyles() {
     #mainView.webgl-ready>.hub,#mainView.webgl-ready>.sphere,#mainView.webgl-ready>.network,#mainView.webgl-ready>.galaxy{display:none!important}
     #mainView .webgl-stage{position:absolute;inset:0;z-index:4;min-height:100%;touch-action:none;overflow:hidden}
     #mainView .webgl-stage canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}#mainView .webgl-stage canvas:focus-visible{outline:2px solid #d1d0c5;outline-offset:-4px}
-    #mainView .webgl-hit-target{position:absolute!important;z-index:30;width:54px;height:54px;min-width:48px;min-height:48px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
+    #mainView .webgl-hit-target{position:absolute!important;z-index:30;width:42px;height:42px;min-width:42px;min-height:42px;padding:0;border:0;border-radius:50%;background:transparent;color:transparent;opacity:.015;pointer-events:auto!important;touch-action:manipulation;transform:translate(-50%,-50%);cursor:pointer;-webkit-tap-highlight-color:transparent}
     #mainView .webgl-hit-target:focus-visible{opacity:.24;outline:2px solid #d1d0c5;background:#b96b4d33}
     #mainView .webgl-stage .webgl-hint{position:absolute;left:16px;bottom:14px;z-index:8;padding:9px 12px;max-width:calc(100% - 32px);white-space:normal;border:1px solid #78958a66;border-radius:999px;background:#142321d9;color:#e5e9df;font:600 9px/1.4 system-ui;letter-spacing:.08em;pointer-events:none;backdrop-filter:blur(12px)}
     #mainView .webgl-stage .webgl-status{position:absolute;right:16px;bottom:17px;z-index:8;color:#c2cfc5;font:600 9px system-ui;letter-spacing:.12em;pointer-events:none}
@@ -285,7 +285,7 @@ function addResourceHitTarget(label) {
  element.textContent=data.title||data.name||'Ouvrir';
  const compact=window.innerWidth<760;
  const width=Math.min(compact?210:280,Math.max(compact?128:150,String(element.textContent).length*(compact?7.4:8.5)+32));
- Object.assign(element.style,{display:'block',opacity:'0.015',visibility:'visible',color:'transparent',background:'transparent',border:'0',borderRadius:'50%',boxShadow:'none',font:'1px/1 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'clip',padding:'0',width:Math.max(54,Math.min(72,width*.32))+'px',height:'54px',minWidth:'48px',maxWidth:'72px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
+ Object.assign(element.style,{display:'block',opacity:'0.015',visibility:'visible',color:'transparent',background:'transparent',border:'0',borderRadius:'50%',boxShadow:'none',font:'1px/1 system-ui,sans-serif',textAlign:'center',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'clip',padding:'0',width:42+'px',height:'42px',minWidth:'42px',maxWidth:'42px',pointerEvents:'auto',touchAction:'manipulation',transform:'translate(-50%,-50%)',cursor:'pointer'});
  element.setAttribute('aria-label',(data.title||data.name||'Branche')+(hasChildren?' — ouvrir le dossier':' — ouvrir la page'));
  element.title=data.title||data.name||'';
  element.dataset.hasChildren=String(hasChildren);element.dataset.depth=String(data.depth||0);element.dataset.resourceUrl=data.url||'';
@@ -313,7 +313,7 @@ function syncResourceHitTargets() {
  const obstacles=[...stage.querySelectorAll('.webgl-controls,.webgl-status,.webgl-path,.webgl-focus,.webgl-intro')]
   .filter(el=>!el.hidden&&getComputedStyle(el).display!=='none')
   .map(el=>{const r=el.getBoundingClientRect();return {l:r.left-stageRect.left,t:r.top-stageRect.top,r:r.right-stageRect.left,b:r.bottom-stageRect.top}});
- const overlaps=(a,b)=>a.l<b.r+8&&a.r>b.l-8&&a.t<b.b+8&&a.b>b.t-8;
+ const overlaps=(a,b)=>a.l<b.r+16&&a.r>b.l-16&&a.t<b.b+16&&a.b>b.t-16;
  const offsets=[[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[2,0],[-2,0],[0,2],[0,-2]];
  for(const item of projected){
   const {button}=item,columns=stageRect.width<560?2:3,slotWidth=stageRect.width/columns;button.style.maxWidth=Math.max(128,slotWidth-12)+'px';button.style.width=Math.min(button.offsetWidth||150,slotWidth-12)+'px';const w=button.offsetWidth||150,h=button.offsetHeight||50;
