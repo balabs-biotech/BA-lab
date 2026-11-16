@@ -26,10 +26,10 @@ try {
       const rect = canvas.getBoundingClientRect();
       const pad = Math.min(150, Math.max(78, rect.width * .16));
       const overviewScale = Math.max(.26, Math.min(.62,
-        (rect.width - pad * 2) / 1110,
+        (rect.width - pad * 2) / 850,
         (rect.height - pad * 2) / 1110,
       ));
-      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 - 430 * overviewScale };
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 - 300 * overviewScale };
     });
     await page.mouse.click(target.x, target.y);
     await page.locator('#selection .card').waitFor({ state: 'visible' });
