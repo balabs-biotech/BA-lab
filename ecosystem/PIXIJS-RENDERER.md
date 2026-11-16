@@ -11,7 +11,7 @@ The 2D explorer now uses PixiJS v8 as its primary WebGL renderer. The existing g
 
 ## Rendering and biological direction
 
-PixiJS owns the field rendering. The topology remains driven by the Notion tree and stable IDs. Main hyphae, lateral hyphae and cross-links are rendered as curved filaments; deeper generations fade in with camera scale. The visual language must stay asymmetric and microscopy-inspired: no planets, radial cards, tubes, starburst hubs or decorative spheres.
+PixiJS owns the field rendering. The topology remains driven by the Notion tree and stable IDs. The eight universe anchors now occupy an irregular spatial field instead of an eight-spoke ring. Cross-universe links are selected by nearest-neighbour distance, with first-generation anastomoses and within-universe branch links. Main hyphae, lateral hyphae and cross-links are rendered as seeded, asymmetrically curved filaments; deeper generations fade in with camera scale. The visual language must stay asymmetric and microscopy-inspired: no planets, radial cards, tubes, starburst hubs or decorative spheres.
 
 tsParticles is not loaded as a second independent canvas. Its useful motion concepts (noise-driven drift, trails and particle flow) should be integrated only where they can follow the graph's actual edges and node IDs. OriginKit remains a visual/technique reference for field density, ribbons, glow restraint and pointer response, not a production runtime dependency.
 
@@ -19,7 +19,7 @@ tsParticles is not loaded as a second independent canvas. Its useful motion conc
 
 1. Browser-test PixiJS initialization and verify the actual WebGL canvas on desktop and mobile.
 2. Move repeated Graphics allocation to retained containers/geometry and use ParticleContainer or a custom shader for large spore/flow populations.
-3. Replace the current deterministic radial overview placement with a graph-aware organic spatial layout, preserving eight connected universes and all descendants.
+3. Continue refining the irregular graph-aware layout and branch density while preserving eight connected universes and all descendants.
 4. Add camera-aware level-of-detail and label collision handling; labels must not grow into the viewport or obscure the hyphae.
 5. Add edge-following particle advection with bounded CPU/GPU cost and reduced-motion support.
 6. Measure frame time on a mid-range mobile device before increasing filament or particle density.
