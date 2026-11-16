@@ -84,7 +84,7 @@ body{overscroll-behavior:none}
  .experience-page .rb-image-armed,.experience-page .rb-image-armed.rb-image-revealed{clip-path:none;transform:none;transition:none;will-change:auto}
 }
 
-/* Vercel-style scroll focus, restrained for BA Labs editorial headings */
+/* Editorial scroll focus, restrained for BA Labs headings */
 .experience-page .rb-heading-armed{opacity:.22;filter:blur(5px);transform:translateY(12px);transition:opacity .7s ease,filter .7s ease,transform .7s cubic-bezier(.2,.72,.18,1)}
 .experience-page .rb-heading-armed.rb-heading-visible{opacity:1;filter:blur(0);transform:translateY(0)}
 @media(prefers-reduced-motion:reduce){
@@ -153,3 +153,17 @@ body{overscroll-behavior:none}
 /* Living signal: a restrained luminous node follows the user's actual scroll position. */
 .chapter-filament .filament-signal{fill:#e2c7b7;stroke:#b96b4d;stroke-width:2;filter:drop-shadow(0 0 3px #c47b5c) drop-shadow(0 0 8px #c47b5c99);pointer-events:none}
 @media(prefers-reduced-motion:reduce){.chapter-filament .filament-signal{filter:none}}
+
+
+/* Mobile directory: reclaim outer gutters without covering the mycelial rail. */
+@media(max-width:760px){
+ .experience-page>.universe-index{
+  width:calc(100% + 40px)!important;
+  max-width:none!important;
+  margin-inline-end:-40px!important;
+  padding-inline:8px!important;
+  box-sizing:border-box!important;
+ }
+ .experience-page>.universe-index .universe-index-grid{width:100%!important;grid-template-columns:minmax(0,1fr)!important}
+ .experience-page>.universe-index .universe-index-card{width:100%!important;min-width:0!important;box-sizing:border-box!important}
+}
