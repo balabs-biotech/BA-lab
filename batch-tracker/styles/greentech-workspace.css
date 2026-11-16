@@ -1,0 +1,46 @@
+/* GreenTech interior — plant registry and cultivation context. */
+html body[data-domain="agronomy"] #plantCard { gap:20px !important; }
+html body[data-domain="agronomy"] #plantCard > p { max-width:780px !important; line-height:1.65 !important; }
+html body[data-domain="agronomy"] #plantCard #plantCultureForm {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:13px !important;
+  margin:0 !important;
+  padding:20px !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  background:linear-gradient(145deg,#202d2b,#1b2525) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm > div { min-width:0 !important; }
+html body[data-domain="agronomy"] #plantCard #plantCultureForm .bio-operation-wide { grid-column:1/-1 !important; }
+html body[data-domain="agronomy"] #plantCard #savePlantCultureButton { justify-self:start !important; min-width:210px !important; }
+html body[data-domain="agronomy"] #plantCard #plantCultureStatus { margin:8px 0 0 !important; line-height:1.5 !important; }
+html body[data-domain="agronomy"] #plantCard .overview-section-heading {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+  padding-top:8px !important;
+  border-top:1px solid var(--border) !important;
+}
+html body[data-domain="agronomy"] #plantCard .overview-section-heading h3 { margin:0 !important; }
+html body[data-domain="agronomy"] #plantCard #plantCultureList {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)) !important;
+  gap:12px !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList > p { grid-column:1/-1 !important; margin:0 !important; padding:18px !important; }
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:10px !important;
+  min-width:0 !important;
+  padding:16px !important;
+  border:1px solid var(--border) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:12px !important;
+  background:var(--surface-raised) !important;
+}
+html body[data-domain="agronomy"] #plantCard .culture-catalog-code { color:var(--paper) !important; font-size:15px !important; overflow-wrap:anywhere !important; }
+html body[data-domain="agronomy"] #plantCard .culture-catalog-meta { display:grid !important; gap:5px !important; color:var(--muted) !important; font-size:11px !important; }
