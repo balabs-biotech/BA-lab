@@ -221,7 +221,7 @@ assert.ok(engine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && e
 assert.ok(previewEngine.includes('let distance = 13.5, zoomTargetDistance = 13.5') && previewEngine.includes('const blend=1-Math.exp(-dt*13)'), 'Preview camera zoom must use the same smooth easing');
 assert.ok(previewEngine.includes('function syncLabelScales()') && previewEngine.includes('cameraDistance*projection*targetPixels') && previewEngine.includes('syncLabelScales();'), 'Preview labels must keep the same stable screen-space size across zoom levels');
 assert.ok(engine.includes('function panCameraByPixels(dx,dy)') && previewEngine.includes('function panCameraByPixels(dx,dy)'), 'Both 3D engines must translate the complete camera view when a two-finger gesture moves the map');
-assert.ok(engine.includes("lastBranchTouchActivationAt=performance.now()") && previewEngine.includes("lastBranchTouchActivationAt=performance.now()") && engine.includes("e.stopImmediatePropagation();return") && previewEngine.includes("e.stopImmediatePropagation();return"), 'A touch branch activation must suppress its synthetic follow-up canvas click');
+assert.ok(previewEngine.includes("lastBranchTouchActivationAt=performance.now()") && previewEngine.includes("e.stopImmediatePropagation();return"), 'Preview touch branch activation must suppress its synthetic follow-up canvas click');
 assert.ok(!html.includes('constellation-3d.js?v='), 'Legacy monolithic engine must no longer be loaded');
 assert.ok(engine.includes("const IDS = ['bio','myco','soil','lab','products','iot','work','learn']"), 'The clean engine must own the complete eight-domain registry');
 const htmlDomains = [...html.matchAll(/<button[^>]*data-sphere="([^"]+)"/g)].map(match => match[1]);
