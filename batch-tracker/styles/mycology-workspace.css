@@ -903,3 +903,74 @@ html body[data-domain="mycology"] #trackerCard #cultureCatalogList > .culture-ca
   background-color:#30433e !important;
   background-image:linear-gradient(145deg,#30433e 0%,#243631 100%) !important;
 }
+
+
+/* PASS 135 — linked production batches are a distinct, actionable block in the culture record. */
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches {
+  display:grid !important;
+  gap:8px !important;
+  min-width:0 !important;
+  margin:0 0 8px !important;
+  padding:12px !important;
+  border:1px solid rgba(201,130,89,.2) !important;
+  border-radius:10px !important;
+  background:linear-gradient(145deg,rgba(201,130,89,.065),rgba(24,35,33,.72)) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > h3 {
+  margin:0 0 3px !important;
+  color:#dfb092 !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  letter-spacing:.055em !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:11px 12px !important;
+  border:1px solid rgba(126,151,140,.16) !important;
+  border-radius:7px !important;
+  background-color:#202d2b !important;
+  background-image:linear-gradient(120deg,rgba(255,255,255,.025),rgba(255,255,255,0)) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry > div {
+  display:grid !important;
+  gap:4px !important;
+  min-width:0 !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry strong {
+  color:#e8e9df !important;
+  font-size:12px !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry p {
+  margin:0 !important;
+  color:#aebdb4 !important;
+  font-size:10px !important;
+  line-height:1.5 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry .culture-catalog-action {
+  min-height:34px !important;
+  padding:7px 10px !important;
+  border:1px solid rgba(201,130,89,.32) !important;
+  border-radius:6px !important;
+  background:#3a302b !important;
+  color:#e5b28f !important;
+  font-size:10px !important;
+  white-space:nowrap !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry .culture-catalog-action:hover {
+  background:#49372e !important;
+  border-color:rgba(201,130,89,.55) !important;
+}
+@media (max-width:560px) {
+  html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+    align-items:stretch !important;
+  }
+  html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .culture-timeline-entry .culture-catalog-action {
+    justify-self:start !important;
+  }
+}
