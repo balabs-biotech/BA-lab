@@ -2746,6 +2746,8 @@ function renderBatchList() {
 
     button.className =
       "batch-item";
+    button.setAttribute("aria-pressed", String(batch.id === selectedBatchId));
+    button.classList.toggle("is-selected", batch.id === selectedBatchId);
 
 
     const heading = document.createElement("span");
@@ -2773,13 +2775,15 @@ function renderBatchList() {
     button.append(heading, meta);
 
 
-    button.addEventListener(
-      "click",
-      () =>
-        loadBatch(
-          batch.id
-        )
-    );
+    button.addEventListener("click", () => {
+      batchList.querySelectorAll(".batch-item").forEach(item => {
+        item.classList.remove("is-selected");
+        item.setAttribute("aria-pressed", "false");
+      });
+      button.classList.add("is-selected");
+      button.setAttribute("aria-pressed", "true");
+      loadBatch(batch.id);
+    });
 
 
     batchList.appendChild(
