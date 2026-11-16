@@ -32,3 +32,12 @@ footer{display:flex;justify-content:space-between;gap:12px;padding:18px clamp(18
 a:focus-visible{outline:2px solid #d18a6b;outline-offset:3px}
 @media(max-width:760px){.universe-switch{margin-top:32px;padding-top:20px}.switch-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.switch-link{min-height:52px;padding:9px}.switch-link b{font-size:10px}}
 @media(max-width:390px){.switch-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Fast resource filtering, styled as part of the BA Labs field interface. */
+.resource-search{display:flex;align-items:center;gap:14px;margin:0 0 15px;padding:10px 13px;border:1px solid #40564d;border-radius:12px;background:#192725;color:#d18a6b;font-size:9px;font-weight:800;letter-spacing:.13em}
+.resource-search input{width:100%;min-width:0;padding:9px 11px;border:1px solid #52665b;border-radius:8px;outline:none;background:#111b1d;color:#e7e8df;font:inherit;font-size:13px;font-weight:450;letter-spacing:0}
+.resource-search input::placeholder{color:#8f9f96}
+.resource-search input:focus{border-color:#b96b4d;box-shadow:0 0 0 3px #b96b4d24}
+.node[hidden]{display:none!important}
+@media(max-width:640px){.resource-search{display:block;padding:10px;margin-bottom:11px}.resource-search span{display:block;margin-bottom:7px}.resource-search input{font-size:16px}}
