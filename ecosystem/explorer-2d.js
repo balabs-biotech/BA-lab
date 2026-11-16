@@ -80,7 +80,15 @@ function draw(){
   const a=screen(e.a),b=screen(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
   const bend=Math.min(42,len*.17)*(e.i%2?1:-1),cx=(a.x+b.x)/2-dy/len*bend,cy=(a.y+b.y)/2+dx/len*bend;
   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(cx,cy,b.x,b.y);
-  ctx.strokeStyle=e.cross?"#b96b4d38":(PALETTE[e.a.rootId]||"#78958a")+"88";ctx.lineWidth=e.cross?.75:e.tertiary?.62:1.05;ctx.stroke();
+  const density=e.density??.45;
+  const mainWidth=e.cross?.7:e.tertiary?.48:1.05+density*.62;
+  ctx.lineCap="round";ctx.lineJoin="round";
+  if(!e.cross&&!e.tertiary&&density>.62){
+   ctx.strokeStyle=(PALETTE[e.a.rootId]||"#78958a")+"20";ctx.lineWidth=mainWidth*3.1;ctx.stroke();
+   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(cx,cy,b.x,b.y);
+  }
+  ctx.strokeStyle=e.cross?"#b96b4d38":(PALETTE[e.a.rootId]||"#78958a")+(e.tertiary?"66":density>.72?"c0":"88");
+  ctx.lineWidth=mainWidth;ctx.stroke();
   // Branching hyphae: primary filaments produce tapered-looking lateral growth,
   // then split into two fine tips. Seeded by edge index so the network stays stable.
   if(!e.cross&&!e.tertiary&&len>85){
@@ -93,7 +101,7 @@ function draw(){
     const ex=px+dx/len*reach*.58+nx*side*reach*.82,ey=py+dy/len*reach*.58+ny*side*reach*.82;
     const mx=(px+ex)/2+nx*side*reach*.18,my=(py+ey)/2+ny*side*reach*.18;
     ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(mx,my,ex,ey);
-    ctx.strokeStyle="#9db5a05c";ctx.lineWidth=.72;ctx.stroke();
+    ctx.strokeStyle=density>.72?"#b9c8b788":"#9db5a05c";ctx.lineWidth=density>.72?.86:.68;ctx.stroke();
     const tip=reach*.34;
     [-1,1].forEach(fork=>{
      const tx=ex+dx/len*tip*.28+nx*fork*tip*.72,ty=ey+dy/len*tip*.28+ny*fork*tip*.72;
