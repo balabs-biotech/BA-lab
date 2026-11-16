@@ -158,7 +158,8 @@
           "children": []
         }
       ],
-      "notionParentId": "hub"
+      "notionParentId": "hub",
+      "description": "Equipment, substrates, biological processes and prototypes developed or studied for applied research and agrotechnical experimentation."
     },
     {
       "id": "iot",
@@ -191,7 +192,8 @@
           "children": []
         }
       ],
-      "notionParentId": "hub"
+      "notionParentId": "hub",
+      "description": "Measurement, sensors and automation: observing experimental systems, collecting reliable data and progressively developing control workflows."
     },
     {
       "id": "lab",
@@ -208,7 +210,8 @@
           "children": []
         }
       ],
-      "notionParentId": "hub"
+      "notionParentId": "hub",
+      "description": "A working space for laboratory methods, preparation and controlled experiments, connecting plant trials with documented observations."
     },
     {
       "id": "products",
