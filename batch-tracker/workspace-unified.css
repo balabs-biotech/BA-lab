@@ -386,3 +386,16 @@ html body[data-domain="laboratory"] #cultureCatalogList > .culture-catalog-row:h
   background-color:#2a3d43 !important;
   background-image:linear-gradient(145deg,rgba(42,61,67,.98),rgba(28,43,47,.99)) !important;
 }
+
+
+/* PASS 126 — override legacy tracker.css shorthand at the catalogue row itself. */
+html body[data-domain="laboratory"] #trackerCard #cultureCatalogList > .culture-catalog-row {
+  background:#243439 !important;
+  background-color:#243439 !important;
+  background-image:linear-gradient(145deg,rgba(36,52,57,.96),rgba(25,38,41,.98)) !important;
+}
+html body[data-domain="laboratory"] #trackerCard #cultureCatalogList > .culture-catalog-row:hover {
+  background:#2a3d43 !important;
+  background-color:#2a3d43 !important;
+  background-image:linear-gradient(145deg,rgba(42,61,67,.98),rgba(28,43,47,.99)) !important;
+}
