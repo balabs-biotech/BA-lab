@@ -1,0 +1,144 @@
+/* BA Labs CultureOps — shared shell and component contracts. */
+html body[data-domain] .app-toolbar {
+  display:flex !important;
+  align-items:center !important;
+  gap:18px !important;
+  min-height:68px !important;
+  padding:12px 16px !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  background:rgba(27,37,37,.96) !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.18) !important;
+}
+html body[data-domain] .toolbar-brand { flex:0 0 auto; }
+html body[data-domain] .brand-wordmark strong { color:var(--paper) !important; letter-spacing:.12em !important; }
+html body[data-domain] .brand-wordmark small { color:var(--muted) !important; letter-spacing:.16em !important; }
+html body[data-domain] .toolbar-status {
+  margin-inline-start:auto !important;
+  color:var(--muted) !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.13em !important;
+  white-space:nowrap !important;
+}
+html body[data-domain] .app-hero {
+  position:relative !important;
+  isolation:isolate !important;
+  min-height:250px !important;
+  margin:18px 0 26px !important;
+  padding:clamp(26px,4vw,46px) !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1.25fr) minmax(210px,.75fr) !important;
+  align-items:center !important;
+  gap:24px !important;
+  overflow:hidden !important;
+  border:1px solid var(--border) !important;
+  border-radius:var(--ba-radius-lg) !important;
+  background:
+    radial-gradient(ellipse at 82% 42%,color-mix(in srgb,var(--workspace-accent) 13%,transparent),transparent 44%),
+    linear-gradient(120deg,#263633 0%,#1b2525 64%,#172020 100%) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.18) !important;
+}
+html body[data-domain] .hero-copy { position:relative !important; z-index:2 !important; max-width:720px !important; }
+html body[data-domain] .app-hero .eyebrow,
+html body[data-domain] .section-kicker,
+html body[data-domain] .entry-step-mark {
+  color:var(--workspace-accent) !important;
+  font-size:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.15em !important;
+}
+html body[data-domain] .app-hero h1 {
+  max-width:760px !important;
+  margin:14px 0 12px !important;
+  color:var(--paper) !important;
+  font-size:clamp(34px,4.3vw,58px) !important;
+  font-weight:680 !important;
+  line-height:1.04 !important;
+}
+html body[data-domain] .app-hero h1 span { color:var(--workspace-accent) !important; }
+html body[data-domain] .hero-description { max-width:640px !important; color:#c2cdc6 !important; font-size:15px !important; line-height:1.7 !important; }
+html body[data-domain] .hero-tags { display:flex !important; flex-wrap:wrap !important; gap:8px !important; margin-top:20px !important; }
+html body[data-domain] .hero-tags > span {
+  padding:7px 10px !important;
+  border:1px solid rgba(210,225,215,.16) !important;
+  border-radius:999px !important;
+  background:rgba(10,17,16,.24) !important;
+  color:#d5ded8 !important;
+  font-size:11px !important;
+}
+html body[data-domain] .hero-art { position:relative !important; z-index:1 !important; min-height:170px !important; opacity:.9 !important; }
+html body[data-domain] .card,
+html body[data-domain] :is(#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
+  min-width:0 !important;
+  padding:clamp(20px,2.6vw,30px) !important;
+  border:1px solid var(--border) !important;
+  border-radius:var(--ba-radius-lg) !important;
+  background:linear-gradient(180deg,rgba(31,43,42,.98),rgba(27,37,37,.98)) !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.17) !important;
+}
+html body[data-domain] .card > .section-kicker {
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:100% !important;
+  padding-bottom:12px !important;
+  border-bottom:1px solid var(--border) !important;
+}
+html body[data-domain] .card :is(h2,h3,h4) { color:var(--paper) !important; font-weight:650 !important; }
+html body[data-domain] .card h2 { font-size:clamp(23px,2.2vw,30px) !important; }
+html body[data-domain] .card h3 { font-size:18px !important; }
+html body[data-domain] .card h4 { font-size:15px !important; }
+html body[data-domain] .card :is(.muted,.hint,small) { color:var(--muted) !important; }
+html body[data-domain] .card :is(input,select,textarea) {
+  width:100% !important;
+  min-height:42px !important;
+  padding:10px 12px !important;
+  color:var(--text) !important;
+  background:var(--control-bg) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:9px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card textarea { min-height:104px !important; resize:vertical !important; }
+html body[data-domain] .card :is(input,select,textarea):focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:2px !important;
+  border-color:var(--workspace-accent) !important;
+}
+html body[data-domain] .card button:not(.culture-lineage-node),
+html body[data-domain] .section-nav a {
+  border-radius:9px !important;
+  font-family:var(--ba-font) !important;
+  font-weight:650 !important;
+}
+html body[data-domain] .card :is(button[data-primary],.primary-button,#createButton,#createBatchButton,#saveBioOperation) {
+  color:#11191a !important;
+  background:var(--workspace-accent) !important;
+  border:1px solid var(--workspace-accent) !important;
+}
+html body[data-domain] .card :is(.secondary-button,.small-button,.culture-catalog-action) {
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  border:1px solid var(--border-strong) !important;
+}
+html body[data-domain] .card :is(.info,.consent-panel,.assisted-entry-panel,.batch-create-panel) {
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border:1px solid var(--border) !important;
+  border-radius:12px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card :is(.culture-catalog-row,.culture-detail-field,.culture-timeline-entry,.measurement-entry,.batch-event-item,.stage,.qc-row,.statistics-summary-item) {
+  min-width:0 !important;
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  border:1px solid var(--border) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:11px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card .culture-catalog-row :is(strong,.culture-catalog-code) { color:var(--paper) !important; }
+html body[data-domain] .card .culture-catalog-meta { color:var(--muted) !important; }
+html body[data-domain] .statistics-table th { color:var(--paper) !important; background:var(--surface-2) !important; }
+html body[data-domain] .statistics-table td { color:var(--text) !important; }
