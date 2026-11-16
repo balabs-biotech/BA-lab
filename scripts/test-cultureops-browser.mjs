@@ -132,6 +132,21 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
+          overflowElements: [...document.querySelectorAll("body *")].map(element => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return {
+              tag: element.tagName,
+              id: element.id || null,
+              className: typeof element.className === "string" ? element.className.slice(0, 90) : null,
+              left: Math.round(rect.left),
+              right: Math.round(rect.right),
+              width: Math.round(rect.width),
+              position: style.position,
+              display: style.display
+            };
+          }).filter(item => item.width > 0 && (item.right > innerWidth + 1 || item.left < -1))
+            .sort((a, b) => b.right - a.right).slice(0, 12),
           navLinks: document.querySelectorAll(".section-nav a").length,
           navigationHidden: document.querySelector(".section-nav")?.hidden ?? false,
         };
