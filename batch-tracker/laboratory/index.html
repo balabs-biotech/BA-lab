@@ -7,7 +7,7 @@
   <meta name="description" content="Espace Laboratory BA Labs : géloses, cultures liquides, inoculation du grain, matières, protocoles et filiation des lots.">
   <title>BA Labs CultureOps — Laboratory</title>
   <link rel="stylesheet" href="../tracker.css?v=20261116-ba-unified-110">
-  <link rel="stylesheet" href="../workspace-unified.css?v=20261116-ba-layout-115">
+  <link rel="stylesheet" href="../workspace-unified.css?v=20261116-visual-refactor-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="laboratory">
@@ -17,12 +17,12 @@
       document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
     } else {
       window.BA_LABS_DOMAIN = "laboratory";
-    fetch("../workspace.html?v=20261115-ui-refinement-37")
+    fetch("../workspace.html?v=20261116-visual-refactor-1")
       .then(response => { if (!response.ok) throw new Error("workspace unavailable"); return response.text(); })
       .then(markup => {
         document.getElementById("workspace-root").innerHTML = markup;
         const visualRuntime = document.createElement("script");
-        visualRuntime.src = "../workspace-visuals.js?v=20261116-origin-pixi-1";
+        visualRuntime.src = "../workspace-visuals.js?v=20261116-visual-refactor-1";
         visualRuntime.onerror = () => console.info("BA Labs: effets visuels optionnels indisponibles.");
         document.body.appendChild(visualRuntime);
         const i18nScript = document.createElement("script");
