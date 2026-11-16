@@ -417,7 +417,7 @@ function openResource(item) {
   currentNode=data;currentAnchor=data.position.clone();renderPath();
   const trace={rawTitle:raw?.title||raw?.name||null,resolved:!!spatial,parentMatches:parent===previousNode,before,after:{title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0},position:!!currentAnchor,error:null};
   window.__BALABS_3D_NAV_TRACE__=trace;
-  smoothCamera(currentAnchor,6.1,720,()=>{try{buildResources(selected,data,currentAnchor);trace.afterBuild={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0}}catch(error){trace.error={message:error?.message||String(error),stack:error?.stack||''};window.__BALABS_3D_LAST_OPEN_ERROR__=trace.error}});
+  try{buildResources(selected,data,currentAnchor);trace.afterBuild={title:currentNode?.title||null,depth:navigationStack.length,children:currentNode?.children?.length||0};smoothCamera(currentAnchor,6.1,720)}catch(error){trace.error={message:error?.message||String(error),stack:error?.stack||''};window.__BALABS_3D_LAST_OPEN_ERROR__=trace.error}
   return;
  }
  if(data.url){window.open(data.url,'_blank','noopener');return}
@@ -429,7 +429,7 @@ function enterDomain(id) {
   intro.hidden=true;nav.hidden=false;ROOT.classList.remove('universe-closed');ROOT.classList.add('universe-open');panel.hidden=true;panel.replaceChildren();
   // Stay inside the primary Three.js scene: the manifest is the sole content source.
   // Do not invoke the legacy sphere renderer or rebuild its HTML view.
-  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?12.5:10.5):5.8;smoothCamera(cells.get(id).position,initialDistance,1050,()=>buildResources(id));
+  const rootCount=manifest?.domains?.find(d=>d.id===id)?.children?.length||0;const initialDistance=rootCount>16?(window.innerWidth<760?12.5:10.5):6.8;buildResources(id);smoothCamera(cells.get(id).position,initialDistance,1050);
 }
 function goBackLevel() {
   if(navigationStack.length){const previous=navigationStack.pop();currentNode=previous.node;currentAnchor=previous.anchor.clone();smoothCamera(currentAnchor,6.2,650,()=>buildResources(selected,currentNode,currentAnchor));return}
