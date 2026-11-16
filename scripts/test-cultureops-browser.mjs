@@ -307,7 +307,6 @@ try {
             border: style.borderTopColor,
             radius: style.borderTopLeftRadius,
             padding: style.padding,
-            accent: style.borderTopColor === getComputedStyle(document.body).getPropertyValue("--domain-accent").trim(),
           });
           fixture.remove();
         }
