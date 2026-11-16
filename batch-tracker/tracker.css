@@ -23088,3 +23088,140 @@ html body[data-domain] #batchCard #batchList .batch-item:focus-visible {
   background-image:none !important;
   border-color:var(--border-strong) !important;
 }
+
+
+/* BA LABS CULTUREOPS — PASS 108: normalize inherited domain-specific interiors */
+/* The three workspaces share typography, surfaces, borders and component density.
+   Domain identity is expressed only through --domain-accent. */
+html body[data-domain] {
+  --bg:#11191a !important;
+  --surface:#1b2525 !important;
+  --surface-2:#222f2e !important;
+  --surface-raised:#293735 !important;
+  --control-bg:#151f1e !important;
+  --border:#394846 !important;
+  --border-strong:#52645f !important;
+  --text:#e9eeea !important;
+  --muted:#aab8b1 !important;
+  --paper:#f2f1e9 !important;
+  color-scheme:dark !important;
+  color:var(--text) !important;
+  background:var(--bg) !important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+}
+html body[data-domain] .app-toolbar,
+html body[data-domain] .card,
+html body[data-domain] #contextPanel,
+html body[data-domain] .panel,
+html body[data-domain] .auth-card {
+  color:var(--text) !important;
+  background:var(--surface) !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.16) !important;
+}
+html body[data-domain] .card :is(h2,h3,h4),
+html body[data-domain] .app-toolbar :is(h2,h3,h4) {
+  color:var(--paper) !important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+  font-weight:650 !important;
+  letter-spacing:normal !important;
+  text-transform:none !important;
+}
+html body[data-domain] .card :is(
+  .culture-catalog-row,
+  .culture-detail-field,
+  .culture-timeline-entry,
+  .statistics-summary-item,
+  .statistics-chart,
+  .statistics-table-wrap,
+  .quick-capture,
+  .quick-capture-tile,
+  .overview-metric,
+  .overview-activity,
+  .overview-shortcuts,
+  .culture-detail-summary,
+  .measurement-entry,
+  .batch-stat,
+  .batch-event-item,
+  .stage,
+  .qc-row
+) {
+  color:var(--text) !important;
+  background:var(--surface-raised) !important;
+  border:1px solid var(--border) !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card :is(
+  .culture-catalog-row,
+  .culture-detail-field,
+  .culture-timeline-entry,
+  .statistics-summary-item,
+  .quick-capture,
+  .quick-capture-tile,
+  .overview-metric,
+  .overview-activity,
+  .overview-shortcuts,
+  .measurement-entry,
+  .batch-stat,
+  .batch-event-item,
+  .stage,
+  .qc-row
+) :is(strong,h3,h4,.title,.label) {
+  color:var(--paper) !important;
+}
+html body[data-domain] .card :is(.muted,.hint,.culture-catalog-meta,.batch-stat-label,.qc-code) {
+  color:var(--muted) !important;
+}
+html body[data-domain] .card :is(input,select,textarea) {
+  color:var(--text) !important;
+  background:var(--control-bg) !important;
+  border:1px solid var(--border-strong) !important;
+  border-radius:9px !important;
+}
+html body[data-domain] .card :is(input,select,textarea)::placeholder {
+  color:var(--muted) !important;
+  opacity:1 !important;
+}
+html body[data-domain] .card .culture-catalog-action,
+html body[data-domain] .card :is(.secondary-button,.small-button),
+html body[data-domain] .card .quick-capture-tile {
+  border:1px solid var(--border-strong) !important;
+  border-radius:9px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card .culture-catalog-action[data-culture-action="observe"],
+html body[data-domain] .card :is(button[data-primary],.primary-button) {
+  color:#11191a !important;
+  background:var(--domain-accent) !important;
+  border-color:var(--domain-accent) !important;
+}
+html body[data-domain] .section-nav a[aria-current="page"] {
+  color:#11191a !important;
+  background:var(--domain-accent) !important;
+  border:1px solid var(--domain-accent) !important;
+  border-radius:9px !important;
+}
+html body[data-domain] .statistics-table th {
+  color:var(--paper) !important;
+  background:var(--surface-2) !important;
+  border-color:var(--border) !important;
+}
+html body[data-domain] .statistics-table td {
+  color:var(--text) !important;
+  border-color:var(--border) !important;
+}
+html body[data-domain] .consent-panel,
+html body[data-domain] .info {
+  color:var(--text) !important;
+  background:var(--surface-2) !important;
+  border-color:var(--border) !important;
+}
+@media(max-width:700px) {
+  html body[data-domain] .card :is(
+    .culture-catalog-row,.culture-detail-field,.culture-timeline-entry,
+    .statistics-summary-item,.quick-capture,.quick-capture-tile,
+    .overview-metric,.overview-activity,.overview-shortcuts
+  ) { border-radius:9px !important; }
+}
