@@ -196,12 +196,11 @@ async function checkWorkingScene(name, viewport) {
     true, name + ': pointer interaction must focus the interactive 3D stage so keyboard navigation is immediately available');
   await page.waitForFunction(() => {
     const mini = document.querySelector('#miniView');
-    return mini?.classList.contains('spatial-source-only') &&
-      getComputedStyle(mini).display === 'none';
-  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain: ' + JSON.stringify(await page.evaluate((surface) => ({probe:window.__BALABS_3D_E2E__(),lastPick:window.__BALABS_3D_LAST_PICK__,pickTrace:window.__BALABS_3D_PICK_TRACE__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,hitSurface:surface}), hitSurface)) + ' — ' + error.message); });
+    return !mini || mini.hidden || getComputedStyle(mini).display === 'none';
+  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain or hide the legacy view: ' + JSON.stringify(await page.evaluate((surface) => ({probe:window.__BALABS_3D_E2E__(),lastPick:window.__BALABS_3D_LAST_PICK__,pickTrace:window.__BALABS_3D_PICK_TRACE__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,hitSurface:surface}), hitSurface)) + ' — ' + error.message); });
   assert.ok(await canvas.isVisible(), name + ': entering a 3D domain must keep the WebGL canvas visible');
-  assert.equal(await page.locator('#miniView.spatial-source-only').count(), 1,
-    name + ': the legacy index must remain a hidden data source during 3D navigation');
+  assert.equal(await page.locator('#miniView:visible').count(), 0,
+    name + ': the legacy HTML index must never be visible during 3D navigation');
   assert.equal(await page.locator('#miniView.spatial-source-only .linknode:visible').count(), 0,
     name + ': no legacy 2D links may overlay the 3D scene');
   await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
