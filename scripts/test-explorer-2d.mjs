@@ -27,7 +27,7 @@ try {
       const pad = Math.min(150, Math.max(78, rect.width * .16));
       const overviewScale = Math.max(.26, Math.min(.62,
         (rect.width - pad * 2) / 1110,
-        (rect.height - pad * 2) / 1390,
+        (rect.height - pad * 2) / 1110,
       ));
       return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 - 430 * overviewScale };
     });
