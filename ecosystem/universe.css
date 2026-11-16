@@ -51,3 +51,7 @@ a:focus-visible{outline:2px solid #d18a6b;outline-offset:3px}
 .search-status{min-height:18px;margin:-5px 3px 10px;color:#d18a6b;font-size:11px}
 .search-status:empty{display:none}
 .node:focus-visible,.switch-link:focus-visible{outline:2px solid #d18a6b;outline-offset:3px}
+
+.search-results[hidden]{display:none!important}
+.result-path{margin:0 0 8px!important;color:#d18a6b!important;font-size:10px!important;letter-spacing:.03em}
+.search-results .node{min-height:145px}
