@@ -41,3 +41,13 @@ a:focus-visible{outline:2px solid #d18a6b;outline-offset:3px}
 .resource-search input:focus{border-color:#b96b4d;box-shadow:0 0 0 3px #b96b4d24}
 .node[hidden]{display:none!important}
 @media(max-width:640px){.resource-search{display:block;padding:10px;margin-bottom:11px}.resource-search span{display:block;margin-bottom:7px}.resource-search input{font-size:16px}}
+
+
+/* Content hierarchy: collections and leaf resources have distinct visual signatures. */
+.node[data-kind="collection"]{border-top:2px solid #b96b4d; background:linear-gradient(145deg,#263b38,#192725)}
+.node[data-kind="resource"]{border-inline-start:2px solid #8fae98;background:linear-gradient(145deg,#1c2b28,#172320)}
+.node[data-kind="resource"] .number{color:#a9c2ad}
+.node[data-kind="collection"] .count{padding:3px 7px;border:1px solid #52665b;border-radius:999px;background:#111b1d88}
+.search-status{min-height:18px;margin:-5px 3px 10px;color:#d18a6b;font-size:11px}
+.search-status:empty{display:none}
+.node:focus-visible,.switch-link:focus-visible{outline:2px solid #d18a6b;outline-offset:3px}
