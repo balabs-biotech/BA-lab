@@ -34,12 +34,12 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
  <nav class="crumbs breadcrumbs" aria-label="Navigation du réseau"><ul id="crumbs"><li><span>BA Labs</span></li></ul></nav>
  <div class="actions">
   <select class="select select-sm lang-select" id="language" aria-label="Choisir la langue"><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="ar">🇩🇿 العربية</option><option value="pt">🇵🇹 PT</option></select>
-  <a class="btn btn-outline btn-sm" id="back3d" href="./index.html#universe">3D ↗</a>
+  <span class="badge badge-outline">CONTINUOUS 2D</span>
  </div>
 </header>
 <main class="stage">
- <canvas id="field" aria-label="Réseau biologique interactif des huit univers BA Labs"></canvas>
- <div class="stage-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h1 id="heading">Un réseau, huit univers.</h1><p id="description">Explore les ramifications de BA Labs.</p></div>
+ <canvas id="field" aria-label="Réseau mycélien continu et explorable des huit univers BA Labs"></canvas>
+ <div class="stage-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h1 id="heading">Un seul réseau vivant.</h1><p id="description">Zoome dans les ramifications et sélectionne chaque branche.</p></div>
  <div class="controls" aria-label="Contrôles de la carte"><button class="btn btn-square btn-sm" id="zoomIn" aria-label="Zoom avant">+</button><button class="btn btn-square btn-sm" id="zoomOut" aria-label="Zoom arrière">−</button><button class="btn btn-square btn-sm" id="reset" aria-label="Recentrer">⌖</button><button class="btn btn-square btn-sm" id="back" aria-label="Retour" disabled>↶</button></div>
  <section id="selection" aria-live="polite"></section>
  <div class="hint" id="hint">GLISSER · PINCER POUR ZOOMER · SÉLECTIONNER UN NŒUD</div>
@@ -47,5 +47,5 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
  <div class="loading" id="loading"><div class="card"><div class="card-body"><span class="loading loading-spinner loading-md"></span><p>Chargement du réseau…</p></div></div></div>
 </main>
 </div>
-<script type="module" src="./explorer-2d.js?v=2"></script>
+<script type="module" src="./explorer-2d.js?v=3"></script>
 </body></html>
