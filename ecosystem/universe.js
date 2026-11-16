@@ -16,7 +16,7 @@ const slug=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
 const urlFor=(node)=>'?domain='+encodeURIComponent(domainId)+'&node='+encodeURIComponent(node.id)+'&lang='+lang;
 const findNode=(nodes,id,parent=null)=>{for(const n of nodes||[]){if(n.id===id)return {node:n,parent};const found=findNode(n.children,id,n);if(found)return found;}return null;};
 const renderNode=(node,index)=>{const children=node.children||[],hasChildren=children.length>0;const href=hasChildren?urlFor(node):node.url||'#';const external=!hasChildren&&/^https?:\/\//i.test(href);return '<a class="node" data-kind="'+(hasChildren?'collection':'resource')+'" href="'+esc(href)+'" '+(external?'target="_blank" rel="noopener noreferrer"':'')+'><span class="number">'+String(index+1).padStart(2,'0')+' / '+(hasChildren?'SECTION':'RESOURCE')+'</span>'+(hasChildren?'<span class="count">'+children.length+'</span>':'')+'<h3>'+esc(node.title)+'</h3>'+(node.description?'<p>'+esc(node.description)+'</p>':'')+'<span class="open">'+esc(hasChildren?t.open:t.detail)+'</span></a>';};
-fetch('./notion-tree.'+lang+'.json').then(r=>{if(!r.ok)throw Error('tree unavailable');return r.json();}).then(data=>{
+fetch('./notion-tree.'+lang+'.json?v=2').then(r=>{if(!r.ok)throw Error('tree unavailable');return r.json();}).then(data=>{
  const domain=(data.domains||[]).find(x=>x.id===domainId);if(!domain)throw Error('domain unavailable');
  let current=domain,parent=null,trail=[];
  if(nodeId){const found=findNode(domain.children,nodeId);if(found){current=found.node;parent=found.parent;let cursor=parent;while(cursor&&cursor!==domain){trail.unshift(cursor);const f=findNode(domain.children,cursor.id);cursor=f?.parent||null;}}}
