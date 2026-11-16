@@ -22121,3 +22121,17 @@ body[data-domain] :is(input,select,textarea,button,a):focus-visible { outline-co
     margin-bottom:9px !important;
   }
 }
+
+@media(max-width:700px) {
+  body[data-domain].workspace-authenticated .app-hero {
+    min-height:0 !important;
+    padding:8px 14px !important;
+    margin-bottom:8px !important;
+  }
+  body[data-domain].workspace-authenticated .app-hero .hero-art,
+  body[data-domain].workspace-authenticated .app-hero .hero-description,
+  body[data-domain].workspace-authenticated .app-hero .hero-tags,
+  body[data-domain].workspace-authenticated .app-hero .hero-note {
+    display:none !important;
+  }
+}
