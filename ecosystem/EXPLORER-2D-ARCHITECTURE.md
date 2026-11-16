@@ -1,29 +1,31 @@
 # BA Labs — architecture cible de l’explorateur 2D
 
-## Objectif
-Développer une expérience 2D immersive sur une page secondaire, comparée au moteur 3D historique avant toute bascule. La page principale conserve son moteur 3D pendant cette phase.
+## Direction retenue
+Un seul espace Canvas 2D continu, explorable par zoom progressif. Les huit univers, leurs branches, sous-branches et ressources restent dans le même espace et conservent leurs coordonnées. Cliquer sur un nœud ne change jamais de page ni de scène : le moteur centre le nœud, augmente le niveau de zoom et révèle les ramifications suivantes.
 
-## Architecture retenue
-- **Canvas 2D natif** : rendu des filaments, connexions, jonctions et particules. Les libellés sont dessinés en coordonnées écran et conservent une taille fixe pendant le zoom.
-- **Données existantes** : lecture de `notion-tree.fr.json`, `en`, `ar` ou `pt`. Pas de duplication de contenu ni de nouvelle base.
-- **DaisyUI 5.8.1** : couche d’interface uniquement — navbar, boutons, badges, breadcrumbs, carte de sélection et sélecteur de langue. Le thème reprend le graphite pétrole, le vert minéral, le cuivre et le gris minéral de BA Labs.
-- **Navigation hiérarchique** : vue des huit univers, sélection d’un nœud, exploration explicite de ses enfants, fil d’Ariane et retour au niveau précédent. Les ressources ouvrent leur URL Notion.
-- **Gestes** : déplacement, zoom molette, pincement tactile, commandes visibles de zoom et recentrage.
-- **Accessibilité** : liste DOM des nœuds visibles pour clavier et technologies d’assistance; prise en compte de `prefers-reduced-motion`; libellés ARIA.
-- **Comparaison** : lien de retour au moteur 3D, sans suppression ni modification du moteur historique.
+## Architecture
+- **Canvas 2D natif** : filaments organiques, ramifications latérales, bifurcations, anastomoses, jonctions irrégulières et particules en mouvement.
+- **Graphe hiérarchique global** : tous les descendants des huit arbres JSON sont positionnés dès le chargement. La profondeur est révélée progressivement selon le niveau de zoom; aucune navigation par remplacement de scène.
+- **Zoom profond** : zoom molette, boutons et pincement tactile; caméra centrée sur le point de zoom; niveaux de zoom élevés pour parcourir les branches les plus fines.
+- **Sélection directe** : toucher/clic sur un nœud sélectionne et centre la ressource. La fiche flottante propose explicitement le lien Notion, sans redirection automatique.
+- **Données** : arbres notion-tree.fr/en/ar/pt.json, sans duplication de contenu.
+- **DaisyUI 5.8.1** : commandes et fiche de sélection uniquement. Le réseau biologique reste dessiné par Canvas.
+- **Accessibilité** : liste DOM des nœuds visibles, libellés ARIA et prise en compte de prefers-reduced-motion.
 
-## DaisyUI : règles
-DaisyUI ne doit pas dessiner le réseau biologique. Il sert aux commandes et aux éléments de contexte. Aucun panneau latéral permanent; la fiche de sélection est compacte et flottante. Le moteur Canvas reste indépendant de DaisyUI.
+## Principes visuels
+- Densité organique croissante avec le zoom, sans grille ni disposition en cartes.
+- Ramifications secondaires et tertiaires visibles à mesure que la caméra s’approche.
+- Anastomoses limitées et irrégulières pour relier le réseau sans créer une grille artificielle.
+- Labels hiérarchisés : univers à la vue globale, ressources profondes au zoom rapproché.
+- Palette BA Labs : graphite pétrole, vert minéral, cuivre oxydé et gris minéral.
 
 ## Critères d’acceptation
-1. Les huit univers sont affichés et sélectionnables.
-2. Les sous-branches s’ouvrent à chaque niveau avec un fil d’Ariane fonctionnel.
-3. Chaque feuille ouvre sa bonne URL Notion.
-4. Les quatre langues et le RTL arabe sont pris en charge.
-5. La taille du texte reste constante au zoom.
-6. Les interactions tactiles, souris et clavier restent utilisables.
-7. Le moteur 3D reste disponible comme version de comparaison.
-8. Tester les performances sur mobile avant de promouvoir le 2D.
+1. Les huit univers et tous leurs descendants sont chargés dans un graphe unique.
+2. Le zoom révèle les sous-branches sans changer de page ni remplacer la scène.
+3. Un clic sur un nœud centre et agrandit cette zone; seule l'action explicite « Ouvrir la ressource » ouvre Notion.
+4. Le déplacement et le zoom fonctionnent à la souris et au tactile.
+5. Les quatre langues FR/EN/AR/PT restent disponibles; arabe en RTL.
+6. Le moteur 3D historique n'est pas modifié par ce travail.
 
-## Étape actuelle
-Cette branche ajoute le shell DaisyUI et le moteur Canvas 2D hiérarchique. Le layout organique est déterministe; une simulation de croissance plus poussée viendra après validation de la navigation, des données et des performances.
+## État
+Refonte continue en cours sur la branche feat/continuous-mycelium-explorer. Le déploiement public ne doit intervenir qu'après revue et validation du rendu.
