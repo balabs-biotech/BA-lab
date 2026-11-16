@@ -157,25 +157,24 @@ function createWorld() {
       const strandMesh=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.0045,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.8,roughness:.8}));
       soma.add(strandMesh);
     }
-    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.18,24,18),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));
-    glow.scale.copy(soma.scale);group.add(glow);
+    // No halo sphere: the identity remains an open hyphal junction, not a planet-like body.
     const label=makeLabel(LABELS[id]?.title||id, color, 17);label.position.set(0,-.94,0);label.scale.set(2.8,.66,1);label.userData={id,kind:'domain-label'};group.add(label);
     const hit=new THREE.Mesh(new THREE.SphereGeometry(.96,16,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.userData={id,kind:'domain'};group.add(hit);
     world.add(group);cells.set(id,{group,soma,label,hit,position:pos,color});
     const domainButton=document.createElement('button');domainButton.type='button';domainButton.className='webgl-hit-target webgl-domain-target';domainButton.setAttribute('aria-label',(LABELS[id]?.title||id)+' — '+t('domain'));domainButton.title=LABELS[id]?.title||id;domainButton.dataset.domainId=id;domainButton.style.width='116px';domainButton.style.height='116px';domainButton.addEventListener('pointerdown',()=>stage?.focus({preventScroll:true}));domainButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();stage?.focus({preventScroll:true});if(!selected)enterDomain(id)});stage.append(domainButton);domainHitTargets.set(id,{object:hit,button:domainButton});
     pickables.push(soma,hit,label);
-    for(let j=0;j<14;j++){
-      const a=j/14*Math.PI*2+IDS.indexOf(id)*.31;
+    for(let j=0;j<9;j++){
+      const a=j/9*Math.PI*2+IDS.indexOf(id)*.31;
       const start=new THREE.Vector3(Math.cos(a)*.10,Math.sin(a)*.09,Math.sin(a*1.7)*.035);
-      const reach=1.0+(j%4)*.24;
+      const reach=.82+(j%4)*.27+(j%3)*.06;
       const end=new THREE.Vector3(Math.cos(a)*reach,Math.sin(a)*reach*.76,Math.sin(a*1.7)*.34);
-      const mid=start.clone().lerp(end,.52).add(new THREE.Vector3(Math.cos(a+1)*.18,Math.sin(a+1)*.16,.13));
+      const mid=start.clone().lerp(end,.43).add(new THREE.Vector3(Math.cos(a+1.1)*(.22+(j%3)*.07),Math.sin(a+1.1)*(.18+(j%2)*.08),.16+(j%3)*.035));
       const curve=new THREE.CatmullRomCurve3([start,mid,end]);
       const neurite=new THREE.Mesh(new THREE.TubeGeometry(curve,28,.0065+(j%3)*.0014,5,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.28,transparent:true,opacity:.76,roughness:.7}));
       neurite.userData={id,kind:'neurite'};group.add(neurite);
-      for(let fork=0;fork<2;fork++){
-        const at=curve.getPoint(.48+fork*.22),side=fork===0?-1:1;
-        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.34+(j%3)*.08),Math.sin(a+side*.72)*(.28+(j%2)*.07),.07));
+      for(let fork=0;fork<3;fork++){
+        const at=curve.getPoint(.34+fork*.2),side=fork===1?1:-1;
+        const forkEnd=at.clone().add(new THREE.Vector3(Math.cos(a+side*.72)*(.22+(j%3)*.09+(fork===2?.13:0)),Math.sin(a+side*(.62+fork*.13))*(.19+(j%2)*.08+(fork===2?.1:0)),.07));
         const forkCurve=new THREE.CatmullRomCurve3([at,at.clone().lerp(forkEnd,.55).add(new THREE.Vector3(0,.035,.035)),forkEnd]);
         group.add(new THREE.Mesh(new THREE.TubeGeometry(forkCurve,14,.0038,4,false),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.22,transparent:true,opacity:.52,roughness:.8})));
       }
@@ -592,10 +591,10 @@ function syncLabelScales() {
     const depth=label.userData.depth||0;
     const compact=window.innerWidth<760;
     const isDomain=label.userData.kind==='domain-label';
-    const basePixels=isDomain?(compact?15:17):label.userData.denseRoot?(compact?14:16):Math.max(compact?9:10,(compact?12:14)-depth*1.5);
+    const basePixels=isDomain?(compact?12:13):label.userData.denseRoot?(compact?10:11):Math.max(compact?8:9,(compact?10:11)-depth*1.1);
     const referenceDistance=isDomain?13.5:6.5;
     const zoomFactor=Math.pow(cameraDistance/referenceDistance,.55);
-    const targetPixels=THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:8,compact?19:22);
+    const targetPixels=THREE.MathUtils.clamp(basePixels*zoomFactor,compact?7:7,compact?15:17);
     const worldHeight=cameraDistance*projection*targetPixels;
     label.scale.set(worldHeight*3.8,worldHeight,1);
   };
