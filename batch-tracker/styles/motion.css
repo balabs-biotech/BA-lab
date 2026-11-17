@@ -44,3 +44,15 @@ html body[data-domain] .culture-lineage-node {
     transition-duration:.01ms !important;
   }
 }
+
+
+/* PASS 151 — OriginKit-style pointer light is now tied to the full surface language. */
+html body[data-domain] .ba-reactive-surface {
+  border-color:color-mix(in srgb,var(--workspace-accent) 34%,rgba(169,192,179,.18)) !important;
+  background-image:
+    radial-gradient(360px circle at var(--ba-pointer-x,50%) var(--ba-pointer-y,50%),color-mix(in srgb,var(--workspace-accent) 8%,transparent),transparent 72%),
+    linear-gradient(145deg,rgba(255,255,255,.027),transparent 42%) !important;
+}
+html body[data-domain] .app-toolbar.ba-reactive-surface {
+  background-color:rgba(24,36,35,.9) !important;
+}
