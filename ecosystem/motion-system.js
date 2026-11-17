@@ -123,3 +123,4 @@
     const heroImage=document.querySelector('.hero-micrograph');
     if(heroImage) animate(heroImage,{scale:[1,1.018],duration:9500,ease:'inOutSine',alternate:true,loop:true});
   }).catch(()=>{ /* The site remains readable and usable if the animation CDN is unavailable. */ });
+})();
