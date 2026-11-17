@@ -95,6 +95,7 @@ for (const [label, entry] of [["GreenTech", greenTechEntry], ["Mycology", mycolo
 assert.ok(spatialStyles.includes(".ba-spatial-dock") && spatialStyles.includes("@keyframes ba-spatial-arrive"), "The navigation dock and panel transition must have a dedicated visual layer");
 assert.ok(spatialStyles.includes("grid-area:spatial"), "The dock must occupy a dedicated grid row without displacing the workspace hero");
 assert.ok(["grid-area:back","grid-area:hero","grid-area:message","grid-area:auth","grid-area:result"].every(area => spatialStyles.includes(area)), "All primary workspace regions must have explicit grid placement around the new dock");
+assert.ok(spatialStyles.includes("#environmentalCard { grid-area:workspace"), "GreenTech environmental intelligence must remain inside the workspace grid row");
 assert.ok(spatialNavigation.includes("ba-spatial-enter-x") && spatialNavigation.includes("ba-spatial-enter-y") && spatialStyles.includes("translate3d(var(--ba-spatial-enter-x"), "Panel transitions must follow the chosen left, right, up or down direction");
 assert.ok(["fr:", "en:", "pt:", "ar:"].every(language => spatialNavigation.includes(language)), "Spatial navigation must be available in all four CultureOps languages");
 console.log("✓ CultureOps spatial navigation: four directions, keyboard, touch and reduced motion");
