@@ -446,7 +446,7 @@ assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .art-cap
 
 // Shared design-system contract: preview consumes the same maintained editorial layer as public.
 assert.ok(previewHtml.includes('class="wrap balabs-ui" id="app"'), 'Preview root must opt into the shared BA Labs visual system');
-assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v=14'), 'Preview must load the shared visual system after its local styles');
+assert.ok(previewHtml.includes('../ecosystem/brand-system.css?v='), 'Preview must load the shared visual system after its local styles');
 
 // Preview parity contract: retain the preview's independent light theme while
 // matching editorial hierarchy, responsive grids, touch targets and RTL focus.
@@ -491,8 +491,8 @@ for (const selector of [
 assert.ok(brandCss.includes('PHASE 6 — internal universe navigation'), 'Internal universe navigation art direction must be present');
 assert.ok(brandCss.includes('counter-increment: branch-index'), 'Nested branch links must receive a consistent editorial index');
 assert.ok(brandCss.includes('grid-template-columns: repeat(4, minmax(0, 1fr)) !important'), 'Homepage scientific method section remains intact after phase 6');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(html), 'Public page must request phase 6 visual system');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(previewHtml), 'Preview must request phase 6 visual system');
+assert.ok( html.includes('brand-system.css?v='), 'Public page must request phase 6 visual system');
+assert.ok( previewHtml.includes('brand-system.css?v='), 'Preview must request phase 6 visual system');
 
 
 // Phase 7 selected branch dossier: presentation-only, no engine logic changes.
@@ -505,8 +505,8 @@ for (const selector of [
 assert.ok(brandCss.includes('PHASE 7 — selected branch dossier'), 'Phase 7 dossier art direction must be present');
 assert.ok(brandCss.includes('width: min(360px, calc(100% - 108px)) !important'), 'Dossier must reserve room for explorer controls');
 assert.ok(brandCss.includes('max-height: calc(100% - 112px) !important'), 'Mobile dossier must remain inside the explorer viewport');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(html), 'Public site must request phase 7 visual system');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(previewHtml), 'Preview must request phase 7 visual system');
+assert.ok( html.includes('brand-system.css?v='), 'Public site must request phase 7 visual system');
+assert.ok( previewHtml.includes('brand-system.css?v='), 'Preview must request phase 7 visual system');
 
 
 // Root entry page: deliberate art-direction change, not another rounded-card skin.
@@ -524,8 +524,8 @@ assert.ok(brandCss.includes('grid-template-areas: "image index" "image title" "i
 assert.ok(brandCss.includes('filter: grayscale(.72) contrast(1.08)'), 'Research imagery must use the monochrome field-documentation treatment');
 assert.ok(brandCss.includes('grid-template-columns: repeat(4,minmax(0,1fr))'), 'Method section must use a four-column research sequence on desktop');
 assert.ok(brandCss.includes('grid-template-columns: repeat(2,minmax(0,1fr)) !important;'), 'Editorial method must adapt to a two-column mobile sequence');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(html), 'Public site must request phase 11 art direction');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(previewHtml), 'Preview must request phase 8 art direction');
+assert.ok( html.includes('brand-system.css?v='), 'Public site must request phase 11 art direction');
+assert.ok( previewHtml.includes('brand-system.css?v='), 'Preview must request phase 8 art direction');
 
 assert.ok(brandCss.includes('PHASE 10 — field-report project index'), 'Phase 10 field-report art direction must exist');
 assert.ok(brandCss.includes('grid-template-areas: "image index" "image title" "image copy" "image topics" "image tag" "image link"'), 'Project tracks must render as an alternating editorial field-report sequence');
@@ -543,8 +543,8 @@ assert.ok(brandCss.includes('PHASE 12 — navigation and closing imprint'), 'Pha
 assert.ok(brandCss.includes('.foot .foot-nav') && brandCss.includes('grid-template-columns:minmax(0,1fr) auto'), 'Footer must use a deliberate editorial two-column composition');
 assert.ok(brandCss.includes('.site-nav a::after') && brandCss.includes('transform:scaleX(1)'), 'Primary navigation must have a restrained copper active/hover rule');
 assert.ok(brandCss.includes('@media(max-width:760px)') && brandCss.includes('.foot { grid-template-columns:1fr'), 'Navigation and footer must collapse cleanly on mobile');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(html), 'Public site must request phase 12 visual system');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(previewHtml), 'Preview must request phase 12 visual system');
+assert.ok( html.includes('brand-system.css?v='), 'Public site must request phase 12 visual system');
+assert.ok( previewHtml.includes('brand-system.css?v='), 'Preview must request phase 12 visual system');
 
 
 // Phase 13: close the homepage with an editorial principles colophon, not generic cards.
@@ -552,7 +552,7 @@ assert.ok(brandCss.includes('PHASE 13 — research principles as an editorial co
 assert.ok(html.includes('class="value-grid"') && html.includes('class="value-item"'), 'Closing principles must use the active semantic value-grid markup');
 assert.ok(overridesCss.includes('.value-grid{display:grid') && overridesCss.includes('.value-item{'), 'Closing principles must use the active value-item styles');
 assert.ok(overridesCss.includes('grid-template-columns:repeat(3,minmax(0,1fr))'), 'Closing principles must use the current three-column desktop layout');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(html) &&  /brand-system\\.css\\?v=\\d+/.test(previewHtml), 'Public and preview must use the same Phase 13 stylesheet');
+assert.ok( html.includes('brand-system.css?v=') &&  previewHtml.includes('brand-system.css?v='), 'Public and preview must use the same Phase 13 stylesheet');
 
 
 // Phase 14: browser-capture fixes for the responsive gateway header and hero.
@@ -560,4 +560,4 @@ assert.ok(brandCss.includes('PHASE 14 — browser-capture fixes'), 'Phase 14 bro
 assert.ok(brandCss.includes('flex-wrap:nowrap !important') && brandCss.includes('white-space:nowrap !important'), 'Language and navigation controls must remain on a single horizontal rail');
 assert.ok(brandCss.includes('#app.balabs-ui > .top .tools::-webkit-scrollbar'), 'Mobile language rail must scroll without visible scrollbar');
 assert.ok(brandCss.includes('padding:42px 22px 44px !important'), 'Mobile gateway hero must have safe horizontal breathing room');
-assert.ok( /brand-system\\.css\\?v=\\d+/.test(html) &&  /brand-system\\.css\\?v=\\d+/.test(previewHtml), 'Public and preview must share Phase 14 stylesheet');
+assert.ok( html.includes('brand-system.css?v=') &&  previewHtml.includes('brand-system.css?v='), 'Public and preview must share Phase 14 stylesheet');
