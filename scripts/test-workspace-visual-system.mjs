@@ -54,3 +54,15 @@ assert.ok(laboratoryStyles.includes(".lab-process-map-stage"), "Laboratory proce
 assert.ok(laboratoryEntry.includes("20261117-lab-process-map-161"), "Laboratory must load the new process map runtime");
 
 console.log("✓ CultureOps sector-specific visual runtime contract");
+
+const greenClimate = fs.readFileSync("batch-tracker/greentech-climate-signature.js", "utf8");
+const greenClimateStyles = fs.readFileSync("batch-tracker/styles/greentech-climate-signature.css", "utf8");
+assert.ok(greenClimate.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "GreenTech climate signature must use pinned PixiJS");
+assert.ok(greenClimate.includes('document.querySelectorAll("#envWeatherCharts > .environmental-weather-chart")'), "GreenTech visualization must read existing NASA POWER chart cards");
+assert.ok(greenClimate.includes('svg.querySelectorAll("circle")') && greenClimate.includes('circle.querySelector("title")'), "GreenTech visualization must derive plotted points and labels from real chart data");
+assert.ok(greenClimate.includes("next.stop()"), "GreenTech PixiJS visualization must render on demand without a permanent ticker");
+assert.ok(greenClimate.includes("resizeObserver.disconnect()"), "GreenTech visualization must clean up resize observers");
+assert.ok(greenClimate.includes("Les graphiques météo natifs restent actifs"), "GreenTech visualization must preserve native charts as fallback");
+assert.ok(greenClimateStyles.includes(".greentech-climate-signature"), "GreenTech climate signature must have its own visual system");
+assert.ok(greenClimateStyles.includes("greentech-climate-values"), "GreenTech visual summary must expose accessible textual values");
+assert.ok(greenTechEntry.includes("20261117-climate-signature-162"), "GreenTech must load the climate signature runtime");
