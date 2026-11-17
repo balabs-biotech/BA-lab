@@ -50,6 +50,12 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection .card-title')?.textContent === 'MYCOLOGIE', undefined, { timeout: 15000 });
     assert.equal(page.url(), originalUrl, 'Selecting a universe must stay inside the normal BA Labs homepage');
     assert.ok((await page.locator('#selection .card-title').innerText()).length > 0, 'Direct domain selection must focus the requested universe in the embedded scene');
+    assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), 'location', 'The side rail must reflect the focused universe');
+    await page.locator('.universe-rail [data-universe="bio"]').click();
+    await page.waitForFunction(() => document.querySelector('#selection .card-title')?.textContent === 'BIOTECHNOLOGIE', undefined, { timeout: 10000 });
+    assert.equal(await page.locator('.universe-rail [data-universe="bio"]').getAttribute('aria-current'), 'location', 'Clicking a side point must focus and activate its matching universe');
+    assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), null, 'Only the currently focused universe may be active in the side rail');
+
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(failed, [], 'No failed network requests');
     await page.screenshot({ path: outputDir + '/' + viewport.name + '-vernpixi-primary.png', fullPage: false });
