@@ -1545,3 +1545,18 @@
 #app.balabs-ui > main .universe-index-card .universe-visual.is-unavailable img{display:none}
 #app.balabs-ui > main .universe-index-card .universe-visual.is-unavailable{background:radial-gradient(ellipse at 48% 38%,#405b50,#172522 68%,#111b1d)}
 @media(prefers-reduced-motion:reduce){#app.balabs-ui > main .universe-index-card .universe-visual img{animation:none!important;will-change:auto}}
+
+
+/* PHASE 44 — fix the universe directory hit-testing: only actual cards receive pointer input. */
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-grid{
+  pointer-events:none!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card{
+  pointer-events:auto!important;position:relative!important;z-index:5!important;
+  cursor:pointer!important;touch-action:manipulation;
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card:before,
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card:after,
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card>*{
+  pointer-events:none!important;
+}
