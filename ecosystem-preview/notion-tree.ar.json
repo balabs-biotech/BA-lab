@@ -705,40 +705,45 @@
               "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
               "notionId": "40173152f17181f18a55d7ba9a90a713",
               "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "ar-products-pleurotus",
               "title": "Pleurotus — الأنواع والموارد المزروعة",
               "notionId": "40273152f1718104965acbf434612d39",
               "url": "https://app.notion.com/p/40273152f1718104965acbf434612d39",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "ar-products-other-fungi",
               "title": "فطريات أخرى مدروسة أو مزروعة",
               "notionId": "40273152f171817dafeae0d07ecb305f",
               "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "ar-products-fungal-resources",
               "title": "الموارد الفطرية",
               "notionId": "40173152f171814b88a0dbb38a75acdd",
               "url": "https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "ar-products-mycorrhizae",
               "title": "الفطريات الجذرية والتفاعلات البيولوجية",
               "notionId": "40173152f17181c6b3baf6efc7bb60bc",
               "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             }
           ]
         },
