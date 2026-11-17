@@ -175,12 +175,16 @@ try {
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
       const compactHero = await page.evaluate(() => {
         const hero = document.querySelector(".app-hero");
+        const auth = document.querySelector("#authCard");
+        const authWasVisible = auth && !auth.classList.contains("hidden");
         const before = hero?.getBoundingClientRect().height ?? 0;
         document.body.classList.add("workspace-authenticated");
+        auth?.classList.add("hidden");
         const after = hero?.getBoundingClientRect().height ?? 0;
         const artHidden = getComputedStyle(document.querySelector(".hero-art")).display === "none";
         const descriptionHidden = getComputedStyle(document.querySelector(".hero-description")).display === "none";
         document.body.classList.remove("workspace-authenticated");
+        if (authWasVisible) auth.classList.remove("hidden");
         return { before, after, artHidden, descriptionHidden };
       });
       if (!compactHero.artHidden || !compactHero.descriptionHidden || compactHero.after >= compactHero.before) failures.push(`${workspace.slug}/${viewport.name}: authenticated hero did not collapse (${compactHero.before}px -> ${compactHero.after}px)`);
