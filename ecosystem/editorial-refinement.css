@@ -1267,8 +1267,7 @@
 }
 
 
-/* PHASE 37 — catalogue as a visual field dossier.
-   Images are explicitly identified as scientific reference imagery, never product photography. */
+/* Catalogue product visuals: category-accurate, no recycled unrelated stock imagery. */
 #app.balabs-ui > main .product-catalogue-card{
   position:relative;isolation:isolate;overflow:hidden;
   padding-top:118px!important;
@@ -1277,26 +1276,26 @@
   transition:transform .42s cubic-bezier(.2,.7,.2,1),border-color .35s ease,background-color .35s ease;
 }
 #app.balabs-ui > main .product-catalogue-card:after{
-  content:"VISUEL SCIENTIFIQUE · RÉFÉRENCE";
+  content:"LC · LIQUID CULTURE / SCHÉMA DE CATÉGORIE";
   position:absolute;z-index:-1;inset:0 0 auto;height:96px;
   display:flex;align-items:flex-end;padding:0 12px 9px;
-  color:rgba(230,230,216,.8);font:600 8px/1.2 ui-monospace,monospace;letter-spacing:.13em;
-  background-size:cover;background-position:center 44%;
+  color:rgba(230,230,216,.9);font:600 8px/1.2 ui-monospace,monospace;letter-spacing:.13em;
+  background:
+    radial-gradient(ellipse at 50% 35%,rgba(157,190,160,.34) 0 7%,transparent 8%),
+    radial-gradient(ellipse at 50% 35%,transparent 0 17%,rgba(185,107,77,.42) 17.5% 18.5%,transparent 19%),
+    radial-gradient(ellipse at 50% 35%,rgba(64,104,87,.48),rgba(17,27,29,.08) 48%,transparent 70%),
+    linear-gradient(135deg,#263b38,#111b1d 72%);
+  background-size:cover;background-position:center;
   border-bottom:1px solid rgba(185,107,77,.42);
-  filter:saturate(.78) contrast(1.08);
+  filter:saturate(.92) contrast(1.04);
   transition:filter .5s ease,background-position .8s ease;
 }
-#app.balabs-ui > main .product-catalogue-card:nth-child(4n+1):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-coffee.jpg");
-}
-#app.balabs-ui > main .product-catalogue-card:nth-child(4n+2):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.06),rgba(17,27,29,.8)),url("./assets/product-card-medium.jpg");
-}
-#app.balabs-ui > main .product-catalogue-card:nth-child(4n+3):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-penicillium.png");
-}
-#app.balabs-ui > main .product-catalogue-card:nth-child(4n):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-soil.jpg");
+#app.balabs-ui > main .product-catalogue-card[data-product-type="agar"]:after{
+  content:"WA · WATER AGAR / GÉLOSE EN BOÎTE DE PÉTRI";
+  background:
+    radial-gradient(ellipse at 50% 36%,rgba(222,218,185,.52) 0 19%,rgba(185,107,77,.68) 19.5% 20.5%,transparent 21%),
+    radial-gradient(ellipse at 50% 36%,rgba(209,208,197,.12) 0 27%,transparent 28%),
+    linear-gradient(135deg,#344a43,#111b1d 75%);
 }
 #app.balabs-ui > main .product-catalogue-card:hover,
 #app.balabs-ui > main .product-catalogue-card:focus-visible{
@@ -1581,4 +1580,20 @@
 }
 #app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
   opacity:.48!important;
+}
+
+
+/* HERO — one image layer, visible microscopy, text contrast localized to the copy. */
+#app section.hero{isolation:isolate!important}
+#app section.hero .hero-micrograph{
+  z-index:-2!important;filter:saturate(.9) contrast(1.04) brightness(.96)!important;
+  opacity:.92!important;object-position:64% 42%!important;
+}
+#app section.hero:after{
+  background-image:linear-gradient(90deg,rgba(7,13,15,.76) 0%,rgba(7,13,15,.48) 38%,rgba(7,13,15,.08) 76%,rgba(7,13,15,.12) 100%),linear-gradient(0deg,rgba(7,13,15,.22),transparent 38%)!important;
+  filter:none!important;opacity:1!important;
+}
+@media(max-width:760px){
+ #app section.hero .hero-micrograph{filter:saturate(.94) contrast(1.03) brightness(.98)!important;opacity:.9!important;object-position:58% 44%!important}
+ #app section.hero:after{background-image:linear-gradient(90deg,rgba(7,13,15,.64),rgba(7,13,15,.18)),linear-gradient(0deg,rgba(7,13,15,.36),transparent 62%)!important}
 }
