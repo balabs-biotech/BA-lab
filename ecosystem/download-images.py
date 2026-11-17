@@ -39,7 +39,7 @@ def audit_references(site, entries):
 
 def resolve_source(url):
     """Resolve Commons file titles through imageinfo instead of the fragile Special:FilePath redirect."""
-    match = re.match(r"https://commons\\.wikimedia\\.org/wiki/Special:FilePath/(.+?)(?:\\?.*)?$", url)
+    match = re.match(r"https://commons\.wikimedia\.org/wiki/Special:FilePath/(.+?)(?:\?.*)?$", url)
     if not match:
         return url
     filename = unquote(match.group(1))
