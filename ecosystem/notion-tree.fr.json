@@ -1072,21 +1072,24 @@
           "title": "Travaux documentés",
           "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "3f273152f171815597b6c696402b42c0"
         },
         {
           "id": "evidence-resource-2",
           "title": "Méthodologie de R&D",
           "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "3e273152f17181ab88bfe456f838b011"
         },
         {
           "id": "evidence-resource-3",
           "title": "Catalogue public",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
         },
         {
           "id": "evidence-resource-4",
