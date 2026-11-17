@@ -290,3 +290,55 @@
  #app.balabs-ui .site-nav a,
  #app.balabs-ui .brand:after{transition:none!important}
 }
+
+
+/* Whole-site composition pass — consistent reading width, image rhythm and touch layouts. */
+#app.balabs-ui .experience-page .editorial-about,
+#app.balabs-ui .experience-page .editorial-method,
+#app.balabs-ui .experience-page .field-atlas,
+#app.balabs-ui .experience-page .product-catalogue,
+#app.balabs-ui .experience-page .value-principles{
+  min-width:0;max-width:100%;
+}
+#app.balabs-ui .experience-page :is(p,li,figcaption){
+  text-wrap:pretty;
+}
+#app.balabs-ui .experience-page :is(.editorial-about,.editorial-method,.field-atlas,.product-catalogue,.value-principles) :is(p,.description,.intro){
+  color:#c1cbc2;line-height:1.72;
+}
+#app.balabs-ui .experience-page :is(.field-frame,.work-media,.editorial-art,.product-catalogue-card figure){
+  background:#172522;
+  border:1px solid rgba(209,208,197,.12);
+}
+#app.balabs-ui .experience-page :is(.field-frame,.work-media,.editorial-art,.product-catalogue-card figure) img{
+  object-position:center;
+}
+#app.balabs-ui .experience-page :is(a,button,[role=button]){ -webkit-tap-highlight-color:transparent; }
+#app.balabs-ui .experience-page :is(a,button,[role=button]):focus-visible{
+  outline:2px solid #d28c6e!important;outline-offset:4px!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page{overflow-wrap:anywhere;}
+  #app.balabs-ui .experience-page :is(.editorial-about,.editorial-method,.field-atlas,.product-catalogue,.value-principles){
+    padding-inline:clamp(8px,2.5vw,16px);
+  }
+  #app.balabs-ui .experience-page :is(.editorial-about,.editorial-method,.field-atlas,.product-catalogue,.value-principles) :is(p,.description,.intro){
+    font-size:14px;line-height:1.68;
+  }
+  #app.balabs-ui .experience-page :is(.field-frame,.work-media,.editorial-art,.product-catalogue-card figure){
+    min-height:clamp(165px,48vw,250px);aspect-ratio:16/10;
+  }
+  #app.balabs-ui .experience-page :is(.field-frame,.work-media,.editorial-art,.product-catalogue-card figure) img{
+    width:100%;height:100%;object-fit:cover;
+  }
+  #app.balabs-ui .experience-page :is(.work-card,.universe-index-card,.product-catalogue-card,.value-item){
+    max-width:100%;overflow:hidden;
+  }
+}
+@media(max-width:420px){
+  #app.balabs-ui .experience-page .experience-page-label{font-size:8px!important;letter-spacing:.14em!important;}
+  #app.balabs-ui .experience-page :is(.editorial-about,.editorial-method,.field-atlas,.product-catalogue,.value-principles){padding-inline:6px;}
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-page :is(.work-card,.universe-index-card,.product-catalogue-card,.value-item){scroll-behavior:auto;}
+}
