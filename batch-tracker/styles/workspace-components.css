@@ -1510,3 +1510,24 @@ html body[data-domain] :is(button.primary-button,button[data-primary],#saveObser
   html body[data-domain] .universe-home-link,
   html body[data-domain] button:not(.culture-lineage-node) { transition:none !important; }
 }
+
+
+/* PASS 152 — explicit measurement-row descendants.
+   These selectors keep value hierarchy and provenance scoped to each entry. */
+html body[data-domain] #measurementHistory > .measurement-entry .measurement-value {
+  color:#f0f5ef !important;
+  font-size:clamp(17px,2vw,22px) !important;
+  font-weight:820 !important;
+  font-variant-numeric:tabular-nums !important;
+  letter-spacing:-.035em !important;
+  white-space:nowrap !important;
+}
+html body[data-domain] #measurementHistory > .measurement-entry .measurement-stamp {
+  grid-column:1/-1 !important;
+  padding-top:7px !important;
+  border-top:1px solid rgba(180,198,186,.11) !important;
+  color:#82968a !important;
+  font-size:9px !important;
+  font-variant-numeric:tabular-nums !important;
+  letter-spacing:.015em !important;
+}
