@@ -971,3 +971,102 @@ html body[data-domain="laboratory"] #batchCard #releaseBatchButton:not(.hidden) 
 @media(max-width:380px) {
   html body[data-domain="laboratory"] #batchCard #batchStageList { grid-template-columns:minmax(0,1fr) !important; }
 }
+
+
+/* PASS 147 — lot creation: distinguish identity, biological source and production context. */
+html body[data-domain="laboratory"] #batchCard .batch-create-panel {
+  gap:16px !important;
+  padding:clamp(14px,2vw,21px) !important;
+  border-color:rgba(120,184,232,.22) !important;
+  background:
+    linear-gradient(90deg,rgba(120,184,232,.04),transparent 40%),
+    linear-gradient(145deg,#202d32,#192528) !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-heading {
+  padding-bottom:13px !important;
+  border-bottom:1px solid rgba(120,184,232,.16) !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-heading .entry-step-mark {
+  color:#a9d4ed !important;
+  font-size:9px !important;
+  font-weight:850 !important;
+  letter-spacing:.15em !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-heading h3 {
+  margin:5px 0 4px !important;
+  color:#e5eff3 !important;
+  font-size:clamp(18px,2vw,22px) !important;
+  line-height:1.2 !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-heading p {
+  color:#aebfc3 !important;
+  font-size:11px !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-required-note {
+  border-color:rgba(120,184,232,.2) !important;
+  background:rgba(120,184,232,.06) !important;
+  color:#b8cbd3 !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel .grid {
+  gap:12px 14px !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel .grid > div {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:5px !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel label {
+  color:#c8d8de !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  line-height:1.4 !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel :is(input,select,textarea) {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:39px !important;
+  padding:9px 11px !important;
+  border:1px solid rgba(145,166,176,.24) !important;
+  border-radius:8px !important;
+  background:#111c20 !important;
+  color:#e4edef !important;
+  font-size:11px !important;
+  line-height:1.45 !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel textarea {
+  min-height:76px !important;
+  resize:vertical !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel :is(input,select,textarea):focus-visible {
+  outline:2px solid rgba(120,184,232,.7) !important;
+  outline-offset:2px !important;
+  border-color:rgba(120,184,232,.48) !important;
+}
+html body[data-domain="laboratory"] #batchCard .batch-create-panel .hint {
+  color:#8fa5aa !important;
+  font-size:9px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain="laboratory"] #batchCard #createBatchButton {
+  min-height:42px !important;
+  padding:10px 16px !important;
+  border:1px solid rgba(120,184,232,.34) !important;
+  border-radius:8px !important;
+  background:linear-gradient(135deg,#31556a,#263f4d) !important;
+  color:#e0f1fb !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+}
+html body[data-domain="laboratory"] #batchCard #createBatchButton:hover {
+  border-color:rgba(120,184,232,.58) !important;
+  background:linear-gradient(135deg,#3b6680,#2c4a59) !important;
+}
+@media(max-width:620px) {
+  html body[data-domain="laboratory"] #batchCard .batch-create-panel { gap:13px !important; }
+  html body[data-domain="laboratory"] #batchCard .batch-create-panel .grid { grid-template-columns:minmax(0,1fr) !important; }
+  html body[data-domain="laboratory"] #batchCard #createBatchButton { width:100% !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="laboratory"] #batchCard #createBatchButton { transition:none !important; }
+}
