@@ -52,14 +52,14 @@
           pauseOnOutsideViewport: true,
           particles: {
             number: {
-              value: compact ? 12 : 24,
+              value: compact ? 9 : 18,
               density: { enable: true, width: 800, height: 600 }
             },
             color: { value: accent },
             links: {
               enable: true,
               color: accent,
-              distance: compact ? 92 : 128,
+              distance: compact ? 84 : 116,
               opacity: 0.16,
               width: 0.65
             },
@@ -83,7 +83,9 @@
   }
 
   const start = () => startParticleField();
-  if ("IntersectionObserver" in window && art) {
+  if (particleLayer?.classList.contains("workspace-particle-field")) {
+    void start();
+  } else if ("IntersectionObserver" in window && art) {
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
         observer.disconnect();
