@@ -7,7 +7,7 @@ const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'wor
 for (const language of expectedLanguages) {
   const path = new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url);
   const manifest = JSON.parse(await readFile(path, 'utf8'));
-  assert.equal(manifest.version, 2, language + ': unsupported manifest version');
+  assert.equal(manifest.version, 3, language + ': unsupported manifest version');\n  assert.equal(manifest.relationModel, 'notion-crosslinks-and-documented-topics-v1', language + ': relation model marker missing');
   assert.equal(manifest.language, language, language + ': language marker mismatch');
   assert.ok(Array.isArray(manifest.domains), language + ': domains must be an array');
   assert.deepEqual(
@@ -44,6 +44,24 @@ for (const language of expectedLanguages) {
     assert.ok(Array.isArray(children), trail + ': children must be an array when present');
     for (const child of children) visit(child, trail);
   };
+
+  const rootIds = new Set(manifest.domains.map((domain) => domain.id));
+  let relationCount = 0;
+  let contentRelationCount = 0;
+  for (const root of manifest.domains) {
+    assert.ok(Array.isArray(root.relations), language + ': every universe root must expose its verified relation list');
+    for (const relation of root.relations) {
+      assert.ok(rootIds.has(relation.target), language + ': relation target must be a real universe root');
+      assert.ok(typeof relation.label === 'string' && relation.label.trim(), language + ': relation label is required');
+      assert.ok(typeof relation.evidence === 'string' && relation.evidence.trim(), language + ': relation evidence is required');
+      assert.ok(['notion-link', 'page-content'].includes(relation.basis), language + ': relation basis must distinguish explicit Notion links from documented topics');
+      relationCount += 1;
+      if (relation.basis === 'page-content') contentRelationCount += 1;
+    }
+  }
+  assert.ok(relationCount >= 10, language + ': too few documented cross-universe relationships');
+  assert.ok(contentRelationCount >= 4, language + ': Batch Tracker and Technosoil content links must be represented');
+  assert.ok(manifest.domains.find((domain) => domain.id === 'soil').relations.some((relation) => relation.target === 'lab' && relation.label.toLowerCase().includes('technosoil')), language + ': Technosoil must connect agrotechnology to plant experimentation');
 
   const evidence = manifest.domains.find((domain) => domain.id === 'evidence');
   assert.ok(evidence?.notionId && evidence.url === 'https://app.notion.com/p/' + evidence.notionId, language + ': evidence universe must link to its real Notion page');
