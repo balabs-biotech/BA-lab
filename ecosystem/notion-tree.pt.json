@@ -1098,14 +1098,16 @@
           "title": "Evidências e medição",
           "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "40273152f1718150b2beccb7c12d0792"
         },
         {
           "id": "evidence-resource-3",
           "title": "Catálogo público",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
         },
         {
           "id": "evidence-resource-4",
