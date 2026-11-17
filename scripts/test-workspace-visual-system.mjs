@@ -93,4 +93,5 @@ for (const [label, entry] of [["GreenTech", greenTechEntry], ["Mycology", mycolo
   assert.ok(entry.includes("workspace-spatial-navigation.js?v=20261117-spatial-navigation-1"), label + " must load the shared spatial navigation runtime after the workspace engine");
 }
 assert.ok(spatialStyles.includes(".ba-spatial-dock") && spatialStyles.includes("@keyframes ba-spatial-arrive"), "The navigation dock and panel transition must have a dedicated visual layer");
+assert.ok(spatialStyles.includes("grid-area:spatial"), "The dock must occupy a dedicated grid row without displacing the workspace hero");
 console.log("✓ CultureOps spatial navigation: four directions, keyboard, touch and reduced motion");
