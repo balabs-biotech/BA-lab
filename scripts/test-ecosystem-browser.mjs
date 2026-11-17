@@ -63,6 +63,8 @@ try {
       if (viewport.name === 'mobile') await page.locator('.chapter-rail-node').nth(index).tap();
       else await page.locator('.chapter-rail-node').nth(index).click();
       await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
+      await page.waitForFunction((index) => { const track=document.querySelector('#experienceTrack'); return !!track && Math.abs(track.scrollLeft-index*track.clientWidth)<3; }, index, { timeout: 10000 });
+      assert.equal(await page.locator('.chapter-rail-node').nth(index).getAttribute('aria-current'),'step','The tapped chapter dot must remain the active navigation point');
       await page.waitForTimeout(650);
       const audit = await page.evaluate(async (chapterId) => {
         const root = document.querySelector('#app .experience-page[data-chapter="' + chapterId + '"]') || document.querySelector('#app .experience-page');
