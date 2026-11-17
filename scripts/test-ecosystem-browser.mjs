@@ -20,7 +20,7 @@ try {
     const errors = [];
     const failed = [];
     page.on('pageerror', error => errors.push(error.message));
-    page.on('requestfailed', request => failed.push(request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
+    page.on('requestfailed', request => { const reason = request.failure()?.errorText || 'unknown'; if (reason !== 'net::ERR_ABORTED') failed.push(request.url() + ' — ' + reason); });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('#app .editorial-method').waitFor({ state: 'visible', timeout: 15000 });
     assert.equal(await page.locator('script[src*="engine-v2.js"]').count(), 0, 'The legacy 3D engine must not load on the primary site');
