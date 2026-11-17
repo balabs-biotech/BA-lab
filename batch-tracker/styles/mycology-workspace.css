@@ -974,3 +974,200 @@ html body[data-domain="mycology"] #trackerCard .culture-linked-batches > .cultur
     justify-self:start !important;
   }
 }
+
+
+/* PASS 143 — experimental record: clearer hierarchy for specimen identity,
+   biological operations, lineage and chronological evidence. */
+html body[data-domain="mycology"] #trackerCard #cultureDetailPanel {
+  align-items:start !important;
+  gap:14px 16px !important;
+  padding:clamp(14px,2vw,22px) !important;
+  background:
+    linear-gradient(90deg,rgba(201,130,89,.045),transparent 32%),
+    linear-gradient(145deg,#202d2b,#192322) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-heading {
+  position:relative !important;
+  align-items:center !important;
+  padding:2px 0 16px 14px !important;
+  border-bottom-color:rgba(201,130,89,.24) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-heading::before {
+  content:"" !important;
+  position:absolute !important;
+  inset:3px auto 17px 0 !important;
+  width:3px !important;
+  border-radius:3px !important;
+  background:#c98259 !important;
+  box-shadow:0 0 14px rgba(201,130,89,.2) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-heading .section-kicker-label {
+  color:#d6a083 !important;
+  font-size:9px !important;
+  font-weight:850 !important;
+  letter-spacing:.16em !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-heading h3 {
+  margin:4px 0 3px !important;
+  font-size:clamp(19px,2.2vw,25px) !important;
+  line-height:1.25 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain="mycology"] #trackerCard #cultureDetailMeta {
+  margin:0 !important;
+  font-size:11px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain="mycology"] #trackerCard #cultureDetailSummary {
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,165px),1fr)) !important;
+  gap:8px !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-field {
+  min-height:70px !important;
+  gap:9px !important;
+  padding:11px 12px !important;
+  border-color:rgba(126,151,140,.17) !important;
+  background:linear-gradient(145deg,rgba(12,20,19,.48),rgba(29,42,39,.72)) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-field span {
+  font-size:9px !important;
+  font-weight:760 !important;
+  letter-spacing:.105em !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-field strong {
+  font-size:12px !important;
+  line-height:1.45 !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-panel,
+html body[data-domain="mycology"] #trackerCard .bio-lineage-panel {
+  position:relative !important;
+  align-self:stretch !important;
+  padding:16px !important;
+  border-color:rgba(126,151,140,.2) !important;
+  background:linear-gradient(150deg,rgba(31,45,42,.92),rgba(18,27,26,.9)) !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-panel h4,
+html body[data-domain="mycology"] #trackerCard .bio-lineage-panel h4 {
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  margin:0 0 10px !important;
+  font-size:13px !important;
+  letter-spacing:.01em !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-panel h4::before,
+html body[data-domain="mycology"] #trackerCard .bio-lineage-panel h4::before {
+  content:"" !important;
+  width:6px !important;
+  height:6px !important;
+  flex:0 0 6px !important;
+  border-radius:2px !important;
+  background:#c98259 !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-panel > p {
+  max-width:68ch !important;
+  margin:0 0 13px !important;
+  font-size:11px !important;
+  line-height:1.65 !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-form {
+  gap:10px 12px !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-form label {
+  display:block !important;
+  margin:0 0 5px !important;
+  color:#c5d0c8 !important;
+  font-size:10px !important;
+  font-weight:720 !important;
+  letter-spacing:.035em !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-form :is(input,select,textarea) {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:39px !important;
+  border-color:rgba(126,151,140,.25) !important;
+  border-radius:7px !important;
+  background:#111b19 !important;
+  color:#e3e9e2 !important;
+  font-size:11px !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-form textarea {
+  min-height:76px !important;
+  resize:vertical !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-form small {
+  display:block !important;
+  margin-top:5px !important;
+  color:#9eafa5 !important;
+  font-size:10px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain="mycology"] #trackerCard .bio-operation-form :is(input,select,textarea):focus-visible,
+html body[data-domain="mycology"] #trackerCard .culture-detail-heading button:focus-visible {
+  outline:2px solid #e0ad91 !important;
+  outline-offset:2px !important;
+}
+html body[data-domain="mycology"] #trackerCard #cultureDetailPanel > h4 {
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  margin:4px 0 -5px !important;
+  padding-top:15px !important;
+  color:#e0e7df !important;
+  font-size:13px !important;
+}
+html body[data-domain="mycology"] #trackerCard #cultureDetailPanel > h4::before {
+  content:"" !important;
+  width:6px !important;
+  height:6px !important;
+  border-radius:2px !important;
+  background:#c98259 !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-timeline {
+  gap:0 !important;
+  padding:5px 14px !important;
+  border-color:rgba(126,151,140,.19) !important;
+  background:rgba(10,17,16,.28) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-detail-timeline > .culture-timeline-entry {
+  grid-template-columns:minmax(118px,155px) minmax(0,1fr) !important;
+  gap:14px !important;
+  padding:13px 7px 13px 15px !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-timeline-date {
+  display:block !important;
+  padding-top:2px !important;
+  color:#d7a083 !important;
+  font-size:10px !important;
+  letter-spacing:.01em !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-timeline-entry strong {
+  font-size:12px !important;
+  font-weight:760 !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-timeline-entry p {
+  max-width:78ch !important;
+  font-size:11px !important;
+}
+@media(max-width:900px) {
+  html body[data-domain="mycology"] #trackerCard .bio-operation-panel,
+  html body[data-domain="mycology"] #trackerCard .bio-lineage-panel {
+    grid-column:1/-1 !important;
+  }
+}
+@media(max-width:600px) {
+  html body[data-domain="mycology"] #trackerCard #cultureDetailPanel { padding:13px !important; }
+  html body[data-domain="mycology"] #trackerCard .bio-operation-panel,
+  html body[data-domain="mycology"] #trackerCard .bio-lineage-panel { padding:13px !important; }
+  html body[data-domain="mycology"] #trackerCard .bio-operation-form { grid-template-columns:minmax(0,1fr) !important; }
+  html body[data-domain="mycology"] #trackerCard .bio-operation-form > div,
+  html body[data-domain="mycology"] #trackerCard .bio-operation-form .bio-operation-wide { grid-column:1/-1 !important; }
+  html body[data-domain="mycology"] #trackerCard .culture-detail-timeline > .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:5px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="mycology"] #trackerCard * { scroll-behavior:auto !important; }
+}
