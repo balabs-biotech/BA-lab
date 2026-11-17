@@ -3,10 +3,18 @@ import { readFileSync } from 'node:fs';
 
 const entryHtml = readFileSync('index.html', 'utf8');
 const html = readFileSync('ecosystem/index.html', 'utf8');
-const previewHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
+const previewHtml = readFileSync('ecosystem-preview/legacy-3d-preview.html', 'utf8');
+const previewExplorerHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
+const previewExplorerJs = readFileSync('ecosystem-preview/explorer-2d.js', 'utf8');
+const previewPixiJs = readFileSync('ecosystem-preview/explorer-2d-pixi.js', 'utf8');
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
+assert.ok(previewExplorerHtml.includes('id="field"') && previewExplorerHtml.includes('pixi.js@8.23.0'), 'Preview entry must mount the PixiJS 2D canvas, not the retired 3D scene');
+assert.ok(previewExplorerHtml.includes('./explorer-2d.js?v=pixijs-2') && !previewExplorerHtml.includes('engine-v2.js'), 'Preview entry must load Vernpixi 2D and never load the 3D engine');
+assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes("fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
+assert.ok(previewPixiJs.includes('pixijs-webgl') && previewPixiJs.includes('filaments'), 'Preview Vernpixi renderer must draw the biological filament network');
+
 const expectedExplorerDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'evidence'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
 const baseCss = readFileSync('ecosystem/site-base.css', 'utf8');
