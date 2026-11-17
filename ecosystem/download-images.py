@@ -52,7 +52,8 @@ def resolve_source(url):
     info = page.get("imageinfo", [])
     if not info:
         raise RuntimeError(f"Wikimedia Commons has no imageinfo for {filename}")
-    time.sleep(1.4)  # Respect Commons API rate limits between metadata requests.\n    return info[0].get("thumburl") or info[0].get("url")
+    time.sleep(1.4)  # Respect Commons API rate limits between metadata requests.
+    return info[0].get("thumburl") or info[0].get("url")
 
 def download(url):
     url = resolve_source(url)
