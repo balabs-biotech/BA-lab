@@ -1,6 +1,6 @@
 # BA Labs — HyperFrames / Field Notes
 
-HyperFrames is the **video-rendering layer**, not a runtime dependency of the public website. The live site uses the BA Labs motion system (Vanta.js, GLSL shader gradient and Anime.js); HyperFrames turns selected pages, research notes and visual sequences into deterministic MP4 films.
+HyperFrames is the **video-rendering layer**, not a runtime dependency of the public website. The live site uses the BA Labs motion system (Vanta.js, a GLSL shader gradient and Anime.js); HyperFrames turns selected pages, research notes and visual sequences into deterministic MP4 films.
 
 ## First composition
 
@@ -11,11 +11,11 @@ The starter composition is `field-notes-60s.html`. Replace the media placeholder
 Requires Node.js 22+ and FFmpeg, as specified by HyperFrames.
 
 ```bash
-npx hyperframes preview media/hyperframes/field-notes-60s.html
-npx hyperframes render media/hyperframes/field-notes-60s.html --output field-notes-60s.mp4
+npx hyperframes init
+# Place field-notes-60s.html in the initialized project directory.
+npx hyperframes preview
+npx hyperframes render --output field-notes-60s.mp4
 ```
-
-If your installed CLI expects a project directory, initialize it with `npx hyperframes init`, copy the composition into that project, then preview and render there.
 
 ## Production rules
 
