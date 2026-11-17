@@ -24,6 +24,15 @@ export async function createPixiRenderer(canvas){
   for(let i=0;i<110;i++){const x=(i*137.51)%width,y=(i*83.71)%height;field.circle(x,y,i%9===0?1.1:.6).fill({color:i%7===0?0xb96b4d:0xd1d0c5,alpha:i%5===0?.16:.055});}
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
+  const byId=new Map(nodes.map(n=>[n.id,n]));
+  const lineage=new Set();let ancestor=selected;
+  while(ancestor){lineage.add(ancestor.id);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
+  const activeBranch=new Set();
+  if(selected){
+   activeBranch.add(selected.id);
+   let grew=true;
+   while(grew){grew=false;for(const n of nodes){if(n.parent&&activeBranch.has(n.parent)&&!activeBranch.has(n.id)){activeBranch.add(n.id);grew=true;}}}
+  }
   for(const e of edges){
    const depth=Math.max(e.a.level,e.b.level);let alpha=alphaFor(depth);if(alpha<.015)continue;
    if(selected&&!e.verified)alpha*=activeBranch.has(e.a.id)&&activeBranch.has(e.b.id)?1:.16;
@@ -62,17 +71,9 @@ export async function createPixiRenderer(canvas){
    pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS"}
   };
   const candidates=[];
-  const byId=new Map(nodes.map(n=>[n.id,n]));
-  const lineage=new Set();let ancestor=selected;
-  while(ancestor){lineage.add(ancestor.id);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
-  const activeBranch=new Set();
-  if(selected){
-   activeBranch.add(selected.id);
-   let grew=true;
-   while(grew){grew=false;for(const n of nodes){if(n.parent&&activeBranch.has(n.parent)&&!activeBranch.has(n.id)){activeBranch.add(n.id);grew=true;}}}
-  }
   for(const n of nodes){
-   const alpha=alphaFor(n.level);if(alpha<.015)continue;
+   let alpha=alphaFor(n.level);if(alpha<.015)continue;
+   if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
    const threshold=n.level===0?0:n.level===1?.72:n.level===2?1.3:n.level===3?2.55:4.3;
