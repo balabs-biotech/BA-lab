@@ -86,6 +86,7 @@ jobs:
           node scripts/check-batch-tracker-js.mjs
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
           node --check batch-tracker/environmental-data.js
+          node --check batch-tracker/workspace-spatial-navigation.js
           node scripts/check-i18n.mjs
           node scripts/test-environmental-fallback.mjs
           node scripts/test-greentech-ndvi-chart.mjs

@@ -1,0 +1,140 @@
+/* BA Labs CultureOps — spatial navigation dock and panel transitions. */
+/* Dock lives inside the sticky toolbar, not as an extra page-grid item. */
+html body[data-domain] .app-toolbar {
+  display:grid !important;
+  grid-template-columns:auto 1px minmax(0,1fr) auto;
+  grid-template-areas:
+    "brand divider sections status"
+    "spatial spatial spatial spatial";
+  align-items:center;
+  gap:10px 16px;
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+html body[data-domain] .toolbar-brand { grid-area:brand !important; }
+html body[data-domain] .toolbar-divider { grid-area:divider !important; }
+html body[data-domain] .section-nav { grid-area:sections !important; min-width:0; }
+html body[data-domain] .toolbar-status { grid-area:status !important; }
+html body[data-domain] .ba-spatial-dock {
+  grid-area:spatial !important;
+  position:relative;
+  top:auto;
+  z-index:30;
+  display:grid;
+  grid-template-columns:minmax(150px,1fr) auto minmax(100px,.7fr);
+  align-items:center;
+  gap:18px;
+  width:100%;
+  min-width:0;
+  min-height:76px;
+  padding:10px 16px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(19,29,29,.96);
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  backdrop-filter:blur(16px);
+}
+html body[data-domain] .ba-spatial-dock[hidden] { display:none !important; }
+
+.ba-spatial-context { min-width:0; display:grid; gap:3px; }
+.ba-spatial-kicker { color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.15em; }
+.ba-spatial-title { color:var(--paper); font-size:14px; line-height:1.25; }
+.ba-spatial-plane { color:var(--domain-accent); font-size:10px; font-weight:650; }
+.ba-spatial-pad {
+  display:grid;
+  grid-template-columns:38px 38px 38px;
+  grid-template-rows:30px 38px 30px;
+  align-items:center;
+  justify-items:center;
+  gap:2px;
+}
+.ba-spatial-pad button {
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:30px;
+  padding:0;
+  border:1px solid color-mix(in srgb,var(--domain-accent) 28%,var(--border));
+  border-radius:8px;
+  background:color-mix(in srgb,var(--domain-accent) 8%,var(--surface));
+  color:var(--paper);
+  font-size:17px;
+  font-weight:650;
+  line-height:1;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.ba-spatial-pad button[data-ba-direction="left"],
+.ba-spatial-pad button[data-ba-direction="right"] { grid-row:2; }
+.ba-spatial-pad button[data-ba-direction="left"] { grid-column:1; }
+.ba-spatial-pad button[data-ba-direction="right"] { grid-column:3; }
+.ba-spatial-pad button[data-ba-direction="up"] { grid-column:2; grid-row:1; }
+.ba-spatial-pad button[data-ba-direction="down"] { grid-column:2; grid-row:3; }
+.ba-spatial-pad button:hover:not(:disabled) {
+  border-color:var(--domain-accent);
+  background:color-mix(in srgb,var(--domain-accent) 19%,var(--surface));
+  transform:translateY(-1px);
+}
+.ba-spatial-pad button:disabled { opacity:.24; cursor:default; }
+.ba-spatial-pad button:focus-visible { outline:2px solid var(--domain-accent); outline-offset:3px; }
+.ba-spatial-center {
+  grid-column:2; grid-row:2;
+  display:grid; place-items:center;
+  width:24px; height:24px;
+  border:1px solid color-mix(in srgb,var(--domain-accent) 42%,var(--border));
+  border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--domain-accent) 22%,transparent),transparent 72%);
+}
+.ba-spatial-center i { width:5px; height:5px; border-radius:50%; background:var(--domain-accent); box-shadow:0 0 12px var(--domain-accent); }
+.ba-spatial-progress { display:grid; gap:7px; justify-items:end; color:var(--muted); font:700 10px/1 ui-monospace,monospace; }
+.ba-spatial-progress > div { width:min(100%,130px); height:3px; overflow:hidden; border-radius:3px; background:var(--surface-2); }
+.ba-spatial-progress i { display:block; width:25%; height:100%; border-radius:inherit; background:var(--domain-accent); transition:width .22s ease; }
+.ba-spatial-live { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+html body[data-domain] .ba-spatial-enter { animation:ba-spatial-arrive .24s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes ba-spatial-arrive {
+  from {
+    opacity:.45;
+    transform:translate3d(var(--ba-spatial-enter-x,12px),var(--ba-spatial-enter-y,0),0) scale(.995);
+  }
+  to { opacity:1; transform:translate3d(0,0,0) scale(1); }
+}
+@media(max-width:820px) {
+  html body[data-domain] .app-toolbar {
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-areas:"brand" "sections" "spatial" !important;
+    gap:8px !important;
+    overflow:visible !important;
+  }
+  html body[data-domain] :is(.toolbar-divider,.toolbar-status) { display:none !important; }
+  html body[data-domain] .section-nav {
+    width:100%;
+    max-width:100%;
+    flex-wrap:nowrap !important;
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+  }
+  html body[data-domain] .ba-spatial-dock {
+    top:auto;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    min-height:68px;
+    padding:8px 10px;
+  }
+  .ba-spatial-progress { display:none; }
+  .ba-spatial-pad { grid-template-columns:34px 34px 34px; grid-template-rows:25px 34px 25px; }
+  .ba-spatial-pad button { width:32px; height:26px; }
+}
+@media(max-width:420px) {
+  html body[data-domain] .ba-spatial-dock { gap:6px; padding:7px 8px; }
+  .ba-spatial-title { font-size:12px; }
+  .ba-spatial-kicker { font-size:8px; }
+  .ba-spatial-plane { font-size:9px; }
+  .ba-spatial-pad { grid-template-columns:30px 30px 30px; grid-template-rows:23px 30px 23px; }
+  .ba-spatial-pad button { width:29px; height:24px; border-radius:7px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .ba-spatial-pad button,.ba-spatial-progress i { transition:none !important; }
+  html body[data-domain] .ba-spatial-enter { animation:none !important; }
+}
