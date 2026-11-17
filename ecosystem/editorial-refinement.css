@@ -1267,7 +1267,7 @@
 }
 
 
-/* Catalogue product visuals: category-accurate, no recycled unrelated stock imagery. */
+/* Catalogue product visuals: original BA Labs category illustrations, never recycled stock. */
 #app.balabs-ui > main .product-catalogue-card{
   position:relative;isolation:isolate;overflow:hidden;
   padding-top:118px!important;
@@ -1281,22 +1281,15 @@
   position:absolute;z-index:0;inset:0 0 auto;height:96px;
   display:flex;align-items:flex-end;padding:0 12px 9px;
   color:rgba(230,230,216,.9);font:600 8px/1.2 ui-monospace,monospace;letter-spacing:.13em;
-  background:
-    radial-gradient(ellipse at 50% 35%,rgba(157,190,160,.34) 0 7%,transparent 8%),
-    radial-gradient(ellipse at 50% 35%,transparent 0 17%,rgba(185,107,77,.42) 17.5% 18.5%,transparent 19%),
-    radial-gradient(ellipse at 50% 35%,rgba(64,104,87,.48),rgba(17,27,29,.08) 48%,transparent 70%),
-    linear-gradient(135deg,#263b38,#111b1d 72%);
-  background-size:cover;background-position:center;
+  background-image:url("./assets/catalogue-liquid-culture.svg");
+  background-repeat:no-repeat;background-size:cover;background-position:center;
   border-bottom:1px solid rgba(185,107,77,.42);
-  filter:saturate(.92) contrast(1.04);
+  filter:saturate(.96) contrast(1.03);
   transition:filter .5s ease,background-position .8s ease;
 }
 #app.balabs-ui > main .product-catalogue-card[data-product-type="agar"]:after{
   content:"WA · WATER AGAR / GÉLOSE EN BOÎTE DE PÉTRI";
-  background:
-    radial-gradient(ellipse at 50% 36%,rgba(222,218,185,.52) 0 19%,rgba(185,107,77,.68) 19.5% 20.5%,transparent 21%),
-    radial-gradient(ellipse at 50% 36%,rgba(209,208,197,.12) 0 27%,transparent 28%),
-    linear-gradient(135deg,#344a43,#111b1d 75%);
+  background-image:url("./assets/catalogue-water-agar.svg");
 }
 #app.balabs-ui > main .product-catalogue-card:hover,
 #app.balabs-ui > main .product-catalogue-card:focus-visible{
