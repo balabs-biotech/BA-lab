@@ -481,7 +481,9 @@ assert.ok(previewHtml.includes('brand-system.css?v=14'), 'Preview must request p
 
 // Root entry page: deliberate art-direction change, not another rounded-card skin.
 assert.ok(entryHtml.includes('FIELD NOTE / 001'), 'Entry page must carry the field-research editorial identity');
-assert.ok(entryHtml.includes('BRANCHED BIOLOGICAL NETWORK'), 'Entry page must feature the original branched biology illustration');
+assert.ok(!entryHtml.includes('BRANCHED BIOLOGICAL NETWORK') && !entryHtml.includes('hyphae-figure'), 'Entry page must not ship the rejected vermicelli illustration');
+assert.ok(entryHtml.includes('hero-image-stack') && entryHtml.includes('Mycélium dans une boîte de Petri'), 'Entry page must use real sector-specific scientific imagery');
+assert.ok(entryHtml.includes('plants.jpg') && entryHtml.includes('fermentation-services-1.jpg'), 'Entry page must show greenhouse and bioreactor imagery');
 assert.ok(entryHtml.includes('--paper:#111B1D') && entryHtml.includes('--copper:#B96B4D'), 'Entry page must use the BA Labs graphite/copper palette');
 assert.ok(entryHtml.includes('font:400 clamp(29px,3.1vw,43px)/1 Georgia,serif'), 'Workspace links must use the editorial list composition');
 assert.ok(!entryHtml.includes('border-radius:16px'), 'Entry page must not fall back to generic rounded cards');
