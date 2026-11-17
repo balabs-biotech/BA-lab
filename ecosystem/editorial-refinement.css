@@ -1275,9 +1275,10 @@
   border-top-color:rgba(209,208,197,.18)!important;
   transition:transform .42s cubic-bezier(.2,.7,.2,1),border-color .35s ease,background-color .35s ease;
 }
+#app.balabs-ui > main .product-catalogue-card > *{position:relative;z-index:1}
 #app.balabs-ui > main .product-catalogue-card:after{
   content:"LC · LIQUID CULTURE / SCHÉMA DE CATÉGORIE";
-  position:absolute;z-index:-1;inset:0 0 auto;height:96px;
+  position:absolute;z-index:0;inset:0 0 auto;height:96px;
   display:flex;align-items:flex-end;padding:0 12px 9px;
   color:rgba(230,230,216,.9);font:600 8px/1.2 ui-monospace,monospace;letter-spacing:.13em;
   background:
