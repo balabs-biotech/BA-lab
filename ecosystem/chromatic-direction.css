@@ -195,3 +195,15 @@ html,body{
 @media(max-width:760px){
   html,body{background-attachment:scroll!important}
 }
+
+@media(max-width:760px){
+  #app.balabs-ui>.top .tools{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    justify-content:flex-start!important;flex-wrap:wrap!important;
+    overflow:visible!important;gap:5px!important;
+  }
+  #app.balabs-ui>.top .lang{
+    flex:0 1 auto!important;min-width:0!important;
+    padding:6px 8px!important;font-size:10px!important;
+  }
+}
