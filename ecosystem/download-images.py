@@ -52,7 +52,7 @@ def resolve_source(url):
     info = page.get("imageinfo", [])
     if not info:
         raise RuntimeError(f"Wikimedia Commons has no imageinfo for {filename}")
-    return info[0].get("thumburl") or info[0].get("url")
+    time.sleep(1.4)  # Respect Commons API rate limits between metadata requests.\n    return info[0].get("thumburl") or info[0].get("url")
 
 def download(url):
     url = resolve_source(url)
@@ -100,7 +100,7 @@ def main():
             time.sleep(1.0)
         return f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}"
 
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=1) as pool:
         jobs = {pool.submit(fetch_one, item): item for item in entries}
         for future in as_completed(jobs):
             item = jobs[future]
