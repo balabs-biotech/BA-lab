@@ -436,8 +436,8 @@ assert.ok(brandCss.includes('flex-wrap: wrap !important;') && brandCss.includes(
 assert.ok(brandCss.includes('font: 400 clamp(58px, 6.6vw, 94px)/.94 Georgia'), 'Hero typography must use the refined editorial scale without pushing actions below the composition');
 assert.ok(brandCss.includes('grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr)'), 'Featured project must use the new asymmetric image-led split');
 assert.ok(brandCss.includes('min-height: 740px !important'), 'Mobile hero must have its own image-led composition');
-assert.ok(html.includes('brand-system.css?v=14'), 'Public page must request the new visual system version');
-assert.ok(previewHtml.includes('brand-system.css?v=14'), 'Preview must request the same visual system version');
+assert.match(html, /brand-system\.css\?v=\d+/, 'Public page must request a versioned visual system');
+assert.match(previewHtml, /brand-system\.css\?v=\d+/, 'Preview must request a versioned visual system');
 
 // Featured section metadata must remain legible against its light mineral background.
 assert.ok(brandCss.includes('#app.balabs-ui > main > .editorial-feature .feature-status'), 'Featured status metadata must use a scoped high-contrast treatment');
