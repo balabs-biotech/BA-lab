@@ -11,7 +11,7 @@
   lab:{src:'./assets/universe-lab.svg',page:'./assets/universe-lab.svg',label:'MICROBIOLOGY / ASEPTIC BENCH',alt:'Illustration originale d’une paillasse de microbiologie avec microscope, boîtes de culture et flacons de milieux',credit:'BA Labs · illustration vectorielle originale'},
   products:{src:'./assets/universe-products.jpg',page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_017-024.jpg',label:'PLEUROTUS / CULTIVATION KIT',alt:'Pleurotes gris cultivés sur substrat de copeaux de bois',credit:'Zinnmann · Wikimedia Commons'},
   work:{src:'./assets/universe-work.svg',page:'./assets/universe-work.svg',label:'EXPERIMENT SERIES / CULTURE MORPHOLOGY',alt:'Planche scientifique originale de trois boîtes de Petri et morphologies schématiques de cultures',credit:'BA Labs · illustration vectorielle originale'},
-  learn:{src:'./assets/universe-evidence.jpg',page:'https://commons.wikimedia.org/wiki/File:Microscopic_View_of_Penicillium_Conidia.jpg',label:'PENICILLIUM / CONIDIA',alt:'Conidies de Penicillium observées au microscope',credit:'Ajay Kumar Chaurasiya · Wikimedia Commons'}
+  learn:{src:'./assets/universe-learn.svg',page:'./assets/universe-learn.svg',label:'FIELD NOTES / SCIENTIFIC TRANSMISSION',alt:'Fiche BA Labs de transmission scientifique avec réseau d’hyphes schématique et repères de protocole',credit:'BA Labs · illustration vectorielle originale'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  cards.forEach((card,index)=>{
