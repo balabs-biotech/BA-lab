@@ -12,7 +12,7 @@
   {
     "id": "home-hyphae",
     "file": "home-hyphae.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Fungal_hyphae.jpg/1200px-Fungal_hyphae.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Fungal_hyphae.jpg/1024px-Fungal_hyphae.jpg"
   },
   {
     "id": "home-compost",
@@ -22,17 +22,17 @@
   {
     "id": "home-penicillium",
     "file": "home-penicillium.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Microscopic_Image_of_Penicillium_conidial_fungi.jpg/1200px-Microscopic_Image_of_Penicillium_conidial_fungi.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Microscopic_Image_of_Penicillium_conidial_fungi.jpg/1024px-Microscopic_Image_of_Penicillium_conidial_fungi.jpg"
   },
   {
     "id": "home-colony",
     "file": "home-colony.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Fungal_hyphae_and_mycelium.jpg/1200px-Fungal_hyphae_and_mycelium.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Fungal_hyphae_and_mycelium.jpg/1024px-Fungal_hyphae_and_mycelium.jpg"
   },
   {
     "id": "home-substrate",
     "file": "home-substrate.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/20210719_Pleurotus_ostreatus_001-016.jpg/1200px-20210719_Pleurotus_ostreatus_001-016.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/20210719_Pleurotus_ostreatus_001-016.jpg/1024px-20210719_Pleurotus_ostreatus_001-016.jpg"
   },
   {
     "id": "home-lab",
@@ -42,32 +42,32 @@
   {
     "id": "home-coffee",
     "file": "home-coffee.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Microscope_view_of_fungus.jpg/1200px-Microscope_view_of_fungus.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Microscope_view_of_fungus.jpg/1024px-Microscope_view_of_fungus.jpg"
   },
   {
     "id": "chapter-home",
     "file": "chapter-home.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Fungal_mycelium.jpg/1200px-Fungal_mycelium.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Fungal_mycelium.jpg/1024px-Fungal_mycelium.jpg"
   },
   {
     "id": "chapter-research",
     "file": "chapter-research.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Fungus_in_glass_dish28.jpg/1200px-Fungus_in_glass_dish28.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Fungus_in_glass_dish28.jpg/1024px-Fungus_in_glass_dish28.jpg"
   },
   {
     "id": "chapter-network",
     "file": "chapter-network.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Petri_dish_with_solid-state_fermentation.jpg/1200px-Petri_dish_with_solid-state_fermentation.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Petri_dish_with_solid-state_fermentation.jpg/1024px-Petri_dish_with_solid-state_fermentation.jpg"
   },
   {
     "id": "chapter-catalogue",
     "file": "chapter-catalogue.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/20210719_Pleurotus_ostreatus_025-047.jpg/1200px-20210719_Pleurotus_ostreatus_025-047.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/20210719_Pleurotus_ostreatus_025-047.jpg/1024px-20210719_Pleurotus_ostreatus_025-047.jpg"
   },
   {
     "id": "chapter-about",
     "file": "chapter-about.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg/1200px-Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg/1024px-Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg"
   },
   {
     "id": "universe-myco",
@@ -77,27 +77,27 @@
   {
     "id": "universe-bio",
     "file": "universe-bio.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Asco1013.jpg/1200px-Asco1013.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Asco1013.jpg/1024px-Asco1013.jpg"
   },
   {
     "id": "universe-iot",
     "file": "universe-iot.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Data_logger.jpg/1200px-Data_logger.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Data_logger.jpg/1024px-Data_logger.jpg"
   },
   {
     "id": "universe-soil",
     "file": "universe-soil.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Compost.layers.jpg/1200px-Compost.layers.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Compost.layers.jpg/1024px-Compost.layers.jpg"
   },
   {
     "id": "universe-lab",
     "file": "universe-lab.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Penicillium_in_LPCB_Tease_Mount_Microscopy.jpg/1200px-Penicillium_in_LPCB_Tease_Mount_Microscopy.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Penicillium_in_LPCB_Tease_Mount_Microscopy.jpg/1024px-Penicillium_in_LPCB_Tease_Mount_Microscopy.jpg"
   },
   {
     "id": "universe-products",
     "file": "universe-products.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/20210719_Pleurotus_ostreatus_098-127.jpg/1200px-20210719_Pleurotus_ostreatus_098-127.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/20210719_Pleurotus_ostreatus_098-127.jpg/1024px-20210719_Pleurotus_ostreatus_098-127.jpg"
   },
   {
     "id": "universe-work",
@@ -107,7 +107,7 @@
   {
     "id": "universe-evidence",
     "file": "universe-evidence.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Fungi_seen_with_fluorescence_microscope.jpg/1200px-Fungi_seen_with_fluorescence_microscope.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Fungi_seen_with_fluorescence_microscope.jpg/1024px-Fungi_seen_with_fluorescence_microscope.jpg"
   },
   {
     "id": "chapter-about-method",
@@ -137,11 +137,11 @@
   {
     "id": "product-card-medium",
     "file": "product-card-medium.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Mushroom_medium.jpg/1200px-Mushroom_medium.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Mushroom_medium.jpg/1024px-Mushroom_medium.jpg"
   },
   {
     "id": "editorial-preview",
     "file": "editorial-preview.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Mycelium.jpg/1200px-Mycelium.jpg"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Mycelium.jpg/1024px-Mycelium.jpg"
   }
 ]
