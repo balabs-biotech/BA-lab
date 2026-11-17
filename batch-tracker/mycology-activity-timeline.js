@@ -154,6 +154,7 @@
     frame = requestAnimationFrame(() => void render());
   }
   const observer = new MutationObserver(records => {
+    if (!shell.isConnected) target.prepend(shell);
     if (records.some(record => record.target !== shell && !shell.contains(record.target))) schedule();
   });
   observer.observe(target, { childList: true, subtree: true });
