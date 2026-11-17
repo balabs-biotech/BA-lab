@@ -24,15 +24,56 @@
               "notionId": "40273152f17181f29a8efba7e0d87825",
               "description": "Coleção que distingue fichas de espécies de registos de recursos e designações de cultura, sem presumir identidade ou disponibilidade.",
               "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
-              "children": []
-            },
-            {
-              "id": "pt-myco-other-fungi",
-              "title": "Outros fungos estudados e cultivados",
-              "notionId": "40273152f17181ec9770df8a5a662720",
-              "description": "Fichas de outros fungos de interesse para cultivo ou estudo biológico, sem os apresentar como culturas validadas ou disponíveis.",
-              "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
-              "children": []
+              "children": [
+                {
+                  "id": "pt-myco-black-pearl",
+                  "title": "Black Pearl — perfil de recurso Pleurotus",
+                  "notionId": "40273152f17181e69641f29ec2925807",
+                  "url": "https://app.notion.com/p/40273152f17181e69641f29ec2925807",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-pearl",
+                  "title": "Pearl — perfil de recurso Pleurotus",
+                  "notionId": "40273152f1718104aa82d39ea5634cbf",
+                  "url": "https://app.notion.com/p/40273152f1718104aa82d39ea5634cbf",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-kryos",
+                  "title": "KRYOS — perfil de recurso fúngico",
+                  "notionId": "40273152f1718119a89bfcdee40969aa",
+                  "url": "https://app.notion.com/p/40273152f1718119a89bfcdee40969aa",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-g8",
+                  "title": "G8 — perfil de recurso fúngico",
+                  "notionId": "40273152f17181839d37c01a7453ded8",
+                  "url": "https://app.notion.com/p/40273152f17181839d37c01a7453ded8",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-blue-oyster",
+                  "title": "Blue Oyster — perfil de recurso fúngico",
+                  "notionId": "40273152f17181109a20f7dbed24a5c1",
+                  "url": "https://app.notion.com/p/40273152f17181109a20f7dbed24a5c1",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-gris-americain",
+                  "title": "Gris américain — perfil de recurso fúngico",
+                  "notionId": "40273152f17181a1ac41c6b2e83a8fa1",
+                  "url": "https://app.notion.com/p/40273152f17181a1ac41c6b2e83a8fa1",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                }
+              ]
             },
             {
               "id": "pt-myco-glomus",
@@ -41,6 +82,23 @@
               "description": "Referência a um fungo micorrízico arbuscular; esporos, hifas e estruturas radiculares são relevantes para a sua caracterização.",
               "url": "https://app.notion.com/p/40173152f17181dcb1b3cd27efc9e6ba",
               "children": []
+            },
+            {
+              "id": "pt-myco-other-fungi",
+              "title": "Outros fungos estudados e cultivados",
+              "notionId": "40273152f17181ec9770df8a5a662720",
+              "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
+              "description": "Sous-page publique de ressources fongiques, relevée dans la page parente.",
+              "children": [
+                {
+                  "id": "pt-myco-cyclocybe",
+                  "title": "Cyclocybe aegerita — pioppino",
+                  "notionId": "40273152f17181669cd8dd135bce91f3",
+                  "url": "https://app.notion.com/p/40273152f17181669cd8dd135bce91f3",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                }
+              ]
             }
           ]
         },
@@ -58,7 +116,40 @@
           "notionId": "40173152f1718134a778d4c8d405ca62",
           "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
           "description": "Relações entre fungos, plantas e outros organismos.",
-          "children": []
+          "children": [
+            {
+              "id": "pt-myco-arbuscular",
+              "title": "Micorrizas arbusculares — recursos e funções",
+              "notionId": "40273152f17181028a17ff4bc311aed2",
+              "url": "https://app.notion.com/p/40273152f17181028a17ff4bc311aed2",
+              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+              "children": []
+            },
+            {
+              "id": "pt-myco-ectomycorrhizae",
+              "title": "Ectomicorrizas — recursos e interações com plantas",
+              "notionId": "40273152f17181dc83dfe15afb255af0",
+              "url": "https://app.notion.com/p/40273152f17181dc83dfe15afb255af0",
+              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+              "children": []
+            },
+            {
+              "id": "pt-myco-rhizopogon",
+              "title": "Rhizopogon spp. — perfil do grupo ectomicorrízico",
+              "notionId": "40273152f17181e2ac6bea5be62575c0",
+              "url": "https://app.notion.com/p/40273152f17181e2ac6bea5be62575c0",
+              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+              "children": []
+            },
+            {
+              "id": "pt-myco-scleroderma",
+              "title": "Scleroderma spp. — perfil do grupo ectomicorrízico",
+              "notionId": "40273152f17181adb944fdf46ecde734",
+              "url": "https://app.notion.com/p/40273152f17181adb944fdf46ecde734",
+              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+              "children": []
+            }
+          ]
         },
         {
           "id": "pt-myco-applications",
