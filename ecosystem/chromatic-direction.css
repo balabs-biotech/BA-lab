@@ -372,3 +372,18 @@ html,body{
     flex:0 0 auto!important;
   }
 }
+
+
+/* Readability correction — the editorial work title sits on a deep ink surface.
+   Keep the first line ivory and the italic phrase copper; never inherit the
+   mineral-paper dark heading color from the legacy chapter theme. */
+#app.balabs-ui > main > section.editorial-work .work-heading h2{
+  color:#F4F1E8!important;
+  text-shadow:0 2px 18px rgba(7,13,24,.22)!important;
+}
+#app.balabs-ui > main > section.editorial-work .work-heading h2 em{
+  color:#D58A68!important;
+}
+#app.balabs-ui > main > section.editorial-work .work-heading>p{
+  color:#C5CDDA!important;
+}
