@@ -423,3 +423,136 @@
 @media(prefers-reduced-motion:reduce){
   #app.balabs-ui>.site-nav a:after{transition:none}
 }
+
+
+/* PHASE 17 — detail pass for project cards, catalogue and chapter rhythm. */
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work{
+  position:relative;isolation:isolate;
+  background:
+    radial-gradient(ellipse at 88% 12%,rgba(38,59,56,.24),transparent 35%),
+    linear-gradient(180deg,#111b1d 0%,#14201e 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading{
+  align-items:end;gap:clamp(24px,5vw,80px);
+  padding-bottom:clamp(28px,4vw,52px);
+}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading h2{
+  max-width:13ch;text-wrap:balance;
+  font:400 clamp(34px,5.2vw,68px)/.99 Georgia,serif;
+  letter-spacing:-.055em;
+}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading h2 em{
+  color:#c18b70;font-style:italic;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-grid{
+  gap:0!important;border-top:1px solid rgba(209,208,197,.24);
+  border-bottom:1px solid rgba(209,208,197,.24);
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card{
+  min-width:0;padding:clamp(18px,2.2vw,30px)!important;
+  border:0!important;border-inline-end:1px solid rgba(209,208,197,.2)!important;
+  background:linear-gradient(180deg,rgba(38,59,56,.1),transparent 65%);
+  transition:background .25s ease,transform .25s ease;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card:hover{
+  background:linear-gradient(180deg,rgba(38,59,56,.34),rgba(17,27,29,.02));
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card:last-child{
+  border-inline-end:0!important;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-index{
+  display:block;margin-bottom:18px;color:#d28c6e;
+  font:700 9px/1.5 ui-monospace,monospace;letter-spacing:.14em;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-media{
+  aspect-ratio:16/10;overflow:hidden;margin:0 0 24px;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-media img{
+  transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .35s ease;
+  filter:saturate(.78) contrast(1.04);
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card:hover .work-media img{
+  transform:scale(1.045);filter:saturate(1) contrast(1.04);
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card h3{
+  margin-top:0;font:400 clamp(21px,2.3vw,29px)/1.12 Georgia,serif!important;
+  letter-spacing:-.025em;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-topics{
+  margin-top:22px;padding-top:12px;border-top:1px solid rgba(209,208,197,.18);
+  font:700 8px/1.6 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue .product-catalogue-head{
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.75fr);
+  align-items:end;gap:clamp(22px,5vw,76px);
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue .product-catalogue-head h2{
+  font:400 clamp(36px,5vw,66px)/.98 Georgia,serif;
+  letter-spacing:-.055em;text-wrap:balance;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue .product-catalogue-head h2 em{
+  color:#c18b70;font-style:italic;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue .product-catalogue-intro{
+  max-width:48ch;line-height:1.8;color:#c5c9bf;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:space-between;
+  min-height:250px!important;
+  transition:transform .25s ease,border-color .25s ease,background .25s ease;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card:hover{
+  transform:translateY(-3px);
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card h3{
+  font:400 clamp(20px,2vw,27px)/1.15 Georgia,serif!important;
+  letter-spacing:-.02em;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card .product-state{
+  display:inline-flex;align-items:center;gap:8px;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card .product-state:before{
+  content:"";width:6px;height:6px;border-radius:50%;background:#b96b4d;
+  box-shadow:0 0 0 3px rgba(185,107,77,.12);
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-all{
+  text-underline-offset:5px;text-decoration-color:rgba(185,107,77,.7);
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-trigger{
+  transition:background .22s ease,padding-inline .22s ease;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-trigger:hover{
+  background:rgba(38,59,56,.24);padding-inline:14px;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-trigger[aria-expanded="true"]{
+  background:rgba(38,59,56,.34);
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-trigger[aria-expanded="true"] .method-arrow{
+  color:#d28c6e;transform:rotate(45deg);
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading{
+    display:block;
+  }
+  #app.balabs-ui .experience-page[data-chapter="research"] .work-card{
+    border-inline-end:0!important;border-bottom:1px solid rgba(209,208,197,.2)!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="research"] .work-card:last-child{
+    border-bottom:0!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue .product-catalogue-head{
+    grid-template-columns:1fr;gap:16px;
+  }
+  #app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card{
+    min-height:215px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-page[data-chapter="research"] .work-card,
+  #app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-media img,
+  #app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card,
+  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-trigger{
+    transition:none!important;
+  }
+}
