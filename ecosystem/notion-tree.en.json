@@ -636,22 +636,22 @@
               "id": "iot-temperature",
               "title": "Temperature",
               "description": "Track gradients, cycles and thermal stability in cultivation spaces.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-humidity",
               "title": "Humidity",
               "description": "Observe air humidity and water availability conditions.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-gas",
               "title": "Gas exchange & airflow",
               "description": "Study ventilation and gas exchange in cultivation enclosures.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-instrumentation",
@@ -662,22 +662,22 @@
               "id": "iot-sensors-types",
               "title": "Sensors & probes",
               "description": "Compare measurement technologies, ranges, accuracy and limitations.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-microcontrollers",
               "title": "Microcontrollers",
               "description": "Explore reading interfaces, inputs, outputs and embedded units.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-power",
               "title": "Power & safety",
               "description": "Document power supply, electrical protection and setup reliability.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-control",
@@ -688,22 +688,22 @@
               "id": "iot-airflow",
               "title": "Ventilation & airflow",
               "description": "Design monitoring and control of air renewal.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-humidification",
               "title": "Humidification",
               "description": "Study humidity regulation and water distribution.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-lighting",
               "title": "Lighting & cycles",
               "description": "Define lighting and timing scenarios for experimental trials.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-data",
@@ -714,22 +714,22 @@
               "id": "iot-logging",
               "title": "Continuous logging",
               "description": "Timestamp measurements and retain raw data with context.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-dashboard",
               "title": "Visualization & alerts",
               "description": "Present trends, thresholds and deviations for monitoring.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-quality",
               "title": "Measurement quality",
               "description": "Identify drift, missing values, calibration needs and uncertainty.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-traceability-detail",
@@ -740,22 +740,22 @@
               "id": "iot-batch-links",
               "title": "Batches & cultures",
               "description": "Associate readings with batch identifiers and cultivation stages.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-protocol-links",
               "title": "Protocols & events",
               "description": "Record setpoint changes, interventions and incidents.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-comparison",
               "title": "History & comparisons",
               "description": "Compare experimental cycles without losing their initial conditions.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         }
       ],
       "notionParentId": "hub",
