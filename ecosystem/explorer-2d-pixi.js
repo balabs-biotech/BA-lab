@@ -38,7 +38,7 @@ export async function createPixiRenderer(canvas){
     const count=depth===1?4:depth===2?3:2,nx=-dy/len,ny=dx/len;
     for(let i=0;i<count;i++){const u=(i+1)/(count+1),x=(1-u)*(1-u)*a.x+2*(1-u)*u*cx+u*u*b.x,y=(1-u)*(1-u)*a.y+2*(1-u)*u*cy+u*u*b.y,side=((e.seed+i)%2?1:-1),reach=Math.min(28,Math.max(7,len*(.13-depth*.012))),ex=x+dx/len*reach*.35+nx*side*reach,ey=y+dy/len*reach*.35+ny*side*reach,mx=(x+ex)/2+nx*side*reach*.2,my=(y+ey)/2+ny*side*reach*.2;filaments.moveTo(x,y).quadraticCurveTo(mx,my,ex,ey).stroke({color,alpha:alpha*.43,width:Math.max(.38,.78-depth*.08),cap:"round"});}
    }
-   if(!reduced&&!e.cross&&alpha>.2){const phase=time*.00012+(e.seed%100)*.013,q=(phase*(e.depth===1?.7:.48))%1,u=1-q,x=u*u*a.x+2*u*q*cx+q*q*b.x,y=u*u*a.y+2*u*q*cy+q*q*b.y;filaments.circle(x,y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:.82});}
+   if(!reduced&&!e.cross&&alpha>.2){const particleCount=depth<=2&&len>150?3:depth<=2&&len>72?2:1;for(let particle=0;particle<particleCount;particle++){const phase=time*.00012+(seed%100)*.013+particle/particleCount,q=(phase*(depth===1?.7:.48))%1,u=1-q,x=u*u*a.x+2*u*q*cx+q*q*b.x,y=u*u*a.y+2*u*q*cy+q*q*b.y;filaments.circle(x,y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:particleCount===1?.82:.68});}}
   }
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
