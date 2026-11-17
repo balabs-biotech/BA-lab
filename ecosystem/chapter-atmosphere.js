@@ -14,7 +14,7 @@
   const figure=document.createElement('figure');figure.className='chapter-atmosphere';
   const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=key==='home'?'eager':'lazy';img.decoding='async';
   const fallback=key==='research'?'https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg':key==='catalogue'?'https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w':'https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg';
-  img.addEventListener('error',()=>{if(img.dataset.fallbackAttempted!=='true'&&img.src!==fallback){img.dataset.fallbackAttempted='true';img.src=fallback;}else{figure.classList.add('is-unavailable');}},{once:false});
+
   const caption=document.createElement('figcaption');const tag=document.createElement('span');tag.textContent=data.tag;
   const credit=document.createElement('small');credit.textContent='IMAGE / '+data.credit;
   const source=document.createElement('a');source.href=data.page;source.target='_blank';source.rel='noopener noreferrer';source.textContent='SOURCE ↗';source.setAttribute('aria-label','Ouvrir la source de cette image');
