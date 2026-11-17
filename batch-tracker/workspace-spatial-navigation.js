@@ -157,7 +157,11 @@
   document.addEventListener("keydown", event => {
     if (!dock || dock.hidden || event.altKey || event.ctrlKey || event.metaKey) return;
     const target = event.target;
-    if (target instanceof Element && target.closest("input,textarea,select,[contenteditable='true'],button:not(.ba-spatial-pad button)")) return;
+    if (target instanceof Element) {
+      if (target.closest("input,textarea,select,[contenteditable='true']")) return;
+      const focusedButton = target.closest("button");
+      if (focusedButton && !focusedButton.closest(".ba-spatial-pad")) return;
+    }
     const directions = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "up", ArrowDown: "down" };
     const direction = directions[event.key];
     if (!direction) return;
