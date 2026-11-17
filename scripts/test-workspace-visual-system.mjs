@@ -7,6 +7,8 @@ const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
 
 assert.ok(html.includes('class="app-hero"'), "Each sector must retain the shared workspace header");
+assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particle layer must be removed from the shared workspace markup");
+assert.ok(!html.includes("visual-mycology"), "The obsolete branching mycelium hero SVG must not be shipped in the shared markup");
 assert.ok(!visuals.includes("workspace-particle-field"), "The old generic global particle field must be removed");
 assert.ok(visuals.includes('ba-sector-visual--mycology'), "Mycology must have a dedicated colony-growth scene");
 assert.ok(visuals.includes('ba-sector-visual--greentech'), "GreenTech must have a dedicated leaf-growth scene");
