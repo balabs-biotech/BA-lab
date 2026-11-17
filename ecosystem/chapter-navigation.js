@@ -30,8 +30,19 @@
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
  const rail=document.createElement('nav');rail.className='chapter-rail';rail.setAttribute('aria-label','Parcours des chapitres');
- rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 L32 476"/><path class="filament-progress" d="M32 24 L32 476"/><circle class="filament-signal" cx="32" cy="24" r="4"/><path class="filament-branch" d="M31 86 C20 82 14 70 9 59 M34 174 C46 168 51 156 56 145 M31 298 C19 291 13 281 8 270 M34 414 C46 407 51 395 57 384"/></svg><div class="chapter-rail-nodes"></div>';
+ rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M34 18 C13 62 51 91 29 137 S14 211 37 252 S53 326 27 369 S17 435 34 482"/><path class="filament-progress" d="M34 18 C13 62 51 91 29 137 S14 211 37 252 S53 326 27 369 S17 435 34 482"/><circle class="filament-signal" cx="34" cy="18" r="4"/><path class="filament-branch" d="M24 104 C13 98 10 84 5 73 M34 179 C47 174 52 162 60 150 M34 282 C20 276 14 265 5 253 M31 399 C45 391 51 378 59 365 M27 137 C13 139 8 130 3 122"/></svg><div class="chapter-rail-nodes"></div>';
  const railNodes=rail.querySelector('.chapter-rail-nodes');
+ const filamentBase=rail.querySelector('.filament-base');
+ const positionRailNodes=()=>{
+  if(!filamentBase)return;
+  let length=0;try{length=filamentBase.getTotalLength()}catch(_){return}
+  groups.forEach((g,i)=>{
+   const node=railNodes.children[i];if(!node)return;
+   const point=filamentBase.getPointAtLength(length*(i/Math.max(1,groups.length-1)));
+   node.style.left=(point.x/64*100)+'%';
+   node.style.top=(point.y/500*100)+'%';
+  });
+ };
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  document.body.append(rail);
  // Scroll-led editorial typography: reveal only key section headings, not body copy.
@@ -85,7 +96,7 @@
  prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
  track.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
  track.addEventListener('scrollend',update,{passive:true});
- window.addEventListener('resize',()=>requestAnimationFrame(update),{passive:true});
+ window.addEventListener('resize',()=>{positionRailNodes();requestAnimationFrame(update)},{passive:true});
  // Each chapter-rail button owns its own click handler above; do not dispatch go() twice.
  track.addEventListener('keydown',e=>{const panel=e.target.closest&&e.target.closest('.experience-page');if(e.target!==track&&e.target!==panel)return;if(e.key==='ArrowRight'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(pages.length-1)}});
  document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;const page=pages[current];if(!page)return;const atTop=page.scrollTop<=4;const atBottom=page.scrollTop+page.clientHeight>=page.scrollHeight-4;if(e.key==='PageDown'&&atBottom&&current<pages.length-1){e.preventDefault();go(current+1)}if(e.key==='PageUp'&&atTop&&current>0){e.preventDefault();go(current-1)}});
@@ -121,7 +132,7 @@
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{const label=groups[i].label[l]||groups[i].label.fr;b.setAttribute('aria-label',label);const name=b.querySelector('.chapter-rail-name');if(name)name.textContent=label;});
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
- localize();update();
+ localize();positionRailNodes();update();
  const hash=location.hash&&document.getElementById(decodeURIComponent(location.hash.slice(1)));
  if(hash){const page=hash.closest('.experience-page');if(page){go(pages.indexOf(page));requestAnimationFrame(()=>hash.scrollIntoView({block:'start',behavior:scrollBehavior()}));}}
 })();
