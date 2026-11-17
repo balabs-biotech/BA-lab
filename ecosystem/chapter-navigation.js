@@ -65,9 +65,10 @@
  let current=0;
  const lang=()=>document.documentElement.lang||'fr';
  const update=()=>{
+  const offsets=pages.map(page=>page.getBoundingClientRect().left-track.getBoundingClientRect().left+track.scrollLeft);
+  const idx=offsets.reduce((best,value,i)=>Math.abs(value-track.scrollLeft)<Math.abs(offsets[best]-track.scrollLeft)?i:best,0);
   const pageWidth=Math.max(1,track.clientWidth);
-  const rawProgress=Math.max(0,Math.min(pages.length-1,track.scrollLeft/pageWidth));
-  const idx=Math.round(rawProgress);
+  const rawProgress=Math.max(0,Math.min(pages.length-1,idx+(track.scrollLeft-offsets[idx])/pageWidth));
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
@@ -79,10 +80,12 @@
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
  const scrollBehavior=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
- const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));const left=n*Math.max(1,track.clientWidth);track.scrollTo({left,top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
+ const pageOffset=n=>{const page=pages[n];return page.getBoundingClientRect().left-track.getBoundingClientRect().left+track.scrollLeft;};
+ const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:pageOffset(n),top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
  prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
  track.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
  track.addEventListener('scrollend',update,{passive:true});
+ window.addEventListener('resize',()=>requestAnimationFrame(update),{passive:true});
  // Each chapter-rail button owns its own click handler above; do not dispatch go() twice.
  track.addEventListener('keydown',e=>{const panel=e.target.closest&&e.target.closest('.experience-page');if(e.target!==track&&e.target!==panel)return;if(e.key==='ArrowRight'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(pages.length-1)}});
  document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;const page=pages[current];if(!page)return;const atTop=page.scrollTop<=4;const atBottom=page.scrollTop+page.clientHeight>=page.scrollHeight-4;if(e.key==='PageDown'&&atBottom&&current<pages.length-1){e.preventDefault();go(current+1)}if(e.key==='PageUp'&&atTop&&current>0){e.preventDefault();go(current-1)}});
