@@ -1,13 +1,24 @@
 /* BA Labs CultureOps — spatial navigation dock and panel transitions. */
-/* Keep spatial controls inside the toolbar so existing workspace grid rows stay unchanged. */
-html body[data-domain] .app-toolbar { flex-wrap:wrap !important; }
-html body[data-domain] .ba-spatial-dock {
-  position:relative;
-  top:auto;
-  grid-area:auto !important;
-  flex:1 0 100%;
-  width:100%;
+/* Give the direction dock a real, explicit grid row. This prevents implicit
+   grid placement from pushing the hero or auth panel far down the page. */
+html body[data-domain] .container {
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-template-areas:
+    "nav"
+    "spatial"
+    "back"
+    "hero"
+    "message"
+    "auth"
+    "workspace"
+    "result" !important;
 }
+html body[data-domain] .ba-spatial-dock { grid-area:spatial !important; }
+html body[data-domain] .universe-home-link { grid-area:back !important; }
+html body[data-domain] .app-hero { grid-area:hero !important; }
+html body[data-domain] #message { grid-area:message !important; }
+html body[data-domain] #authCard { grid-area:auth !important; }
+html body[data-domain] #resultCard { grid-area:result !important; }
 
 html body[data-domain] .ba-spatial-dock {
   position:relative;
