@@ -8,6 +8,7 @@
   <title>BA Labs CultureOps — Green Tech</title>
   <link rel="stylesheet" href="../tracker.css?v=20261116-ba-unified-110">
   <link rel="stylesheet" href="../workspace-unified.css?v=20261117-form-fields-157">
+  <link rel="stylesheet" href="../styles/greentech-climate-signature.css?v=20261117-climate-signature-162">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="agronomy">
@@ -46,6 +47,12 @@
             const environmental = document.createElement("script");
             environmental.src = "../environmental-data.js?v=20261027-sentinel-fallback-fix-1";
             environmental.onerror = () => console.error("Le module de contexte environnemental n’a pas pu être chargé.");
+            environmental.onload = () => {
+              const climateVisual = document.createElement("script");
+              climateVisual.src = "../greentech-climate-signature.js?v=20261117-climate-signature-162";
+              climateVisual.onerror = () => console.info("BA Labs: synthèse graphique météo optionnelle indisponible.");
+              document.body.appendChild(climateVisual);
+            };
             document.body.appendChild(environmental);
           };
           document.body.appendChild(script);
