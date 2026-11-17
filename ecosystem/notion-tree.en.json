@@ -635,17 +635,20 @@
             {
               "id": "iot-temperature",
               "title": "Temperature",
-              "description": "Track gradients, cycles and thermal stability in cultivation spaces."
+              "description": "Track gradients, cycles and thermal stability in cultivation spaces.",
+              "kind": "section"
             },
             {
               "id": "iot-humidity",
               "title": "Humidity",
-              "description": "Observe air humidity and water availability conditions."
+              "description": "Observe air humidity and water availability conditions.",
+              "kind": "section"
             },
             {
               "id": "iot-gas",
               "title": "Gas exchange & airflow",
-              "description": "Study ventilation and gas exchange in cultivation enclosures."
+              "description": "Study ventilation and gas exchange in cultivation enclosures.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -658,17 +661,20 @@
             {
               "id": "iot-sensors-types",
               "title": "Sensors & probes",
-              "description": "Compare measurement technologies, ranges, accuracy and limitations."
+              "description": "Compare measurement technologies, ranges, accuracy and limitations.",
+              "kind": "section"
             },
             {
               "id": "iot-microcontrollers",
               "title": "Microcontrollers",
-              "description": "Explore reading interfaces, inputs, outputs and embedded units."
+              "description": "Explore reading interfaces, inputs, outputs and embedded units.",
+              "kind": "section"
             },
             {
               "id": "iot-power",
               "title": "Power & safety",
-              "description": "Document power supply, electrical protection and setup reliability."
+              "description": "Document power supply, electrical protection and setup reliability.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -681,17 +687,20 @@
             {
               "id": "iot-airflow",
               "title": "Ventilation & airflow",
-              "description": "Design monitoring and control of air renewal."
+              "description": "Design monitoring and control of air renewal.",
+              "kind": "section"
             },
             {
               "id": "iot-humidification",
               "title": "Humidification",
-              "description": "Study humidity regulation and water distribution."
+              "description": "Study humidity regulation and water distribution.",
+              "kind": "section"
             },
             {
               "id": "iot-lighting",
               "title": "Lighting & cycles",
-              "description": "Define lighting and timing scenarios for experimental trials."
+              "description": "Define lighting and timing scenarios for experimental trials.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -704,17 +713,20 @@
             {
               "id": "iot-logging",
               "title": "Continuous logging",
-              "description": "Timestamp measurements and retain raw data with context."
+              "description": "Timestamp measurements and retain raw data with context.",
+              "kind": "section"
             },
             {
               "id": "iot-dashboard",
               "title": "Visualization & alerts",
-              "description": "Present trends, thresholds and deviations for monitoring."
+              "description": "Present trends, thresholds and deviations for monitoring.",
+              "kind": "section"
             },
             {
               "id": "iot-quality",
               "title": "Measurement quality",
-              "description": "Identify drift, missing values, calibration needs and uncertainty."
+              "description": "Identify drift, missing values, calibration needs and uncertainty.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -727,17 +739,20 @@
             {
               "id": "iot-batch-links",
               "title": "Batches & cultures",
-              "description": "Associate readings with batch identifiers and cultivation stages."
+              "description": "Associate readings with batch identifiers and cultivation stages.",
+              "kind": "section"
             },
             {
               "id": "iot-protocol-links",
               "title": "Protocols & events",
-              "description": "Record setpoint changes, interventions and incidents."
+              "description": "Record setpoint changes, interventions and incidents.",
+              "kind": "section"
             },
             {
               "id": "iot-comparison",
               "title": "History & comparisons",
-              "description": "Compare experimental cycles without losing their initial conditions."
+              "description": "Compare experimental cycles without losing their initial conditions.",
+              "kind": "section"
             }
           ],
           "kind": "section"
