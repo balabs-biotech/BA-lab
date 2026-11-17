@@ -556,3 +556,72 @@
     transition:none!important;
   }
 }
+
+
+/* PHASE 18 — opening chapter: stronger BA Labs identity and a clearer first action. */
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 78% 22%,rgba(38,59,56,.64),transparent 42%),
+    linear-gradient(112deg,#101819 0%,#14211f 54%,#111b1d 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero:after{
+  content:"BA / APPLIED BIOTECHNOLOGY";
+  position:absolute;z-index:0;inset-inline-end:clamp(18px,4vw,58px);top:clamp(20px,4vw,48px);
+  color:rgba(209,208,197,.34);font:700 8px/1.4 ui-monospace,monospace;
+  letter-spacing:.2em;pointer-events:none;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
+  filter:grayscale(1) sepia(.12) hue-rotate(95deg) contrast(1.12);
+  opacity:.48;mix-blend-mode:screen;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero h1{
+  max-width:10ch;color:#f2f1e9!important;
+  font:400 clamp(54px,8vw,112px)/.91 Georgia,serif!important;
+  letter-spacing:-.075em;text-wrap:balance;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero h1 span{
+  color:#d28c6e!important;font-style:italic;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .eyebrow{
+  color:#d28c6e!important;font:700 9px/1.5 ui-monospace,monospace!important;
+  letter-spacing:.19em;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero p{
+  max-width:48ch;color:#d1d0c5!important;line-height:1.8;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-action-primary{
+  border:1px solid #b96b4d!important;background:#b96b4d!important;color:#111b1d!important;
+  border-radius:2px!important;font-weight:700;transition:transform .2s ease,background .2s ease;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-action-primary:hover{
+  transform:translateY(-2px);background:#d28c6e!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-action-secondary{
+  color:#e4e3d9!important;text-decoration-color:rgba(185,107,77,.75);
+  text-underline-offset:5px;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .aside{
+  border-inline-start:2px solid #b96b4d!important;
+  background:rgba(17,27,29,.78)!important;backdrop-filter:blur(12px);
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-credit{
+  color:rgba(209,208,197,.7)!important;letter-spacing:.12em;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+    min-height:640px!important;padding-block:clamp(48px,12vw,82px)!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="home"]>.hero h1{
+    max-width:9ch;font-size:clamp(48px,14vw,76px)!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="home"]>.hero .aside{
+    margin:20px 0 0!important;max-width:100%!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-credit{
+    max-width:85%;font-size:7px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-action-primary{transition:none}
+}
