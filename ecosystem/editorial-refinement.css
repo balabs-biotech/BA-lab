@@ -1606,3 +1606,45 @@
     object-position:58% 44%!important;
   }
 }
+
+
+/* Catalogue correction: documentary process photography appears once per category,
+   never repeated as a false product packshot on every strain card. */
+#app.balabs-ui > main .product-catalogue-visuals{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:14px!important;margin:22px 0 20px!important;align-items:stretch!important;
+}
+#app.balabs-ui > main .product-catalogue-visual{
+ position:relative!important;min-width:0!important;margin:0!important;overflow:hidden!important;
+ border:1px solid rgba(209,208,197,.22)!important;background:#172522!important;
+}
+#app.balabs-ui > main .product-catalogue-visual-img{
+ display:block!important;width:100%!important;height:clamp(150px,18vw,230px)!important;
+ object-fit:cover!important;object-position:center!important;filter:none!important;
+ clip-path:none!important;transform:none!important;opacity:1!important;
+}
+#app.balabs-ui > main .product-catalogue-visual figcaption{
+ display:grid!important;gap:5px!important;padding:10px 12px 12px!important;
+ border-top:1px solid rgba(185,107,77,.55)!important;
+ color:#d1d0c5!important;font:600 8px/1.45 ui-monospace,monospace!important;letter-spacing:.08em!important;
+}
+#app.balabs-ui > main .product-catalogue-visual figcaption b{color:#d28c6e!important;font-size:9px!important}
+#app.balabs-ui > main .product-catalogue-visual figcaption span{color:#9baea4!important;font:400 10px/1.5 system-ui,sans-serif!important;letter-spacing:0!important}
+#app.balabs-ui > main .product-catalogue-visual-note{
+ grid-column:1/-1!important;margin:0!important;color:#9baea4!important;
+ font:10px/1.55 system-ui,sans-serif!important;
+}
+#app.balabs-ui > main .product-catalogue-card{
+ padding-top:20px!important;min-height:0!important;
+ background:linear-gradient(145deg,rgba(38,59,56,.22),rgba(17,27,29,.12))!important;
+}
+#app.balabs-ui > main .product-catalogue-card:after{display:none!important;content:none!important;background-image:none!important}
+#app.balabs-ui > main .product-catalogue-card:hover:after,
+#app.balabs-ui > main .product-catalogue-card:focus-visible:after{display:none!important}
+@media(max-width:760px){
+ #app.balabs-ui > main .product-catalogue-visuals{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ #app.balabs-ui > main .product-catalogue-visual:last-of-type{grid-column:1/-1!important}
+ #app.balabs-ui > main .product-catalogue-visual-img{height:clamp(125px,36vw,180px)!important}
+ #app.balabs-ui > main .product-catalogue-visual-note{font-size:9px!important}
+ #app.balabs-ui > main .product-catalogue-card{padding-top:16px!important}
+}
