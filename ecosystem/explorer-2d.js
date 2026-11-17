@@ -54,11 +54,10 @@ function buildNetwork(){
  // Cross-universe connections come only from the Notion relation manifest.
  // page-content links are explicitly distinguished from direct Notion hyperlinks.
  relationIndex=new Map();const relationPairs=new Set();
- let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0;
+ let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0,nodeLevelRelationCount=0;
  const addRelationIndex=(id,entry)=>{if(!relationIndex.has(id))relationIndex.set(id,[]);relationIndex.get(id).push(entry);};
- tree.forEach(root=>{
-  const source=byId.get(root.id);if(!source)return;
-  for(const relation of root.relations||[]){
+ nodes.forEach(source=>{
+  for(const relation of source.data.relations||[]){\n   if(source.level>0)nodeLevelRelationCount++;
    const target=byId.get(relation.target);if(!target||target.level!==0||target.id===source.id)continue;
    const key=[source.id,target.id].sort().join("|");if(relationPairs.has(key))continue;
    relationPairs.add(key);
@@ -74,7 +73,7 @@ function buildNetwork(){
  canvas.dataset.verifiedRelations=String(verifiedRelationCount);
  canvas.dataset.explicitRelations=String(explicitRelationCount);
  canvas.dataset.contentRelations=String(contentRelationCount);
- canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);
+ canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);\n canvas.dataset.nodeLevelRelations=String(nodeLevelRelationCount);
  // Local anastomoses follow spatial proximity, not array order. Each hypha can
  // form one restrained side-connection at its depth, creating irregular meshes
  // while avoiding long chords and the visual regularity of a grid.
