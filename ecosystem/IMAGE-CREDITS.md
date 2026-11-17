@@ -36,4 +36,5 @@ Pour les œuvres Wikimedia Commons, la page de chaque fichier est la référence
 ## Photographies du catalogue
 
 - `assets/catalogue-liquid-culture.jpg` — « Fungal growth in erlenmeyer », Luis Fernando Flores LAB, photographie originale publiée sous CC BY 4.0. Source : https://commons.wikimedia.org/wiki/File:Fungal_growth_in_erlenmeyer.jpg
+- `assets/catalogue-liquid-batch.jpg` — « Flask batch fermentation », Luis Fernando Flores LAB, photographie originale de cultures fongiques en flacons, CC BY 4.0. Source : https://commons.wikimedia.org/wiki/File:Flask_batch_fermentation.jpg
 - `assets/catalogue-water-agar.jpg` — « White mycelium growing on agar », Zenyrgarden, photographie originale publiée sous CC BY-SA 4.0. Source : https://commons.wikimedia.org/wiki/File:White_mycelium_growing_on_agar.jpg
