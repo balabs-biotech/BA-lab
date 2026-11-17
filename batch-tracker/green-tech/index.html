@@ -17,7 +17,7 @@
       document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
     } else {
       window.BA_LABS_DOMAIN = "agronomy";
-    fetch("../workspace.html?v=20261117-sector-motion-154")
+    fetch("../workspace.html?v=20261117-sector-interaction-160")
       .then(response => {
         if (!response.ok) throw new Error("Impossible de charger l’interface commune.");
         return response.text();
@@ -25,7 +25,7 @@
       .then(markup => {
         document.getElementById("workspace-root").innerHTML = markup;
         const visualRuntime = document.createElement("script");
-        visualRuntime.src = "../workspace-visuals.js?v=20261117-sector-motion-154";
+        visualRuntime.src = "../workspace-visuals.js?v=20261117-sector-interaction-160";
         visualRuntime.onerror = () => console.info("BA Labs: effets visuels optionnels indisponibles.");
         document.body.appendChild(visualRuntime);
         const interactionRuntime = document.createElement("script");
