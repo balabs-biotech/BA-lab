@@ -631,7 +631,8 @@
               "title": "Gaz & renouvellement d’air",
               "description": "Étudier la ventilation et les échanges gazeux dans les enceintes de culture."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-instrumentation",
@@ -653,7 +654,8 @@
               "title": "Alimentation & sécurité",
               "description": "Documenter l’alimentation, la protection électrique et la fiabilité des montages."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-control",
@@ -675,7 +677,8 @@
               "title": "Éclairage & cycles",
               "description": "Définir des scénarios d’éclairage et de temporisation selon les essais."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-data",
@@ -697,7 +700,8 @@
               "title": "Qualité des mesures",
               "description": "Repérer dérives, valeurs manquantes, étalonnage et incertitudes."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-traceability-detail",
@@ -719,7 +723,8 @@
               "title": "Historique & comparaisons",
               "description": "Comparer les cycles expérimentaux sans perdre les conditions initiales."
             }
-          ]
+          ],
+          "kind": "section"
         }
       ],
       "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations.",
