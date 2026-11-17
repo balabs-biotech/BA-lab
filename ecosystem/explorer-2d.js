@@ -122,8 +122,15 @@ function renderUniverseRail(){
  syncUniverseRail(selected);
 }
 function syncUniverseRail(n){
- const active=n?(n.level===0?n.id:n.rootId):null;
- document.querySelectorAll(".universe-rail [data-universe]").forEach(b=>{const on=b.dataset.universe===active;if(on){b.setAttribute("aria-current","location");b.classList.add("is-active");}else{b.removeAttribute("aria-current");b.classList.remove("is-active");}});
+ const root=n?(n.level===0?n.id:n.rootId):null;
+ // The public rail calls the evidence universe "learn" for visitors.
+ const active=root==="evidence"?"learn":root;
+ document.querySelectorAll(".universe-rail [data-universe]").forEach(b=>{
+  const on=b.dataset.universe===active;
+  if(on){b.setAttribute("aria-current","location");b.classList.add("is-active");}
+  else{b.removeAttribute("aria-current");b.classList.remove("is-active");}
+ });
+ canvas.dataset.activeUniverse=active||"";
 }
 function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function hit(x,y){let found=null,best=22;for(const n of nodes){if(levelOpacity(n.level)<.12)continue;const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);if(d<limit){best=d;found=n;}}return found;}
