@@ -159,3 +159,10 @@
   width:100%!important;height:clamp(150px,43vw,190px)!important;
  }
 }
+
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere.is-unavailable{
+  position:relative!important;inset:auto!important;width:100%!important;
+  height:clamp(150px,43vw,220px)!important;margin:0 auto 22px!important;
+ }
+}
