@@ -1522,3 +1522,26 @@
 #app.balabs-ui > main .universe-index-card .universe-visual figcaption small{display:block;color:#f2f1e9;font-size:6px;letter-spacing:.06em;text-shadow:0 1px 8px #000}
 #app.balabs-ui > main .universe-index-card.visual-fallback .universe-visual{background:radial-gradient(ellipse at 45% 35%,#405b50,#172522 68%,#111b1d)}
 @media(max-width:760px){#app.balabs-ui .experience-page>.chapter-atmosphere{opacity:.56}}
+
+
+/* PHASE 43 — distinct motion signatures for all eight scientific universes. */
+#app.balabs-ui > main .universe-index-card .universe-visual img{will-change:transform}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="myco"] img{animation:universe-hyphae-drift 23s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="bio"] img{animation:universe-biofilm-pulse 17s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="iot"] img{animation:universe-sensor-pan 29s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="soil"] img{animation:universe-soil-scan 25s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="lab"] img{animation:universe-lab-focus 21s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="products"] img{animation:universe-material-breathe 18s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="work"] img{animation:universe-culture-growth 22s ease-in-out infinite alternate}
+#app.balabs-ui > main .universe-index-card .universe-visual[data-universe-visual="learn"] img{animation:universe-micrograph-scan 26s ease-in-out infinite alternate}
+@keyframes universe-hyphae-drift{from{transform:scale(1.04) translate3d(-.6%,.2%,0)}to{transform:scale(1.15) translate3d(.8%,-.8%,0)}}
+@keyframes universe-biofilm-pulse{from{transform:scale(1.06) translate3d(0,.4%,0)}to{transform:scale(1.16) translate3d(-.5%,-.6%,0)}}
+@keyframes universe-sensor-pan{from{transform:scale(1.03) translate3d(-1%,0,0)}to{transform:scale(1.11) translate3d(1%,-.2%,0)}}
+@keyframes universe-soil-scan{from{transform:scale(1.05) translate3d(0,-.7%,0)}to{transform:scale(1.14) translate3d(0,.7%,0)}}
+@keyframes universe-lab-focus{from{transform:scale(1.04) translate3d(-.4%,.3%,0)}to{transform:scale(1.13) translate3d(.5%,-.4%,0)}}
+@keyframes universe-material-breathe{from{transform:scale(1.04) translate3d(.4%,.2%,0)}to{transform:scale(1.16) translate3d(-.6%,-.5%,0)}}
+@keyframes universe-culture-growth{from{transform:scale(1.04) translate3d(-.7%,0,0)}to{transform:scale(1.15) translate3d(.8%,-.6%,0)}}
+@keyframes universe-micrograph-scan{from{transform:scale(1.03) translate3d(.3%,.4%,0)}to{transform:scale(1.14) translate3d(-.5%,-.5%,0)}}
+#app.balabs-ui > main .universe-index-card .universe-visual.is-unavailable img{display:none}
+#app.balabs-ui > main .universe-index-card .universe-visual.is-unavailable{background:radial-gradient(ellipse at 48% 38%,#405b50,#172522 68%,#111b1d)}
+@media(prefers-reduced-motion:reduce){#app.balabs-ui > main .universe-index-card .universe-visual img{animation:none!important;will-change:auto}}

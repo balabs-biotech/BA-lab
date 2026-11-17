@@ -55,3 +55,18 @@
 @media(prefers-reduced-motion:reduce){
  .experience-page>.chapter-atmosphere img,.experience-page>.chapter-atmosphere svg path{animation:none!important;transition:none!important;transform:none!important;stroke-dashoffset:0}
 }
+
+
+/* Five chapter-specific camera moves: each image has its own motion signature. */
+.experience-page[data-chapter="home"]>.chapter-atmosphere.is-animated img{animation:chapter-hyphae-drift 24s ease-in-out infinite alternate}
+.experience-page[data-chapter="research"]>.chapter-atmosphere.is-animated img{animation:chapter-instrument-pan 30s ease-in-out infinite alternate}
+.experience-page[data-chapter="network"]>.chapter-atmosphere.is-animated img{animation:chapter-colony-growth 21s ease-in-out infinite alternate}
+.experience-page[data-chapter="catalogue"]>.chapter-atmosphere.is-animated img{animation:chapter-material-breathe 18s ease-in-out infinite alternate}
+.experience-page[data-chapter="about"]>.chapter-atmosphere.is-animated img{animation:chapter-lab-scan 27s ease-in-out infinite alternate}
+.experience-page>.chapter-atmosphere figcaption a{color:#f0b18f;text-decoration:underline;text-underline-offset:3px;font:650 7px/1.2 ui-monospace,monospace;letter-spacing:.1em;text-shadow:0 1px 8px #000}
+@keyframes chapter-hyphae-drift{from{transform:scale(1.025) translate3d(-.7%,.3%,0)}to{transform:scale(1.16) translate3d(1.1%,-.9%,0)}}
+@keyframes chapter-instrument-pan{from{transform:scale(1.04) translate3d(-1.4%,0,0)}to{transform:scale(1.13) translate3d(1.2%,-.3%,0)}}
+@keyframes chapter-colony-growth{from{transform:scale(1.035) translate3d(0,.8%,0)}to{transform:scale(1.17) translate3d(-.7%,-.8%,0)}}
+@keyframes chapter-material-breathe{from{transform:scale(1.03) translate3d(.5%,.3%,0)}to{transform:scale(1.14) translate3d(-.8%,-.5%,0)}}
+@keyframes chapter-lab-scan{from{transform:scale(1.04) translate3d(-.4%,.5%,0)}to{transform:scale(1.13) translate3d(.8%,-.4%,0)}}
+@media(prefers-reduced-motion:reduce){.experience-page>.chapter-atmosphere.is-animated img{animation:none!important}}

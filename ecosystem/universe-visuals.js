@@ -17,7 +17,7 @@
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  cards.forEach((card,index)=>{
   const data=images[card.dataset.domainPage];if(!data)return;
-  const figure=document.createElement('figure');figure.className='universe-visual';
+  const figure=document.createElement('figure');figure.className='universe-visual';figure.dataset.universeVisual=card.dataset.domainPage;
   const img=document.createElement('img');
   img.src=base+encodeURIComponent(data.file)+'?width=1200';
   img.alt=data.alt;img.loading=index<4?'eager':'lazy';img.decoding='async';img.referrerPolicy='no-referrer';
