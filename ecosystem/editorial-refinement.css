@@ -1560,3 +1560,25 @@
 #app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card>*{
   pointer-events:none!important;
 }
+
+/* PHASE 46 — restore visibility of the actual photographic layers.
+   Negative stacking placed universe figures behind the isolated card surface. */
+#app.balabs-ui > main .universe-index-card .universe-visual{
+  z-index:0!important;
+}
+#app.balabs-ui > main .universe-index-card>span:first-child,
+#app.balabs-ui > main .universe-index-card>b,
+#app.balabs-ui > main .universe-index-card>small,
+#app.balabs-ui > main .universe-index-card>p,
+#app.balabs-ui > main .universe-index-card>em{
+  position:relative!important;z-index:2!important;
+}
+#app.balabs-ui > main .universe-index-card .universe-visual.is-unavailable{
+  background:
+    radial-gradient(ellipse at 70% 32%,rgba(185,107,77,.24),transparent 32%),
+    radial-gradient(ellipse at 28% 72%,rgba(126,170,163,.22),transparent 40%),
+    linear-gradient(135deg,#263b38,#111b1d 72%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
+  opacity:.48!important;
+}
