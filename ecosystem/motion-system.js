@@ -60,67 +60,51 @@
     }else canvas.remove();
   }
 
-  // Anime.js 4 is the single motion engine: editorial choreography, not generic fade-up presets.
+  // Anime.js 4 choreographs the real editorial sections. The embedded explorer is deliberately untouched.
   import('https://cdn.jsdelivr.net/npm/animejs@4.1.3/+esm').then(({animate,stagger})=>{
-    if(!animate || reduce) return;
-    const track=document.querySelector('#experienceTrack');
-    const pages=[...(track||document).querySelectorAll('.experience-page')];
-    const observeRoot=track||null;
-    const armed=new WeakSet();
+    if(typeof animate!=='function' || reduce) return;
+    const sections=[...document.querySelectorAll(
+      '#accueil,.editorial-work,.editorial-feature,.editorial-about,.editorial-method,.field-atlas,.product-catalogue,.scene'
+    )];
+    const seen=new WeakSet();
 
-    const reveal=(page)=>{
-      if(armed.has(page)) return;
-      armed.add(page);
+    const enter=(section)=>{
+      if(seen.has(section)) return;
+      seen.add(section);
 
-      const hero=page.querySelector('.hero');
-      if(hero){
-        const title=hero.querySelector('h1');
-        const image=hero.querySelector('.hero-micrograph');
-        if(title) animate(title,{opacity:[0,1],translateY:[28,0],duration:1150,ease:'out(4)'});
-        if(image) animate(image,{opacity:[.45,1],duration:1500,ease:'out(3)'});
-      }
+      const hero=section.matches('#accueil');
+      const title=section.querySelector(hero?'h1':'.work-heading h2,.editorial-copy h2,.about-copy h2,.method-top h2,.field-atlas-head,.scenehead strong,.product-catalogue-head h2');
+      const image=section.querySelector(hero?'.hero-micrograph':'.editorial-art img,.feature-photo,.field-frame img,.product-catalogue-visual-img');
+      const copy=section.querySelectorAll(hero?'.hero p,.hero-actions,.aside':'.work-heading p,.editorial-copy p,.about-copy p,.method-top p,.field-frame figcaption');
+      const cards=section.querySelectorAll('.work-card,.method-steps li,.value-item,.product-catalogue-card');
 
-      const headings=[...page.querySelectorAll('.work-heading,.universe-index-heading,.value-heading,.product-catalogue-head,.editorial-about h2,.editorial-method h2,.bridge-copy h2,.field-atlas-head')];
-      headings.forEach((el,i)=>{
-        el.style.opacity='0';
-        animate(el,{opacity:[0,1],translateX:[i%2?-18:18,0],translateY:[10,0],duration:950,delay:i*85,ease:'out(4)'});
+      if(title) animate(title,{opacity:[.72,1],translateY:[12,0],duration:1050,ease:'out(3)'});
+      if(image && !image.closest('.inline-explorer')) animate(image,{
+        opacity:[.72,1],clipPath:['inset(0 7% 0 0)','inset(0 0% 0 0)'],
+        translateX:[hero?16:-12,0],duration:1450,ease:'out(3)'
       });
-
-      const media=[...page.querySelectorAll('.field-frame,.editorial-art,.work-media,.product-catalogue-card figure,.feature-photo')].filter(el=>!el.closest('.inline-explorer'));
-      media.forEach(el=>{
-        el.style.opacity='0';
-        el.style.clipPath='inset(0 9% 0 9%)';
+      if(copy.length) animate(copy,{
+        opacity:[.65,1],translateY:[9,0],duration:900,
+        delay:stagger(95,{start:140}),ease:'out(3)'
       });
-      if(media.length) animate(media,{
-        opacity:[0,1],clipPath:['inset(0 9% 0 9%)','inset(0 0% 0 0%)'],
-        translateY:[14,0],duration:1250,delay:stagger(115,{start:80}),ease:'out(4)'
-      });
-
-      const cards=[...page.querySelectorAll('.work-card,.universe-index-card,.product-catalogue-card,.method-steps li,.value-item')].filter(el=>!el.closest('.inline-explorer'));
-      cards.forEach(el=>{el.style.opacity='0';});
       if(cards.length) animate(cards,{
-        opacity:[0,1],translateY:[24,0],scale:[.975,1],
-        rotate:[-.22,0],
-        duration:980,delay:stagger(78,{start:130}),ease:'out(4)'
+        opacity:[.78,1],translateY:[14,0],scale:[.99,1],
+        duration:1050,delay:stagger(105,{start:100}),ease:'out(3)'
       });
-
-      const copy=[...page.querySelectorAll('.hero p,.work-intro,.editorial-feature p,.editorial-about p,.editorial-method p,.bridge-copy p')];
-      copy.forEach((el,i)=>animate(el,{opacity:[0,1],translateY:[12,0],duration:800,delay:220+i*75,ease:'out(3)'}));
     };
 
-    if(!('IntersectionObserver'in window)){pages.forEach(reveal);return;}
-    const pageObserver=new IntersectionObserver(entries=>{
+    const heroSection=document.querySelector('#accueil');
+    if(heroSection) enter(heroSection);
+    if(!('IntersectionObserver'in window)){sections.forEach(enter);return;}
+    const observer=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{
-        if(entry.isIntersecting && entry.intersectionRatio>=.24){
-          reveal(entry.target);
-          pageObserver.unobserve(entry.target);
-        }
+        if(entry.isIntersecting){enter(entry.target);observer.unobserve(entry.target);}
       });
-    },{root:observeRoot,threshold:[.24,.42]});
-    pages.forEach(page=>pageObserver.observe(page));
+    },{threshold:.18});
+    sections.filter(section=>section!==heroSection).forEach(section=>observer.observe(section));
 
-    // A slow, restrained breathing movement gives the hero image depth without competing with reading.
-    const heroImage=document.querySelector('.hero-micrograph');
-    if(heroImage) animate(heroImage,{scale:[1,1.018],duration:9500,ease:'inOutSine',alternate:true,loop:true});
-  }).catch(()=>{ /* The site remains readable and usable if the animation CDN is unavailable. */ });
+    // Slow breathing is reserved for the documentary hero photograph, never the interface or explorer.
+    const heroImage=document.querySelector('#accueil .hero-micrograph');
+    if(heroImage) animate(heroImage,{scale:[1,1.014],duration:11000,ease:'inOutSine',alternate:true,loop:true});
+  }).catch(()=>{ /* Static editorial layout remains fully visible if the animation CDN is unavailable. */ });
 })();
