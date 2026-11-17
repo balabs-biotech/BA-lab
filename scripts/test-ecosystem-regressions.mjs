@@ -7,6 +7,9 @@ const previewHtml = readFileSync('ecosystem-preview/legacy-3d-preview.html', 'ut
 const previewExplorerHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const previewExplorerJs = readFileSync('ecosystem-preview/explorer-2d.js', 'utf8');
 const previewPixiJs = readFileSync('ecosystem-preview/explorer-2d-pixi.js', 'utf8');
+const publicExplorerJs = readFileSync('ecosystem/explorer-2d.js', 'utf8');
+const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
+
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
@@ -14,6 +17,11 @@ assert.ok(previewExplorerHtml.includes('id="field"') && previewExplorerHtml.incl
 assert.ok(previewExplorerHtml.includes('./explorer-2d.js?v=pixijs-2') && !previewExplorerHtml.includes('engine-v2.js'), 'Preview entry must load Vernpixi 2D and never load the 3D engine');
 assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes('fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
 assert.ok(previewPixiJs.includes('pixijs-webgl') && previewPixiJs.includes('filaments'), 'Preview Vernpixi renderer must draw the biological filament network');
+assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && html.includes('src="./explorer-2d.js?v=inline-embed-1"'), 'Public homepage must mount Vernpixi 2D directly inside the existing universe section');
+assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
+assert.ok(publicPixiJs.includes('pixijs-webgl') && publicPixiJs.includes('filaments'), 'Public Vernpixi renderer must draw the biological filament network');
+assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
+
 
 const expectedExplorerDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'evidence'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
@@ -54,7 +62,7 @@ const homepageSequence = [
   '<section class="under"',
 ].map((marker) => html.indexOf(marker));
 assert.ok(homepageSequence.every((position) => position >= 0), 'Homepage must retain every primary editorial and explorer section');
-assert.ok(homepageSequence.every((position, index) => index === 0 || position > homepageSequence[index - 1]), 'Homepage journey must prioritize the IoT-led work section, then the 3D explorer, then the eight-universe directory');
+assert.ok(homepageSequence.every((position, index) => index === 0 || position > homepageSequence[index - 1]), 'Homepage journey must prioritize the IoT-led work section, then the embedded 2D explorer, then the eight-universe directory');
 for (const [before, after] of [
   ['01 / CHAMPS D’EXPLORATION', '02 / Univers BALabs'],
   ['01 / AREAS OF EXPLORATION', '02 / BALabs universe'],
@@ -218,7 +226,7 @@ for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue
   const languageStart = html.indexOf(language + ':{');
   assert.ok(languageStart >= 0 && html.slice(languageStart, languageStart + 1800).includes('navCatalogue:"' + label + '"'), language + ' footer catalogue label must be localised');
 }
-assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("location.href='./explorer-2d.html?domain='") && previewHtml.includes("enterSphere(id,true,false)"), 'Public homepage links must enter Vernpixi while the isolated preview retains its legacy navigation');
+assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("balabs:focus-domain") && html.includes("scrollIntoView({behavior:'smooth',block:'center'})") && previewHtml.includes("enterSphere(id,true,false)"), 'Public homepage links must focus the embedded Vernpixi network while the isolated preview retains its legacy navigation');
 const featuredOrder = (source) => [...source.matchAll(/<a class="work-card-link" data-work-page="([^"]+)"/g)].map((match) => match[1]);
 assert.deepEqual(featuredOrder(html), ['iot', 'myco', 'soil'], 'Public featured work must present IoT, cultures, then materials');
 assert.deepEqual(featuredOrder(previewHtml), ['iot', 'myco', 'soil'], 'Preview featured work must match the public homepage order');
@@ -447,7 +455,7 @@ assert.ok(previewHtml.includes('grid-template-columns:repeat(2,minmax(0,1fr))!im
 assert.ok(previewHtml.includes('grid-template-columns:minmax(0,1fr)!important'), 'Preview must use a one-column mobile work grid');
 
 console.log('BA Labs site-wide visual refinement checks passed.');
-console.log('Clean 3D engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
+console.log('Clean 2D homepage integration and legacy-engine regression checks passed: eight domains, mycelial topology, animated signals, stable camera, desktop/mobile controls, hierarchical Notion branches and explicit page actions.');
 
 
 for (const language of ['fr', 'ar', 'en', 'pt']) {
