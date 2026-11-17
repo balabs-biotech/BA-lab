@@ -1277,19 +1277,19 @@
 }
 #app.balabs-ui > main .product-catalogue-card > *{position:relative;z-index:1}
 #app.balabs-ui > main .product-catalogue-card:after{
-  content:"LC · LIQUID CULTURE / SCHÉMA DE CATÉGORIE";
+  content:"LC · LIQUID CULTURE / FUNGAL BROTH";
   position:absolute;z-index:0;inset:0 0 auto;height:96px;
   display:flex;align-items:flex-end;padding:0 12px 9px;
   color:rgba(230,230,216,.9);font:600 8px/1.2 ui-monospace,monospace;letter-spacing:.13em;
-  background-image:url("./assets/catalogue-liquid-culture.svg");
+  background-image:url("./assets/catalogue-liquid-culture.jpg");
   background-repeat:no-repeat;background-size:cover;background-position:center;
   border-bottom:1px solid rgba(185,107,77,.42);
   filter:saturate(.96) contrast(1.03);
   transition:filter .5s ease,background-position .8s ease;
 }
 #app.balabs-ui > main .product-catalogue-card[data-product-type="agar"]:after{
-  content:"WA · WATER AGAR / GÉLOSE EN BOÎTE DE PÉTRI";
-  background-image:url("./assets/catalogue-water-agar.svg");
+  content:"WA · WATER AGAR / MYCELIUM ON AGAR";
+  background-image:url("./assets/catalogue-water-agar.jpg");
 }
 #app.balabs-ui > main .product-catalogue-card:hover,
 #app.balabs-ui > main .product-catalogue-card:focus-visible{
