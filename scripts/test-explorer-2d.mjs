@@ -29,11 +29,11 @@ try {
       nodes: Number(el.dataset.nodeCount || 0),
       edges: Number(el.dataset.edgeCount || 0),
       verifiedRelations: Number(el.dataset.verifiedRelations || 0),
-      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0)
+      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0),\n      nodeLevelRelations: Number(el.dataset.nodeLevelRelations || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
     assert.ok(topology.verifiedRelations >= 10, 'Cross-universe filaments must come from documented Notion relationships, not spatial proximity');
-    assert.ok(topology.crossUniverseConnections >= 8, 'The overview must expose a connected evidence-backed universe network');
+    assert.ok(topology.crossUniverseConnections >= 8, 'The overview must expose a connected evidence-backed universe network');\n    assert.ok(topology.nodeLevelRelations >= 10, 'The map must include Notion-backed links between real resource pages, not just universe roots');
     const mappedTree = await page.evaluate(async () => {
       const response = await fetch('./notion-tree.fr.json');
       const tree = await response.json();
