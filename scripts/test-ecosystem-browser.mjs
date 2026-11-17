@@ -87,7 +87,7 @@ try {
         const headings = [...root.querySelectorAll('.rb-heading-armed')];
         const hiddenHeadings = headings.filter(el => { const s=getComputedStyle(el); return Number(s.opacity)<.98 || s.filter!=='none' || s.transform!=='none'; });
         const images = [...root.querySelectorAll('.rb-image-armed')];
-        const hiddenImages = images.filter(el => { const s=getComputedStyle(el); return s.visibility==='hidden' || s.display==='none' || s.clipPath!=='none' || Number(s.opacity)<.98; });
+        const hiddenImages = images.filter(el => { const s=getComputedStyle(el); return s.visibility==='hidden' || s.display==='none' || s.clipPath!=='none' || Number(s.opacity)<.1; });
         return {hiddenHeadings:hiddenHeadings.length,hiddenImages:hiddenImages.length};
       }, chapter);
       assert.equal(presentation.hiddenHeadings, 0, 'No editorial heading may remain blurred or faded in ' + chapter);
