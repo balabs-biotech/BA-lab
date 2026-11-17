@@ -43,7 +43,7 @@ try {
       return {
         roots: tree.domains.map(node => ({ id: node.id, title: node.title, notionId: node.notionId, url: node.url })),
         nodes: nodes.length,
-        unmapped: nodes.filter(node => (!node.notionId || !node.url) && !(node.kind === 'section' && (node.children || []).length > 0)).map(node => node.title),
+        unmapped: nodes.filter(node => node.kind !== 'label' && (!node.notionId || !node.url) && !(node.kind === 'section' && (node.children || []).length > 0)).map(node => node.title),
         uniquePages: new Set(nodes.filter(node => node.notionId && node.kind !== 'reference').map(node => node.notionId)).size,
         canonicalPages: nodes.filter(node => node.notionId && node.kind !== 'reference').length,
         catalogueRecords: (() => { const product = tree.domains.find(node => node.id === 'products'); const records = []; const visit = list => (list || []).forEach(node => { if (node.notionId && node.kind !== 'reference') records.push(node); visit(node.children); }); visit(product?.children); return records.length; })()
