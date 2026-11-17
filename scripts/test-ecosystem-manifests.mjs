@@ -68,7 +68,13 @@ for (const language of expectedLanguages) {
   collectNodes(manifest.domains);
   const nodeLevelRelations = allNodes.filter((node) => node.level !== undefined || node.relations?.length).reduce((sum, node) => sum + (node.relations?.length || 0), 0);
   assert.ok(relationCount >= 10, language + ': too few documented cross-universe relationships');
-  assert.ok(contentRelationCount >= 4, language + ': Batch Tracker and Technosoil content links must be represented');\n  if (language === 'fr') {\n    for (const id of ['myco-culture', 'myco-mycorrhiza-ectomycorrhiza', 'bio-organism-pgpr', 'lab-plant-experimentation']) {\n      assert.ok(allNodes.find((node) => node.id === id)?.relations?.length, 'fr: expected page-level Notion links on ' + id);\n    }\n    assert.ok(allNodes.find((node) => node.id === 'myco-culture').relations.some((relation) => relation.target === 'products-wa-agar'), 'fr: culture-to-WA cross-link must be explicit');\n  }
+  assert.ok(contentRelationCount >= 4, language + ': Batch Tracker and Technosoil content links must be represented');
+  if (language === 'fr') {
+    for (const id of ['myco-culture', 'myco-mycorrhiza-ectomycorrhiza', 'bio-organism-pgpr', 'lab-plant-experimentation']) {
+      assert.ok(allNodes.find((node) => node.id === id)?.relations?.length, 'fr: expected page-level Notion links on ' + id);
+    }
+    assert.ok(allNodes.find((node) => node.id === 'myco-culture').relations.some((relation) => relation.target === 'products-wa-agar'), 'fr: culture-to-WA cross-link must be explicit');
+  }
   assert.ok(manifest.domains.find((domain) => domain.id === 'soil').relations.some((relation) => relation.target === 'lab' && relation.label.toLowerCase().includes('technosoil')), language + ': Technosoil must connect agrotechnology to plant experimentation');
 
   const evidence = manifest.domains.find((domain) => domain.id === 'evidence');
