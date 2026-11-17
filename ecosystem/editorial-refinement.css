@@ -20,6 +20,23 @@
 }
 #app.balabs-ui .experience-page-label:before{width:18px;box-shadow:0 0 10px #b96b4d66}
 
+
+/* Desktop gateway balance: keep the manifesto note in its own image-side column,
+   clear of the title, description and primary actions. */
+@media(min-width:1100px){
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+  grid-template-columns:minmax(0,1.12fr) minmax(280px,.68fr)!important;
+  grid-template-rows:1fr!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero .aside{
+  grid-column:2!important;grid-row:1!important;align-self:end!important;
+  max-width:330px!important;margin:0 0 78px auto!important;
+  padding:18px 20px!important;border:1px solid rgba(209,208,197,.28)!important;
+  border-inline-start:2px solid #b96b4d!important;
+  background:rgba(17,27,29,.82)!important;backdrop-filter:blur(10px);
+ }
+}
+
 /* Research spread: images carry the weight; metadata stays quiet and legible. */
 #app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work{
   position:relative;isolation:isolate;
