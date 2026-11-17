@@ -411,7 +411,7 @@ function renderSphereHops(id){const wrap=document.getElementById('sphereHops'),t
 
 function enterSphere(id,scroll=true,spatial3D=false){selected=id;const d=pages[id],tx=T[lang];if(!spatial3D&&mainView.classList.contains('universe-closed'))toggleUniverse();if(!spatial3D){mainView.hidden=false;homeBtn.hidden=false;}miniView.hidden=spatial3D;miniView.classList.toggle('spatial-source-only',spatial3D);sceneTitle.textContent=tx.sphere[id][0];document.getElementById('miniKicker').textContent=tx.tag+' '+String(['bio','myco','soil','lab','products','iot','work','learn'].indexOf(id)+1).padStart(2,'0');document.getElementById('miniTitle').textContent=tx.sphere[id][0];document.getElementById('miniDesc').textContent=tx.desc[id];document.getElementById('spherePage').href='./index.html?domain='+encodeURIComponent(id)+'&lang='+lang;document.getElementById('spherePage').removeAttribute('target');document.getElementById('spherePage').removeAttribute('rel');document.getElementById('spherePage').textContent=lang==='fr'?'Explorer cet univers ↗':lang==='en'?'Explore this universe ↗':lang==='ar'?'استكشف هذا العالم ↗':'Explorar este universo ↗';document.querySelector('.mini-map').style.setProperty('--sphere-color',getComputedStyle(document.querySelector('[data-sphere="'+id+'"]')).getPropertyValue('--c').trim()||'var(--lime)');const links=document.querySelectorAll('.linknode');const list=(localizedLinks[id]&&localizedLinks[id][lang])||d.links;links.forEach((a,i)=>{const p=list[i];if(!p){a.hidden=true;a.removeAttribute('href');return}a.hidden=false;a.href=p[1];a.target='_blank';a.rel='noopener noreferrer';a.dataset.resourceUrl=p[1];a.setAttribute('aria-label',p[0]+' — '+(lang==='fr'?'ouvrir la page Notion':lang==='en'?'open Notion page':lang==='ar'?'فتح صفحة Notion':'abrir página Notion'));a.title=p[0];a.querySelector('span').textContent=String(i+1).padStart(2,'0')+' / '+(lang==='fr'?'PAGE':lang==='en'?'PAGE':lang==='ar'?'صفحة':'PÁGINA');a.querySelector('b').textContent=p[0];a.querySelector('small').textContent=lang==='fr'?'Ouvrir cette page ↗':lang==='en'?'Open this page ↗':lang==='ar'?'فتح هذه الصفحة ↗':'Abrir esta página ↗';});renderSphereHops(id);requestAnimationFrame(drawMiniConnections);document.querySelectorAll('.sphere').forEach(s=>s.classList.toggle('active',s.dataset.sphere===id));if(scroll)document.querySelector('.miniintro')?.scrollIntoView({behavior:'smooth',block:'start'})}
 window.enterSphere=enterSphere;
-/* Homepage links enter the active Three.js scene; never open the legacy HTML mini-map. */
+/* Homepage universe links open Vernpixi directly, with the selected universe and language. */
 document.addEventListener('click',event=>{
  const link=event.target.closest('a[data-domain-page],a[data-work-page]');
  if(!link)return;
@@ -421,11 +421,11 @@ document.addEventListener('click',event=>{
  location.href='./explorer-2d.html?domain='+encodeURIComponent(id)+'&lang='+encodeURIComponent(lang);
 });
 
-/* The clean Three.js engine is the sole owner of #mainView. This legacy script keeps only site-wide language/content behavior; it must not bind sphere, hub, home or pointer navigation. */
+/* Vernpixi is the primary explorer. The former 3D engine is no longer loaded on this public route. */
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));
 window.addEventListener('resize',()=>{drawMiniConnections()});
 
-/* Customer journey: featured work → live 3D explorer → eight domains.
+/* Customer journey: featured work → Vernpixi 2D explorer → eight domains.
    Keep the scientific method and network bridge after the main discovery path. */
 (()=>{
  const scene=app?.querySelector('#universe');
