@@ -115,7 +115,16 @@ function buildNetwork(){
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
 function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
-function syncUniverseRail(n){const active=n?(n.level===0?n.id:n.rootId):null;document.querySelectorAll(".universe-rail [data-universe]").forEach(button=>{const current=button.dataset.universe===active;if(current){button.setAttribute("aria-current","location");button.style.background="#263b38";button.style.color="#f0eee3";button.style.outline="1px solid #b96b4d";}else{button.removeAttribute("aria-current");button.style.background="transparent";button.style.color="";button.style.outline="none";}});}
+function renderUniverseRail(){
+ const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
+ const names={fr:{bio:"BIO",myco:"MYCO",soil:"SOL",lab:"R&D",products:"OBJ",iot:"IoT",work:"PROJ",evidence:"DOC"},en:{bio:"BIO",myco:"MYCO",soil:"SOIL",lab:"R&D",products:"KIT",iot:"IoT",work:"WORK",evidence:"LOG"},ar:{bio:"حيوي",myco:"فطر",soil:"تربة",lab:"بحث",products:"عدة",iot:"IoT",work:"عمل",evidence:"توثيق"},pt:{bio:"BIO",myco:"MICO",soil:"SOLO",lab:"I&D",products:"KIT",iot:"IoT",work:"PROJ",evidence:"DOC"}};
+ tree.forEach(root=>{const b=el("button","universe-point",(names[lang]||names.fr)[root.id]||root.title.slice(0,4));b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)focusNode(n);};rail.append(b);});
+ syncUniverseRail(selected);
+}
+function syncUniverseRail(n){
+ const active=n?(n.level===0?n.id:n.rootId):null;
+ document.querySelectorAll(".universe-rail [data-universe]").forEach(b=>{const on=b.dataset.universe===active;if(on){b.setAttribute("aria-current","location");b.classList.add("is-active");}else{b.removeAttribute("aria-current");b.classList.remove("is-active");}});
+}
 function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function hit(x,y){let found=null,best=22;for(const n of nodes){if(levelOpacity(n.level)<.12)continue;const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);if(d<limit){best=d;found=n;}}return found;}
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
@@ -143,6 +152,7 @@ function updateUI(){
   ["notion","content","hypha"].forEach((kind,i)=>{const item=el("span",kind);item.append(el("i",""),document.createTextNode(labels[i]));legend.append(item);});
  }
  if(!document.getElementById("inlineExplorer"))document.title="BA Labs — "+t("title");
+ renderUniverseRail();
 }
 function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,12),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
 function pointerDown(e){canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragged=false;gesture={x:e.clientX,y:e.clientY,ox:targetOffset.x,oy:targetOffset.y};canvas.classList.add("dragging");}
