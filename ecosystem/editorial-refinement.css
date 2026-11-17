@@ -1153,3 +1153,84 @@
  #app.balabs-ui > main .feature-photo{animation:none!important}
  #app.balabs-ui > main .field-frame img{transform:none!important}
 }
+
+
+/* PHASE 35 — eight living research territories.
+   Real field imagery is reused only where it supports the subject; overlays
+   add a shared microscopy/network language without turning cards into planets. */
+#app.balabs-ui > main .universe-index .universe-index-card{
+  position:relative!important;isolation:isolate!important;
+  overflow:hidden!important;
+  border:1px solid rgba(209,208,197,.19)!important;
+  border-top:1px solid rgba(185,107,77,.68)!important;
+  background:linear-gradient(155deg,rgba(38,59,56,.92),rgba(17,27,29,.98) 72%)!important;
+  transition:transform .32s ease,border-color .32s ease,background .32s ease!important;
+}
+#app.balabs-ui > main .universe-index .universe-index-card:before{
+  content:"";display:block;position:relative;flex:0 0 126px;width:calc(100% + 44px);
+  margin:-22px -22px 17px;overflow:hidden;
+  background-color:#20332f;background-size:cover;background-position:center;
+  filter:saturate(.7) contrast(1.08);
+  opacity:.9;transition:filter .55s ease,transform .8s cubic-bezier(.2,.7,.2,1),opacity .4s ease;
+}
+#app.balabs-ui > main .universe-index .universe-index-card:after{
+  content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;opacity:.46;
+  background:
+   radial-gradient(circle at 18% 23%,rgba(209,208,197,.34) 0 1px,transparent 2px),
+   radial-gradient(circle at 76% 36%,rgba(185,107,77,.55) 0 1px,transparent 2px),
+   linear-gradient(125deg,transparent 38%,rgba(185,107,77,.14) 58%,transparent 78%);
+  background-size:31px 29px,47px 43px,100% 100%;
+  animation:universe-signal 17s ease-in-out infinite alternate;
+}
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(2n):after{animation-delay:-8s}
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(1):before{
+  background-image:linear-gradient(180deg,transparent 42%,rgba(17,27,29,.6)),url("https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png");
+}
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(2):before{
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+}
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(3):before,
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(8):before{
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.65)),url("https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg");
+}
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(4):before,
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(7):before{
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w");
+}
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(5):before,
+#app.balabs-ui > main .universe-index .universe-index-card:nth-child(6):before{
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+}
+#app.balabs-ui > main .universe-index .universe-index-card:hover,
+#app.balabs-ui > main .universe-index .universe-index-card:focus-visible{
+  transform:translateY(-4px)!important;border-color:rgba(185,107,77,.9)!important;
+  background:linear-gradient(155deg,rgba(45,72,63,.96),rgba(17,27,29,.98) 72%)!important;
+}
+#app.balabs-ui > main .universe-index .universe-index-card:hover:before,
+#app.balabs-ui > main .universe-index .universe-index-card:focus-visible:before{
+  filter:saturate(.96) contrast(1.08);transform:scale(1.035);opacity:1;
+}
+#app.balabs-ui > main .universe-index .universe-index-card > span{
+  position:relative!important;z-index:1!important;
+  width:36px!important;min-width:36px!important;height:28px!important;flex-basis:28px!important;
+  margin:0 0 13px!important;border:1px solid rgba(185,107,77,.55);
+  background:rgba(17,27,29,.76);color:#d28c6e!important;
+}
+#app.balabs-ui > main .universe-index .universe-index-card > b,
+#app.balabs-ui > main .universe-index .universe-index-card > small,
+#app.balabs-ui > main .universe-index .universe-index-card > p,
+#app.balabs-ui > main .universe-index .universe-index-card > em{position:relative;z-index:1}
+@keyframes universe-signal{
+  from{background-position:0 0,0 0,0 0;opacity:.28}
+  to{background-position:13px -9px,-12px 11px,0 0;opacity:.58}
+}
+@media(max-width:620px){
+ #app.balabs-ui > main .universe-index .universe-index-card:before{
+  flex-basis:108px;margin:-18px -18px 14px;width:calc(100% + 36px)
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui > main .universe-index .universe-index-card,
+ #app.balabs-ui > main .universe-index .universe-index-card:before,
+ #app.balabs-ui > main .universe-index .universe-index-card:after{animation:none!important;transition:none!important}
+}
