@@ -11,13 +11,13 @@
   lab:{src:'./assets/universe-lab.jpg',page:'https://commons.wikimedia.org/wiki/File:Lab_bench_with_lab_equipment.jpg',label:'LAB / INSTRUMENTATION',alt:'Paillasse avec plusieurs équipements de laboratoire',credit:'Jba.batista · CC BY-SA 4.0'},
   products:{src:'./assets/universe-products.jpg',page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_017-024.jpg',label:'PLEUROTUS / CULTIVATION KIT',alt:'Pleurotes gris cultivés sur substrat de copeaux de bois',credit:'Zinnmann · Wikimedia Commons'},
   work:{src:'./assets/universe-work.jpg',page:'https://commons.wikimedia.org/wiki/File:Candida_fungus_colony_grown_on_agar_media.jpg',label:'FUNGAL COLONY / AGAR',alt:'Colonie de levure cultivée sur milieu gélosé',credit:'Ivan Pashkov · Wikimedia Commons'},
-  evidence:{src:'./assets/universe-evidence.jpg',page:'https://commons.wikimedia.org/wiki/File:Microscopic_View_of_Penicillium_Conidia.jpg',label:'PENICILLIUM / CONIDIA',alt:'Conidies de Penicillium observées au microscope',credit:'Ajay Kumar Chaurasiya · Wikimedia Commons'}
+  learn:{src:'./assets/universe-evidence.jpg',page:'https://commons.wikimedia.org/wiki/File:Microscopic_View_of_Penicillium_Conidia.jpg',label:'PENICILLIUM / CONIDIA',alt:'Conidies de Penicillium observées au microscope',credit:'Ajay Kumar Chaurasiya · Wikimedia Commons'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  cards.forEach((card,index)=>{
   const data=images[card.dataset.domainPage];if(!data)return;
   const figure=document.createElement('figure');figure.className='universe-visual';
-  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=index<4?'eager':'lazy';img.decoding='async';img.addEventListener('error',()=>figure.classList.add('image-unavailable'),{once:true});figure.dataset.universeVisual=card.dataset.domainPage;
+  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=index<4?'eager':'lazy';img.decoding='async';img.addEventListener('error',()=>figure.classList.add('is-unavailable'),{once:true});img.addEventListener('load',()=>figure.classList.remove('is-unavailable'));figure.dataset.universeVisual=card.dataset.domainPage;
   const caption=document.createElement('figcaption');
   const subject=document.createElement('span');subject.textContent=data.label;
   const credit=document.createElement('small');credit.textContent='IMAGE / '+data.credit;
