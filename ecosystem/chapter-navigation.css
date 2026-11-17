@@ -167,3 +167,26 @@ body{overscroll-behavior:none}
  .experience-page>.universe-index .universe-index-grid{width:100%!important;grid-template-columns:minmax(0,1fr)!important}
  .experience-page>.universe-index .universe-index-card{width:100%!important;min-width:0!important;box-sizing:border-box!important}
 }
+
+
+/* Restore the persistent side-point navigation above the horizontal chapter track.
+   Fixed positioning prevents the rail from being clipped by the scrollable track/panels. */
+.chapter-rail{
+ position:fixed!important;
+ inset-inline-start:max(2px,env(safe-area-inset-left))!important;
+ top:50%!important;
+ bottom:auto!important;
+ z-index:999!important;
+ width:58px!important;
+ height:min(64vh,500px)!important;
+ transform:translateY(-50%)!important;
+ visibility:visible!important;
+ opacity:1!important;
+ pointer-events:none!important;
+}
+.chapter-rail-nodes,.chapter-rail-node{pointer-events:auto}
+[dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:max(2px,env(safe-area-inset-right))!important}
+@media(max-width:760px){
+ .chapter-rail{width:38px!important;height:min(58vh,420px)!important;inset-inline-start:max(0px,env(safe-area-inset-left))!important}
+ [dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:max(0px,env(safe-area-inset-right))!important}
+}
