@@ -1488,3 +1488,18 @@
  #app.balabs-ui .inline-explorer .universe-point{width:29px!important;height:29px!important;min-width:29px!important;font-size:8px!important}
  #app.balabs-ui .inline-explorer #selection{bottom:52px!important;max-height:35%!important}
 }
+
+
+/* PHASE 41 — keep the persistent chapter navigation above all editorial surfaces. */
+#app.balabs-ui .chapter-rail{
+  position:fixed!important;
+  z-index:2147483000!important;
+  isolation:isolate!important;
+  pointer-events:none!important;
+}
+#app.balabs-ui .chapter-rail-nodes,
+#app.balabs-ui .chapter-rail-node{
+  position:relative!important;
+  z-index:1!important;
+  pointer-events:auto!important;
+}
