@@ -1,0 +1,67 @@
+/* BA Labs — cinematic motion grammar, informed by Eyecandy / Prompt Motion / Motionographer.
+   Original CSS/SVG motion only: no copied footage, embeds, or extra UI layers. */
+.experience-track{position:relative}
+.experience-track:after{
+ content:"";position:fixed;inset:0;z-index:35;pointer-events:none;opacity:.12;
+ background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+ mix-blend-mode:soft-light
+}
+.experience-page .hero h1,
+.experience-page .work-heading,
+.experience-page .universe-index-heading,
+.experience-page .value-heading,
+.experience-page .product-catalogue-heading{
+ transform:translateY(18px);opacity:0;clip-path:inset(0 0 100% 0);
+ transition:transform .85s cubic-bezier(.16,1,.3,1),opacity .7s ease,clip-path .9s cubic-bezier(.16,1,.3,1)
+}
+.experience-page.is-motion-active .hero h1,
+.experience-page.is-motion-active .work-heading,
+.experience-page.is-motion-active .universe-index-heading,
+.experience-page.is-motion-active .value-heading,
+.experience-page.is-motion-active .product-catalogue-heading{
+ transform:translateY(0);opacity:1;clip-path:inset(0 0 0 0)
+}
+.experience-page .chapter-atmosphere{transform:translate3d(0,12px,0);opacity:0;transition:opacity 1s ease,transform 1.1s cubic-bezier(.16,1,.3,1)}
+.experience-page.is-motion-active .chapter-atmosphere{transform:translate3d(0,0,0);opacity:.72}
+.experience-page .rb-motion-media{
+ overflow:hidden;clip-path:inset(9% 7% 9% 7% round 2px);
+ transition:clip-path 1.05s cubic-bezier(.16,1,.3,1),filter .9s ease,transform 1s cubic-bezier(.16,1,.3,1)
+}
+.experience-page .rb-motion-media img,
+.experience-page .rb-motion-media video{
+ transform:scale(1.075);transition:transform 1.4s cubic-bezier(.16,1,.3,1),filter .9s ease;
+ will-change:transform
+}
+.experience-page .rb-motion-media.is-motion-visible{clip-path:inset(0 0 0 0 round 2px)}
+.experience-page .rb-motion-media.is-motion-visible img,
+.experience-page .rb-motion-media.is-motion-visible video{transform:scale(1)}
+.experience-page .work-card,
+.experience-page .universe-index-card,
+.experience-page .product-catalogue-card,
+.experience-page .method-steps li,
+.experience-page .value-item{
+ transition:transform .55s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .45s ease
+}
+@media(hover:hover){
+ .experience-page .work-card:hover,
+ .experience-page .universe-index-card:hover,
+ .experience-page .product-catalogue-card:hover,
+ .experience-page .value-item:hover{transform:translateY(-4px)}
+ .experience-page .rb-motion-media:hover img,
+ .experience-page .rb-motion-media:hover video{transform:scale(1.045)}
+}
+.experience-page .experience-page-label{transition:letter-spacing .7s ease,color .5s ease}
+.experience-page.is-motion-active>.experience-page-label{letter-spacing:.24em;color:#d1d0c5}
+.experience-page .chapter-atmosphere svg path{stroke-dasharray:420;stroke-dashoffset:420}
+.experience-page.is-motion-active .chapter-atmosphere svg path{stroke-dashoffset:0;transition:stroke-dashoffset 2.2s cubic-bezier(.16,1,.3,1)}
+@media(max-width:760px){
+ .experience-page .rb-motion-media{clip-path:inset(4% 3% round 2px)}
+ .experience-page.is-motion-active .chapter-atmosphere{opacity:.48}
+}
+@media(prefers-reduced-motion:reduce){
+ .experience-track:after{display:none}
+ .experience-page .hero h1,.experience-page .work-heading,.experience-page .universe-index-heading,.experience-page .value-heading,.experience-page .product-catalogue-heading,
+ .experience-page .chapter-atmosphere,.experience-page .rb-motion-media,.experience-page .rb-motion-media img,.experience-page .rb-motion-media video,
+ .experience-page .experience-page-label{opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important;animation:none!important}
+ .experience-page .chapter-atmosphere svg path{stroke-dashoffset:0!important;transition:none!important}
+}
