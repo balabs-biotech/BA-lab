@@ -1,21 +1,20 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>BA Labs — Ouverture de l’univers 3D</title>
-<style>html,body{margin:0;min-height:100%;background:#111b1d;color:#d1d0c5;font:16px system-ui}main{min-height:100vh;display:grid;place-items:center;text-align:center;padding:24px}a{color:#d1d0c5}</style>
+<title>BA Labs — Explorateur Vernpixi</title>
 <script>
 (function(){
  const params=new URLSearchParams(location.search);
- const domain=params.get('domain');
- const lang=params.get('lang')||'fr';
  const allowed=['bio','myco','soil','lab','products','iot','work','learn'];
- if(!allowed.includes(domain)){location.replace('./index.html'+(params.toString()?'?'+params.toString():''));return}
- location.replace('./index.html?domain='+encodeURIComponent(domain)+'&lang='+encodeURIComponent(lang));
+ const domain=params.get('domain'),lang=params.get('lang')||'fr';
+ const target=new URL('./explorer-2d.html',location.href);
+ if(allowed.includes(domain))target.searchParams.set('domain',domain);
+ if(['fr','en','ar','pt'].includes(lang))target.searchParams.set('lang',lang);
+ location.replace(target.pathname+target.search);
 })();
 </script>
 </head>
-<body><main><p>Ouverture du moteur 3D BA Labs…<br><a href="./index.html">Revenir à l’exploration</a></p></main></body>
+<body><p><a href="./explorer-2d.html">Ouvrir l’explorateur BA Labs</a></p></body>
 </html>

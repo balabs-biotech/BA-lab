@@ -55,6 +55,14 @@ try {
     await page.locator('#back').click();
     assert.equal(await page.locator('#selection .card-title').innerText(), selectedRoot, 'Back must restore the selected branch as well as the camera');
     assert.equal(await page.locator('#back').isDisabled(), true, 'Back control must return to a stable state after restoring the previous view');
+    const domainUrl = new URL(base);
+    domainUrl.searchParams.set('domain', 'myco');
+    domainUrl.searchParams.set('lang', 'fr');
+    await page.goto(domainUrl.toString(), { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 30000 });
+    await page.locator('#selection .card-title').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#selection .card-title').innerText(), 'MYCOLOGIE', 'Direct domain URL must focus the requested universe');
+    assert.equal(page.url(), domainUrl.toString(), 'Direct domain entry must remain inside the same explorer route');
     await page.locator('#zoomIn').click();
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');
     for (const language of ['en', 'ar', 'pt', 'fr']) {

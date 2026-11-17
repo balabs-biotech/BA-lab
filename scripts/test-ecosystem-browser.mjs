@@ -2,423 +2,56 @@ import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
-const baseURL = process.env.BALABS_SITE_URL || 'http://127.0.0.1:8765/';
-const outputDir = process.env.BALABS_BROWSER_ARTIFACT_DIR || 'artifacts/3d-browser-smoke';
+const base = process.env.BALABS_SITE_URL || 'http://127.0.0.1:8765/';
+const outputDir = process.env.BALABS_BROWSER_ARTIFACT_DIR || 'artifacts/vernpixi-primary';
 await mkdir(outputDir, { recursive: true });
-
-const browser = await chromium.launch({
-  headless: true,
-  args: [
-    '--enable-webgl',
-    '--ignore-gpu-blocklist',
-    '--use-gl=angle',
-    '--use-angle=swiftshader',
-    '--enable-unsafe-swiftshader',
-  ],
-});
-
-async function tapSpatialTarget(page, name, x, y, selector) {
-  // Hit targets can overlap in projected 3D space. Find a point that is
-  // genuinely exposed to the requested target instead of clicking its center
-  // (which may be covered by a neighbouring transparent hit surface).
-  if (selector) {
-    const target = page.locator(selector).first();
-    await target.waitFor({ state: 'visible', timeout: 5000 });
-    if (name === 'mobile') await target.scrollIntoViewIfNeeded();
-    const point = await target.evaluate((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.width < 40 || rect.height < 40) return null;
-      for (let row = 1; row <= 9; row++) {
-        for (let col = 1; col <= 9; col++) {
-          const px = rect.left + rect.width * col / 10;
-          const py = rect.top + rect.height * row / 10;
-          const hit = document.elementFromPoint(px, py);
-          if (hit && (hit === el || el.contains(hit))) return { x: px, y: py };
-        }
-      }
-      return null;
-    });
-    assert.ok(point, name + ': requested spatial target is fully occluded by another hit surface: ' + selector);
-    if (name === 'mobile') return page.touchscreen.tap(point.x, point.y);
-    return page.mouse.click(point.x, point.y);
-  }
-  if (name !== 'mobile') return page.mouse.click(x, y);
-  return page.touchscreen.tap(x, y);
-}
-
-async function checkTwoFingerPan(page, name) {
-  if (name !== 'mobile') return;
-  const beforeState = await page.evaluate(() => window.__BALABS_3D_E2E__());
-  const before = beforeState?.cameraTarget;
-  const selectedBefore = beforeState?.selected;
-  assert.ok(before, name + ': camera target probe is unavailable before the two-finger gesture');
-  assert.ok(selectedBefore, name + ': no selected universe before the two-finger gesture');
-  const rect = await page.locator('#mainView .webgl-stage canvas').boundingBox();
-  assert.ok(rect, name + ': canvas bounds are unavailable for the two-finger gesture');
-  const session = await page.context().newCDPSession(page);
-  // Start in the open perimeter of the scene, away from projected node
-  // hit areas, so the gesture measures camera panning rather than node picking.
-  const x = Math.round(rect.x + rect.width * .82);
-  const y = Math.round(rect.y + rect.height * .78);
-  await session.send('Input.dispatchTouchEvent', {
-    type: 'touchStart',
-    touchPoints: [{ x: x - 34, y, id: 1 }, { x: x + 34, y, id: 2 }],
-  });
-  await session.send('Input.dispatchTouchEvent', {
-    type: 'touchMove',
-    touchPoints: [{ x: x + 26, y: y + 8, id: 1 }, { x: x + 94, y: y + 8, id: 2 }],
-  });
-  await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await session.detach();
-  await page.waitForTimeout(150);
-  const after = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraTarget);
-  const moved = after && Math.hypot(after.x - before.x, after.y - before.y, after.z - before.z);
-  assert.ok(moved > 0.02, name + ': dragging with two fingers must pan the complete 3D map without changing hierarchy');
-  const state = await page.evaluate(() => window.__BALABS_3D_E2E__());
-  assert.equal(state?.selected, selectedBefore, name + ': two-finger panning must preserve the selected universe (before=' + selectedBefore + ', after=' + state?.selected + ')');
-  console.log(name + ': two-finger map pan moved camera target', { before, after });
-}
-
-async function checkWorkingScene(name, viewport) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, isMobile: name === 'mobile', hasTouch: name === 'mobile' });
-  const pageErrors = [];
-  const browserDiagnostics = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
-  page.on('console', (message) => { if (message.type() === 'error') browserDiagnostics.push('console: ' + message.text()); });
-  page.on('requestfailed', (request) => browserDiagnostics.push('request failed: ' + request.url() + ' — ' + (request.failure()?.errorText || 'unknown')));
-  await page.goto(baseURL + (baseURL.includes('?') ? '&' : '?') + 'e2e=1', { waitUntil: 'domcontentloaded', timeout: 30000 });
-
-  // Editorial method exists on the full ecosystem homepage, not the isolated 3D preview.
-  if (!outputDir.includes('3d-browser-smoke-preview')) {
-    // The four editorial method steps must open real, translated content—not just animate.
-    const methodRoot = page.locator('#app .editorial-method');
-    await methodRoot.waitFor({ state: 'visible', timeout: 10000 });
-    for (const language of ['fr', 'en', 'ar', 'pt']) {
-      await page.locator('[data-lang="' + language + '"]').click();
-      for (const [step, titleKey] of [
-        ['observe', 'methodObserve'],
-        ['question', 'methodQuestion'],
-        ['test', 'methodTest'],
-        ['share', 'methodShare'],
-      ]) {
-        const trigger = methodRoot.locator('[data-method-step="' + step + '"]');
-        await trigger.click();
-        const detail = methodRoot.locator('#methodDetail');
-        await detail.waitFor({ state: 'visible', timeout: 3000 });
-        const detailState = await detail.evaluate((el) => ({
-          title: el.querySelector('#methodDetailTitle')?.textContent?.trim() || '',
-          explanation: el.querySelector('#methodDetailText')?.textContent?.trim() || '',
-          output: el.querySelector('#methodDetailOutput')?.textContent?.trim() || '',
-          display: getComputedStyle(el).display,
-          hidden: el.hidden,
-        }));
-        assert.ok(detailState.title && detailState.explanation.length > 40 && detailState.output.length > 25,
-          language + '/' + step + ': method detail must contain translated explanation and a concrete expected record. ' + JSON.stringify(detailState));
-        assert.notEqual(detailState.display, 'none', language + '/' + step + ': opened method detail must be visible');
-        assert.equal(await trigger.getAttribute('aria-expanded'), 'true',
-          language + '/' + step + ': active method step must expose its expanded state');
-        await trigger.click();
-        await detail.waitFor({ state: 'hidden', timeout: 3000 });
-      }
-    }
-    await page.locator('[data-lang="fr"]').click();
-  
-  }
-
-  try {
-  await checkUniverseIndexLayout('desktop', { width: 1440, height: 1000 }, 4);
-  await checkUniverseIndexLayout('mobile', { width: 390, height: 844 }, 1);
-    await page.waitForFunction(() => {
-      const root = document.querySelector('#mainView');
-      return root?.classList.contains('webgl-ready') ||
-        !!document.querySelector('.webgl-load-error-panel');
-    }, undefined, { timeout: 35000 });
-  } catch (error) {
-    const state = await page.evaluate(() => ({
-      readyState: document.readyState,
-      rootClass: document.querySelector('#mainView')?.className || null,
-      moduleScripts: [...document.querySelectorAll('script[type="module"]')].map((item) => item.src),
-      stageCount: document.querySelectorAll('#mainView .webgl-stage').length,
-      canvasCount: document.querySelectorAll('#mainView canvas').length,
-      failurePanelCount: document.querySelectorAll('.webgl-load-error-panel').length,
-    }));
-    throw new Error(name + ': 3D engine did not reach ready or failure state. ' +
-      JSON.stringify({ state, pageErrors, browserDiagnostics, cause: error.message }));
-  }
-
-  assert.equal(
-    await page.locator('.webgl-load-error-panel').count(),
-    0,
-    name + ': the 3D engine must start instead of showing the failure state',
-  );
-  const root = page.locator('#mainView');
-  await root.waitFor({ state: 'visible' });
-  assert.ok(await root.evaluate((el) => el.classList.contains('webgl-ready')), name + ': WebGL-ready state missing');
-  assert.ok(await root.evaluate((el) => el.classList.contains('universe-closed')), name + ': gateway must be the initial state');
-
-  const canvas = page.locator('#mainView .webgl-stage canvas');
-  await canvas.waitFor({ state: 'visible', timeout: 15000 });
-  const canvasState = await canvas.evaluate((el) => {
-    const rect = el.getBoundingClientRect();
-    const gl = el.getContext('webgl2') || el.getContext('webgl');
-    return {
-      width: el.width,
-      height: el.height,
-      visibleWidth: rect.width,
-      visibleHeight: rect.height,
-      webglContext: !!gl,
-      display: getComputedStyle(el).display,
-    };
-  });
-  assert.ok(canvasState.webglContext, name + ': browser did not create a WebGL context');
-  assert.ok(canvasState.width > 0 && canvasState.height > 0, name + ': canvas has zero drawing dimensions');
-  assert.ok(canvasState.visibleWidth > 250 && canvasState.visibleHeight > 300, name + ': 3D canvas is clipped or collapsed');
-
-  const legacyVisible = await page.locator('#mainView .sphere').evaluateAll((items) =>
-    items.filter((el) => {
-      const style = getComputedStyle(el);
-      const rect = el.getBoundingClientRect();
-      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-    }).length,
-  );
-  assert.equal(legacyVisible, 0, name + ': old HTML spheres must not appear over the WebGL scene');
-
-  await page.screenshot({ path: outputDir + '/' + name + '-gateway.png', fullPage: false });
-  const intro = page.locator('#mainView .webgl-intro');
-  await intro.waitFor({ state: 'visible' });
-  await intro.click();
-  await page.waitForFunction(() => document.querySelector('#mainView')?.classList.contains('universe-open'), undefined, { timeout: 5000 });
-  assert.equal(await intro.isVisible(), false, name + ': gateway overlay must leave the scene after entry');
-  assert.ok(await canvas.isVisible(), name + ': the 3D canvas must remain visible after entering');
-  await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
-
-  await page.waitForFunction(() => !!window.__BALABS_3D_E2E__()?.domainTarget, undefined, { timeout: 8000 });
-  const domainTarget = await page.evaluate(() => window.__BALABS_3D_E2E__().domainTarget);
-  const hitSurface = await page.evaluate(({x,y}) => { const stage=document.querySelector('.webgl-stage'), canvas=stage?.querySelector('canvas'), rect=el=>{const r=el?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height}:null};return{stage:rect(stage),canvas:rect(canvas),stagePointer:stage&&getComputedStyle(stage).pointerEvents,canvasPointer:canvas&&getComputedStyle(canvas).pointerEvents,element:document.elementFromPoint(x,y)?.tagName,elementClass:document.elementFromPoint(x,y)?.className,main:rect(document.querySelector('#mainView'))}; }, domainTarget);
-  await page.evaluate(() => document.addEventListener('click', event => { window.__BALABS_3D_DOCUMENT_CLICK__ = {tag:event.target?.tagName, id:event.target?.id, className:typeof event.target?.className==='string'?event.target.className:'', stage:!!event.target?.closest?.('.webgl-stage'), x:event.clientX, y:event.clientY}; }, true));
-  // The semantic button is intentionally hidden; test the real WebGL hit
-  // at the projected coordinate exposed by the scene probe.
-  await tapSpatialTarget(page, name, domainTarget.x, domainTarget.y);
-  assert.equal(await page.evaluate(() => [document.querySelector('#mainView .webgl-stage'), document.querySelector('#mainView .webgl-stage canvas')].includes(document.activeElement)),
-    true, name + ': pointer interaction must focus the interactive 3D stage so keyboard navigation is immediately available');
-  await page.waitForFunction(() => {
-    const mini = document.querySelector('#miniView');
-    return !mini || mini.hidden || getComputedStyle(mini).display === 'none';
-  }, undefined, { timeout: 8000 }).catch(async error => { throw new Error('3D domain tap did not enter its domain or hide the legacy view: ' + JSON.stringify(await page.evaluate((surface) => ({probe:window.__BALABS_3D_E2E__(),lastPick:window.__BALABS_3D_LAST_PICK__,pickTrace:window.__BALABS_3D_PICK_TRACE__,documentClick:window.__BALABS_3D_DOCUMENT_CLICK__,hitSurface:surface}), hitSurface)) + ' — ' + error.message); });
-  assert.ok(await canvas.isVisible(), name + ': entering a 3D domain must keep the WebGL canvas visible');
-  assert.equal(await page.locator('#miniView:visible').count(), 0,
-    name + ': the legacy HTML index must never be visible during 3D navigation');
-  assert.equal(await page.locator('#miniView.spatial-source-only .linknode:visible').count(), 0,
-    name + ': no legacy 2D links may overlay the 3D scene');
-  await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
-  await page.waitForFunction(() => typeof window.__BALABS_3D_E2E__ === 'function', undefined, { timeout: 5000 });
-  await checkTwoFingerPan(page, name);
-  await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 15000 }).catch(async error => { throw new Error('No 3D branch is visible for a real tap: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
-  // The isolated preview deliberately retains its six static resource links;
-  // enforce the no-dock rule on the production ecosystem scene only.
-  if (!outputDir.includes('3d-browser-smoke-preview')) {
-    assert.equal(await page.locator('.webgl-branch-dock:visible,.webgl-branch-item:visible').count(), 0,
-      name + ': the old HTML subpage dock must never be visible over the 3D engine');
-  }
-  await page.waitForFunction(() => document.querySelectorAll('.webgl-resource-target[data-depth="0"]').length > 0, undefined, { timeout: 8000 });
-  assert.ok(await page.locator('.webgl-resource-target[data-depth="0"]:visible').count() > 0, name + ': 3D branches must retain invisible spatial hit targets');
-  await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; for (const type of ['pointerdown','pointerup','click','touchend']) document.addEventListener(type,event=>{if(event.target?.closest?.('.webgl-hit-target,.webgl-resource-target'))window.__BALABS_3D_TARGET_EVENTS__.push({type,target:event.target.title||event.target.tagName,pointerType:event.pointerType||null,x:event.clientX??null,y:event.clientY??null})},true); });
-  await page.evaluate(() => { window.__BALABS_3D_TARGET_EVENTS__=[]; window.__BALABS_3D_DOCUMENT_CLICK__=null; });
-  await page.evaluate(() => { window.__BALABS_3D_E2E_CLICKS=0; window.__BALABS_3D_LAST_OPEN__=null; window.__BALABS_3D_LAST_OPEN_ERROR__=null; });
-  let navigated = false;
-  let openedNotion = false;
-  let zoomOutChecked = false;
-  for (let level = 0; level < 8; level++) {
-    await page.waitForFunction(() => (window.__BALABS_3D_E2E__()?.visible || 0) > 0, undefined, { timeout: 12000 });
-    const probe = await page.evaluate(() => window.__BALABS_3D_E2E__());
-    if (level === 0) assert.ok(probe.childCount > 0, name + ': selected universe must expose its actual Notion resources as 3D branches');
-    const branchTarget = probe.target;
-    assert.ok(branchTarget, name + ': no spatial folder/page target was found');
-    if (branchTarget.hasChildren) {
-      const depthBefore = probe.depth;
-      const branchButtonPoint = await page.evaluate((title) => { const button=[...document.querySelectorAll('.webgl-resource-target[data-depth="0"][data-has-children="true"]')].find(item=>item.title===title&&getComputedStyle(item).display!=='none'); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; }, branchTarget.title);
-      assert.ok(branchButtonPoint, name + ': at least one folder must expose an unobstructed DOM hit target');
-      const beforeActivation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,picks:window.__BALABS_3D_E2E__()?.pickCalls||0}));
-      const clicksBefore = beforeActivation.clicks;
-      await tapSpatialTarget(page, name, branchButtonPoint.x, branchButtonPoint.y, '.webgl-resource-target[data-depth="0"][data-has-children="true"][title='+JSON.stringify(branchButtonPoint.title)+']');
-      await page.waitForFunction(({title,before}) => { const probe=window.__BALABS_3D_E2E__?.(); return window.__BALABS_3D_LAST_OPEN__?.title===title && (window.__BALABS_3D_E2E_CLICKS||0)>before && probe?.currentTitle===title && probe.childCount>0; }, {title:branchButtonPoint.title,before:clicksBefore}, { timeout: 8000 }).catch(async error => { throw new Error(name + ': selecting a branch did not activate the intended folder. ' + JSON.stringify(await page.evaluate(() => ({probe:window.__BALABS_3D_E2E__(),lastOpen:window.__BALABS_3D_LAST_OPEN__,clicks:window.__BALABS_3D_E2E_CLICKS,trace:window.__BALABS_3D_NAV_TRACE__,events:window.__BALABS_3D_TARGET_EVENTS__})) ) + ' expected=' + JSON.stringify({title:branchButtonPoint.title,before:beforeActivation}) + ' — ' + error.message); });
-      await page.waitForTimeout(250);
-      const activation = await page.evaluate(() => ({clicks:window.__BALABS_3D_E2E_CLICKS||0,last:window.__BALABS_3D_LAST_OPEN__,events:window.__BALABS_3D_TARGET_EVENTS__||[]}));
-      assert.equal(activation.clicks, clicksBefore+1, name + ': one finger tap must activate a branch exactly once');
-      assert.equal(await page.evaluate(() => window.__BALABS_3D_E2E__()?.pickCalls||0), beforeActivation.picks, name + ': a branch tap must not also trigger a spatial canvas selection');
-      if(name==='mobile')assert.ok(activation.events.some(event=>event.type==='pointerup'&&event.target===branchButtonPoint.title), name + ': mobile branch selection must be handled on touch pointer release');
-      const childSpatialState = await page.evaluate(() => { const probe=window.__BALABS_3D_E2E__(); const targets=[...document.querySelectorAll('.webgl-resource-target[data-depth="0"]')]; return {dock:!!document.querySelector('.webgl-branch-dock'),items:targets.length,childCount:probe?.childCount,titles:targets.map(button=>button.title)}; });
-      const isolatedPreview = outputDir.includes('3d-browser-smoke-preview');
-      assert.ok(childSpatialState && (isolatedPreview || !childSpatialState.dock) && childSpatialState.items===childSpatialState.childCount && childSpatialState.items>0,
-        name + ': selecting a folder must replace the spatial network level without an HTML subpage list in the production scene. ' + JSON.stringify(childSpatialState));
-      navigated = true;
-      await page.waitForFunction(() => !document.querySelector('#mainView .webgl-stage')?.classList.contains('is-transitioning'), undefined, { timeout: 8000 });
-      if (!zoomOutChecked) {
-        const nestedDepth = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-        const cameraDistance = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
-        assert.ok(nestedDepth > 0, name + ': nested depth must be available before testing zoom-out');
-        await page.locator('.webgl-controls [data-camera="out"]').evaluate((button) => button.click());
-        await page.waitForFunction((previous) => (window.__BALABS_3D_E2E__()?.cameraDistance || 0) > previous,
-          cameraDistance, { timeout: 8000 });
-        const depthAfterZoom = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-        assert.equal(depthAfterZoom, nestedDepth,
-          name + ': camera zoom-out must not change the selected hierarchy level');
-        zoomOutChecked = true;
-        const distanceAfterZoomOut = await page.evaluate(() => window.__BALABS_3D_E2E__()?.cameraDistance || 0);
-        await page.locator('.webgl-controls [data-camera="in"]').evaluate((button) => button.click());
-        await page.waitForFunction(({ previous, expectedDepth }) => {
-          const state = window.__BALABS_3D_E2E__();
-          return state && state.cameraDistance < previous && state.depth === expectedDepth;
-        }, { previous: distanceAfterZoomOut, expectedDepth: nestedDepth }, { timeout: 8000 });
-        const depthAfterZoomIn = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-        assert.equal(depthAfterZoomIn, nestedDepth,
-          name + ': camera zoom-in must not change the selected hierarchy level');
-      }
-      continue;
-    }
-    assert.ok(branchTarget.url, name + ': terminal branch must carry its Notion destination');
-    const terminalPoint = await page.evaluate((title) => { const button=[...document.querySelectorAll('.webgl-resource-target[data-depth="0"][data-has-children="false"][data-resource-url]')].find(item=>item.title===title&&getComputedStyle(item).display!=='none'); if(!button)return null; const rect=button.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,title:button.title}; }, branchTarget.title);
-    assert.ok(terminalPoint, name + ': at least one page must expose an unobstructed DOM hit target');
-    const notionRequest = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error(name + ': terminal branch did not request its Notion destination')), 10000);
-      page.context().on('page', popup => {
-        popup.waitForLoadState('domcontentloaded', { timeout: 12000 }).catch(() => {}).then(() => {
-          if (/notion\.(so|site|com)/i.test(popup.url())) { clearTimeout(timer); resolve(popup); }
-        });
-      });
-      page.on('request', request => {
-        if (/https?:\/\/(?:www\.)?notion\.(?:so|site|com)\//i.test(request.url())) {
-          clearTimeout(timer); resolve({ url: () => request.url(), close: async () => {} });
-        }
-      });
-    });
-    await tapSpatialTarget(page, name, terminalPoint.x, terminalPoint.y, '.webgl-resource-target[data-depth="0"][data-has-children="false"][title='+JSON.stringify(terminalPoint.title)+']');
-    const destination = await notionRequest;
-    assert.match(destination.url(), /notion\.(so|site|com)/i, name + ': terminal branch must open its Notion page');
-    await destination.close();
-    openedNotion = true;
-    break;
-  }
-  assert.ok(openedNotion, name + ': tapping a terminal page must open Notion');
-  const initialHierarchy = await page.evaluate(() => window.__BALABS_3D_E2E__()?.nestedAvailable);
-  if (initialHierarchy) {
-    assert.ok(navigated, name + ': tapping a folder must reveal a deeper spatial level');
-    assert.ok(zoomOutChecked, name + ': zoom-out control was not exercised at a nested level');
-  }
-  const depthBeforeBack = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-  for (let step = 0; step <= depthBeforeBack; step++) {
-    const before = await page.evaluate(() => window.__BALABS_3D_E2E__()?.depth || 0);
-    await page.locator('.webgl-controls [data-camera="back"]').evaluate((button) => button.click());
-    await page.waitForFunction((previous) => {
-      const probe = window.__BALABS_3D_E2E__();
-      return probe?.selected === null || (probe?.depth || 0) < previous;
-    }, before, { timeout: 8000 });
-  }
-  await page.waitForFunction(() => window.__BALABS_3D_E2E__()?.selected === null && document.querySelector('#miniView')?.hidden,
-    undefined, { timeout: 8000 }).catch(async error => { throw new Error(name + ': returning through the hierarchy must reach the overview: ' + JSON.stringify(await page.evaluate(() => window.__BALABS_3D_E2E__())) + ' — ' + error.message); });
-  await page.screenshot({ path: outputDir + '/' + name + '-universe.png', fullPage: false });
-
-  assert.deepEqual(pageErrors, [], name + ': uncaught browser errors detected');
-  console.log(name + ': WebGL started, legacy spheres hidden, gateway entered successfully', JSON.stringify(canvasState));
-  await page.close();
-}
-
-async function checkUniverseIndexLayout(name, viewport, expectedColumns) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, isMobile: name === 'mobile', hasTouch: name === 'mobile' });
-  await page.goto(baseURL + (baseURL.includes('?') ? '&' : '?') + 'e2e=1', { waitUntil: 'domcontentloaded', timeout: 30000 });
-  const section = page.locator('#universes');
-  await section.waitFor({ state: 'visible', timeout: 10000 });
-  await section.scrollIntoViewIfNeeded();
-  const grid = page.locator('#universes .universe-index-grid');
-  const cards = grid.locator(':scope > .universe-index-card');
-  await cards.first().waitFor({ state: 'visible' });
-  const result = await page.evaluate(() => {
-    const grid = document.querySelector('#universes .universe-index-grid');
-    const cards = [...(grid?.querySelectorAll(':scope > .universe-index-card') || [])];
-    const gridStyle = grid && getComputedStyle(grid);
-    const rects = cards.map(card => {
-      const r = card.getBoundingClientRect();
-      return { left:r.left, top:r.top, right:r.right, bottom:r.bottom, width:r.width, height:r.height,
-        scrollWidth:card.scrollWidth, clientWidth:card.clientWidth, scrollHeight:card.scrollHeight, clientHeight:card.clientHeight,
-        number:card.querySelector(':scope > span')?.textContent?.trim(),
-        title:card.querySelector(':scope > b')?.textContent?.trim() };
-    });
-    const overlaps = [];
-    for (let i=0;i<rects.length;i++) for (let j=i+1;j<rects.length;j++) {
-      const a=rects[i], b=rects[j];
-      if (Math.min(a.right,b.right)-Math.max(a.left,b.left)>1 &&
-          Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1) overlaps.push([a.number,b.number]);
-    }
-    return { columns:gridStyle?.gridTemplateColumns?.split(' ').length || 0, gridTemplateColumns:gridStyle?.gridTemplateColumns, cards:rects, overlaps,
-      sectionWidth:document.querySelector('#universes')?.getBoundingClientRect().width || 0,
-      viewportWidth:window.innerWidth };
-  });
-  assert.equal(result.cards.length, 8, name + ': the homepage must show exactly eight universe panels');
-  assert.equal(result.columns, expectedColumns, name + ': universe panels must use the intended responsive column count; layout=' + JSON.stringify({columns:result.columns,viewportWidth:result.viewportWidth,sectionWidth:result.sectionWidth,grid:result.gridTemplateColumns}));
-  assert.deepEqual(result.overlaps, [], name + ': universe panels must not overlap');
-  for (const card of result.cards) {
-    assert.ok(card.width >= (name === 'mobile' ? 300 : 200), name + ': panel ' + card.number + ' is too narrow');
-    assert.ok(card.scrollWidth <= card.clientWidth + 1, name + ': panel ' + card.number + ' clips text horizontally');
-    assert.ok(card.scrollHeight <= card.clientHeight + 1, name + ': panel ' + card.number + ' clips text vertically');
-    assert.ok(card.title, name + ': panel ' + card.number + ' is missing its title');
-  }
-  await section.screenshot({ path: outputDir + '/' + name + '-universe-index.png' });
-  console.log(name + ': eight universe panels verified', JSON.stringify({ columns:result.columns, overlaps:result.overlaps, cards:result.cards.map(card=>({number:card.number,title:card.title,width:card.width,height:card.height})) }));
-  await page.close();
-}
-
-
-async function checkPrimaryCdnFallback() {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  await page.route('https://cdn.jsdelivr.net/**', (route) => route.abort());
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await page.waitForFunction(() => {
-    const root = document.querySelector('#mainView');
-    return root?.classList.contains('webgl-ready') ||
-      !!document.querySelector('.webgl-load-error-panel');
-  }, undefined, { timeout: 35000 });
-  assert.equal(await page.locator('.webgl-load-error-panel').count(), 0,
-    'The pinned secondary CDN must start the 3D scene when jsDelivr is unavailable');
-  assert.ok(await page.locator('#mainView .webgl-stage canvas').isVisible(),
-    'The secondary CDN must create a visible 3D canvas');
-  console.log('CDN fallback: 3D scene started after jsDelivr was blocked');
-  await page.close();
-}
-
-async function checkFailureState() {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  for (const host of ['cdn.jsdelivr.net', 'unpkg.com', 'esm.sh']) {
-    await page.route('https://' + host + '/**', (route) => route.abort());
-  }
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await page.locator('.webgl-load-error-panel').waitFor({ state: 'visible', timeout: 60000 });
-  const visibleLegacy = await page.locator('#mainView .sphere').evaluateAll((items) =>
-    items.filter((el) => {
-      const style = getComputedStyle(el);
-      const rect = el.getBoundingClientRect();
-      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-    }).length,
-  );
-  assert.equal(visibleLegacy, 0, 'WebGL failure must not revive the legacy sphere interface');
-  assert.ok(await page.locator('.webgl-load-error-panel button').isVisible(), 'Failure state must offer a retry action');
-  await page.screenshot({ path: outputDir + '/webgl-failure-state.png', fullPage: false });
-  console.log('Failure path: legacy spheres remain suppressed and retry state is visible');
-  await page.close();
-}
-
+const browser = await chromium.launch({ headless: true });
+const results = [];
 try {
-  if (outputDir.includes('3d-browser-smoke-preview')) {
-    // The isolated preview is a static resource-index surface, not the production
-    // 3D scene. Validate its responsive eight-universe index without applying
-    // production WebGL picking assertions to its fallback links.
-    await checkUniverseIndexLayout('desktop', { width: 1440, height: 1000 }, 4);
-    await checkUniverseIndexLayout('mobile', { width: 390, height: 844 }, 1);
-  } else {
-    await checkWorkingScene('desktop', { width: 1440, height: 1000 });
-    await checkWorkingScene('mobile', { width: 390, height: 844 });
-    await checkPrimaryCdnFallback();
-    await checkFailureState();
+  for (const viewport of [
+    { name: 'desktop', width: 1440, height: 1000 },
+    { name: 'mobile', width: 390, height: 844 },
+  ]) {
+    const page = await browser.newPage({
+      viewport: { width: viewport.width, height: viewport.height },
+      isMobile: viewport.name === 'mobile',
+      hasTouch: viewport.name === 'mobile',
+    });
+    const errors = [];
+    const failed = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('requestfailed', request => { const reason = request.failure()?.errorText || 'unknown'; if (reason !== 'net::ERR_ABORTED') failed.push(request.url() + ' — ' + reason); });
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('#app .editorial-method').waitFor({ state: 'visible', timeout: 15000 });
+    assert.equal(await page.locator('script[src*="engine-v2.js"]').count(), 0, 'The legacy 3D engine must not load on the primary site');
+    assert.equal(await page.locator('#mainView:visible,#miniView:visible').count(), 0, 'Legacy 3D scene must not remain visible');
+    const explorerLink = page.locator('#open2DExplorer');
+    await explorerLink.waitFor({ state: 'visible' });
+    assert.match(await explorerLink.getAttribute('href'), /explorer-2d\.html/, 'Primary explorer CTA must point to Vernpixi');
+    for (const language of ['fr', 'en', 'ar', 'pt']) {
+      const button = page.locator('[data-lang="' + language + '"]');
+      if (await button.count()) await button.first().click();
+    }
+    await page.locator('[data-lang="fr"]').first().click();
+    await page.locator('a[data-domain-page="myco"]').first().click();
+    await page.waitForURL(/explorer-2d\.html\?domain=myco&lang=fr|explorer-2d\.html\?lang=fr&domain=myco/, { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 30000 });
+    await page.locator('#field').waitFor({ state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#field')?.dataset.renderer === 'pixijs-webgl', undefined, { timeout: 20000 });
+    assert.equal(await page.locator('#field').getAttribute('data-universe-count'), '8');
+    await page.locator('#selection .card-title').waitFor({ state: 'visible' });
+    assert.ok((await page.locator('#selection .card-title').innerText()).length > 0, 'Direct domain entry must focus the requested universe');
+    assert.deepEqual(errors, [], 'No uncaught browser errors');
+    assert.deepEqual(failed, [], 'No failed network requests');
+    await page.screenshot({ path: outputDir + '/' + viewport.name + '-vernpixi-primary.png', fullPage: false });
+    results.push({ viewport: viewport.name, renderer: 'PixiJS 2D', universes: 8, directDomainEntry: true, browserErrors: errors.length });
+    await page.close();
   }
+  const route = await browser.newPage();
+  await route.goto(base + 'universe.html?domain=soil&lang=pt', { waitUntil: 'domcontentloaded' });
+  await route.waitForURL(/explorer-2d\.html\?domain=soil&lang=pt|explorer-2d\.html\?lang=pt&domain=soil/, { timeout: 10000 });
+  console.log(JSON.stringify({ vernpixiPrimary: 'PASS', results, universeRouteRedirect: true }, null, 2));
+  await route.close();
 } finally {
   await browser.close();
 }
