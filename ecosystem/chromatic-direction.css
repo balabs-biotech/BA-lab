@@ -387,3 +387,17 @@ html,body{
 #app.balabs-ui > main > section.editorial-work .work-heading>p{
   color:#C5CDDA!important;
 }
+
+
+/* High-specificity override: the research chapter's legacy heading rule
+   otherwise wins over the global editorial contrast correction. */
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading h2{
+  color:#F4F1E8!important;
+  text-shadow:0 2px 18px rgba(7,13,24,.22)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading h2 em{
+  color:#D58A68!important;
+}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading>p{
+  color:#C5CDDA!important;
+}
