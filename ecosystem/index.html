@@ -568,21 +568,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script src="./motion-director.js?v=1" defer></script>
 
 <script>
-/* Resilient editorial imagery: retry with a subject-matched source, then a known mycelium image. */
-(()=>{
- const fallbackFor=img=>{const hint=((img.alt||'')+' '+(img.className||'')).toLowerCase();
-  if(/sensor|iot|instrument|capteur|mesure|laboratoire|bench/.test(hint))return 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/LPMDL-110X_IoT_solar_level_monitoring_data_logger.jpg/1280px-LPMDL-110X_IoT_solar_level_monitoring_data_logger.jpg';
-  if(/pleurot|mushroom|champignon|culture|substrat|oyster/.test(hint))return 'https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w';
-  return 'https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg';
- };
- document.addEventListener('error',event=>{
-  const img=event.target;if(!(img instanceof HTMLImageElement))return;
-  const step=Number(img.dataset.imageFallbackStep||0),candidates=[fallbackFor(img),'https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG'];
-  const next=candidates.slice(step).find(url=>url!==img.src);
-  if(next){img.dataset.imageFallbackStep=String(step+1);img.src=next;}
-  else{img.classList.add('image-failed');}
- },true);
-})();
+/* Images load their declared source directly. */
 </script>
 </body>
 </html>
