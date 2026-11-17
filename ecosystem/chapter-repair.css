@@ -661,3 +661,14 @@
     padding-bottom:34px!important;
   }
 }
+
+
+/* PASS 54 — remove the residual dead zone between the chapter marker and catalogue heading. */
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue{
+  margin-top:clamp(-54px,-3.8vw,-30px)!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue{
+    margin-top:-30px!important;
+  }
+}
