@@ -1353,3 +1353,54 @@ html body[data-domain="mycology"] #trackerCard .culture-catalog-action:focus-vis
     transition:none !important;
   }
 }
+
+
+/* PASS 157 — native PixiJS graph controls; this styles controls, not the rendered graph. */
+html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:6px !important;
+  min-width:0 !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:34px !important;
+  min-height:30px !important;
+  padding:5px 9px !important;
+  border:1px solid rgba(201,130,89,.28) !important;
+  border-radius:7px !important;
+  color:#e2b092 !important;
+  background:rgba(201,130,89,.075) !important;
+  font-size:11px !important;
+  font-weight:750 !important;
+  cursor:pointer !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button:hover {
+  border-color:rgba(201,130,89,.62) !important;
+  background:rgba(201,130,89,.16) !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-zoom-label {
+  min-width:42px !important;
+  color:#aebdb4 !important;
+  font-size:9px !important;
+  font-variant-numeric:tabular-nums !important;
+  text-align:right !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-stage {
+  cursor:grab !important;
+  touch-action:pan-x pan-y !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-stage.is-panning {
+  cursor:grabbing !important;
+  user-select:none !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-stage:focus-visible {
+  outline:2px solid rgba(201,130,89,.7) !important;
+  outline-offset:2px !important;
+}
+@media(max-width:600px) {
+  html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar { justify-content:flex-start !important; }
+}
