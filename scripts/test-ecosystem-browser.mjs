@@ -138,6 +138,17 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.trim() === 'BIOTECHNOLOGIE', undefined, { timeout: 10000 });
     assert.equal(await page.locator('.universe-rail [data-universe="bio"]').getAttribute('aria-current'), 'location', 'Clicking a side point must focus and activate its matching universe');
     assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), null, 'Only the currently focused universe may be active in the side rail');
+    // Every one of the eight public points must stay synchronized with the focused root.
+    for (const domain of ['myco','bio','iot','soil','lab','products','work','learn']) {
+      await page.locator('.universe-rail [data-universe="' + domain + '"]').click();
+      await page.waitForFunction((expected) => {
+        const canvas = document.querySelector('#field');
+        const point = document.querySelector('.universe-rail [data-universe="' + expected + '"]');
+        return canvas?.dataset.activeUniverse === expected && point?.getAttribute('aria-current') === 'location';
+      }, domain, { timeout: 10000 });
+      assert.equal(await page.locator('.universe-rail [aria-current="location"]').count(), 1, 'Exactly one universe point must be active at a time');
+    }
+    assert.ok(await page.locator('.universe-rail-filament').count() === 1, 'The eight universe points must be connected by the organic filament');
 
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(failed, [], 'No failed network requests');
