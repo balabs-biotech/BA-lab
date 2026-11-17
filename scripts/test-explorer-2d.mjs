@@ -30,6 +30,35 @@ try {
       edges: Number(el.dataset.edgeCount || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
+    const rootTitles = JSON.parse(await page.locator('#field').getAttribute('data-root-titles') || '[]');
+    assert.ok(rootTitles.includes('LE LABORATOIRE') && rootTitles.includes('R&D'), 'The French explorer must use the actual Notion root titles, not invented abbreviations');
+    const accessibleRootTitles = await page.locator('#accessibleNodes button').allTextContents();
+    assert.ok(accessibleRootTitles.includes('LE LABORATOIRE') && accessibleRootTitles.includes('R&D'), 'Full Notion root titles must remain available in the explorer labels');
+    const auditedTrees = await page.evaluate(async () => {
+      const load = async lang => (await fetch('./notion-tree.' + lang + '.json')).json();
+      const [en, pt, fr] = await Promise.all(['en', 'pt', 'fr'].map(load));
+      const find = (tree, notionId) => {
+        const visit = nodes => { for (const node of nodes || []) { if (node.notionId === notionId) return node; const found = visit(node.children); if (found) return found; } return null; };
+        return visit(tree.domains);
+      };
+      return {
+        enFungal: find(en, '40173152f1718111a73ced2825985454')?.children?.length || 0,
+        enPleurotus: find(en, '40273152f17181eba1bbcaf1b1d491d6')?.children?.length || 0,
+        enMycorrhizae: find(en, '40173152f1718101965cc766e3d7e27f')?.children?.length || 0,
+        enMicrobes: find(en, '40173152f171817e918cc9c278aeca0d')?.children?.length || 0,
+        enMicrobesUnderSoil: (find(en, '40173152f1718100b468f740dbb40647')?.children || []).some(n => n.notionId === '40173152f171817e918cc9c278aeca0d'),
+        ptFungal: find(pt, '40173152f171812fb8d5de62178f6aef')?.children?.length || 0,
+        ptMycorrhizae: find(pt, '40173152f1718134a778d4c8d405ca62')?.children?.length || 0,
+        ptMicrobes: find(pt, '40173152f171814ca1cae513ca2f0427')?.children?.length || 0,
+        ptWorkTitle: pt.domains.find(n => n.id === 'work')?.title,
+        frLabTitle: fr.domains.find(n => n.id === 'lab')?.title
+      };
+    });
+    assert.ok(auditedTrees.enFungal >= 2 && auditedTrees.enPleurotus >= 10 && auditedTrees.enMycorrhizae >= 2, 'English mycology tree must include the verified species and mycorrhizae branches');
+    assert.ok(auditedTrees.enMicrobes >= 7 && !auditedTrees.enMicrobesUnderSoil, 'Agricultural microorganisms must be under Biotechnology, not Agrotechnology');
+    assert.ok(auditedTrees.ptFungal >= 2 && auditedTrees.ptMycorrhizae >= 2 && auditedTrees.ptMicrobes >= 7, 'Portuguese mycology and microbiology branches must expose their verified subfolders');
+    assert.equal(auditedTrees.ptWorkTitle, 'Trabalho documentado e projetos', 'Portuguese R&D universe must use the actual Notion page title');
+    assert.equal(auditedTrees.frLabTitle, 'LE LABORATOIRE', 'French laboratory universe must use the actual Notion page title');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
     const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
