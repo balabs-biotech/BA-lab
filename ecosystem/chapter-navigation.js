@@ -30,7 +30,7 @@
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
  const rail=document.createElement('nav');rail.className='chapter-rail';rail.setAttribute('aria-label','Parcours des chapitres');
- rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 L32 476"/><path class="filament-progress" d="M32 24 L32 476"/><circle class="filament-signal" cx="32" cy="24" r="4"/><path class="filament-branch" d="M31 86 C20 82 14 70 9 59 M34 174 C46 168 51 156 56 145 M31 298 C19 291 13 281 8 270 M34 414 C46 407 51 395 57 384"/></svg><div class="chapter-rail-nodes"></div>';
+ rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 20 C47 66 15 94 32 145 C49 196 15 221 32 270 C49 319 15 345 32 395 C47 440 20 458 32 480"/><path class="filament-progress" d="M32 20 C47 66 15 94 32 145 C49 196 15 221 32 270 C49 319 15 345 32 395 C47 440 20 458 32 480"/><circle class="filament-signal" cx="32" cy="20" r="4"/><path class="filament-branch" d="M33 72 C20 68 13 56 8 43 M25 116 C13 110 10 99 5 91 M39 184 C51 179 54 166 60 157 M25 239 C13 232 10 222 4 213 M39 305 C51 298 55 286 60 276 M25 365 C13 358 10 347 4 337 M38 432 C50 426 54 414 60 405"/></svg><div class="chapter-rail-nodes"></div>';
  const railNodes=rail.querySelector('.chapter-rail-nodes');
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  document.body.append(rail);
@@ -65,17 +65,28 @@
  let current=0;
  const lang=()=>document.documentElement.lang||'fr';
  const update=()=>{
-  const offsets=pages.map(page=>page.getBoundingClientRect().left-track.getBoundingClientRect().left+track.scrollLeft);
-  const idx=offsets.reduce((best,value,i)=>Math.abs(value-track.scrollLeft)<Math.abs(offsets[best]-track.scrollLeft)?i:best,0);
   const pageWidth=Math.max(1,track.clientWidth);
-  const rawProgress=Math.max(0,Math.min(pages.length-1,idx+(track.scrollLeft-offsets[idx])/pageWidth));
-  current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
+  const rawProgress=Math.max(0,Math.min(pages.length-1,track.scrollLeft/pageWidth));
+  const idx=Math.max(0,Math.min(pages.length-1,Math.round(rawProgress)));
+  current=idx;
+  count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
   progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[lang()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
-  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false');});
-  rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
-  if(filamentLength){const filamentProgress=rawProgress/Math.max(1,pages.length-1);filament.style.strokeDashoffset=String(filamentLength*(1-filamentProgress));const signal=rail.querySelector('.filament-signal');if(signal){const point=filament.getPointAtLength(filamentLength*filamentProgress);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2));}}
+  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{
+   const distance=Math.abs(rawProgress-i);
+   b.classList.toggle('is-active',i===idx);
+   b.classList.toggle('is-past',i<rawProgress-.08);
+   b.classList.toggle('is-approaching',i!==idx&&distance<1&&rawProgress>i);
+   b.setAttribute('aria-current',i===idx?'step':'false');
+   b.setAttribute('aria-label',(groups[i].label[lang()]||groups[i].label.fr)+' — '+(i+1)+' / '+pages.length);
+  });
+  if(filamentLength){
+   const filamentProgress=rawProgress/Math.max(1,pages.length-1);
+   filament.style.strokeDashoffset=String(filamentLength*(1-filamentProgress));
+   const signal=rail.querySelector('.filament-signal');
+   if(signal){const point=filament.getPointAtLength(filamentLength*filamentProgress);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2));}
+  }
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
