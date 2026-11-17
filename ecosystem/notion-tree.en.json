@@ -626,6 +626,116 @@
           "url": "https://app.notion.com/p/40173152f17181aa843ace690303e7c8",
           "description": "An introduction to the sensors and measurement tools used to observe biological and cultivation systems.",
           "children": []
+        },
+        {
+          "id": "iot-environment",
+          "title": "Environmental monitoring",
+          "description": "Monitor physical parameters that shape biological systems.",
+          "children": [
+            {
+              "id": "iot-temperature",
+              "title": "Temperature",
+              "description": "Track gradients, cycles and thermal stability in cultivation spaces."
+            },
+            {
+              "id": "iot-humidity",
+              "title": "Humidity",
+              "description": "Observe air humidity and water availability conditions."
+            },
+            {
+              "id": "iot-gas",
+              "title": "Gas exchange & airflow",
+              "description": "Study ventilation and gas exchange in cultivation enclosures."
+            }
+          ]
+        },
+        {
+          "id": "iot-instrumentation",
+          "title": "Instrumentation architecture",
+          "description": "Combine sensors, interfaces and control units suited to experimental work.",
+          "children": [
+            {
+              "id": "iot-sensors-types",
+              "title": "Sensors & probes",
+              "description": "Compare measurement technologies, ranges, accuracy and limitations."
+            },
+            {
+              "id": "iot-microcontrollers",
+              "title": "Microcontrollers",
+              "description": "Explore reading interfaces, inputs, outputs and embedded units."
+            },
+            {
+              "id": "iot-power",
+              "title": "Power & safety",
+              "description": "Document power supply, electrical protection and setup reliability."
+            }
+          ]
+        },
+        {
+          "id": "iot-control",
+          "title": "Cultivation control",
+          "description": "Study gradual control of cultivation conditions, distinguishing prototypes from operational systems.",
+          "children": [
+            {
+              "id": "iot-airflow",
+              "title": "Ventilation & airflow",
+              "description": "Design monitoring and control of air renewal."
+            },
+            {
+              "id": "iot-humidification",
+              "title": "Humidification",
+              "description": "Study humidity regulation and water distribution."
+            },
+            {
+              "id": "iot-lighting",
+              "title": "Lighting & cycles",
+              "description": "Define lighting and timing scenarios for experimental trials."
+            }
+          ]
+        },
+        {
+          "id": "iot-data",
+          "title": "Data acquisition & processing",
+          "description": "Turn measured signals into useful, comparable time series.",
+          "children": [
+            {
+              "id": "iot-logging",
+              "title": "Continuous logging",
+              "description": "Timestamp measurements and retain raw data with context."
+            },
+            {
+              "id": "iot-dashboard",
+              "title": "Visualization & alerts",
+              "description": "Present trends, thresholds and deviations for monitoring."
+            },
+            {
+              "id": "iot-quality",
+              "title": "Measurement quality",
+              "description": "Identify drift, missing values, calibration needs and uncertainty."
+            }
+          ]
+        },
+        {
+          "id": "iot-traceability-detail",
+          "title": "Experimental traceability",
+          "description": "Connect every measurement to a culture, batch, protocol and trial period.",
+          "children": [
+            {
+              "id": "iot-batch-links",
+              "title": "Batches & cultures",
+              "description": "Associate readings with batch identifiers and cultivation stages."
+            },
+            {
+              "id": "iot-protocol-links",
+              "title": "Protocols & events",
+              "description": "Record setpoint changes, interventions and incidents."
+            },
+            {
+              "id": "iot-comparison",
+              "title": "History & comparisons",
+              "description": "Compare experimental cycles without losing their initial conditions."
+            }
+          ]
         }
       ],
       "notionParentId": "hub",
