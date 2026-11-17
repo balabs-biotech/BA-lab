@@ -287,3 +287,34 @@ html body[data-domain].workspace-authenticated .ba-visual-caption {
     transition:none !important;
   }
 }
+
+
+/* PASS 155 — keep the entry animation out of the compact auth and signed-in headers.
+   This protects the sign-in action's first-screen position on narrow phones. */
+html body[data-domain].workspace-authenticated .app-hero {
+  min-height:0 !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  gap:0 !important;
+  padding-block:10px !important;
+}
+html body[data-domain].workspace-authenticated .hero-art.ba-sector-art {
+  display:none !important;
+}
+html body[data-domain].workspace-authenticated .hero-description,
+html body[data-domain].workspace-authenticated .hero-tags {
+  display:none !important;
+}
+@media(max-width:820px) {
+  html body[data-domain]:has(#authCard:not(.hidden)) .app-hero .hero-art {
+    display:none !important;
+  }
+  html body[data-domain]:has(#authCard:not(.hidden)) .app-hero .hero-description,
+  html body[data-domain]:has(#authCard:not(.hidden)) .app-hero .hero-tags {
+    display:none !important;
+  }
+  html body[data-domain]:has(#authCard:not(.hidden)) .app-hero {
+    min-height:0 !important;
+    padding-block:10px !important;
+    gap:0 !important;
+  }
+}
