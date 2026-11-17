@@ -1,7 +1,17 @@
-import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Application, Container, Graphics, Sprite, Texture, Text, TextStyle } from "pixi.js";
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PALETTE={bio:0x79a991,myco:0xb18fc2,soil:0xc19b73,lab:0x80aeb8,products:0xc88773,iot:0x7eaaa3,work:0xaa9cbb,evidence:0xb5b58d};
+const UNIVERSE_IMAGES={
+ myco:"https://upload.wikimedia.org/wikipedia/commons/0/0b/Pleurotus_ostreatus_on_agar.jpg",
+ bio:"https://commons.wikimedia.org/wiki/Special:FilePath/Asco1013.jpg",
+ iot:"https://commons.wikimedia.org/wiki/Special:FilePath/Data_logger.jpg",
+ soil:"https://commons.wikimedia.org/wiki/Special:FilePath/Compost.layers.jpg",
+ lab:"https://commons.wikimedia.org/wiki/Special:FilePath/Penicillium%20in%20LPCB%20Tease%20Mount%20Microscopy.jpg",
+ products:"https://commons.wikimedia.org/wiki/Special:FilePath/20210719%20Pleurotus%20ostreatus%20098-127.jpg",
+ work:"https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg",
+ evidence:"https://commons.wikimedia.org/wiki/Special:FilePath/Fungi%20seen%20with%20fluorescence%20microscope.jpg"
+};
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
 
 export async function createPixiRenderer(canvas){
@@ -9,8 +19,21 @@ export async function createPixiRenderer(canvas){
  await app.init({canvas,backgroundAlpha:0,antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,1.75),powerPreference:"high-performance",preference:"webgl",clearBeforeRender:true,autoStart:false});
  app.stage.eventMode="none";
  canvas.dataset.renderer="pixijs-webgl";
- const field=new Graphics(),filaments=new Graphics(),junctions=new Graphics(),labels=new Container();
- app.stage.addChild(field,filaments,junctions,labels);
+ const field=new Graphics(),rootVisuals=new Container(),filaments=new Graphics(),junctions=new Graphics(),labels=new Container();
+ app.stage.addChild(field,rootVisuals,filaments,junctions,labels);
+ const imageItems=new Map();
+ function loadRootImage(id){
+  if(imageItems.has(id)||!UNIVERSE_IMAGES[id])return;
+  const item={sprite:null,frame:new Graphics()};
+  imageItems.set(id,item);
+  const image=new Image();image.crossOrigin="anonymous";image.decoding="async";
+  image.onload=()=>{
+   const sprite=new Sprite(Texture.from(image));sprite.anchor.set(.5);sprite.alpha=.98;
+   item.sprite=sprite;rootVisuals.addChild(sprite,item.frame);
+  };
+  image.onerror=()=>{imageItems.delete(id);};
+  image.src=UNIVERSE_IMAGES[id];
+ }
  const labelPool=new Map();
  const style=new TextStyle({fontFamily:"Inter, system-ui, sans-serif",fontSize:12,fill:0xf2f1e9,fontWeight:"600",stroke:{color:0x07100f,width:4.5},align:"center"});
  let lastWidth=0,lastHeight=0;
@@ -31,6 +54,21 @@ export async function createPixiRenderer(canvas){
   }
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
+  // Subject-specific image thumbnails are anchored to each of the eight universe roots.
+  // Their screen size is stable while the mycelial network zooms.
+  const roots=nodes.filter(n=>n.level===0);
+  for(const root of roots){
+   loadRootImage(root.id);
+   const item=imageItems.get(root.id);if(!item?.sprite)continue;
+   const selectedRoot=selected&&(selected.level===0?selected.id:selected.rootId)===root.id;
+   const thumbW=(selectedRoot?112:76)/Math.max(.26,scale),thumbH=(selectedRoot?72:50)/Math.max(.26,scale);
+   const x=root.x,y=root.y-(selectedRoot?76:58)/Math.max(.26,scale);
+   item.sprite.position.set(x,y);item.sprite.width=thumbW;item.sprite.height=thumbH;
+   const radius=5/Math.max(.26,scale);
+   item.frame.clear().roundRect(x-thumbW/2,y-thumbH/2,thumbW,thumbH,radius).fill({color:0x111b1d,alpha:.08});
+   item.frame.roundRect(x-thumbW/2,y-thumbH/2,thumbW,thumbH,radius).stroke({color:PALETTE[root.id]||0xd1d0c5,alpha:selectedRoot?.98:.72,width:1.35/Math.max(.26,scale)});
+  }
+  rootVisuals.position.set(width/2+offset.x,height/2+offset.y);rootVisuals.scale.set(scale);
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
   while(ancestor){lineage.add(ancestor.id);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
