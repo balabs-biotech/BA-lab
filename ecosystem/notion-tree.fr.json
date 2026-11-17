@@ -1014,7 +1014,8 @@
               "title": "Ce qui est effectivement démontré",
               "notionId": "3e973152f171816781fbf56674cfe55c",
               "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
-              "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation."
+              "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation.",
+              "kind": "reference"
             }
           ],
           "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
