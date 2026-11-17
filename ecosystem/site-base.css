@@ -1175,7 +1175,7 @@ h1 span{font-style:italic!important;color:var(--field-rust)!important}
  z-index:0!important;right:-2%!important;top:10%!important;
  width:clamp(300px,49vw,650px)!important;height:clamp(260px,40vw,500px)!important;
  background-image:
-  url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Mycelium.JPG/1280px-Mycelium.JPG"),
+  url("./assets/home-hero.jpg"),
   url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20420%20300%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%239ab79a%22%20stroke-width%3D%223.4%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22%3E%3Cpath%20d%3D%22M210%20151%20C180%20142%20166%20120%20145%20101%20S111%2067%2079%2053%20M145%20101%20C139%2076%20144%2055%20132%2030%20M145%20101%20C119%20111%2096%20108%2069%20121%20S38%20143%2016%20139%20M210%20151%20C177%20161%20155%20183%20132%20211%20S91%20239%2058%20263%20M210%20151%20C242%20139%20265%20114%20286%2091%20S325%2064%20355%2050%20M286%2091%20C288%2063%20306%2042%20326%2024%20M286%2091%20C316%2099%20341%2091%20373%20105%20S397%20124%20415%20120%20M210%20151%20C244%20166%20266%20190%20286%20216%20S327%20245%20360%20260%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23c58a59%22%3E%3Ccircle%20cx%3D%22210%22%20cy%3D%22151%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%2279%22%20cy%3D%2253%22%20r%3D%224%22%2F%3E%3Ccircle%20cx%3D%22355%22%20cy%3D%2250%22%20r%3D%224%22%2F%3E%3Ccircle%20cx%3D%22360%22%20cy%3D%22260%22%20r%3D%224%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")!important;
  background-position:center,center!important;
  background-size:cover,contain!important;
@@ -1309,7 +1309,7 @@ body{background:radial-gradient(ellipse at 50% 8%,#1c302d 0%,#101a1b 45%,#080d0f
  background-image:
   linear-gradient(90deg,rgba(6,11,13,.97) 0%,rgba(6,11,13,.86) 35%,rgba(6,11,13,.28) 73%,rgba(6,11,13,.48) 100%),
   linear-gradient(0deg,#080d0f 0%,transparent 32%,rgba(5,9,10,.22) 100%),
-  url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;
+  url("./assets/home-hero.jpg")!important;
  background-size:cover,cover,cover!important;background-position:center,center,65% 42%!important;
  filter:grayscale(1) contrast(1.25) brightness(.60)!important;opacity:.92!important;
  mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%)!important;
@@ -1380,7 +1380,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 .lang{border:1px solid #526457!important;border-radius:0!important;background:transparent!important;color:#dce5da!important;padding:8px 10px!important}
 .lang[aria-pressed=true]{background:#a8bd9b!important;color:#14221b!important;border-color:#a8bd9b!important}
 .hero{display:grid!important;min-height:500px!important;max-height:720px!important;margin:0!important;padding:clamp(76px,11vw,145px) clamp(0px,3vw,44px) clamp(55px,8vw,100px)!important;grid-template-columns:minmax(0,1.2fr) minmax(210px,.55fr)!important;gap:clamp(24px,6vw,90px)!important;align-items:end!important;overflow:hidden!important;background:#0b1214!important}
-.hero:after{inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:auto!important;z-index:0!important;background-image:linear-gradient(90deg,rgba(7,13,15,.96) 0%,rgba(7,13,15,.78) 44%,rgba(7,13,15,.24) 100%),linear-gradient(0deg,#0b1214 0%,transparent 36%),url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;background-size:cover!important;background-position:center 42%!important;filter:grayscale(1) contrast(1.16) brightness(.74)!important;opacity:.94!important;mask-image:none!important;-webkit-mask-image:none!important}
+.hero:after{inset:0!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:auto!important;z-index:0!important;background-image:linear-gradient(90deg,rgba(7,13,15,.96) 0%,rgba(7,13,15,.78) 44%,rgba(7,13,15,.24) 100%),linear-gradient(0deg,#0b1214 0%,transparent 36%),url("./assets/home-hero.jpg")!important;background-size:cover!important;background-position:center 42%!important;filter:grayscale(1) contrast(1.16) brightness(.74)!important;opacity:.94!important;mask-image:none!important;-webkit-mask-image:none!important}
 .hero:before{z-index:1!important;opacity:.36!important}
 .hero>div{z-index:2!important}
 .hero .eyebrow{color:#c8a27f!important}
@@ -1420,7 +1420,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
  .tools{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important;min-width:122px!important}
  .lang{padding:6px 7px!important;font-size:9px!important}
  .hero{min-height:590px!important;max-height:none!important;grid-template-columns:1fr!important;gap:22px!important;padding:126px 8px 56px!important}
- .hero:after{background-image:linear-gradient(90deg,rgba(7,13,15,.82),rgba(7,13,15,.45)),linear-gradient(0deg,#0b1214 0%,transparent 42%),url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;background-position:center,center,60% center!important;filter:grayscale(1) contrast(1.12) brightness(.68)!important}
+ .hero:after{background-image:linear-gradient(90deg,rgba(7,13,15,.82),rgba(7,13,15,.45)),linear-gradient(0deg,#0b1214 0%,transparent 42%),url("./assets/home-hero.jpg")!important;background-position:center,center,60% center!important;filter:grayscale(1) contrast(1.12) brightness(.68)!important}
  .hero h1{font-size:clamp(48px,12.8vw,74px)!important;line-height:.94!important}
  .hero p{font-size:14px!important;max-width:94%!important}
  .hero .aside{max-width:88%!important;margin-left:auto!important;padding:11px 0 11px 14px!important}
@@ -1451,7 +1451,7 @@ body{background:linear-gradient(180deg,#0b1214 0,#101a1b 44%,#eeeade 44%,#eeeade
 .hero .aside{border-left-color:#B96B4D!important;background:linear-gradient(90deg,#111B1Dce,transparent)!important}
 .hero .aside b{color:#f2f0e7!important}
 .hero .eyebrow{color:#D39A7D!important}
-.hero:after{background-image:linear-gradient(90deg,rgba(17,27,29,.92) 0%,rgba(17,27,29,.72) 48%,rgba(17,27,29,.18) 100%),linear-gradient(0deg,#111B1D 0%,transparent 42%),url("https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG")!important;filter:grayscale(1) contrast(1.12) brightness(.72)!important}
+.hero:after{background-image:linear-gradient(90deg,rgba(17,27,29,.92) 0%,rgba(17,27,29,.72) 48%,rgba(17,27,29,.18) 100%),linear-gradient(0deg,#111B1D 0%,transparent 42%),url("./assets/home-hero.jpg")!important;filter:grayscale(1) contrast(1.12) brightness(.72)!important}
 @media(max-width:760px){
  .hero{padding-top:108px!important}
  .hero p{color:#e0e3d9!important;text-shadow:0 1px 8px #111b1d!important}
