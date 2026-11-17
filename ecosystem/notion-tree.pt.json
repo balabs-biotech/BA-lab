@@ -1,8 +1,8 @@
 {
-  "version": 1,
-  "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
+  "version": 2,
+  "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "pt",
-  "coverage": "expanded_verified_topic_pages; only explicitly identified public pages are linked_eight_universes_including_planned_resources_transmission",
+  "coverage": "Eight verified public entry pages per language; catalogue records expanded from the live Notion data source; synthetic placeholder branches removed",
   "domains": [
     {
       "id": "myco",
@@ -697,7 +697,356 @@
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "description": "Catálogo público partilhado de recursos e produtos aprovados para publicação. Confirme o lote, a embalagem e a disponibilidade antes de qualquer fornecimento.",
-          "children": []
+          "children": [
+            {
+              "id": "catalog-lc-lign",
+              "title": "LC LIGNICOLE — milieu liquide exploratoire",
+              "notionId": "40173152f171815b8537fd09016220d6",
+              "url": "https://app.notion.com/p/40173152f171815b8537fd09016220d6",
+              "description": "Milieu exploratoire à base de mélasse de dattes, extrait aqueux de levure et extrait aqueux de blé clarifié. Les performances et le support final doivent être qualifiés par souche.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L0 — Hypothèse",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-pda",
+              "title": "PDA — gélose nutritive pomme de terre & dextrose",
+              "notionId": "40173152f1718183ac57e3d7235ce00b",
+              "url": "https://app.notion.com/p/40173152f1718183ac57e3d7235ce00b",
+              "description": "Gélose nutritive de type PDA selon la recette de travail BA Labs documentée. La distinction avec les références externes est maintenue ; le procédé, le format et les contrôles qualité doivent être confirmés avant toute mise à disposition.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lcmd",
+              "title": "LCMD — milieu liquide à base de mélasse de dattes",
+              "notionId": "40173152f17181888a6af073a562afcd",
+              "url": "https://app.notion.com/p/40173152f17181888a6af073a562afcd",
+              "description": "Milieu liquide exploratoire BA Labs à base de mélasse de dattes (12 g/L) et de levure (1,5 g/L), selon une recette de travail consignée. Le choix du transfert et les performances doivent être évalués par souche ; formulation non qualifiée et non disponible à la vente.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-terr",
+              "title": "LC TERRICOLE — milieu liquide exploratoire",
+              "notionId": "40173152f17181c5ab66c8dab2791814",
+              "url": "https://app.notion.com/p/40173152f17181c5ab66c8dab2791814",
+              "description": "Milieu exploratoire à base de mélasse de dattes, extrait aqueux de levure et extrait aqueux de blé clarifié. La compatibilité est à établir par souche.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L0 — Hypothèse",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-pdae-grain",
+              "title": "PDAE GRAIN+ — gélose enrichie à l’eau de grain",
+              "notionId": "40173152f17181098d44c5e85d73b05c",
+              "url": "https://app.notion.com/p/40173152f17181098d44c5e85d73b05c",
+              "description": "Gélose PDA enrichie à l’eau de grain selon une recette de travail documentée. Procédé, format et contrôles qualité à confirmer ; non disponible à la vente.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-g-clair",
+              "title": "G CLAIR — gélose nutritive BA Labs",
+              "notionId": "40173152f171811eb843dd419d8279c0",
+              "url": "https://app.notion.com/p/40173152f171811eb843dd419d8279c0",
+              "description": "Gélose nutritive BA Labs selon une recette de travail documentée (agar, dextrose, miel et levure). Formulation non qualifiée pour la vente ; procédé, format et contrôles qualité à confirmer avant toute mise à disposition.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-maintien",
+              "title": "LC MAINTIEN — milieu liquide pauvre pour maintien temporaire",
+              "notionId": "40173152f1718150bbf6f9054be8b905",
+              "url": "https://app.notion.com/p/40173152f1718150bbf6f9054be8b905",
+              "description": "Catégorie expérimentale de maintien temporaire. La viabilité doit être mesurée ; aucune conservation longue durée n’est revendiquée.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L0 — Hypothèse",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-g-ligneux",
+              "title": "G LIGNEUX — gélose expérimentale mélasse & biochar",
+              "notionId": "40173152f1718179a6faf08806253a46",
+              "url": "https://app.notion.com/p/40173152f1718179a6faf08806253a46",
+              "description": "Gélose expérimentale à base de mélasse de dattes, biochar de poisson, levure et agar, selon une recette de travail documentée. Formulation non qualifiée pour la vente ; spécification du biochar, procédé et contrôles à confirmer.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-transfert",
+              "title": "LC TRANSFERT — culture liquide pour ensemencer une autre culture liquide",
+              "notionId": "40173152f17181a5928ae148d8e07a85",
+              "url": "https://app.notion.com/p/40173152f17181a5928ae148d8e07a85",
+              "description": "Catégorie LC destinée à l’ensemencement d’un autre milieu liquide. Formulation et critères de transfert à qualifier séparément d’une LC destinée au grain.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L0 — Hypothèse",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-ba-clean",
+              "title": "BA CLEAN — gélose de purification assistée",
+              "notionId": "40173152f17181af8deed2f4f1437990",
+              "url": "https://app.notion.com/p/40173152f17181af8deed2f4f1437990",
+              "description": "Gamme en développement. La compatibilité dépend du contaminant, de l’agent antimicrobien et de la tolérance de la souche fongique ; aucune décontamination totale n’est garantie.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L0 — Hypothèse",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-master-b",
+              "title": "MASTER B / BLAGARD — gélose complexe expérimentale",
+              "notionId": "40173152f17181c482b4f0d4f3ce27e4",
+              "url": "https://app.notion.com/p/40173152f17181c482b4f0d4f3ce27e4",
+              "description": "Gélose expérimentale à base de dextrose, bouillon protéique, levure et biochar de poisson, selon une recette de travail documentée. La définition du bouillon protéique, la spécification du biochar et les contrôles qualité restent à établir avant toute mise à disposition.",
+              "family": "Milieux & géloses",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-grain",
+              "title": "LC GRAIN — culture liquide destinée à l’inoculation du grain",
+              "notionId": "40173152f17181e580bcc4963a38ab29",
+              "url": "https://app.notion.com/p/40173152f17181e580bcc4963a38ab29",
+              "description": "Catégorie LC orientée vers le transfert au grain. La formulation doit être qualifiée par souche et évaluée sur la reprise et la colonisation du grain ; distincte d’une LC de transfert liquide.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L0 — Hypothèse",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-ppu-ete",
+              "title": "LC — Pleurotus pulmonarius été",
+              "notionId": "40173152f1718165a79ace1bc6189c24",
+              "url": "https://app.notion.com/p/40173152f1718165a79ace1bc6189c24",
+              "description": "Culture liquide de Pleurotus pulmonarius — désignation « été ».",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-ppu-hiver",
+              "title": "LC — Pleurotus pulmonarius hiver",
+              "notionId": "40173152f17181cab9f3e85af551ebde",
+              "url": "https://app.notion.com/p/40173152f17181cab9f3e85af551ebde",
+              "description": "Culture liquide de Pleurotus pulmonarius — désignation « hiver ».",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-tri-koningii",
+              "title": "LC — Trichoderma koningii",
+              "notionId": "40173152f1718110a2dfc823dc27bf03",
+              "url": "https://app.notion.com/p/40173152f1718110a2dfc823dc27bf03",
+              "description": "Culture liquide de ressource désignée Trichoderma koningii. Les propriétés et les usages dépendent de la souche et du lot ; aucune performance agronomique n'est garantie par le nom seul.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": false,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-ery-hyb",
+              "title": "LC — Pleurotus eryngii (hybrides)",
+              "notionId": "40173152f1718121bb57fd5eb152e64d",
+              "url": "https://app.notion.com/p/40173152f1718121bb57fd5eb152e64d",
+              "description": "Culture liquide de Pleurotus eryngii — sélection hybride.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-kryos",
+              "title": "LC — Pleurotus ostreatus KRYOS",
+              "notionId": "40173152f171813081afe4ef7766742b",
+              "url": "https://app.notion.com/p/40173152f171813081afe4ef7766742b",
+              "description": "Culture liquide de Pleurotus ostreatus — KRYOS.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-grisam",
+              "title": "LC — Pleurotus ostreatus Gris américain",
+              "notionId": "40173152f17181388138ce462dc3596e",
+              "url": "https://app.notion.com/p/40173152f17181388138ce462dc3596e",
+              "description": "Culture liquide de Pleurotus ostreatus — Gris américain.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-tri-reesei",
+              "title": "LC — Trichoderma reesei",
+              "notionId": "40173152f171813aa500fc6f2f1684c4",
+              "url": "https://app.notion.com/p/40173152f171813aa500fc6f2f1684c4",
+              "description": "Culture liquide de ressource désignée Trichoderma reesei. Les propriétés et les usages dépendent de la souche et du lot ; aucune performance agronomique n'est garantie par le nom seul.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": false,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-hk35",
+              "title": "LC — Pleurotus ostreatus HK35",
+              "notionId": "40173152f1718150a36eddc52198e963",
+              "url": "https://app.notion.com/p/40173152f1718150a36eddc52198e963",
+              "description": "Culture liquide de Pleurotus ostreatus — HK35.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-tri-harzianum",
+              "title": "LC — Trichoderma harzianum",
+              "notionId": "40173152f171816c812df39d52e2484c",
+              "url": "https://app.notion.com/p/40173152f171816c812df39d52e2484c",
+              "description": "Culture liquide de ressource désignée Trichoderma harzianum. Les propriétés et les usages dépendent de la souche et du lot ; aucune performance agronomique n'est garantie par le nom seul.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": false,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-tri-hamatum",
+              "title": "LC — Trichoderma hamatum",
+              "notionId": "40173152f1718190872de4a9c5a21e64",
+              "url": "https://app.notion.com/p/40173152f1718190872de4a9c5a21e64",
+              "description": "Culture liquide de ressource désignée Trichoderma hamatum. Les propriétés et les usages dépendent de la souche et du lot ; aucune performance agronomique n'est garantie par le nom seul.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": false,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-ppu",
+              "title": "LC — Pleurotus pulmonarius",
+              "notionId": "40173152f17181ab8b0bd41a5832e355",
+              "url": "https://app.notion.com/p/40173152f17181ab8b0bd41a5832e355",
+              "description": "Culture liquide de Pleurotus pulmonarius.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-pco",
+              "title": "LC — Pleurotus columbinus",
+              "notionId": "40173152f17181c393c6c26aa5b9191b",
+              "url": "https://app.notion.com/p/40173152f17181c393c6c26aa5b9191b",
+              "description": "Culture liquide de Pleurotus columbinus.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-tri-longibrachiatum",
+              "title": "LC — Trichoderma longibrachiatum",
+              "notionId": "40173152f17181c49f19f0cb82752d75",
+              "url": "https://app.notion.com/p/40173152f17181c49f19f0cb82752d75",
+              "description": "Culture liquide de ressource désignée Trichoderma longibrachiatum. Les propriétés et les usages dépendent de la souche et du lot ; aucune performance agronomique n'est garantie par le nom seul.",
+              "family": "Cultures",
+              "availability": "Indisponible",
+              "evidence": "L1 — Présence / culture",
+              "active": false,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-p80",
+              "title": "LC — Pleurotus ostreatus P80",
+              "notionId": "40173152f17181e7acbcd20c85566bc6",
+              "url": "https://app.notion.com/p/40173152f17181e7acbcd20c85566bc6",
+              "description": "Culture liquide de Pleurotus ostreatus — P80.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-g8",
+              "title": "LC — Pleurotus ostreatus G8",
+              "notionId": "40173152f17181f4888dc89c8c43ee76",
+              "url": "https://app.notion.com/p/40173152f17181f4888dc89c8c43ee76",
+              "description": "Culture liquide de Pleurotus ostreatus — G8.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-lc-blue",
+              "title": "LC — Pleurotus ostreatus Blue Oyster",
+              "notionId": "40173152f17181fc877cd198e7911eac",
+              "url": "https://app.notion.com/p/40173152f17181fc877cd198e7911eac",
+              "description": "Culture liquide de Pleurotus ostreatus — Blue Oyster.",
+              "family": "Cultures",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            },
+            {
+              "id": "catalog-wa",
+              "title": "WA — gélose à l’eau prête à l’emploi",
+              "notionId": "3f473152f171812a814dd7b951786313",
+              "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
+              "description": "WA (Water Agar) : gélose à l’eau pauvre en nutriments, coulée en boîte de Petri pour l’observation, certains travaux d’isolement et le transfert mycologique. Disponible sur demande selon le lot.",
+              "family": "Milieux & géloses",
+              "availability": "Sur demande",
+              "evidence": "L1 — Présence / culture",
+              "active": true,
+              "children": []
+            }
+          ]
         },
         {
           "id": "pt-products-wa",
@@ -730,310 +1079,6 @@
           "url": "https://app.notion.com/p/40173152f17181a6b4d7dbad1a72f900",
           "description": "Guia de início para os protótipos Myco Start e Myco Plate.",
           "children": []
-        },
-        {
-          "id": "pt-products-reference-collection",
-          "title": "Coleções de referência biológica",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "pt-products-microbes",
-              "title": "Microrganismos de interesse agrícola",
-              "notionId": "40173152f171814ca1cae513ca2f0427",
-              "url": "https://app.notion.com/p/40173152f171814ca1cae513ca2f0427",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-pleurotus",
-              "title": "Pleurotus — espécies e recursos cultivados",
-              "notionId": "40273152f17181f29a8efba7e0d87825",
-              "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-other-fungi",
-              "title": "Outros fungos estudados e cultivados",
-              "notionId": "40273152f17181ec9770df8a5a662720",
-              "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-fungal-resources",
-              "title": "Recursos fúngicos",
-              "notionId": "40173152f171812fb8d5de62178f6aef",
-              "url": "https://app.notion.com/p/40173152f171812fb8d5de62178f6aef",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-mycorrhizae",
-              "title": "Micorrizas e interações biológicas",
-              "notionId": "40173152f1718134a778d4c8d405ca62",
-              "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "pt-products-liquid-cultures",
-          "title": "Culturas líquidas — fichas de recursos",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "pt-products-lc-1",
-              "title": "LC — Pleurotus ostreatus HK35",
-              "notionId": "40173152f1718150a36eddc52198e963",
-              "url": "https://app.notion.com/p/40173152f1718150a36eddc52198e963",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-2",
-              "title": "LC — Pleurotus ostreatus P80",
-              "notionId": "40173152f17181e7acbcd20c85566bc6",
-              "url": "https://app.notion.com/p/40173152f17181e7acbcd20c85566bc6",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-3",
-              "title": "LC — Pleurotus ostreatus Blue Oyster",
-              "notionId": "40173152f17181fc877cd198e7911eac",
-              "url": "https://app.notion.com/p/40173152f17181fc877cd198e7911eac",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-4",
-              "title": "LC — Pleurotus ostreatus Cinzento americano",
-              "notionId": "40173152f17181388138ce462dc3596e",
-              "url": "https://app.notion.com/p/40173152f17181388138ce462dc3596e",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-5",
-              "title": "LC — Pleurotus ostreatus KRYOS",
-              "notionId": "40173152f171813081afe4ef7766742b",
-              "url": "https://app.notion.com/p/40173152f171813081afe4ef7766742b",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-6",
-              "title": "LC — Pleurotus ostreatus G8",
-              "notionId": "40173152f17181f4888dc89c8c43ee76",
-              "url": "https://app.notion.com/p/40173152f17181f4888dc89c8c43ee76",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-7",
-              "title": "LC — Pleurotus pulmonarius",
-              "notionId": "40173152f17181ab8b0bd41a5832e355",
-              "url": "https://app.notion.com/p/40173152f17181ab8b0bd41a5832e355",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-8",
-              "title": "LC — Pleurotus eryngii (híbridos)",
-              "notionId": "40173152f1718121bb57fd5eb152e64d",
-              "url": "https://app.notion.com/p/40173152f1718121bb57fd5eb152e64d",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-9",
-              "title": "LC — Pleurotus columbinus",
-              "notionId": "40173152f17181c393c6c26aa5b9191b",
-              "url": "https://app.notion.com/p/40173152f17181c393c6c26aa5b9191b",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-10",
-              "title": "LC — Trichoderma harzianum",
-              "notionId": "40173152f171816c812df39d52e2484c",
-              "url": "https://app.notion.com/p/40173152f171816c812df39d52e2484c",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-11",
-              "title": "LC — Trichoderma hamatum",
-              "notionId": "40173152f1718190872de4a9c5a21e64",
-              "url": "https://app.notion.com/p/40173152f1718190872de4a9c5a21e64",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-12",
-              "title": "LC — Trichoderma koningii",
-              "notionId": "40173152f1718110a2dfc823dc27bf03",
-              "url": "https://app.notion.com/p/40173152f1718110a2dfc823dc27bf03",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-13",
-              "title": "LC — Trichoderma longibrachiatum",
-              "notionId": "40173152f17181c49f19f0cb82752d75",
-              "url": "https://app.notion.com/p/40173152f17181c49f19f0cb82752d75",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-14",
-              "title": "LC — Trichoderma reesei",
-              "notionId": "40173152f171813aa500fc6f2f1684c4",
-              "url": "https://app.notion.com/p/40173152f171813aa500fc6f2f1684c4",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-15",
-              "title": "LC — Pleurotus pulmonarius, verão",
-              "notionId": "40173152f1718165a79ace1bc6189c24",
-              "url": "https://app.notion.com/p/40173152f1718165a79ace1bc6189c24",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-lc-16",
-              "title": "LC — Pleurotus pulmonarius, inverno",
-              "notionId": "40173152f17181cab9f3e85af551ebde",
-              "url": "https://app.notion.com/p/40173152f17181cab9f3e85af551ebde",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "pt-products-solid-supports",
-          "title": "Ágares e suportes sólidos",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "pt-products-solid-1",
-              "title": "WA — ágar-água",
-              "notionId": "3f473152f171812a814dd7b951786313",
-              "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-solid-2",
-              "title": "PDA — ágar de batata e dextrose",
-              "notionId": "40173152f1718183ac57e3d7235ce00b",
-              "url": "https://app.notion.com/p/40173152f1718183ac57e3d7235ce00b",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-solid-3",
-              "title": "PDAE GRAIN+ — ágar enriquecido com água de grão",
-              "notionId": "40173152f17181098d44c5e85d73b05c",
-              "url": "https://app.notion.com/p/40173152f17181098d44c5e85d73b05c",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "pt-products-formulations",
-          "title": "Formulações e meios BA Labs",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "pt-products-formula-1",
-              "title": "MASTER B / BLAGARD",
-              "notionId": "40173152f17181c482b4f0d4f3ce27e4",
-              "url": "https://app.notion.com/p/40173152f17181c482b4f0d4f3ce27e4",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-2",
-              "title": "G CLAIR",
-              "notionId": "40173152f171811eb843dd419d8279c0",
-              "url": "https://app.notion.com/p/40173152f171811eb843dd419d8279c0",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-3",
-              "title": "G LIGNEUX",
-              "notionId": "40173152f1718179a6faf08806253a46",
-              "url": "https://app.notion.com/p/40173152f1718179a6faf08806253a46",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-4",
-              "title": "BA CLEAN — ágar de purificação assistida",
-              "notionId": "40173152f17181af8deed2f4f1437990",
-              "url": "https://app.notion.com/p/40173152f17181af8deed2f4f1437990",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-5",
-              "title": "LC GRAIN",
-              "notionId": "40173152f17181e580bcc4963a38ab29",
-              "url": "https://app.notion.com/p/40173152f17181e580bcc4963a38ab29",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-6",
-              "title": "LC TRANSFER",
-              "notionId": "40173152f17181a5928ae148d8e07a85",
-              "url": "https://app.notion.com/p/40173152f17181a5928ae148d8e07a85",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-7",
-              "title": "LC MANUTENÇÃO",
-              "notionId": "40173152f1718150bbf6f9054be8b905",
-              "url": "https://app.notion.com/p/40173152f1718150bbf6f9054be8b905",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-8",
-              "title": "LCMD — meio líquido à base de melaço de tâmara",
-              "notionId": "40173152f17181888a6af073a562afcd",
-              "url": "https://app.notion.com/p/40173152f17181888a6af073a562afcd",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-9",
-              "title": "LC LIGNICOLE",
-              "notionId": "40173152f171815b8537fd09016220d6",
-              "url": "https://app.notion.com/p/40173152f171815b8537fd09016220d6",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "pt-products-formula-10",
-              "title": "LC TERRICOLE",
-              "notionId": "40173152f17181c5ab66c8dab2791814",
-              "url": "https://app.notion.com/p/40173152f17181c5ab66c8dab2791814",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
         }
       ],
       "notionParentId": "language",
@@ -1090,37 +1135,12 @@
       "description": "Investigação e desenvolvimento na BA Labs: trabalho documentado, questões experimentais, protótipos, medições e limites da evidência atual."
     },
     {
-      "id": "learn",
-      "title": "Recursos e transmissão",
-      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
-      "children": [
-        {
-          "id": "learn-resource-1",
-          "title": "Trabalho documentado",
-          "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
-          "children": []
-        },
-        {
-          "id": "learn-resource-2",
-          "title": "Evidências e medição",
-          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
-          "children": []
-        },
-        {
-          "id": "learn-resource-3",
-          "title": "Catálogo público",
-          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "children": []
-        },
-        {
-          "id": "learn-resource-4",
-          "title": "Colaborar com a BA Labs",
-          "url": "https://app.notion.com/p/40173152f17181f194deca033c534128",
-          "children": []
-        }
-      ],
-      "notionParentId": "hub",
-      "kind": "section"
+      "id": "evidence",
+      "title": "O que a evidência demonstra atualmente",
+      "notionId": "40173152f17181b08d08fdfb8e7eca54",
+      "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
+      "description": "Evidence, documented observations and limits of current work.",
+      "children": []
     }
   ],
   "hub": {
