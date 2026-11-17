@@ -136,19 +136,17 @@
       stage.addEventListener("pointerdown", event => {
         if (event.target === nextApp.canvas) {
           drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
-          stage.setPointerCapture?.(event.pointerId);
           stage.classList.add("is-panning");
         }
       });
-      stage.addEventListener("pointermove", event => {
+      window.addEventListener("pointermove", event => {
         if (!drag) return;
         stage.scrollLeft = drag.left - (event.clientX - drag.x);
         stage.scrollTop = drag.top - (event.clientY - drag.y);
       });
       const stopDrag = () => { drag = null; stage.classList.remove("is-panning"); };
-      stage.addEventListener("pointerup", stopDrag);
-      stage.addEventListener("pointercancel", stopDrag);
-      stage.addEventListener("lostpointercapture", stopDrag);
+      window.addEventListener("pointerup", stopDrag);
+      window.addEventListener("pointercancel", stopDrag);
       stage.addEventListener("wheel", event => {
         if (!event.ctrlKey && !event.metaKey) return;
         event.preventDefault();
