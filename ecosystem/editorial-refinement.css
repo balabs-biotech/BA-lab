@@ -1191,7 +1191,7 @@
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(3):before,
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(8):before{
-  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.65)),url("./assets/editorial-iot.jpg");
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.65)),url("./assets/editorial-iot.png");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(4):before,
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(7):before{
@@ -1378,7 +1378,7 @@
  background-image:radial-gradient(ellipse at 32% 40%,rgba(185,107,77,.6),transparent 30%),repeating-radial-gradient(ellipse at 68% 50%,rgba(209,208,197,.42) 0 1px,transparent 2px 13px),linear-gradient(120deg,#263b38,#111b1d);
 }
 #app.balabs-ui > main .universe-index-card:nth-child(3):before{
- background-image:url("./assets/editorial-iot.jpg");
+ background-image:url("./assets/editorial-iot.png");
 }
 #app.balabs-ui > main .universe-index-card:nth-child(4):before{
  background-image:radial-gradient(ellipse at 25% 35%,rgba(185,107,77,.65),transparent 23%),radial-gradient(ellipse at 70% 65%,rgba(38,59,56,.95),transparent 42%),repeating-linear-gradient(25deg,rgba(209,208,197,.12) 0 1px,transparent 1px 8px),linear-gradient(120deg,#27352e,#111b1d);
