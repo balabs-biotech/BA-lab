@@ -29,11 +29,13 @@ try {
       nodes: Number(el.dataset.nodeCount || 0),
       edges: Number(el.dataset.edgeCount || 0),
       verifiedRelations: Number(el.dataset.verifiedRelations || 0),
-      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0)
+      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0),
+      nodeLevelRelations: Number(el.dataset.nodeLevelRelations || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
     assert.ok(topology.verifiedRelations >= 10, 'Cross-universe filaments must come from documented Notion relationships, not spatial proximity');
     assert.ok(topology.crossUniverseConnections >= 8, 'The overview must expose a connected evidence-backed universe network');
+    assert.ok(topology.nodeLevelRelations >= 10, 'The map must include Notion-backed links between real resource pages, not just universe roots');
     const mappedTree = await page.evaluate(async () => {
       const response = await fetch('./notion-tree.fr.json');
       const tree = await response.json();
@@ -72,6 +74,9 @@ try {
     await page.locator('#selection .card').waitFor({ state: 'visible' });
     await page.locator('#selection .related-universes button').first().waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
+    await page.locator('#selection .child-branches').getByRole('button', { name: 'Culture & multiplication', exact: true }).click();
+    await page.locator('#selection .related-universes button').first().waitFor({ state: 'visible' });
+    await page.locator('#crumbs .breadcrumb-link').first().click();
     const childBranches = page.locator('#selection .child-branches button');
     await childBranches.first().waitFor({ state: 'visible' });
     const selectedRoot = await page.locator('#selection .card-title').innerText();

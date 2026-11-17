@@ -226,7 +226,15 @@
           "title": "Culture & multiplication",
           "notionId": "3e273152f171817c82bdee3cf1c68bb8",
           "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8",
-          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert."
+          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert.",
+          "relations": [
+            {
+              "target": "products-wa-agar",
+              "label": "Culture & multiplication ↔ WA",
+              "basis": "notion-link",
+              "evidence": "Culture & multiplication"
+            }
+          ]
         },
         {
           "id": "myco-interactions",
@@ -345,6 +353,32 @@
                   "description": "Fiche publique présentant cet organisme, ses caractéristiques biologiques et les informations documentées dans la ressource BA Labs.",
                   "children": [],
                   "notionId": "3ff73152f171816e93f5e62e70f77969"
+                }
+              ],
+              "relations": [
+                {
+                  "target": "myco-laccaria-laccata",
+                  "label": "Ressource ectomycorhizienne · Laccaria laccata",
+                  "basis": "notion-link",
+                  "evidence": "Ectomycorhizes — ressources et interactions avec les plantes"
+                },
+                {
+                  "target": "myco-pisolithus",
+                  "label": "Ressource ectomycorhizienne · Pisolithus tinctorius",
+                  "basis": "notion-link",
+                  "evidence": "Ectomycorhizes — ressources et interactions avec les plantes"
+                },
+                {
+                  "target": "myco-rhizopogon",
+                  "label": "Ressource ectomycorhizienne · Rhizopogon spp.",
+                  "basis": "notion-link",
+                  "evidence": "Ectomycorhizes — ressources et interactions avec les plantes"
+                },
+                {
+                  "target": "myco-scleroderma",
+                  "label": "Ressource ectomycorhizienne · Scleroderma spp.",
+                  "basis": "notion-link",
+                  "evidence": "Ectomycorhizes — ressources et interactions avec les plantes"
                 }
               ]
             }
@@ -540,7 +574,39 @@
               "title": "PGPR — Bactéries associées aux racines et potentiel agronomique",
               "notionId": "3ff73152f17181cf8346d696db59ae79",
               "url": "https://app.notion.com/p/3ff73152f17181cf8346d696db59ae79",
-              "description": "Présentation des PGPR, bactéries associées à la rhizosphère pouvant contribuer, selon la souche et les conditions, à la nutrition et aux interactions racinaires des plantes."
+              "description": "Présentation des PGPR, bactéries associées à la rhizosphère pouvant contribuer, selon la souche et les conditions, à la nutrition et aux interactions racinaires des plantes.",
+              "relations": [
+                {
+                  "target": "bio-bacillus-subtilis",
+                  "label": "PGPR · Bacillus subtilis",
+                  "basis": "notion-link",
+                  "evidence": "PGPR — Bactéries associées aux racines et potentiel agronomique"
+                },
+                {
+                  "target": "bio-brevibacillus-brevis",
+                  "label": "PGPR · Brevibacillus brevis",
+                  "basis": "notion-link",
+                  "evidence": "PGPR — Bactéries associées aux racines et potentiel agronomique"
+                },
+                {
+                  "target": "bio-bacillus-mycoides",
+                  "label": "PGPR · Bacillus mycoides",
+                  "basis": "notion-link",
+                  "evidence": "PGPR — Bactéries associées aux racines et potentiel agronomique"
+                },
+                {
+                  "target": "bio-paenibacillus-polymyxa",
+                  "label": "PGPR · Paenibacillus polymyxa",
+                  "basis": "notion-link",
+                  "evidence": "PGPR — Bactéries associées aux racines et potentiel agronomique"
+                },
+                {
+                  "target": "bio-sporosarcina",
+                  "label": "PGPR · Sporosarcina pasteurii",
+                  "basis": "notion-link",
+                  "evidence": "PGPR — Bactéries associées aux racines et potentiel agronomique"
+                }
+              ]
             }
           ],
           "description": "Présentation des microorganismes étudiés par BA Labs, notamment Bacillus, Trichoderma et des ressources bactériennes ; l’intérêt dépend de la souche, du support et de l’usage étudié."
@@ -703,7 +769,15 @@
           "title": "Expérimentation végétale",
           "notionId": "3e273152f171817a81d6f806b3804d6b",
           "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b",
-          "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
+          "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux.",
+          "relations": [
+            {
+              "target": "evidence",
+              "label": "Expérimentation végétale ↔ preuves documentées",
+              "basis": "notion-link",
+              "evidence": "Expérimentation végétale"
+            }
+          ]
         }
       ],
       "description": "Découvrir les espaces et démarches d’expérimentation, notamment les essais végétaux et les dispositifs de laboratoire.",

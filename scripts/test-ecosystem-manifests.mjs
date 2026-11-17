@@ -46,13 +46,15 @@ for (const language of expectedLanguages) {
     for (const child of children) visit(child, trail);
   };
 
-  const rootIds = new Set(manifest.domains.map((domain) => domain.id));
+  const nodeIds = new Set();
+  const collectNodeIds = (nodes) => nodes.forEach((node) => { nodeIds.add(node.id); collectNodeIds(node.children || []); });
+  collectNodeIds(manifest.domains);
   let relationCount = 0;
   let contentRelationCount = 0;
   for (const root of manifest.domains) {
     assert.ok(Array.isArray(root.relations), language + ': every universe root must expose its verified relation list');
     for (const relation of root.relations) {
-      assert.ok(rootIds.has(relation.target), language + ': relation target must be a real universe root');
+      assert.ok(nodeIds.has(relation.target), language + ': relation target must be a real node in the Notion tree');
       assert.ok(typeof relation.label === 'string' && relation.label.trim(), language + ': relation label is required');
       assert.ok(typeof relation.evidence === 'string' && relation.evidence.trim(), language + ': relation evidence is required');
       assert.ok(['notion-link', 'page-content'].includes(relation.basis), language + ': relation basis must distinguish explicit Notion links from documented topics');
@@ -60,8 +62,27 @@ for (const language of expectedLanguages) {
       if (relation.basis === 'page-content') contentRelationCount += 1;
     }
   }
+  const allNodes = [];
+  const collectNodes = (nodes) => nodes.forEach((node) => { allNodes.push(node); collectNodes(node.children || []); });
+  collectNodes(manifest.domains);
   assert.ok(relationCount >= 10, language + ': too few documented cross-universe relationships');
   assert.ok(contentRelationCount >= 4, language + ': Batch Tracker and Technosoil content links must be represented');
+  let pageLevelRelationCount = 0;
+  for (const node of allNodes) {
+    for (const relation of node.relations || []) {
+      assert.ok(nodeIds.has(relation.target), language + ': page-level relation target must exist in this language tree');
+      assert.ok(typeof relation.label === 'string' && relation.label.trim(), language + ': page-level relation label is required');
+      assert.ok(['notion-link', 'page-content'].includes(relation.basis), language + ': page-level relation provenance is required');
+      pageLevelRelationCount++;
+    }
+  }
+  if (language === 'fr') {
+    for (const id of ['myco-culture', 'myco-mycorrhiza-ectomycorrhiza', 'bio-organism-pgpr', 'lab-plant-experimentation']) {
+      assert.ok(allNodes.find((node) => node.id === id)?.relations?.length, 'fr: expected page-level Notion links on ' + id);
+    }
+    assert.ok(allNodes.find((node) => node.id === 'myco-culture').relations.some((relation) => relation.target === 'products-wa-agar'), 'fr: culture-to-WA cross-link must be explicit');
+    assert.ok(pageLevelRelationCount >= 11, 'fr: page-level Notion hyperlinks must be represented as individual filaments');
+  }
   assert.ok(manifest.domains.find((domain) => domain.id === 'soil').relations.some((relation) => relation.target === 'lab' && relation.label.toLowerCase().includes('technosoil')), language + ': Technosoil must connect agrotechnology to plant experimentation');
 
   const evidence = manifest.domains.find((domain) => domain.id === 'evidence');

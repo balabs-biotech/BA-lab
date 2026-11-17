@@ -54,27 +54,29 @@ function buildNetwork(){
  // Cross-universe connections come only from the Notion relation manifest.
  // page-content links are explicitly distinguished from direct Notion hyperlinks.
  relationIndex=new Map();const relationPairs=new Set();
- let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0;
+ let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0,nodeLevelRelationCount=0,crossUniverseConnectionCount=0;
  const addRelationIndex=(id,entry)=>{if(!relationIndex.has(id))relationIndex.set(id,[]);relationIndex.get(id).push(entry);};
- tree.forEach(root=>{
-  const source=byId.get(root.id);if(!source)return;
-  for(const relation of root.relations||[]){
-   const target=byId.get(relation.target);if(!target||target.level!==0||target.id===source.id)continue;
+ nodes.forEach(source=>{
+  for(const relation of source.data.relations||[]){
+   if(source.level>0)nodeLevelRelationCount++;
+   const target=byId.get(relation.target);if(!target||target.id===source.id)continue;
    const key=[source.id,target.id].sort().join("|");if(relationPairs.has(key))continue;
    relationPairs.add(key);
+   if(source.rootId!==target.rootId)crossUniverseConnectionCount++;
    const basis=relation.basis==="notion-link"?"notion-link":"page-content";
-   edges.push({a:source,b:target,depth:0,cross:true,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
+   edges.push({a:source,b:target,depth:Math.max(source.level,target.level),cross:source.rootId!==target.rootId,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
    verifiedRelationCount++;
    if(basis==="notion-link")explicitRelationCount++;else contentRelationCount++;
    addRelationIndex(source.id,{target:target.id,label:relation.label,basis,evidence:relation.evidence});
    addRelationIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
   }
  });
- const crossUniverseConnections=relationPairs.size;
+ const crossUniverseConnections=crossUniverseConnectionCount;
  canvas.dataset.verifiedRelations=String(verifiedRelationCount);
  canvas.dataset.explicitRelations=String(explicitRelationCount);
  canvas.dataset.contentRelations=String(contentRelationCount);
  canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);
+ canvas.dataset.nodeLevelRelations=String(nodeLevelRelationCount);
  // Local anastomoses follow spatial proximity, not array order. Each hypha can
  // form one restrained side-connection at its depth, creating irregular meshes
  // while avoiding long chords and the visual regularity of a grid.
@@ -97,7 +99,7 @@ function buildNetwork(){
   const maxDistance=clamp(median*2.8,48,175);
   candidates.sort((a,b)=>a.d-b.d);
   const degree=new Map(),existing=new Set();
-  for(const edge of edges){if(!edge.cross)continue;existing.add([edge.a.id,edge.b.id].sort().join("|"));}
+  for(const edge of edges){if(!edge.cross&&!edge.verified)continue;existing.add([edge.a.id,edge.b.id].sort().join("|"));}
   for(const pair of candidates){
    if(pair.d>maxDistance)break;
    if((degree.get(pair.a.id)||0)>=1||(degree.get(pair.b.id)||0)>=1)continue;
