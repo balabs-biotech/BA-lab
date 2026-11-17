@@ -296,12 +296,174 @@
       "url": "https://app.notion.com/p/40173152f1718120b45bf79f8e81120a",
       "children": [
         {
-          "id": "pt-bio-agro",
+          "id": "pt-bio-microbes",
           "title": "Microrganismos de interesse agrícola",
           "notionId": "40173152f171814ca1cae513ca2f0427",
           "url": "https://app.notion.com/p/40173152f171814ca1cae513ca2f0427",
           "description": "Microrganismos associados aos sistemas e às interações agrícolas.",
-          "children": []
+          "children": [
+            {
+              "id": "pt-bio-trichoderma-harzianum",
+              "title": "Trichoderma harzianum — ficha do organismo",
+              "notionId": "40173152f1718159974ffe79205166f4",
+              "url": "https://app.notion.com/p/40173152f1718159974ffe79205166f4",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "pt-bio-trichoderma-reesei",
+              "title": "Trichoderma reesei — ficha do organismo",
+              "notionId": "40173152f17181beb616f5d750ec71d7",
+              "url": "https://app.notion.com/p/40173152f17181beb616f5d750ec71d7",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "pt-bio-trichoderma-hamatum",
+              "title": "Trichoderma hamatum — ficha do organismo",
+              "notionId": "40173152f171811dbb52f24694ce5940",
+              "url": "https://app.notion.com/p/40173152f171811dbb52f24694ce5940",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "pt-bio-trichoderma-koningii",
+              "title": "Trichoderma koningii — ficha do organismo",
+              "notionId": "40173152f1718140b52ad907ca031065",
+              "url": "https://app.notion.com/p/40173152f1718140b52ad907ca031065",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "pt-bio-trichoderma-longibrachiatum",
+              "title": "Trichoderma longibrachiatum — ficha do organismo",
+              "notionId": "40173152f17181489fb1c3b5af1db932",
+              "url": "https://app.notion.com/p/40173152f17181489fb1c3b5af1db932",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "pt-bio-bacillus",
+              "title": "Bacillus — grupo bacteriano de interesse agrícola",
+              "notionId": "40273152f17181ec8f91e8b65217488d",
+              "url": "https://app.notion.com/p/40273152f17181ec8f91e8b65217488d",
+              "description": "Page de groupe Bacillus ; les fiches d’espèces sont rattachées ici pour refléter l’organisation taxonomique visible dans la rubrique.",
+              "children": [
+                {
+                  "id": "pt-bacillus-subtilis",
+                  "title": "Bacillus subtilis",
+                  "notionId": "40173152f171814d80b0d5d44d244871",
+                  "url": "https://app.notion.com/p/40173152f171814d80b0d5d44d244871",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-bacillus-amyloliquefaciens",
+                  "title": "Bacillus amyloliquefaciens",
+                  "notionId": "40173152f17181fa93a5ddd9b8ba33bb",
+                  "url": "https://app.notion.com/p/40173152f17181fa93a5ddd9b8ba33bb",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-bacillus-licheniformis",
+                  "title": "Bacillus licheniformis",
+                  "notionId": "40173152f171818ebf41e298f29b0555",
+                  "url": "https://app.notion.com/p/40173152f171818ebf41e298f29b0555",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-bacillus-mycoides",
+                  "title": "Bacillus mycoides",
+                  "notionId": "40173152f17181d1ad7cc7dffd379e00",
+                  "url": "https://app.notion.com/p/40173152f17181d1ad7cc7dffd379e00",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-brevibacillus-brevis",
+                  "title": "Brevibacillus brevis",
+                  "notionId": "40173152f171816d84f6cf2c35ddcd43",
+                  "url": "https://app.notion.com/p/40173152f171816d84f6cf2c35ddcd43",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-paenibacillus-polymyxa",
+                  "title": "Paenibacillus polymyxa",
+                  "notionId": "40173152f17181a0b18ee8e221f65b62",
+                  "url": "https://app.notion.com/p/40173152f17181a0b18ee8e221f65b62",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-sporosarcina-pasteurii",
+                  "title": "Sporosarcina pasteurii",
+                  "notionId": "40173152f171811f992be74df7d15bfa",
+                  "url": "https://app.notion.com/p/40173152f171811f992be74df7d15bfa",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-niallia-circulans",
+                  "title": "Niallia circulans (anteriormente Bacillus circulans)",
+                  "notionId": "40173152f171814eaba7d83c5abd827c",
+                  "url": "https://app.notion.com/p/40173152f171814eaba7d83c5abd827c",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-cytobacillus-firmus",
+                  "title": "Cytobacillus firmus (anteriormente Bacillus firmus)",
+                  "notionId": "40173152f171817d8d1fdc4b51592ad8",
+                  "url": "https://app.notion.com/p/40173152f171817d8d1fdc4b51592ad8",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-priestia-megaterium",
+                  "title": "Priestia megaterium (anteriormente Bacillus megaterium)",
+                  "notionId": "40173152f1718155b849c73e3f1935bc",
+                  "url": "https://app.notion.com/p/40173152f1718155b849c73e3f1935bc",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-weizmannia-coagulans",
+                  "title": "Weizmannia coagulans (anteriormente Bacillus coagulans)",
+                  "notionId": "40173152f1718148b17eef380a139a0d",
+                  "url": "https://app.notion.com/p/40173152f1718148b17eef380a139a0d",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-brevibacillus-laterosporus",
+                  "title": "Brevibacillus laterosporus (anteriormente Bacillus laterosporus)",
+                  "notionId": "40173152f17181eab414c6e579b3e5da",
+                  "url": "https://app.notion.com/p/40173152f17181eab414c6e579b3e5da",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-virgibacillus-halodenitrificans",
+                  "title": "Virgibacillus halodenitrificans (anteriormente Bacillus halodenitrificans)",
+                  "notionId": "40173152f17181c39565e79ca7abb27f",
+                  "url": "https://app.notion.com/p/40173152f17181c39565e79ca7abb27f",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "pt-bio-pgpr",
+              "title": "PGPR — bactérias associadas às raízes e potencial agronómico",
+              "notionId": "40273152f17181b68096ff132de0480f",
+              "url": "https://app.notion.com/p/40273152f17181b68096ff132de0480f",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            }
+          ]
         },
         {
           "id": "pt-bio-substrates",
