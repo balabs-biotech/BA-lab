@@ -1058,7 +1058,7 @@
     {
       "id": "learn",
       "title": "RESSOURCES & TRANSMISSION",
-      "description": "Ressources publiques pour parcourir les travaux documentés, comprendre les limites des preuves et découvrir les modalités de collaboration.",
+      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
       "children": [
         {
           "id": "learn-resource-1",
@@ -1084,7 +1084,8 @@
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
           "children": []
         }
-      ]
+      ],
+      "kind": "section"
     }
   ],
   "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs.",
