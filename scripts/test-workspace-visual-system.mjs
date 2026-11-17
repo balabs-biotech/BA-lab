@@ -42,4 +42,15 @@ assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology 
 assert.ok(greenTechEntry.includes("20261117-sector-interaction-160"), "GreenTech must load the interactive sector particle runtime");
 assert.ok(laboratoryEntry.includes("20261117-sector-interaction-160"), "Laboratory must load the interactive sector particle runtime");
 
+const laboratoryProcess = fs.readFileSync("batch-tracker/laboratory-process-visuals.js", "utf8");
+const laboratoryStyles = fs.readFileSync("batch-tracker/styles/laboratory-process-map.css", "utf8");
+assert.ok(laboratoryProcess.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "Laboratory process map must use the same pinned PixiJS runtime");
+assert.ok(laboratoryProcess.includes('querySelectorAll(":scope > .stage")'), "Laboratory process map must derive nodes from actual rendered batch stages");
+assert.ok(laboratoryProcess.includes('element.classList.contains("completed")') && laboratoryProcess.includes('element.classList.contains("active")') && laboratoryProcess.includes('element.classList.contains("failed")'), "Laboratory process map must reflect persisted stage states");
+assert.ok(laboratoryProcess.includes("next.stop()"), "Laboratory process map must render on demand without a permanent GPU ticker");
+assert.ok(laboratoryProcess.includes("observer.disconnect()"), "Laboratory process map must release its observer on page exit");
+assert.ok(laboratoryProcess.includes("La liste détaillée des étapes reste accessible"), "Laboratory process map must retain a semantic fallback");
+assert.ok(laboratoryStyles.includes(".lab-process-map-stage"), "Laboratory process map must have a bounded scrollable stage");
+assert.ok(laboratoryEntry.includes("20261117-lab-process-map-161"), "Laboratory must load the new process map runtime");
+
 console.log("✓ CultureOps sector-specific visual runtime contract");
