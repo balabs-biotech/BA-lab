@@ -1,16 +1,23 @@
 /* BA Labs CultureOps — spatial navigation dock and panel transitions. */
-/* Keep the dock as a second in-flow row of the existing sticky toolbar.
-   This avoids introducing extra grid items into the legacy workspace layout. */
-html body[data-domain] .app-toolbar { flex-wrap:wrap !important; }
-html body[data-domain] .ba-spatial-dock {
-  position:relative;
-  top:auto;
-  grid-area:auto !important;
-  flex:1 0 100%;
-  width:100%;
+/* Dock lives inside the sticky toolbar, not as an extra page-grid item. */
+html body[data-domain] .app-toolbar {
+  display:grid !important;
+  grid-template-columns:auto 1px minmax(0,1fr) auto;
+  grid-template-areas:
+    "brand divider sections status"
+    "spatial spatial spatial spatial";
+  align-items:center;
+  gap:10px 16px;
+  height:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
 }
-
+html body[data-domain] .toolbar-brand { grid-area:brand !important; }
+html body[data-domain] .toolbar-divider { grid-area:divider !important; }
+html body[data-domain] .section-nav { grid-area:sections !important; min-width:0; }
+html body[data-domain] .toolbar-status { grid-area:status !important; }
 html body[data-domain] .ba-spatial-dock {
+  grid-area:spatial !important;
   position:relative;
   top:auto;
   z-index:30;
@@ -18,6 +25,8 @@ html body[data-domain] .ba-spatial-dock {
   grid-template-columns:minmax(150px,1fr) auto minmax(100px,.7fr);
   align-items:center;
   gap:18px;
+  width:100%;
+  min-width:0;
   min-height:76px;
   padding:10px 16px;
   border:1px solid var(--border);
@@ -27,6 +36,7 @@ html body[data-domain] .ba-spatial-dock {
   backdrop-filter:blur(16px);
 }
 html body[data-domain] .ba-spatial-dock[hidden] { display:none !important; }
+
 .ba-spatial-context { min-width:0; display:grid; gap:3px; }
 .ba-spatial-kicker { color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.15em; }
 .ba-spatial-title { color:var(--paper); font-size:14px; line-height:1.25; }
