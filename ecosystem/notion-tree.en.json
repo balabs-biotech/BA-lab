@@ -168,6 +168,14 @@
       "url": "https://app.notion.com/p/40173152f171819a90d9ffa3a191d09f",
       "children": [
         {
+          "id": "en-soil-microbes",
+          "title": "Agricultural microorganisms",
+          "notionId": "40173152f171817e918cc9c278aeca0d",
+          "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
+          "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
+          "children": []
+        },
+        {
           "id": "en-bio-fermentation",
           "title": "Biological fermentation",
           "notionId": "40173152f17181e999cfc4e456ec0f6d",
@@ -209,14 +217,6 @@
       "notionId": "40173152f1718100b468f740dbb40647",
       "url": "https://app.notion.com/p/40173152f1718100b468f740dbb40647",
       "children": [
-        {
-          "id": "en-soil-microbes",
-          "title": "Agricultural microorganisms",
-          "notionId": "40173152f171817e918cc9c278aeca0d",
-          "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
-          "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
-          "children": []
-        },
         {
           "id": "en-soil-equipment",
           "title": "Experimental equipment",
@@ -669,32 +669,48 @@
     },
     {
       "id": "work",
-      "title": "Documented work & projects",
-      "notionId": "40173152f171812084fcc3e45ece4ec9",
-      "url": "https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9",
+      "title": "Research and development",
+      "notionId": "40173152f1718173ae6bc8cce9f0ba52",
+      "url": "https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52",
       "children": [
         {
-          "id": "en-work-evidence",
-          "title": "What the evidence currently supports",
-          "notionId": "40173152f17181e99831c9e40fb8e614",
-          "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614",
-          "description": "A review of what current observations and evidence do—and do not—support.",
+          "id": "en-work-methodology",
+          "title": "R&D methodology",
+          "notionId": "40273152f17181299be1d95c37976d9d",
+          "url": "https://app.notion.com/p/40273152f17181299be1d95c37976d9d",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
           "children": []
         },
         {
-          "id": "en-work-documented",
-          "title": "Documented work and achievements",
-          "notionId": "40173152f17181baa905d6afb836f038",
-          "url": "https://app.notion.com/p/40173152f17181baa905d6afb836f038",
-          "description": "Overview of documented workstreams, observations and evidence limits.",
+          "id": "en-work-prototypes",
+          "title": "Prototypes and trials",
+          "notionId": "40273152f171811684d1ccce5374a6c3",
+          "url": "https://app.notion.com/p/40273152f171811684d1ccce5374a6c3",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
           "children": []
         },
         {
-          "id": "en-work-r-and-d",
-          "title": "Research and development",
-          "notionId": "40173152f1718173ae6bc8cce9f0ba52",
-          "url": "https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52",
-          "description": "Research workflow connecting questions, protocols, observations, measurements and conclusions.",
+          "id": "en-work-measurement",
+          "title": "Measurement and reproducibility",
+          "notionId": "40273152f17181f896c7c040f4402212",
+          "url": "https://app.notion.com/p/40273152f17181f896c7c040f4402212",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "en-work-iteration",
+          "title": "Iteration and validation",
+          "notionId": "40273152f17181a7be0add6fe6b35581",
+          "url": "https://app.notion.com/p/40273152f17181a7be0add6fe6b35581",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "en-work-expertise",
+          "title": "Expertise and scientific network",
+          "notionId": "40273152f17181bb8f9ff2c94524c6e2",
+          "url": "https://app.notion.com/p/40273152f17181bb8f9ff2c94524c6e2",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
           "children": []
         }
       ],
@@ -704,7 +720,7 @@
     {
       "id": "learn",
       "title": "Resources & knowledge transfer",
-      "description": "Public resources to explore documented work, understand evidence limitations and learn how to collaborate with BA Labs.",
+      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
       "children": [
         {
           "id": "learn-resource-1",
@@ -730,7 +746,8 @@
           "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
           "children": []
         }
-      ]
+      ],
+      "kind": "section"
     }
   ],
   "hub": {
