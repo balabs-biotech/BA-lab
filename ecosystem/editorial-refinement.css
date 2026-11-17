@@ -1648,3 +1648,16 @@
  #app.balabs-ui > main .product-catalogue-visual-note{font-size:9px!important}
  #app.balabs-ui > main .product-catalogue-card{padding-top:16px!important}
 }
+
+
+/* Catalogue visual captions follow the active public language. */
+#app.balabs-ui .product-catalogue-visual [data-cat-lang],
+#app.balabs-ui .product-catalogue-visual-note[data-cat-lang]{display:none!important}
+html[lang="fr"] #app.balabs-ui .product-catalogue-visual [data-cat-lang="fr"],
+html[lang="en"] #app.balabs-ui .product-catalogue-visual [data-cat-lang="en"],
+html[lang="ar"] #app.balabs-ui .product-catalogue-visual [data-cat-lang="ar"],
+html[lang="pt"] #app.balabs-ui .product-catalogue-visual [data-cat-lang="pt"]{display:inline!important}
+html[lang="fr"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="fr"],
+html[lang="en"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="en"],
+html[lang="ar"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="ar"],
+html[lang="pt"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="pt"]{display:block!important}
