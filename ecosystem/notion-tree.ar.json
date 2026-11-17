@@ -197,7 +197,14 @@
             }
           ]
         },
-        null,
+        {
+          "id": "ar-soil-propagation",
+          "title": "الزراعة والإكثار",
+          "notionId": "40173152f1718101afcbdb364eb5d44a",
+          "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
+          "description": "صفحة الزراعة والإكثار المرتبطة مباشرة بجذر علم الفطريات.",
+          "children": []
+        },
         {
           "id": "ar-mycorrhizae",
           "title": "الفطريات الجذرية والتفاعلات البيولوجية",
@@ -321,7 +328,14 @@
             }
           ]
         },
-        null
+        {
+          "id": "ar-myco-applications",
+          "title": "التطبيقات الفطرية",
+          "notionId": "40173152f17181afb288feda1d2c3e5c",
+          "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
+          "description": "صفحة التطبيقات الفطرية المرتبطة مباشرة بجذر علم الفطريات.",
+          "children": []
+        }
       ],
       "description": "استكشف عالم الفطريات: الأنواع المزروعة، مواردها، طرق الإكثار، والتفاعلات التي تربطها بالتربة والمواد العضوية."
     },
