@@ -672,3 +672,48 @@
     margin-top:-30px!important;
   }
 }
+
+
+/* PASS 55 — editorial image, rail calibration and readable type on dark panels. */
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  min-height:clamp(280px,34vw,460px)!important;border:1px solid rgba(209,208,197,.22)!important;
+  background:#172522!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art img{
+  display:block!important;width:100%!important;height:100%!important;
+  min-height:clamp(280px,34vw,460px)!important;max-height:520px!important;
+  object-fit:cover!important;object-position:center!important;filter:contrast(1.08) saturate(.9)!important;opacity:1!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art:after{
+  content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 58%,rgba(17,27,29,.78) 100%);
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .art-caption{
+  position:absolute!important;z-index:2!important;inset-inline-start:14px!important;bottom:12px!important;
+  color:#f2f1e9!important;text-shadow:0 1px 6px #000!important;font:700 8px/1.5 ui-monospace,monospace!important;letter-spacing:.12em!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy .eyebrow{color:#d28c6e!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy h2{color:#f2f1e9!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy h2 em{color:#d28c6e!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy p{color:#d1d0c5!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy .editorial-link{color:#e6c09b!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method,
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work,
+#app.balabs-ui .experience-page[data-chapter="network"]>.scene{color:#d1d0c5!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method :is(p,li,small),
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work :is(p,li,small),
+#app.balabs-ui .experience-page[data-chapter="network"]>.scene :is(p,small){color:#c5d0c7!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method :is(h2,h3,b,strong),
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work :is(h2,h3,b,strong),
+#app.balabs-ui .experience-page[data-chapter="network"]>.scene :is(h2,h3,strong){color:#f2f1e9!important}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method :is(.eyebrow,.method-no,.method-detail-index),
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work :is(.eyebrow,.work-tag,.work-topics){color:#d28c6e!important}
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art,
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art img{min-height:clamp(210px,58vw,300px)!important;max-height:300px!important}
+}
+/* Straight, uniform filament: equal scroll progress now maps to equal node spacing. */
+.chapter-filament .filament-base,.chapter-filament .filament-progress{fill:none!important;stroke-linecap:round!important}
+.chapter-filament .filament-base{stroke:#9aafa2!important;stroke-width:2!important;stroke-dasharray:2 5!important}
+.chapter-filament .filament-progress{stroke:#c47b5c!important;stroke-width:3!important}
+.chapter-filament .filament-signal{r:5!important}
