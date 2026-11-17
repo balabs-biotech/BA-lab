@@ -1280,3 +1280,233 @@ html body[data-domain] #measurementHistory .measurement-stamp {
   html body[data-domain] #measurementHistory > .measurement-entry { grid-template-columns:minmax(0,1fr) auto !important; gap:7px 9px !important; padding:11px !important; }
   html body[data-domain] #measurementHistory .measurement-value { font-size:17px !important; }
 }
+
+
+/* PASS 151 — CultureOps visual system: an application-wide scientific atmosphere.
+   The particle layer is now persistent behind the authenticated workspace, not
+   confined to the introductory hero that collapses after sign-in. */
+html body[data-domain] {
+  position:relative !important;
+  isolation:isolate !important;
+  min-height:100vh !important;
+  background:
+    radial-gradient(ellipse at 8% 0%,color-mix(in srgb,var(--workspace-accent) 9%,transparent),transparent 34rem),
+    radial-gradient(ellipse at 96% 32%,rgba(94,133,122,.09),transparent 38rem),
+    linear-gradient(180deg,#101819 0%,#121b1c 48%,#101718 100%) !important;
+}
+html body[data-domain]::before {
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+  opacity:.24 !important;
+  background-image:
+    linear-gradient(rgba(184,204,193,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(184,204,193,.055) 1px,transparent 1px) !important;
+  background-size:44px 44px !important;
+  mask-image:linear-gradient(to bottom,black,transparent 82%) !important;
+}
+html body[data-domain] .container {
+  position:relative !important;
+  z-index:1 !important;
+}
+html body[data-domain] .workspace-particle-field {
+  position:fixed !important;
+  inset:0 !important;
+  z-index:0 !important;
+  display:block !important;
+  width:100vw !important;
+  height:100vh !important;
+  opacity:.27 !important;
+  overflow:hidden !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .workspace-particle-field canvas {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+}
+html body[data-domain] .app-toolbar {
+  position:sticky !important;
+  top:10px !important;
+  z-index:20 !important;
+  min-height:66px !important;
+  border-color:rgba(177,198,186,.17) !important;
+  background:rgba(22,32,32,.82) !important;
+  box-shadow:0 14px 42px rgba(0,0,0,.23),inset 0 1px 0 rgba(255,255,255,.045) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(125%) !important;
+  backdrop-filter:blur(18px) saturate(125%) !important;
+}
+html body[data-domain] .brand-symbol {
+  display:grid !important;
+  place-items:center !important;
+  width:38px !important;
+  height:38px !important;
+  border:1px solid var(--workspace-accent-border) !important;
+  border-radius:11px !important;
+  background:var(--workspace-accent-soft) !important;
+  color:var(--workspace-accent) !important;
+  box-shadow:0 0 22px color-mix(in srgb,var(--workspace-accent) 12%,transparent) !important;
+}
+html body[data-domain] .brand-symbol svg { width:25px !important; height:25px !important; }
+html body[data-domain] .brand-wordmark strong { font-size:13px !important; letter-spacing:.16em !important; }
+html body[data-domain] .brand-wordmark small { font-size:8px !important; letter-spacing:.22em !important; }
+html body[data-domain] .section-nav {
+  gap:4px !important;
+  padding:4px !important;
+  border:1px solid rgba(177,198,186,.09) !important;
+  border-radius:11px !important;
+  background:rgba(8,15,16,.28) !important;
+}
+html body[data-domain] .section-nav a {
+  min-height:36px !important;
+  border-radius:8px !important;
+  font-size:10px !important;
+  letter-spacing:.005em !important;
+}
+html body[data-domain] .section-nav a[aria-current="page"] {
+  color:#f0f4ef !important;
+  border-color:var(--workspace-accent-border) !important;
+  background:var(--workspace-accent-soft) !important;
+}
+html body[data-domain] .toolbar-status {
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding-inline-start:12px !important;
+  border-inline-start:1px solid rgba(177,198,186,.15) !important;
+  font-size:9px !important;
+  letter-spacing:.12em !important;
+}
+html body[data-domain] .status-pulse {
+  width:7px !important;
+  height:7px !important;
+  border-radius:50% !important;
+  background:var(--workspace-accent) !important;
+  box-shadow:0 0 0 4px var(--workspace-accent-soft),0 0 14px var(--workspace-accent) !important;
+}
+html body[data-domain] .universe-home-link {
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  margin:16px 0 5px !important;
+  color:#9caea4 !important;
+  font-size:10px !important;
+  letter-spacing:.035em !important;
+  text-decoration:none !important;
+  transition:color .18s ease,transform .18s ease !important;
+}
+html body[data-domain] .universe-home-link:hover {
+  color:var(--workspace-accent) !important;
+  transform:translateX(-2px) !important;
+}
+html body[data-domain] .card {
+  position:relative !important;
+  isolation:isolate !important;
+  overflow:hidden !important;
+  border:1px solid rgba(169,192,179,.14) !important;
+  border-radius:15px !important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.027),transparent 42%),
+    linear-gradient(180deg,rgba(31,44,42,.96),rgba(23,34,33,.97)) !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.19),inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+html body[data-domain] .card::before {
+  content:"" !important;
+  position:absolute !important;
+  inset:0 0 auto !important;
+  height:1px !important;
+  opacity:.72 !important;
+  background:linear-gradient(90deg,transparent,var(--workspace-accent-border),transparent) !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .card > :is(h2,h3,.section-kicker,.overview-heading,.culture-detail-heading) {
+  position:relative !important;
+  z-index:1 !important;
+}
+html body[data-domain] .section-kicker {
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  color:var(--workspace-accent) !important;
+  font-size:9px !important;
+  font-weight:820 !important;
+  letter-spacing:.16em !important;
+}
+html body[data-domain] .section-kicker .kicker-line {
+  flex:1 1 auto !important;
+  height:1px !important;
+  background:linear-gradient(90deg,var(--workspace-accent-border),rgba(169,192,179,.04)) !important;
+}
+html body[data-domain] .card h2 {
+  color:#f0f3ed !important;
+  font-size:clamp(20px,2.1vw,26px) !important;
+  font-weight:720 !important;
+  letter-spacing:-.045em !important;
+}
+html body[data-domain] .card h3 {
+  color:#dce6de !important;
+  font-size:14px !important;
+  font-weight:680 !important;
+  letter-spacing:-.018em !important;
+}
+html body[data-domain] :is(.overview-metric,.overview-activity,.overview-shortcuts,.bio-operation-panel,.bio-lineage-panel,.culture-catalog) {
+  border:1px solid rgba(169,192,179,.12) !important;
+  border-radius:12px !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(8,16,15,.19)) !important;
+}
+html body[data-domain] :is(input,select,textarea) {
+  border-color:rgba(169,192,179,.22) !important;
+  border-radius:9px !important;
+  background:rgba(10,18,18,.72) !important;
+  color:#e9eee9 !important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.16) !important;
+}
+html body[data-domain] :is(input,select,textarea):focus-visible {
+  border-color:var(--workspace-accent) !important;
+  outline:3px solid color-mix(in srgb,var(--workspace-accent) 18%,transparent) !important;
+  outline-offset:1px !important;
+  box-shadow:0 0 0 1px var(--workspace-accent-border),0 0 22px color-mix(in srgb,var(--workspace-accent) 10%,transparent) !important;
+}
+html body[data-domain] label {
+  color:#c5d1c8 !important;
+  font-size:11px !important;
+  font-weight:680 !important;
+  letter-spacing:.015em !important;
+}
+html body[data-domain] button:not(.culture-lineage-node) {
+  border-radius:9px !important;
+  transition:transform .16s ease,border-color .16s ease,background-color .16s ease,box-shadow .16s ease !important;
+}
+html body[data-domain] :is(button.primary-button,button[data-primary],#saveObservationButton,#saveMeasurementButton,#createBatchButton,#savePlantCultureButton) {
+  box-shadow:0 7px 18px color-mix(in srgb,var(--workspace-accent) 13%,transparent),inset 0 1px 0 rgba(255,255,255,.2) !important;
+}
+@media(hover:hover) and (pointer:fine) {
+  html body[data-domain] .card:not(.app-hero):hover {
+    border-color:rgba(169,192,179,.22) !important;
+    box-shadow:0 22px 58px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.05) !important;
+  }
+  html body[data-domain] button:not(:disabled):hover {
+    transform:translateY(-1px) !important;
+  }
+}
+@media(max-width:760px) {
+  html body[data-domain] .app-toolbar {
+    position:relative !important;
+    top:auto !important;
+    flex-wrap:wrap !important;
+  }
+  html body[data-domain] .workspace-particle-field { opacity:.16 !important; }
+  html body[data-domain] .toolbar-status { display:none !important; }
+  html body[data-domain] .section-nav {
+    order:3 !important;
+    flex:1 0 100% !important;
+    overflow-x:auto !important;
+  }
+  html body[data-domain] .card { border-radius:12px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .universe-home-link,
+  html body[data-domain] button:not(.culture-lineage-node) { transition:none !important; }
+}
