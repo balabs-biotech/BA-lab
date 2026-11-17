@@ -1009,3 +1009,45 @@ html body[data-domain] .card:not(.app-hero) .culture-detail-heading .muted {
     flex-direction:column !important;
   }
 }
+
+
+/* PASS 142 — replace the abstract hero symbol with accurate domain diagrams. */
+html body[data-domain] .hero-art {
+  min-height:220px !important;
+  display:grid !important;
+  place-items:center !important;
+}
+html body[data-domain] .hero-art :is(.hero-orbit,.hero-note) { display:none !important; }
+html body[data-domain] .hero-core {
+  width:min(100%,280px) !important;
+  height:220px !important;
+  display:grid !important;
+  place-items:center !important;
+  border:1px solid color-mix(in srgb,var(--workspace-accent) 28%,transparent) !important;
+  border-radius:18px !important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.035),transparent 58%),
+    rgba(8,15,15,.26) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 42px rgba(0,0,0,.18) !important;
+}
+html body[data-domain] .hero-science-visual {
+  display:none !important;
+  width:100% !important;
+  height:100% !important;
+  max-height:220px !important;
+  overflow:visible !important;
+}
+html body[data-domain="mycology"] .hero-science-visual.visual-mycology,
+html body[data-domain="laboratory"] .hero-science-visual.visual-laboratory,
+html body[data-domain="agronomy"] .hero-science-visual.visual-agronomy {
+  display:block !important;
+}
+html body[data-domain] .hero-core .hero-science-visual text {
+  font-family:var(--ba-font,Arial,sans-serif) !important;
+  font-weight:700 !important;
+}
+@media(max-width:640px) {
+  html body[data-domain] .hero-art { min-height:170px !important; }
+  html body[data-domain] .hero-core { width:min(100%,240px) !important; height:175px !important; }
+  html body[data-domain] .hero-science-visual { max-height:175px !important; }
+}
