@@ -28,6 +28,12 @@
 .inline-explorer-title .eyebrow{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#91a79a}
 .inline-explorer-title h2{font-size:clamp(17px,2vw,25px);font-weight:600;letter-spacing:-.04em;margin:5px 0;color:#e1e4d9}
 .inline-explorer-title p{font-size:11px;line-height:1.5;color:#9bada2;margin:0;max-width:390px}
+.relation-legend{display:flex;flex-wrap:wrap;gap:7px 12px;margin-top:12px;max-width:390px;pointer-events:none}
+.relation-legend span{display:inline-flex;align-items:center;gap:6px;color:#aebbb1;font:600 8px/1.3 ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase}
+.relation-legend i{display:inline-block;width:18px;height:2px;border-radius:2px;background:#b96b4d;box-shadow:0 0 7px #b96b4d55}
+.relation-legend .content i{background:#7eaaa3;box-shadow:0 0 7px #7eaaa355}
+.relation-legend .hypha i{background:#b5c3b6;opacity:.65}
+@media(max-width:700px){.relation-legend{gap:5px 8px;margin-top:8px}.relation-legend span{font-size:7px}}
 .inline-explorer-controls{position:absolute;right:clamp(12px,2.5vw,28px);top:clamp(14px,2.5vw,26px);z-index:3;display:grid;gap:6px}
 .inline-explorer-controls .btn{width:38px;height:38px;min-height:38px;padding:0;font-size:17px;border:1px solid #7d958733;background:#172522e8;color:#d1d0c5}
 .inline-explorer-controls .btn:hover{border-color:#b96b4d;background:#243630}
@@ -117,7 +123,7 @@
 <div class="cluster-key" aria-label="Domain clusters"><div class="cluster-item cluster-foundations"><i aria-hidden="true"></i><span><b data-i18n="clusterBio">FONDEMENTS BIOLOGIQUES</b><small data-i18n="clusterBioSub">Biotechnologies · mycologie · TechnoSoil · R&D</small></span></div><div class="cluster-item cluster-applications"><i aria-hidden="true"></i><span><b data-i18n="clusterApply">APPLICATIONS &amp; TRANSMISSION</b><small data-i18n="clusterApplySub">Produits · ingénierie · projets · ressources</small></span></div></div><div class="inline-explorer" id="inlineExplorer" aria-label="Explorateur Vernpixi 2D BA Labs">
  <div class="inline-explorer-stage">
   <canvas id="field" aria-label="Réseau mycélien interactif des huit univers BA Labs"></canvas>
-  <div class="inline-explorer-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h2 id="heading">Réseau vivant</h2><p id="description">Huit univers reliés dans un même espace vivant.</p></div>
+  <div class="inline-explorer-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h2 id="heading">Réseau vivant</h2><p id="description">Huit univers reliés dans un même espace vivant.</p><div class="relation-legend" id="relationLegend" aria-label="Légende des connexions"></div></div>
   <div class="inline-explorer-controls" aria-label="Contrôles du réseau"><button class="btn" id="zoomIn" type="button" aria-label="Zoom avant">+</button><button class="btn" id="zoomOut" type="button" aria-label="Zoom arrière">−</button><button class="btn" id="reset" type="button" aria-label="Vue globale">⌖</button><button class="btn" id="back" type="button" aria-label="Vue précédente" disabled>↶</button></div>
   <section id="selection" aria-live="polite"></section>
   <div id="hint">GLISSER · PINCER POUR ZOOMER · SÉLECTIONNER UN NŒUD</div>
