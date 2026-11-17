@@ -619,17 +619,20 @@
             {
               "id": "iot-temperature",
               "title": "Température",
-              "description": "Suivre les gradients, les cycles et la stabilité thermique des espaces de culture."
+              "description": "Suivre les gradients, les cycles et la stabilité thermique des espaces de culture.",
+              "kind": "section"
             },
             {
               "id": "iot-humidity",
               "title": "Humidité & hygrométrie",
-              "description": "Observer l’humidité de l’air et les conditions de disponibilité en eau."
+              "description": "Observer l’humidité de l’air et les conditions de disponibilité en eau.",
+              "kind": "section"
             },
             {
               "id": "iot-gas",
               "title": "Gaz & renouvellement d’air",
-              "description": "Étudier la ventilation et les échanges gazeux dans les enceintes de culture."
+              "description": "Étudier la ventilation et les échanges gazeux dans les enceintes de culture.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -642,17 +645,20 @@
             {
               "id": "iot-sensors-types",
               "title": "Capteurs & sondes",
-              "description": "Comparer les technologies de mesure, leurs plages, leur précision et leurs limites."
+              "description": "Comparer les technologies de mesure, leurs plages, leur précision et leurs limites.",
+              "kind": "section"
             },
             {
               "id": "iot-microcontrollers",
               "title": "Microcontrôleurs",
-              "description": "Explorer les interfaces de lecture, les entrées-sorties et les unités embarquées."
+              "description": "Explorer les interfaces de lecture, les entrées-sorties et les unités embarquées.",
+              "kind": "section"
             },
             {
               "id": "iot-power",
               "title": "Alimentation & sécurité",
-              "description": "Documenter l’alimentation, la protection électrique et la fiabilité des montages."
+              "description": "Documenter l’alimentation, la protection électrique et la fiabilité des montages.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -665,17 +671,20 @@
             {
               "id": "iot-airflow",
               "title": "Ventilation & flux d’air",
-              "description": "Concevoir le suivi et le pilotage du renouvellement d’air."
+              "description": "Concevoir le suivi et le pilotage du renouvellement d’air.",
+              "kind": "section"
             },
             {
               "id": "iot-humidification",
               "title": "Humidification",
-              "description": "Étudier la régulation de l’humidité et la distribution de l’eau."
+              "description": "Étudier la régulation de l’humidité et la distribution de l’eau.",
+              "kind": "section"
             },
             {
               "id": "iot-lighting",
               "title": "Éclairage & cycles",
-              "description": "Définir des scénarios d’éclairage et de temporisation selon les essais."
+              "description": "Définir des scénarios d’éclairage et de temporisation selon les essais.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -688,17 +697,20 @@
             {
               "id": "iot-logging",
               "title": "Enregistrement continu",
-              "description": "Horodater les mesures et conserver les données brutes avec leur contexte."
+              "description": "Horodater les mesures et conserver les données brutes avec leur contexte.",
+              "kind": "section"
             },
             {
               "id": "iot-dashboard",
               "title": "Visualisation & alertes",
-              "description": "Représenter les tendances, seuils et écarts pour faciliter le suivi."
+              "description": "Représenter les tendances, seuils et écarts pour faciliter le suivi.",
+              "kind": "section"
             },
             {
               "id": "iot-quality",
               "title": "Qualité des mesures",
-              "description": "Repérer dérives, valeurs manquantes, étalonnage et incertitudes."
+              "description": "Repérer dérives, valeurs manquantes, étalonnage et incertitudes.",
+              "kind": "section"
             }
           ],
           "kind": "section"
@@ -711,17 +723,20 @@
             {
               "id": "iot-batch-links",
               "title": "Lots & cultures",
-              "description": "Associer les relevés aux identifiants de lots et aux étapes de culture."
+              "description": "Associer les relevés aux identifiants de lots et aux étapes de culture.",
+              "kind": "section"
             },
             {
               "id": "iot-protocol-links",
               "title": "Protocoles & événements",
-              "description": "Consigner les changements de consigne, interventions et incidents."
+              "description": "Consigner les changements de consigne, interventions et incidents.",
+              "kind": "section"
             },
             {
               "id": "iot-comparison",
               "title": "Historique & comparaisons",
-              "description": "Comparer les cycles expérimentaux sans perdre les conditions initiales."
+              "description": "Comparer les cycles expérimentaux sans perdre les conditions initiales.",
+              "kind": "section"
             }
           ],
           "kind": "section"
