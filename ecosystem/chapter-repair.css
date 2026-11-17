@@ -166,3 +166,68 @@
   height:clamp(150px,43vw,220px)!important;margin:0 auto 22px!important;
  }
 }
+
+
+/* PHASE 45 — mobile editorial compacting + visible scientific image in the final method section. */
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method{
+  position:relative!important;isolation:isolate!important;
+  background:
+    linear-gradient(90deg,rgba(17,27,29,.96) 0%,rgba(17,27,29,.88) 54%,rgba(17,27,29,.34) 100%),
+    url("https://upload.wikimedia.org/wikipedia/commons/8/82/Fungus_in_glass_dish3.jpg") right 28%/46% 100% no-repeat,
+    linear-gradient(145deg,#263b38 0%,#1c302d 58%,#172522 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:before{
+  background:
+    radial-gradient(ellipse at 18% 78%,rgba(145,169,154,.12),transparent 28%),
+    radial-gradient(ellipse at 78% 28%,rgba(185,107,77,.08),transparent 26%)!important;
+}
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="about"]{
+   padding-bottom:54px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere{
+   height:clamp(156px,44vw,196px)!important;
+   margin:0 auto 14px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method{
+   padding:26px 18px 30px!important;
+   background:
+     linear-gradient(90deg,rgba(17,27,29,.91),rgba(17,27,29,.76)),
+     url("https://upload.wikimedia.org/wikipedia/commons/8/82/Fungus_in_glass_dish3.jpg") center/cover no-repeat,
+     linear-gradient(145deg,#263b38,#172522)!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top{max-width:100%!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top h2{
+   max-width:16ch!important;font-size:clamp(25px,7vw,34px)!important;line-height:1.08!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top>p{
+   max-width:42ch!important;font-size:12px!important;line-height:1.55!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps{
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   gap:0 14px!important;margin-top:18px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps li{
+   min-height:0!important;padding:13px 0 15px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-trigger{
+   grid-template-columns:22px minmax(0,1fr) 12px!important;gap:7px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps b{
+   font-size:18px!important;margin:1px 0 6px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps p{
+   font-size:10px!important;line-height:1.5!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] #methodDetail{
+   margin:16px auto 0!important;padding:16px!important;
+ }
+}
+@media(max-width:420px){
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps{
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps li{
+   padding:11px 0 13px!important;
+ }
+}
