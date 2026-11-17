@@ -788,7 +788,9 @@
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
           "children": []
         }
-      ]
+      ],
+      "sourceType": "curated-navigation-hub",
+      "notionId": null
     }
   ],
   "hub": null
