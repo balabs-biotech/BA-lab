@@ -454,3 +454,42 @@
  .chapter-rail-node{min-width:40px!important;min-height:40px!important}
  [dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:0!important}
 }
+
+ 
+/* PHASE 47 — tighter editorial canvas.
+   Keep the chapter rail gutter, reduce dead vertical padding and prevent
+   very wide displays from stretching reading layouts. Vernpixi is untouched. */
+#app.balabs-ui .experience-page{
+  padding-block:clamp(12px,1.5vw,22px)!important;
+  padding-inline-start:clamp(72px,4.4vw,84px)!important;
+  padding-inline-end:clamp(18px,2vw,30px)!important;
+}
+#app.balabs-ui .experience-page>.hero,
+#app.balabs-ui .experience-page>.editorial-work,
+#app.balabs-ui .experience-page>.scene,
+#app.balabs-ui .experience-page>.universe-index,
+#app.balabs-ui .experience-page>.product-catalogue,
+#app.balabs-ui .experience-page>section{
+  width:100%!important;
+  max-width:1560px!important;
+  margin-inline:auto!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page{
+    padding-block:12px 18px!important;
+    padding-inline-start:46px!important;
+    padding-inline-end:10px!important;
+  }
+  [dir=rtl] #app.balabs-ui .experience-page{
+    padding-inline-start:10px!important;
+    padding-inline-end:46px!important;
+  }
+  #app.balabs-ui .experience-page>.hero,
+  #app.balabs-ui .experience-page>.editorial-work,
+  #app.balabs-ui .experience-page>.scene,
+  #app.balabs-ui .experience-page>.universe-index,
+  #app.balabs-ui .experience-page>.product-catalogue,
+  #app.balabs-ui .experience-page>section{
+    max-width:100%!important;
+  }
+}
