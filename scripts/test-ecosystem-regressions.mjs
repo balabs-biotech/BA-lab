@@ -201,7 +201,7 @@ for (const [language, label] of Object.entries({ fr: 'Catalogue', en: 'Catalogue
   const languageStart = html.indexOf(language + ':{');
   assert.ok(languageStart >= 0 && html.slice(languageStart, languageStart + 1800).includes('navCatalogue:"' + label + '"'), language + ' footer catalogue label must be localised');
 }
-assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("location.href='./explorer-2d.html?domain='") && previewHtml.includes("__BALABS_3D_ENTER_DOMAIN__(id)"), 'Public homepage links must enter Vernpixi while the isolated preview retains its legacy navigation');
+assert.ok(html.includes("a[data-domain-page],a[data-work-page]") && previewHtml.includes("a[data-domain-page],a[data-work-page]") && html.includes("location.href='./explorer-2d.html?domain='") && previewHtml.includes("enterSphere(id,true,false)"), 'Public homepage links must enter Vernpixi while the isolated preview retains its legacy navigation');
 const featuredOrder = (source) => [...source.matchAll(/<a class="work-card-link" data-work-page="([^"]+)"/g)].map((match) => match[1]);
 assert.deepEqual(featuredOrder(html), ['iot', 'myco', 'soil'], 'Public featured work must present IoT, cultures, then materials');
 assert.deepEqual(featuredOrder(previewHtml), ['iot', 'myco', 'soil'], 'Preview featured work must match the public homepage order');
