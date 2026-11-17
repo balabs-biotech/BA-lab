@@ -8,6 +8,8 @@ const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", 
 const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
 const mycology = fs.readFileSync("batch-tracker/styles/mycology-workspace.css", "utf8");
 const mycologyEntry = fs.readFileSync("batch-tracker/mycology/index.html", "utf8");
+const greenTechEntry = fs.readFileSync("batch-tracker/green-tech/index.html", "utf8");
+const laboratoryEntry = fs.readFileSync("batch-tracker/laboratory/index.html", "utf8");
 
 assert.ok(html.includes('class="app-hero"'), "Each sector must retain the shared workspace header");
 assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particle layer must be removed from the shared workspace markup");
@@ -16,6 +18,10 @@ assert.ok(!visuals.includes("workspace-particle-field"), "The old generic global
 assert.ok(visuals.includes('ba-sector-visual--mycology'), "Mycology must have a dedicated colony-growth scene");
 assert.ok(visuals.includes('ba-sector-visual--greentech'), "GreenTech must have a dedicated leaf-growth scene");
 assert.ok(visuals.includes('ba-sector-visual--laboratory'), "Laboratory must have a dedicated bioreactor scene");
+assert.ok(visuals.includes('mode: "repulse"') && visuals.includes('mode: "push"'), "GreenTech particles must react to pointer hover and click");
+assert.ok(visuals.includes('mode: "bubble"'), "Laboratory particles must react with a controlled bubble interaction");
+assert.ok(visuals.includes('count: compact ? 5 : 10'), "GreenTech must have its own particle density");
+assert.ok(visuals.includes('count: compact ? 4 : 8'), "Laboratory must have its own particle density");
 assert.ok(!visuals.includes("links: { enable: true"), "Decorative sector particles must not form filament-like links");
 assert.ok(visuals.includes("prefers-reduced-motion"), "The visual runtime must respect reduced motion");
 assert.ok(visuals.includes("pauseOnOutsideViewport: true"), "Particle animation must pause outside the viewport");
@@ -33,5 +39,7 @@ assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS l
 assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
+assert.ok(greenTechEntry.includes("20261117-sector-interaction-160"), "GreenTech must load the interactive sector particle runtime");
+assert.ok(laboratoryEntry.includes("20261117-sector-interaction-160"), "Laboratory must load the interactive sector particle runtime");
 
 console.log("✓ CultureOps sector-specific visual runtime contract");
