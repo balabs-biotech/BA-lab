@@ -57,7 +57,8 @@ function buildNetwork(){
  let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0,nodeLevelRelationCount=0;
  const addRelationIndex=(id,entry)=>{if(!relationIndex.has(id))relationIndex.set(id,[]);relationIndex.get(id).push(entry);};
  nodes.forEach(source=>{
-  for(const relation of source.data.relations||[]){\n   if(source.level>0)nodeLevelRelationCount++;
+  for(const relation of source.data.relations||[]){
+   if(source.level>0)nodeLevelRelationCount++;
    const target=byId.get(relation.target);if(!target||target.level!==0||target.id===source.id)continue;
    const key=[source.id,target.id].sort().join("|");if(relationPairs.has(key))continue;
    relationPairs.add(key);
@@ -73,7 +74,8 @@ function buildNetwork(){
  canvas.dataset.verifiedRelations=String(verifiedRelationCount);
  canvas.dataset.explicitRelations=String(explicitRelationCount);
  canvas.dataset.contentRelations=String(contentRelationCount);
- canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);\n canvas.dataset.nodeLevelRelations=String(nodeLevelRelationCount);
+ canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);
+ canvas.dataset.nodeLevelRelations=String(nodeLevelRelationCount);
  // Local anastomoses follow spatial proximity, not array order. Each hypha can
  // form one restrained side-connection at its depth, creating irregular meshes
  // while avoiding long chords and the visual regularity of a grid.
