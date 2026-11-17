@@ -18,54 +18,6 @@
           "description": "صفحات مرجعية عن الموارد الفطرية والكائنات المزروعة والمدروسة.",
           "children": [
             {
-              "id": "ar-soil-propagation",
-              "title": "الزراعة والإكثار",
-              "notionId": "40173152f1718101afcbdb364eb5d44a",
-              "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
-              "description": "تحضير الدعامات والتلقيح والحضانة ومتابعة الزراعات الفطرية.",
-              "children": []
-            },
-            {
-              "id": "ar-myco-applications",
-              "title": "التطبيقات الفطرية",
-              "notionId": "40173152f17181afb288feda1d2c3e5c",
-              "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
-              "description": "مجالات علمية تُدرس فيها الفطريات ووظائفها، مع التمييز بين البحث والتطبيقات المثبتة.",
-              "children": []
-            },
-            {
-              "id": "ar-pleurotus-pulmonarius",
-              "title": "Pleurotus pulmonarius — بطاقة النوع والزراعة",
-              "notionId": "40273152f17181c48525e7bb8ab81f2a",
-              "url": "https://app.notion.com/p/40273152f17181c48525e7bb8ab81f2a",
-              "description": "فطر محاري قريب من Pleurotus ostreatus، ويُعرف بقدرته على الإثمار في ظروف أدفأ نسبيًا؛ تعرض البطاقة بيانات المورد والزراعة المتاحة.",
-              "children": []
-            },
-            {
-              "id": "ar-pleurotus-citrinopileatus",
-              "title": "Pleurotus citrinopileatus — بطاقة الكائن",
-              "notionId": "40173152f171816cbdbff911ab858ee1",
-              "url": "https://app.notion.com/p/40173152f171816cbdbff911ab858ee1",
-              "description": "فطر المحار الأصفر، يتميز بعناقيد ذات قبعات صفراء زاهية؛ تعرض البطاقة خصائص النوع ومتطلبات زراعته الموثقة.",
-              "children": []
-            },
-            {
-              "id": "ar-pleurotus-eryngii",
-              "title": "Pleurotus eryngii والهجن — بطاقة المجموعة",
-              "notionId": "40173152f17181759edbf2beb5b2ba78",
-              "url": "https://app.notion.com/p/40173152f17181759edbf2beb5b2ba78",
-              "description": "فطر المحار الملكي، يتميز بساق سميكة وقبعة صغيرة نسبيًا؛ تجمع البطاقة النوع والهجن المرتبطة به دون افتراض تطابق خصائصها.",
-              "children": []
-            },
-            {
-              "id": "ar-scleroderma",
-              "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
-              "notionId": "40273152f17181d4aa96c4d6aac56b26",
-              "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
-              "description": "فطريات جذرية خارجية تكوّن علاقة تكافلية مع جذور بعض الأشجار؛ تُعرض هنا كمجموعة بيولوجية لا كمنتج زراعي جاهز.",
-              "children": []
-            },
-            {
               "id": "ar-pleurotus-cultivated",
               "title": "Pleurotus — الأنواع والموارد المزروعة",
               "notionId": "40273152f1718104965acbf434612d39",
@@ -111,96 +63,64 @@
                   "url": "https://app.notion.com/p/40273152f1718145ae5dd1c02fbcd786",
                   "description": "بطاقة مورد فطري مرتبط بفرع Pleurotus؛ الاسم هنا تسمية المورد كما وثقتها الصفحة.",
                   "children": []
+                },
+                {
+                  "id": "ar-pleurotus-pulmonarius",
+                  "title": "Pleurotus pulmonarius — بطاقة النوع والزراعة",
+                  "notionId": "40273152f17181c48525e7bb8ab81f2a",
+                  "url": "https://app.notion.com/p/40273152f17181c48525e7bb8ab81f2a",
+                  "description": "فطر محاري قريب من Pleurotus ostreatus، ويُعرف بقدرته على الإثمار في ظروف أدفأ نسبيًا؛ تعرض البطاقة بيانات المورد والزراعة المتاحة.",
+                  "children": []
+                },
+                {
+                  "id": "ar-pleurotus-citrinopileatus",
+                  "title": "Pleurotus citrinopileatus — بطاقة الكائن",
+                  "notionId": "40173152f171816cbdbff911ab858ee1",
+                  "url": "https://app.notion.com/p/40173152f171816cbdbff911ab858ee1",
+                  "description": "فطر المحار الأصفر، يتميز بعناقيد ذات قبعات صفراء زاهية؛ تعرض البطاقة خصائص النوع ومتطلبات زراعته الموثقة.",
+                  "children": []
+                },
+                {
+                  "id": "ar-pleurotus-eryngii",
+                  "title": "Pleurotus eryngii والهجن — بطاقة المجموعة",
+                  "notionId": "40173152f17181759edbf2beb5b2ba78",
+                  "url": "https://app.notion.com/p/40173152f17181759edbf2beb5b2ba78",
+                  "description": "فطر المحار الملكي، يتميز بساق سميكة وقبعة صغيرة نسبيًا؛ تجمع البطاقة النوع والهجن المرتبطة به دون افتراض تطابق خصائصها.",
+                  "children": []
+                },
+                {
+                  "id": "ar-pleurotus-djamor",
+                  "title": "Pleurotus djamor — بطاقة الكائن",
+                  "notionId": "40173152f171810da539ceb498a4bbf2",
+                  "url": "https://app.notion.com/p/40173152f171810da539ceb498a4bbf2",
+                  "description": "فطر المحار الوردي، معروف بلونه الوردي وظهوره في عناقيد؛ تتناول البطاقة خصائص النوع وسياق زراعته.",
+                  "children": []
+                },
+                {
+                  "id": "ar-pleurotus-ostreatus",
+                  "title": "Pleurotus ostreatus — بطاقة النوع",
+                  "notionId": "40173152f1718183a105f3b9cafc055c",
+                  "url": "https://app.notion.com/p/40173152f1718183a105f3b9cafc055c",
+                  "description": "فطر المحار الشائع، يحلل المواد الخشبية ويمكن زراعته على ركائز لجنوسليلوزية؛ تعرض البطاقة تعريف النوع وموارد زراعته.",
+                  "children": []
+                },
+                {
+                  "id": "ar-hk35",
+                  "title": "HK35 — بطاقة السلالة والمورد",
+                  "notionId": "40173152f1718112be87f6224579ad30",
+                  "url": "https://app.notion.com/p/40173152f1718112be87f6224579ad30",
+                  "description": "بطاقة سلالة ومورد فطري ضمن الموارد المزروعة الموثقة.",
+                  "children": []
+                },
+                {
+                  "id": "ar-p80",
+                  "title": "P80 — بطاقة السلالة والمورد",
+                  "notionId": "40173152f17181d985eff110663e2bda",
+                  "url": "https://app.notion.com/p/40173152f17181d985eff110663e2bda",
+                  "description": "بطاقة سلالة ومورد فطري، مع ربطها بموارد الزراعة.",
+                  "children": []
                 }
               ]
-            },
-            {
-              "id": "ar-pleurotus-djamor",
-              "title": "Pleurotus djamor — بطاقة الكائن",
-              "notionId": "40173152f171810da539ceb498a4bbf2",
-              "url": "https://app.notion.com/p/40173152f171810da539ceb498a4bbf2",
-              "description": "فطر المحار الوردي، معروف بلونه الوردي وظهوره في عناقيد؛ تتناول البطاقة خصائص النوع وسياق زراعته.",
-              "children": []
-            },
-            {
-              "id": "ar-pleurotus-ostreatus",
-              "title": "Pleurotus ostreatus — بطاقة النوع",
-              "notionId": "40173152f1718183a105f3b9cafc055c",
-              "url": "https://app.notion.com/p/40173152f1718183a105f3b9cafc055c",
-              "description": "فطر المحار الشائع، يحلل المواد الخشبية ويمكن زراعته على ركائز لجنوسليلوزية؛ تعرض البطاقة تعريف النوع وموارد زراعته.",
-              "children": []
-            },
-            {
-              "id": "ar-cordyceps-militaris",
-              "title": "Cordyceps militaris — بطاقة الكائن",
-              "notionId": "40173152f171818da055d9119d4b49d7",
-              "url": "https://app.notion.com/p/40173152f171818da055d9119d4b49d7",
-              "description": "فطر حشريّ التطفل في الطبيعة، ويكوّن أجسامًا ثمرية برتقالية؛ تعرض البطاقة النوع ضمن الموارد المدروسة لا بوصفه ادعاءً علاجيًا.",
-              "children": []
-            },
-            {
-              "id": "ar-hericium-erinaceus",
-              "title": "Hericium erinaceus — بطاقة الكائن",
-              "notionId": "40173152f17181eca3b4d7110a5cb836",
-              "url": "https://app.notion.com/p/40173152f17181eca3b4d7110a5cb836",
-              "description": "فطر عرف الأسد، يتميز بأشواك بيضاء متدلية بدل الصفائح الظاهرة في كثير من الفطريات؛ تعرض البطاقة هويته وخصائصه.",
-              "children": []
-            },
-            {
-              "id": "ar-trametes-versicolor",
-              "title": "Trametes versicolor — بطاقة الكائن",
-              "notionId": "40173152f17181f0a7ded106c63b48fc",
-              "url": "https://app.notion.com/p/40173152f17181f0a7ded106c63b48fc",
-              "description": "فطر ذيليّ الديك الرومي، ينمو على الخشب ويُظهر حلقات لونية متباينة على سطح القبعة؛ تعرض البطاقة تعريفه البيولوجي.",
-              "children": []
-            },
-            {
-              "id": "ar-lentinula-edodes",
-              "title": "Lentinula edodes — بطاقة الكائن",
-              "notionId": "40173152f1718129828cc0b8303cc4dc",
-              "url": "https://app.notion.com/p/40173152f1718129828cc0b8303cc4dc",
-              "description": "فطر الشيتاكي، نوع خشبي معروف يُزرع على جذوع أو ركائز خشبية مناسبة؛ تعرض البطاقة معلومات النوع دون تعميم طريقة إنتاج واحدة.",
-              "children": []
-            },
-            {
-              "id": "ar-ganoderma-lucidum",
-              "title": "Ganoderma lucidum — بطاقة الكائن",
-              "notionId": "40173152f171819ba9b7ce4edbfafe23",
-              "url": "https://app.notion.com/p/40173152f171819ba9b7ce4edbfafe23",
-              "description": "فطر خشبي من مجموعة Ganoderma، يشكل أجسامًا ثمرية صلبة ذات سطح لامع غالبًا؛ البطاقة تعريفية ولا تتضمن ادعاءات صحية.",
-              "children": []
-            },
-            {
-              "id": "ar-hk35",
-              "title": "HK35 — بطاقة السلالة والمورد",
-              "notionId": "40173152f1718112be87f6224579ad30",
-              "url": "https://app.notion.com/p/40173152f1718112be87f6224579ad30",
-              "description": "بطاقة سلالة ومورد فطري ضمن الموارد المزروعة الموثقة.",
-              "children": []
-            },
-            {
-              "id": "ar-pholiota-adiposa",
-              "title": "Pholiota adiposa — بطاقة الكائن",
-              "notionId": "40173152f1718189b816f33b7d7b2b4f",
-              "url": "https://app.notion.com/p/40173152f1718189b816f33b7d7b2b4f",
-              "description": "فطر Pholiota adiposa، المعروف أحيانًا بفطر الكستناء، يرتبط بالخشب ويتميز بقبعات بنية لزجة؛ تعرض البطاقة خصائص النوع.",
-              "children": []
-            },
-            {
-              "id": "ar-p80",
-              "title": "P80 — بطاقة السلالة والمورد",
-              "notionId": "40173152f17181d985eff110663e2bda",
-              "url": "https://app.notion.com/p/40173152f17181d985eff110663e2bda",
-              "description": "بطاقة سلالة ومورد فطري، مع ربطها بموارد الزراعة.",
-              "children": []
-            },
-            {
-              "id": "ar-rhizopogon",
-              "title": "Rhizopogon spp. — مجموعة الفطريات الجذرية الخارجية",
-              "notionId": "40273152f17181329255c2052485c6c0",
-              "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
-              "description": "فطريات جذرية خارجية غالبًا ما تتكون أجسامها الثمرية تحت سطح التربة؛ ترتبط بجذور الأشجار وتُعرض هنا كمجموعة بيئية.",
-              "children": []
             },
             {
               "id": "ar-other-fungi",
@@ -208,25 +128,82 @@
               "notionId": "40273152f171817dafeae0d07ecb305f",
               "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
               "description": "مجموعة بطاقات لفطريات أخرى تدرسها BA Labs أو توثق مواردها، دون افتراض أن كل نوع متوفر كمزرعة موصوفة.",
-              "children": []
-            },
-            {
-              "id": "ar-hypsizygus-ulmarius",
-              "title": "Hypsizygus ulmarius — بطاقة الكائن",
-              "notionId": "40173152f17181338fe8f9fe77d8554a",
-              "url": "https://app.notion.com/p/40173152f17181338fe8f9fe77d8554a",
-              "description": "فطر المحار الدردار، من الأنواع الخشبية التي تُكوّن عناقيد جانبية؛ تعرض البطاقة هويته وخصائصه البيولوجية.",
-              "children": []
-            },
-            {
-              "id": "ar-hypsizygus-marmoreus",
-              "title": "Hypsizygus marmoreus — بطاقة الكائن",
-              "notionId": "40173152f17181549a76c71217f7337d",
-              "url": "https://app.notion.com/p/40173152f17181549a76c71217f7337d",
-              "description": "فطر الزان، ينمو طبيعيًا على الخشب ويُزرع تجاريًا في عناقيد؛ تعرض البطاقة معلومات النوع مع الحفاظ على اسمه العلمي.",
-              "children": []
+              "children": [
+                {
+                  "id": "ar-cordyceps-militaris",
+                  "title": "Cordyceps militaris — بطاقة الكائن",
+                  "notionId": "40173152f171818da055d9119d4b49d7",
+                  "url": "https://app.notion.com/p/40173152f171818da055d9119d4b49d7",
+                  "description": "فطر حشريّ التطفل في الطبيعة، ويكوّن أجسامًا ثمرية برتقالية؛ تعرض البطاقة النوع ضمن الموارد المدروسة لا بوصفه ادعاءً علاجيًا.",
+                  "children": []
+                },
+                {
+                  "id": "ar-hericium-erinaceus",
+                  "title": "Hericium erinaceus — بطاقة الكائن",
+                  "notionId": "40173152f17181eca3b4d7110a5cb836",
+                  "url": "https://app.notion.com/p/40173152f17181eca3b4d7110a5cb836",
+                  "description": "فطر عرف الأسد، يتميز بأشواك بيضاء متدلية بدل الصفائح الظاهرة في كثير من الفطريات؛ تعرض البطاقة هويته وخصائصه.",
+                  "children": []
+                },
+                {
+                  "id": "ar-trametes-versicolor",
+                  "title": "Trametes versicolor — بطاقة الكائن",
+                  "notionId": "40173152f17181f0a7ded106c63b48fc",
+                  "url": "https://app.notion.com/p/40173152f17181f0a7ded106c63b48fc",
+                  "description": "فطر ذيليّ الديك الرومي، ينمو على الخشب ويُظهر حلقات لونية متباينة على سطح القبعة؛ تعرض البطاقة تعريفه البيولوجي.",
+                  "children": []
+                },
+                {
+                  "id": "ar-lentinula-edodes",
+                  "title": "Lentinula edodes — بطاقة الكائن",
+                  "notionId": "40173152f1718129828cc0b8303cc4dc",
+                  "url": "https://app.notion.com/p/40173152f1718129828cc0b8303cc4dc",
+                  "description": "فطر الشيتاكي، نوع خشبي معروف يُزرع على جذوع أو ركائز خشبية مناسبة؛ تعرض البطاقة معلومات النوع دون تعميم طريقة إنتاج واحدة.",
+                  "children": []
+                },
+                {
+                  "id": "ar-ganoderma-lucidum",
+                  "title": "Ganoderma lucidum — بطاقة الكائن",
+                  "notionId": "40173152f171819ba9b7ce4edbfafe23",
+                  "url": "https://app.notion.com/p/40173152f171819ba9b7ce4edbfafe23",
+                  "description": "فطر خشبي من مجموعة Ganoderma، يشكل أجسامًا ثمرية صلبة ذات سطح لامع غالبًا؛ البطاقة تعريفية ولا تتضمن ادعاءات صحية.",
+                  "children": []
+                },
+                {
+                  "id": "ar-pholiota-adiposa",
+                  "title": "Pholiota adiposa — بطاقة الكائن",
+                  "notionId": "40173152f1718189b816f33b7d7b2b4f",
+                  "url": "https://app.notion.com/p/40173152f1718189b816f33b7d7b2b4f",
+                  "description": "فطر Pholiota adiposa، المعروف أحيانًا بفطر الكستناء، يرتبط بالخشب ويتميز بقبعات بنية لزجة؛ تعرض البطاقة خصائص النوع.",
+                  "children": []
+                },
+                {
+                  "id": "ar-hypsizygus-ulmarius",
+                  "title": "Hypsizygus ulmarius — بطاقة الكائن",
+                  "notionId": "40173152f17181338fe8f9fe77d8554a",
+                  "url": "https://app.notion.com/p/40173152f17181338fe8f9fe77d8554a",
+                  "description": "فطر المحار الدردار، من الأنواع الخشبية التي تُكوّن عناقيد جانبية؛ تعرض البطاقة هويته وخصائصه البيولوجية.",
+                  "children": []
+                },
+                {
+                  "id": "ar-hypsizygus-marmoreus",
+                  "title": "Hypsizygus marmoreus — بطاقة الكائن",
+                  "notionId": "40173152f17181549a76c71217f7337d",
+                  "url": "https://app.notion.com/p/40173152f17181549a76c71217f7337d",
+                  "description": "فطر الزان، ينمو طبيعيًا على الخشب ويُزرع تجاريًا في عناقيد؛ تعرض البطاقة معلومات النوع مع الحفاظ على اسمه العلمي.",
+                  "children": []
+                }
+              ]
             }
           ]
+        },
+        {
+          "id": "ar-soil-propagation",
+          "title": "الزراعة والإكثار",
+          "notionId": "40173152f1718101afcbdb364eb5d44a",
+          "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
+          "description": "تحضير الدعامات والتلقيح والحضانة ومتابعة الزراعات الفطرية.",
+          "children": []
         },
         {
           "id": "ar-mycorrhizae",
@@ -236,92 +213,77 @@
           "description": "العلاقات بين الفطريات والجذور والتفاعلات البيولوجية المرتبطة بها.",
           "children": [
             {
-              "id": "ar-rhizophagus-clarus",
-              "title": "Rhizophagus clarus (Glomus clarum) — بطاقة الكائن",
-              "notionId": "40173152f17181719006ef281004f5b9",
-              "url": "https://app.notion.com/p/40173152f17181719006ef281004f5b9",
-              "description": "فطر جذري تكافلي؛ تتناول البطاقة علاقته بالجذور وسياقه الزراعي.",
-              "children": []
-            },
-            {
-              "id": "ar-funneliformis-mosseae",
-              "title": "Funneliformis mosseae (Glomus mosseae) — بطاقة الكائن",
-              "notionId": "40173152f171815b98f8e23d75ce30dc",
-              "url": "https://app.notion.com/p/40173152f171815b98f8e23d75ce30dc",
-              "description": "فطر جذري تكافلي من مجموعة الفطريات الشجيرية، مرتبط بتفاعلات الجذور.",
-              "children": []
-            },
-            {
-              "id": "ar-pisolithus",
-              "title": "Pisolithus tinctorius — بطاقة الكائن",
-              "notionId": "40173152f171816294f4e4279f59b3f0",
-              "url": "https://app.notion.com/p/40173152f171816294f4e4279f59b3f0",
-              "description": "فطر جذري خارجي يرتبط بجذور بعض النباتات، ويُدرس ضمن التفاعلات بين الفطر والنبات.",
-              "children": []
-            },
-            {
-              "id": "ar-glomus-brasilianum",
-              "title": "Glomus brasilianum — بطاقة الكائن",
-              "notionId": "40173152f1718130a2f3ecb93f2b4bb2",
-              "url": "https://app.notion.com/p/40173152f1718130a2f3ecb93f2b4bb2",
-              "description": "بطاقة تعريف لفطر جذري ضمن مجموعة الفطريات الشجيرية.",
-              "children": []
-            },
-            {
-              "id": "ar-laccaria",
-              "title": "Laccaria laccata — بطاقة الكائن",
-              "notionId": "40173152f1718181af4ece2b3f17309a",
-              "url": "https://app.notion.com/p/40173152f1718181af4ece2b3f17309a",
-              "description": "فطر جذري خارجي؛ تعرض البطاقة علاقته بالنباتات المضيفة وسياقه البيئي.",
-              "children": []
-            },
-            {
-              "id": "ar-rhizophagus-irregularis",
-              "title": "Rhizophagus irregularis (Glomus intraradices) — بطاقة الكائن",
-              "notionId": "40173152f171814d8f84de5e8a48e1e6",
-              "url": "https://app.notion.com/p/40173152f171814d8f84de5e8a48e1e6",
-              "description": "فطر جذري شجيري واسع الدراسة، يرتبط بتبادل الموارد مع جذور النبات.",
-              "children": []
-            },
-            {
-              "id": "ar-gigaspora-margarita",
-              "title": "Gigaspora margarita — بطاقة الكائن",
-              "notionId": "40173152f17181cd8677ec3204dfb9dd",
-              "url": "https://app.notion.com/p/40173152f17181cd8677ec3204dfb9dd",
-              "description": "فطر جذري شجيري من مجموعة Gigaspora، ضمن تفاعلات الفطر والنبات.",
-              "children": []
-            },
-            {
-              "id": "ar-glomus-aggregatum",
-              "title": "Glomus aggregatum — بطاقة الكائن",
-              "notionId": "40173152f171815ea37ffc16917d2386",
-              "url": "https://app.notion.com/p/40173152f171815ea37ffc16917d2386",
-              "description": "فطر جذري شجيري، يُعرض ضمن الكائنات المرتبطة بجذور النباتات.",
-              "children": []
-            },
-            {
-              "id": "ar-glomus-deserticola",
-              "title": "Glomus deserticola — بطاقة الكائن",
-              "notionId": "40173152f17181838ae8f585441b5db7",
-              "url": "https://app.notion.com/p/40173152f17181838ae8f585441b5db7",
-              "description": "فطر جذري شجيري مرتبط بدراسة تفاعلات الجذور والبيئة.",
-              "children": []
-            },
-            {
-              "id": "ar-glomus-monosporus",
-              "title": "Glomus monosporus — بطاقة الكائن",
-              "notionId": "40173152f17181deb719fcea5367afe1",
-              "url": "https://app.notion.com/p/40173152f17181deb719fcea5367afe1",
-              "description": "بطاقة تعريف لفطر جذري ضمن مجموعة Glomus.",
-              "children": []
-            },
-            {
               "id": "ar-arbuscular-resources",
               "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
               "notionId": "40273152f171813fb16ac5000499acfd",
               "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
               "description": "مدخل إلى الفطريات الجذرية الشجيرية ووظائفها البيولوجية المحتملة وعلاقتها بجذور النباتات.",
-              "children": []
+              "children": [
+                {
+                  "id": "ar-rhizophagus-clarus",
+                  "title": "Rhizophagus clarus (Glomus clarum) — بطاقة الكائن",
+                  "notionId": "40173152f17181719006ef281004f5b9",
+                  "url": "https://app.notion.com/p/40173152f17181719006ef281004f5b9",
+                  "description": "فطر جذري تكافلي؛ تتناول البطاقة علاقته بالجذور وسياقه الزراعي.",
+                  "children": []
+                },
+                {
+                  "id": "ar-funneliformis-mosseae",
+                  "title": "Funneliformis mosseae (Glomus mosseae) — بطاقة الكائن",
+                  "notionId": "40173152f171815b98f8e23d75ce30dc",
+                  "url": "https://app.notion.com/p/40173152f171815b98f8e23d75ce30dc",
+                  "description": "فطر جذري تكافلي من مجموعة الفطريات الشجيرية، مرتبط بتفاعلات الجذور.",
+                  "children": []
+                },
+                {
+                  "id": "ar-glomus-brasilianum",
+                  "title": "Glomus brasilianum — بطاقة الكائن",
+                  "notionId": "40173152f1718130a2f3ecb93f2b4bb2",
+                  "url": "https://app.notion.com/p/40173152f1718130a2f3ecb93f2b4bb2",
+                  "description": "بطاقة تعريف لفطر جذري ضمن مجموعة الفطريات الشجيرية.",
+                  "children": []
+                },
+                {
+                  "id": "ar-rhizophagus-irregularis",
+                  "title": "Rhizophagus irregularis (Glomus intraradices) — بطاقة الكائن",
+                  "notionId": "40173152f171814d8f84de5e8a48e1e6",
+                  "url": "https://app.notion.com/p/40173152f171814d8f84de5e8a48e1e6",
+                  "description": "فطر جذري شجيري واسع الدراسة، يرتبط بتبادل الموارد مع جذور النبات.",
+                  "children": []
+                },
+                {
+                  "id": "ar-gigaspora-margarita",
+                  "title": "Gigaspora margarita — بطاقة الكائن",
+                  "notionId": "40173152f17181cd8677ec3204dfb9dd",
+                  "url": "https://app.notion.com/p/40173152f17181cd8677ec3204dfb9dd",
+                  "description": "فطر جذري شجيري من مجموعة Gigaspora، ضمن تفاعلات الفطر والنبات.",
+                  "children": []
+                },
+                {
+                  "id": "ar-glomus-aggregatum",
+                  "title": "Glomus aggregatum — بطاقة الكائن",
+                  "notionId": "40173152f171815ea37ffc16917d2386",
+                  "url": "https://app.notion.com/p/40173152f171815ea37ffc16917d2386",
+                  "description": "فطر جذري شجيري، يُعرض ضمن الكائنات المرتبطة بجذور النباتات.",
+                  "children": []
+                },
+                {
+                  "id": "ar-glomus-deserticola",
+                  "title": "Glomus deserticola — بطاقة الكائن",
+                  "notionId": "40173152f17181838ae8f585441b5db7",
+                  "url": "https://app.notion.com/p/40173152f17181838ae8f585441b5db7",
+                  "description": "فطر جذري شجيري مرتبط بدراسة تفاعلات الجذور والبيئة.",
+                  "children": []
+                },
+                {
+                  "id": "ar-glomus-monosporus",
+                  "title": "Glomus monosporus — بطاقة الكائن",
+                  "notionId": "40173152f17181deb719fcea5367afe1",
+                  "url": "https://app.notion.com/p/40173152f17181deb719fcea5367afe1",
+                  "description": "بطاقة تعريف لفطر جذري ضمن مجموعة Glomus.",
+                  "children": []
+                }
+              ]
             },
             {
               "id": "ar-ectomycorrhizal-resources",
@@ -329,9 +291,50 @@
               "notionId": "40273152f17181e59ab3feebe521aa71",
               "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
               "description": "مدخل إلى الفطريات الجذرية الخارجية وتفاعلاتها مع النباتات المضيفة والسياق البيئي.",
-              "children": []
+              "children": [
+                {
+                  "id": "ar-pisolithus",
+                  "title": "Pisolithus tinctorius — بطاقة الكائن",
+                  "notionId": "40173152f171816294f4e4279f59b3f0",
+                  "url": "https://app.notion.com/p/40173152f171816294f4e4279f59b3f0",
+                  "description": "فطر جذري خارجي يرتبط بجذور بعض النباتات، ويُدرس ضمن التفاعلات بين الفطر والنبات.",
+                  "children": []
+                },
+                {
+                  "id": "ar-laccaria",
+                  "title": "Laccaria laccata — بطاقة الكائن",
+                  "notionId": "40173152f1718181af4ece2b3f17309a",
+                  "url": "https://app.notion.com/p/40173152f1718181af4ece2b3f17309a",
+                  "description": "فطر جذري خارجي؛ تعرض البطاقة علاقته بالنباتات المضيفة وسياقه البيئي.",
+                  "children": []
+                },
+                {
+                  "id": "ar-rhizopogon",
+                  "title": "Rhizopogon spp. — مجموعة الفطريات الجذرية الخارجية",
+                  "notionId": "40273152f17181329255c2052485c6c0",
+                  "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
+                  "description": "فطريات جذرية خارجية غالبًا ما تتكون أجسامها الثمرية تحت سطح التربة؛ ترتبط بجذور الأشجار وتُعرض هنا كمجموعة بيئية.",
+                  "children": []
+                },
+                {
+                  "id": "ar-scleroderma",
+                  "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
+                  "notionId": "40273152f17181d4aa96c4d6aac56b26",
+                  "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
+                  "description": "فطريات جذرية خارجية تكوّن علاقة تكافلية مع جذور بعض الأشجار؛ تُعرض هنا كمجموعة بيولوجية لا كمنتج زراعي جاهز.",
+                  "children": []
+                }
+              ]
             }
           ]
+        },
+        {
+          "id": "ar-myco-applications",
+          "title": "التطبيقات الفطرية",
+          "notionId": "40173152f17181afb288feda1d2c3e5c",
+          "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
+          "description": "مجالات علمية تُدرس فيها الفطريات ووظائفها، مع التمييز بين البحث والتطبيقات المثبتة.",
+          "children": []
         }
       ],
       "description": "استكشف عالم الفطريات: الأنواع المزروعة، مواردها، طرق الإكثار، والتفاعلات التي تربطها بالتربة والمواد العضوية."
