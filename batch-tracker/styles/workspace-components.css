@@ -1051,3 +1051,30 @@ html body[data-domain] .hero-core .hero-science-visual text {
   html body[data-domain] .hero-core { width:min(100%,240px) !important; height:175px !important; }
   html body[data-domain] .hero-science-visual { max-height:175px !important; }
 }
+
+
+/* PASS 144 — authenticated workspaces use a compact persistent title bar
+   on desktop as well as mobile; the full hero remains for signed-out entry. */
+html body[data-domain].workspace-authenticated .app-hero {
+  min-height:0 !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  gap:0 !important;
+  margin:8px 0 14px !important;
+  padding:10px 18px !important;
+  border-radius:12px !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.12) !important;
+}
+html body[data-domain].workspace-authenticated .app-hero :is(.hero-art,.hero-description,.hero-tags,.hero-note,.eyebrow) {
+  display:none !important;
+}
+html body[data-domain].workspace-authenticated .app-hero .hero-copy {
+  max-width:none !important;
+}
+html body[data-domain].workspace-authenticated .app-hero h1 {
+  margin:0 !important;
+  font-size:clamp(19px,2vw,25px) !important;
+  line-height:1.15 !important;
+}
+html body[data-domain].workspace-authenticated .app-hero h1 br {
+  display:none !important;
+}
