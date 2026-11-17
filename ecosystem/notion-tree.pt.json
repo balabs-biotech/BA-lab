@@ -661,32 +661,48 @@
     },
     {
       "id": "work",
-      "title": "Trabalho documentado e projetos",
-      "notionId": "40173152f171818fb366e51fc9ba0f18",
-      "url": "https://app.notion.com/p/40173152f171818fb366e51fc9ba0f18",
+      "title": "Investigação e desenvolvimento",
+      "notionId": "40173152f171810f95b9d36ac1b04533",
+      "url": "https://app.notion.com/p/40173152f171810f95b9d36ac1b04533",
       "children": [
         {
-          "id": "pt-work-evidence",
-          "title": "O que a evidência demonstra atualmente",
-          "notionId": "40173152f17181b08d08fdfb8e7eca54",
-          "url": "https://app.notion.com/p/40173152f17181b08d08fdfb8e7eca54",
-          "description": "Síntese do que os dados e observações atuais permitem concluir.",
-          "children": []
-        },
-        {
-          "id": "pt-work-measurement",
-          "title": "Medição e reprodutibilidade",
-          "notionId": "40273152f1718150b2beccb7c12d0792",
-          "description": "Princípios para registar variáveis, instrumentos, unidades e condições, tornando os ensaios comparáveis.",
-          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
+          "id": "pt-work-methodology",
+          "title": "Metodologia de I&D",
+          "notionId": "40273152f1718113a306fa764c01b62b",
+          "url": "https://app.notion.com/p/40273152f1718113a306fa764c01b62b",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
           "children": []
         },
         {
           "id": "pt-work-prototypes",
           "title": "Protótipos e ensaios",
           "notionId": "40273152f17181ed8c23f8efa76a2587",
-          "description": "Como transformar hipóteses biológicas ou técnicas em protótipos e ciclos de ensaio documentados.",
           "url": "https://app.notion.com/p/40273152f17181ed8c23f8efa76a2587",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "pt-work-measurement",
+          "title": "Medição e reprodutibilidade",
+          "notionId": "40273152f1718150b2beccb7c12d0792",
+          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "pt-work-iteration",
+          "title": "Iteração e validação",
+          "notionId": "40273152f1718144ac4ddd7a46c410d8",
+          "url": "https://app.notion.com/p/40273152f1718144ac4ddd7a46c410d8",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "pt-work-expertise",
+          "title": "Competências e rede científica",
+          "notionId": "40273152f17181ee8b40f19e198d8ffc",
+          "url": "https://app.notion.com/p/40273152f17181ee8b40f19e198d8ffc",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
           "children": []
         }
       ],
@@ -696,7 +712,7 @@
     {
       "id": "learn",
       "title": "Recursos e transmissão",
-      "description": "Recursos públicos para explorar o trabalho documentado, compreender os limites da evidência e conhecer as formas de colaborar com a BA Labs.",
+      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
       "children": [
         {
           "id": "learn-resource-1",
@@ -723,7 +739,8 @@
           "children": []
         }
       ],
-      "notionParentId": "hub"
+      "notionParentId": "hub",
+      "kind": "section"
     }
   ],
   "hub": {
