@@ -74,7 +74,7 @@ for (const id of [
 ]) assert.ok(englishAgrotechnology.children.some((node) => node.notionId === id), 'English agrotechnology must expose every verified public child page');
 const arabicMycology = languageTrees.ar.domains.find((domain) => domain.id === 'myco');
 function containsNotionPage(nodes, id) {
-  return nodes.some((node) => node.notionId === id || (node.url || '').endsWith('/' + id) || containsNotionPage(node.children || [], id));
+  return nodes.some((node) => node && (node.notionId === id || (node.url || '').endsWith('/' + id) || containsNotionPage(node.children || [], id)));
 }
 for (const id of ['40173152f1718101afcbdb364eb5d44a', '40173152f17181afb288feda1d2c3e5c']) {
   assert.ok(containsNotionPage(arabicMycology.children, id), 'Arabic mycology must expose its verified cultivation and applications pages at any valid hierarchy depth');
