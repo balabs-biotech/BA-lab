@@ -4981,3 +4981,14 @@
 @media(prefers-reduced-motion:reduce){
  #app.balabs-ui>.site-nav a,#app.balabs-ui>.site-nav a:before,#app.balabs-ui>.site-nav a:after{transition:none!important}
 }
+
+/* Image art direction: scientific imagery as evidence, not thumbnails. */
+#app.balabs-ui > main .hero .hero-micrograph{filter:saturate(.82) contrast(1.08) brightness(.76)!important;object-position:center 46%!important}
+#app.balabs-ui > main .editorial-work .work-media{position:relative!important;overflow:hidden!important;aspect-ratio:16/10!important;background:#10182a!important;border:1px solid #6c9bff55!important}
+#app.balabs-ui > main .editorial-work .work-media img{display:block!important;width:100%!important;height:100%!important;min-height:0!important;object-fit:cover!important;filter:saturate(.9) contrast(1.06)!important;transition:transform .55s cubic-bezier(.2,.7,.2,1),filter .35s ease!important}
+#app.balabs-ui > main .editorial-work .work-card:hover .work-media img{transform:scale(1.035)!important;filter:saturate(1.04) contrast(1.08)!important}
+#app.balabs-ui > main .product-catalogue-visual-img{display:block!important;width:100%!important;height:clamp(190px,22vw,285px)!important;object-fit:cover!important;object-position:center!important;border:1px solid #6c9bff66!important;box-shadow:inset 0 0 0 1px #d6ad5b33,0 12px 34px #050a1480!important;filter:saturate(.94) contrast(1.05)!important}
+#app.balabs-ui > main .feature-photo,#app.balabs-ui > main .editorial-about img{display:block!important;width:100%!important;max-width:100%!important;object-fit:cover!important;object-position:center!important;border:1px solid #6c9bff66!important;box-shadow:0 18px 48px #050a1470,inset 0 0 0 1px #d6ad5b33!important;filter:saturate(.92) contrast(1.06)!important}
+#app.balabs-ui > main .editorial-about img{aspect-ratio:5/4!important}#app.balabs-ui > main .feature-photo{aspect-ratio:16/10!important}
+@media(max-width:640px){#app.balabs-ui > main .product-catalogue-visual-img{height:220px!important}#app.balabs-ui > main .editorial-about img{aspect-ratio:4/3!important}}
+@media(prefers-reduced-motion:reduce){#app.balabs-ui > main .editorial-work .work-media img{transition:none!important}}
