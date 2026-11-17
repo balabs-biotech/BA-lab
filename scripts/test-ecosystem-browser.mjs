@@ -60,8 +60,10 @@ try {
     // Audit real image decoding on every editorial chapter after navigation.
     const chapterImageAudits = [];
     for (const [index, chapter] of ['home','research','network','catalogue','about'].entries()) {
-      await page.locator('.chapter-rail-node').nth(index).click();
+      if (viewport.name === 'mobile') await page.locator('.chapter-rail-node').nth(index).tap();
+      else await page.locator('.chapter-rail-node').nth(index).click();
       await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
+      await page.waitForTimeout(650);
       const audit = await page.evaluate(async (chapterId) => {
         const root = document.querySelector('#app .experience-page[data-chapter="' + chapterId + '"]') || document.querySelector('#app .experience-page');
         if (!root) return { chapter: chapterId, images: [], missing: ['chapter root not found'] };
@@ -78,10 +80,22 @@ try {
       }, chapter);
       chapterImageAudits.push(audit);
       assert.deepEqual(audit.missing, [], 'All images in chapter ' + chapter + ' must decode');
+      const presentation = await page.evaluate((chapterId) => {
+        const root = document.querySelector('#chapter-' + chapterId);
+        const headings = [...root.querySelectorAll('.rb-heading-armed')];
+        const hiddenHeadings = headings.filter(el => { const s=getComputedStyle(el); return Number(s.opacity)<.98 || s.filter!=='none' || s.transform!=='none'; });
+        const images = [...root.querySelectorAll('.rb-image-armed')];
+        const hiddenImages = images.filter(el => { const s=getComputedStyle(el); return s.visibility==='hidden' || s.display==='none' || s.clipPath!=='none' || Number(s.opacity)<.98; });
+        return {hiddenHeadings:hiddenHeadings.length,hiddenImages:hiddenImages.length};
+      }, chapter);
+      assert.equal(presentation.hiddenHeadings, 0, 'No editorial heading may remain blurred or faded in ' + chapter);
+      assert.equal(presentation.hiddenImages, 0, 'No editorial image may remain clipped or hidden in ' + chapter);
       await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
     }
     const allChapterImageAudits = chapterImageAudits.flatMap(audit => audit.images);
     assert.ok(allChapterImageAudits.length > 0, 'Editorial chapters must contain real image elements');
+    const catalogueVisuals = await page.locator('.product-catalogue-visual-img').evaluateAll(imgs => ({count:imgs.length,unique:new Set(imgs.map(img=>img.currentSrc||img.src)).size,loaded:imgs.every(img=>img.complete&&img.naturalWidth>0)}));
+    assert.deepEqual(catalogueVisuals,{count:3,unique:3,loaded:true},'Catalogue must show three distinct, decoded documentary photos rather than repeated card backgrounds');
     const originalUrl = page.url();
     await page.locator('.chapter-rail-node').nth(2).click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
@@ -97,6 +111,7 @@ try {
 
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(failed, [], 'No failed network requests');
+    await page.waitForTimeout(650);
     await page.screenshot({ path: outputDir + '/' + viewport.name + '-vernpixi-primary.png', fullPage: false });
     results.push({ viewport: viewport.name, renderer: 'PixiJS 2D embedded in homepage', universes: 8, directDomainEntry: true, staysOnHomepage: true, imagesChecked: imageAudit.length + chapterImageAudits.reduce((sum, audit) => sum + audit.images.length, 0), chaptersChecked: chapterImageAudits.length, browserErrors: errors.length });
     await page.close();
