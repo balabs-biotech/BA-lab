@@ -75,16 +75,18 @@
 .inline-explorer-title{left:16px;top:14px;opacity:.58;max-width:210px}
 .inline-explorer-title h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0}
 .inline-explorer-title .eyebrow{font-size:8px}
-.universe-rail{left:10px;gap:5px;padding:4px;background:transparent;border:0;backdrop-filter:none}
-.universe-rail button{position:relative;justify-content:center;gap:0;width:18px;min-width:18px;height:18px;padding:0;border-radius:50%;background:transparent!important;outline:0!important}
-.universe-rail button i{width:7px;height:7px;flex-basis:7px;transition:transform .16s,box-shadow .16s}
-.universe-rail button span{position:absolute;left:25px;top:50%;transform:translateY(-50%) translateX(-4px);padding:5px 7px;border:1px solid #82998a38;border-radius:5px;background:#111b1df0;color:#d1d0c5;font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .16s,transform .16s}
+/* Eight domain dots stay visually discreet but have reliable 36px hit areas. */
+.universe-rail{left:10px;gap:4px;padding:4px;background:transparent;border:0;backdrop-filter:none}
+.universe-rail button{position:relative;display:flex;align-items:center;justify-content:center;gap:0;width:36px;min-width:36px;height:36px;padding:0;border-radius:50%;background:transparent!important;outline:0!important;touch-action:manipulation}
+.universe-rail button i{width:8px;height:8px;flex:0 0 8px;transition:transform .16s,box-shadow .16s}
+.universe-rail button span{position:absolute;left:34px;top:50%;transform:translateY(-50%) translateX(-4px);padding:5px 7px;border:1px solid #82998a55;border-radius:5px;background:#111b1df5;color:#d1d0c5;font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .16s,transform .16s}
 .universe-rail button:hover i,.universe-rail button:focus-visible i,.universe-rail button[aria-current="location"] i{transform:scale(1.45);box-shadow:0 0 12px var(--dot)}
 .universe-rail button:hover span,.universe-rail button:focus-visible span{opacity:1;transform:translateY(-50%) translateX(0)}
+.universe-rail button:focus-visible{outline:2px solid #d1d0c5!important;outline-offset:1px!important}
 .inline-explorer-controls{right:12px;top:12px;display:flex;gap:4px;opacity:.48;transition:opacity .18s}
 .inline-explorer-controls:hover,.inline-explorer-controls:focus-within{opacity:1}
 .inline-explorer-controls .btn{width:29px;height:29px;min-height:29px;font-size:14px;border-radius:50%;padding:0}
-@media(max-width:700px){.inline-explorer-title{left:10px;top:10px}.universe-rail{left:5px;gap:4px}.universe-rail button{width:15px;min-width:15px;height:15px}.inline-explorer-controls{right:8px;top:8px}.inline-explorer-controls .btn{width:27px;height:27px;min-height:27px}}
+@media(max-width:700px){.inline-explorer-title{left:10px;top:10px}.universe-rail{left:5px;gap:3px}.universe-rail button{width:30px;min-width:30px;height:30px}.universe-rail button span{left:28px}.inline-explorer-controls{right:8px;top:8px}.inline-explorer-controls .btn{width:27px;height:27px;min-height:27px}}
 </style>
 </head>
 <body>
