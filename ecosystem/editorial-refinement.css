@@ -1184,22 +1184,22 @@
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(2n):after{animation-delay:-8s}
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(1):before{
-  background-image:linear-gradient(180deg,transparent 42%,rgba(17,27,29,.6)),url("https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png");
+  background-image:linear-gradient(180deg,transparent 42%,rgba(17,27,29,.6)),url("./assets/editorial-penicillium.jpg");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(2):before{
-  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("./assets/universe-work.jpg");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(3):before,
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(8):before{
-  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.65)),url("https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg");
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.65)),url("./assets/editorial-iot.jpg");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(4):before,
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(7):before{
-  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w");
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("./assets/editorial-soil.jpg");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(5):before,
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(6):before{
-  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+  background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("./assets/universe-work.jpg");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:hover,
 #app.balabs-ui > main .universe-index .universe-index-card:focus-visible{
@@ -1287,16 +1287,16 @@
   transition:filter .5s ease,background-position .8s ease;
 }
 #app.balabs-ui > main .product-catalogue-card:nth-child(4n+1):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("https://upload.wikimedia.org/wikipedia/commons/3/31/Oyster_mushroom_%28Pleurotus_ostreatus%29_mycelium_in_petri_dish_on_coffee_grounds.JPG");
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-coffee.jpg");
 }
 #app.balabs-ui > main .product-catalogue-card:nth-child(4n+2):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.06),rgba(17,27,29,.8)),url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+ background-image:linear-gradient(180deg,rgba(17,27,29,.06),rgba(17,27,29,.8)),url("./assets/product-card-medium.jpg");
 }
 #app.balabs-ui > main .product-catalogue-card:nth-child(4n+3):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png");
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-penicillium.jpg");
 }
 #app.balabs-ui > main .product-catalogue-card:nth-child(4n):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w");
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-soil.jpg");
 }
 #app.balabs-ui > main .product-catalogue-card:hover,
 #app.balabs-ui > main .product-catalogue-card:focus-visible{
@@ -1372,22 +1372,22 @@
  pointer-events:none;
 }
 #app.balabs-ui > main .universe-index-card:nth-child(1):before{
- background-image:url("https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png");
+ background-image:url("./assets/editorial-penicillium.jpg");
 }
 #app.balabs-ui > main .universe-index-card:nth-child(2):before{
  background-image:radial-gradient(ellipse at 32% 40%,rgba(185,107,77,.6),transparent 30%),repeating-radial-gradient(ellipse at 68% 50%,rgba(209,208,197,.42) 0 1px,transparent 2px 13px),linear-gradient(120deg,#263b38,#111b1d);
 }
 #app.balabs-ui > main .universe-index-card:nth-child(3):before{
- background-image:url("https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg");
+ background-image:url("./assets/editorial-iot.jpg");
 }
 #app.balabs-ui > main .universe-index-card:nth-child(4):before{
  background-image:radial-gradient(ellipse at 25% 35%,rgba(185,107,77,.65),transparent 23%),radial-gradient(ellipse at 70% 65%,rgba(38,59,56,.95),transparent 42%),repeating-linear-gradient(25deg,rgba(209,208,197,.12) 0 1px,transparent 1px 8px),linear-gradient(120deg,#27352e,#111b1d);
 }
 #app.balabs-ui > main .universe-index-card:nth-child(5):before{
- background-image:url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+ background-image:url("./assets/universe-work.jpg");
 }
 #app.balabs-ui > main .universe-index-card:nth-child(6):before{
- background-image:url("https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w");
+ background-image:url("./assets/editorial-soil.jpg");
 }
 #app.balabs-ui > main .universe-index-card:nth-child(7):before{
  background-image:radial-gradient(circle at 25% 45%,rgba(185,107,77,.78) 0 2px,transparent 3px),radial-gradient(circle at 58% 35%,rgba(209,208,197,.72) 0 2px,transparent 3px),radial-gradient(circle at 78% 68%,rgba(185,107,77,.65) 0 3px,transparent 4px),linear-gradient(135deg,transparent 48%,rgba(209,208,197,.3) 49%,transparent 50%),linear-gradient(120deg,#263b38,#111b1d);
