@@ -1503,3 +1503,22 @@
   z-index:1!important;
   pointer-events:auto!important;
 }
+
+
+/* PHASE 42 — image-first chapter art and reliable universe navigation hit areas. */
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index,
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-grid{
+ position:relative!important;z-index:4!important;pointer-events:auto!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card{
+ position:relative!important;z-index:1!important;display:flex!important;
+ pointer-events:auto!important;cursor:pointer!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card>*{pointer-events:none!important}
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card:before,
+#app.balabs-ui .experience-page[data-chapter="network"]>.universe-index .universe-index-card:after{pointer-events:none!important}
+#app.balabs-ui > main .universe-index-card .universe-visual{pointer-events:none!important}
+#app.balabs-ui > main .universe-index-card .universe-visual figcaption{left:16px;right:12px;align-items:flex-start;gap:4px}
+#app.balabs-ui > main .universe-index-card .universe-visual figcaption small{display:block;color:#f2f1e9;font-size:6px;letter-spacing:.06em;text-shadow:0 1px 8px #000}
+#app.balabs-ui > main .universe-index-card.visual-fallback .universe-visual{background:radial-gradient(ellipse at 45% 35%,#405b50,#172522 68%,#111b1d)}
+@media(max-width:760px){#app.balabs-ui .experience-page>.chapter-atmosphere{opacity:.56}}
