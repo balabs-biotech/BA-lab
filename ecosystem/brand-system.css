@@ -4992,3 +4992,53 @@
 #app.balabs-ui > main .editorial-about img{aspect-ratio:5/4!important}#app.balabs-ui > main .feature-photo{aspect-ratio:16/10!important}
 @media(max-width:640px){#app.balabs-ui > main .product-catalogue-visual-img{height:220px!important}#app.balabs-ui > main .editorial-about img{aspect-ratio:4/3!important}}
 @media(prefers-reduced-motion:reduce){#app.balabs-ui > main .editorial-work .work-media img{transition:none!important}}
+
+
+/* Eight-universe index: distinct documentary / original artwork per domain. */
+#app.balabs-ui > main > .universe-index .universe-index-card {
+  overflow: hidden !important;
+  padding: 0 0 20px !important;
+  gap: .55rem !important;
+  background: linear-gradient(145deg, #17243b, #10182a) !important;
+  border: 1px solid rgba(126,157,214,.24) !important;
+  border-top: 2px solid #d6ad5b !important;
+  transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease !important;
+}
+#app.balabs-ui > main > .universe-index .universe-card-image {
+  display: block !important;
+  width: 100% !important;
+  height: clamp(116px, 13vw, 164px) !important;
+  margin: 0 0 8px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-bottom: 1px solid rgba(214,173,91,.38) !important;
+  filter: saturate(.82) contrast(1.04) !important;
+  transition: filter .35s ease, transform .5s ease !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card > span,
+#app.balabs-ui > main > .universe-index .universe-index-card > b,
+#app.balabs-ui > main > .universe-index .universe-index-card > small,
+#app.balabs-ui > main > .universe-index .universe-index-card > p,
+#app.balabs-ui > main > .universe-index .universe-index-card > em {
+  margin-inline: clamp(16px, 1.6vw, 22px) !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card > span { color: #d6ad5b !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card > b { color: #f4f1e8 !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card > small { color: #aebbd0 !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card > p { color: #d8dfeb !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card > em { color: #e0b96b !important; }
+#app.balabs-ui > main > .universe-index .universe-index-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(214,173,91,.72) !important;
+  box-shadow: 0 18px 34px rgba(0,0,0,.28) !important;
+}
+#app.balabs-ui > main > .universe-index .universe-index-card:hover .universe-card-image {
+  filter: saturate(1.04) contrast(1.08) !important;
+}
+@media (max-width: 599px) {
+  #app.balabs-ui > main > .universe-index .universe-card-image { height: 174px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.balabs-ui > main > .universe-index .universe-index-card,
+  #app.balabs-ui > main > .universe-index .universe-card-image { transition: none !important; }
+}
