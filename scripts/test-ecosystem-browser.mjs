@@ -57,12 +57,31 @@ try {
     await page.locator('[data-lang="fr"]').first().click();
     await page.waitForFunction(() => document.documentElement.lang === 'fr' && document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
 
-    // Capture and validate each editorial chapter, not only the embedded explorer.
+    // Audit real image decoding on every editorial chapter after navigation.
+    const chapterImageAudits = [];
     for (const [index, chapter] of ['home','research','network','catalogue','about'].entries()) {
       await page.locator('.chapter-rail-node').nth(index).click();
       await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
+      const audit = await page.evaluate(async (chapterId) => {
+        const root = document.querySelector('#app .experience-page[data-chapter="' + chapterId + '"]') || document.querySelector('#app .experience-page');
+        if (!root) return { chapter: chapterId, images: [], missing: ['chapter root not found'] };
+        const images = [...root.querySelectorAll('img')];
+        images.forEach(image => { image.loading = 'eager'; image.fetchPriority = 'high'; });
+        await Promise.all(images.map(image => image.decode().catch(() => null)));
+        const records = images.map(image => ({
+          src: image.currentSrc || image.src,
+          loaded: image.complete && image.naturalWidth > 0,
+          width: image.naturalWidth,
+          alt: image.alt || ''
+        }));
+        return { chapter: chapterId, images: records, missing: records.filter(image => !image.loaded).map(image => image.src) };
+      }, chapter);
+      chapterImageAudits.push(audit);
+      assert.deepEqual(audit.missing, [], 'All images in chapter ' + chapter + ' must decode');
       await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
     }
+    const allChapterImageAudits = chapterImageAudits.flatMap(audit => audit.images);
+    assert.ok(allChapterImageAudits.length > 0, 'Editorial chapters must contain real image elements');
     const originalUrl = page.url();
     await page.locator('.chapter-rail-node').nth(2).click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
@@ -79,7 +98,7 @@ try {
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(failed, [], 'No failed network requests');
     await page.screenshot({ path: outputDir + '/' + viewport.name + '-vernpixi-primary.png', fullPage: false });
-    results.push({ viewport: viewport.name, renderer: 'PixiJS 2D embedded in homepage', universes: 8, directDomainEntry: true, staysOnHomepage: true, imagesChecked: imageAudit.length, browserErrors: errors.length });
+    results.push({ viewport: viewport.name, renderer: 'PixiJS 2D embedded in homepage', universes: 8, directDomainEntry: true, staysOnHomepage: true, imagesChecked: imageAudit.length + chapterImageAudits.reduce((sum, audit) => sum + audit.images.length, 0), chaptersChecked: chapterImageAudits.length, browserErrors: errors.length });
     await page.close();
   }
   const route = await browser.newPage();
