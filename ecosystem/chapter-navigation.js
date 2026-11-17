@@ -33,7 +33,7 @@
  rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 C8 76 55 108 32 150 S8 224 32 276 S55 350 32 402 S8 456 32 476"/><path class="filament-progress" d="M32 24 C8 76 55 108 32 150 S8 224 32 276 S55 350 32 402 S8 456 32 476"/><circle class="filament-signal" cx="32" cy="24" r="4"/><path class="filament-branch" d="M31 86 C20 82 14 70 9 59 M34 174 C46 168 51 156 56 145 M31 298 C19 291 13 281 8 270 M34 414 C46 407 51 395 57 384"/></svg><div class="chapter-rail-nodes"></div>';
  const railNodes=rail.querySelector('.chapter-rail-nodes');
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
- main.append(rail);
+ document.body.append(rail);
  // Scroll-led editorial typography: reveal only key section headings, not body copy.
  if('IntersectionObserver' in window){
   pages.forEach(page=>{
