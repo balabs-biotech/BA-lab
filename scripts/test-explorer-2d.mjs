@@ -30,6 +30,7 @@ try {
       edges: Number(el.dataset.edgeCount || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
+    assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
     const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
@@ -70,6 +71,8 @@ try {
       await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
       await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
       assert.equal(await page.locator('#language').inputValue(), language);
+      const languageNodeCount = Number(await page.locator('#field').getAttribute('data-node-count') || 0);
+      assert.ok(languageNodeCount >= 100, `The ${language} tree must retain at least 100 mapped Notion nodes (got ${languageNodeCount})`);
     }
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(consoleErrors, [], 'No browser console errors');
