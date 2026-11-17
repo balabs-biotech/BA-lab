@@ -10,7 +10,10 @@
 .experience-page .work-heading,
 .experience-page .universe-index-heading,
 .experience-page .value-heading,
-.experience-page .product-catalogue-heading{
+.experience-page .product-catalogue-head,
+.experience-page .editorial-about h2,
+.experience-page .editorial-method h2,
+.experience-page .bridge-copy h2{
  transform:translateY(18px);opacity:0;clip-path:inset(0 0 100% 0);
  transition:transform .85s cubic-bezier(.16,1,.3,1),opacity .7s ease,clip-path .9s cubic-bezier(.16,1,.3,1)
 }
@@ -18,7 +21,10 @@
 .experience-page.is-motion-active .work-heading,
 .experience-page.is-motion-active .universe-index-heading,
 .experience-page.is-motion-active .value-heading,
-.experience-page.is-motion-active .product-catalogue-heading{
+.experience-page.is-motion-active .product-catalogue-head,
+.experience-page.is-motion-active .editorial-about h2,
+.experience-page.is-motion-active .editorial-method h2,
+.experience-page.is-motion-active .bridge-copy h2{
  transform:translateY(0);opacity:1;clip-path:inset(0 0 0 0)
 }
 .experience-page .chapter-atmosphere{transform:translate3d(0,12px,0);opacity:0;transition:opacity 1s ease,transform 1.1s cubic-bezier(.16,1,.3,1)}
@@ -60,7 +66,8 @@
 }
 @media(prefers-reduced-motion:reduce){
  .experience-track:after{display:none}
- .experience-page .hero h1,.experience-page .work-heading,.experience-page .universe-index-heading,.experience-page .value-heading,.experience-page .product-catalogue-heading,
+ .experience-page .hero h1,.experience-page .work-heading,.experience-page .universe-index-heading,.experience-page .value-heading,.experience-page .product-catalogue-head,
+ .experience-page .editorial-about h2,.experience-page .editorial-method h2,.experience-page .bridge-copy h2,
  .experience-page .chapter-atmosphere,.experience-page .rb-motion-media,.experience-page .rb-motion-media img,.experience-page .rb-motion-media video,
  .experience-page .experience-page-label{opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important;animation:none!important}
  .experience-page .chapter-atmosphere svg path{stroke-dashoffset:0!important;transition:none!important}
