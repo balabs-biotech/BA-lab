@@ -198,3 +198,70 @@ body{overscroll-behavior:none}
 .chapter-rail-node{position:relative!important;z-index:3!important;pointer-events:auto!important;touch-action:manipulation!important;}
 [dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:2px!important;}
 @media(max-width:760px){.chapter-rail{inset-inline-start:0!important;}.chapter-rail-node{min-width:40px!important;min-height:40px!important;}[dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:0!important;}}
+
+
+/* BALabs refinement — reserve a real gutter for the chapter rail and use the page width. */
+.wrap.balabs-ui{
+ max-width:1800px!important;
+ width:100%!important;
+ padding-inline:clamp(18px,2.4vw,42px)!important;
+}
+.experience-page{
+ padding-block:clamp(16px,2vw,30px)!important;
+ padding-inline-start:clamp(72px,5vw,92px)!important;
+ padding-inline-end:clamp(18px,2vw,34px)!important;
+}
+.experience-page>.hero,
+.experience-page>.editorial-work,
+.experience-page>.scene,
+.experience-page>.universe-index,
+.experience-page>.product-catalogue,
+.experience-page>section{
+ max-width:1680px!important;
+ width:100%;
+}
+.chapter-rail{
+ inset-inline-start:clamp(4px,.65vw,12px)!important;
+ width:58px!important;
+ height:min(64vh,520px)!important;
+ opacity:1!important;
+}
+.chapter-rail .filament-base{stroke:#71877b99!important;stroke-width:1.6!important;stroke-dasharray:2 5!important}
+.chapter-rail .filament-progress{stroke:#b96b4d!important;stroke-width:2.6!important}
+.chapter-rail .chapter-rail-dot{border-color:#d1d0c5!important;box-shadow:0 0 0 4px #172522e8,0 0 0 5px #78958a55!important}
+.chapter-rail .chapter-rail-node.is-active .chapter-rail-dot{width:14px!important;height:14px!important;background:#b96b4d!important;border-color:#f0e7dc!important;box-shadow:0 0 0 5px #b96b4d35,0 0 18px #b96b4dcc!important}
+.chapter-rail .chapter-rail-name{background:#172522f5!important;border-color:#b96b4d88!important;color:#f1eee5!important}
+.experience-page .rb-image-armed,
+.experience-page .rb-image-armed.rb-image-revealed{
+ clip-path:none!important;
+ transform:none!important;
+ will-change:auto!important;
+}
+.universe-visual.image-unavailable{background:#172522;border:1px solid #b96b4d88}
+@media(max-width:760px){
+ .wrap.balabs-ui{padding-inline:10px!important}
+ .experience-page{
+  padding-inline-start:46px!important;
+  padding-inline-end:10px!important;
+ }
+ [dir=rtl] .experience-page{
+  padding-inline-start:10px!important;
+  padding-inline-end:46px!important;
+ }
+ .chapter-rail{
+  inset-inline-start:0!important;
+  width:38px!important;
+  height:min(58vh,420px)!important;
+ }
+ [dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:0!important}
+ .chapter-rail-node{min-width:40px!important;min-height:40px!important}
+ .experience-page>.hero,
+ .experience-page>.editorial-work,
+ .experience-page>.scene,
+ .experience-page>.universe-index,
+ .experience-page>.product-catalogue,
+ .experience-page>section{max-width:100%!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .chapter-rail .filament-progress,.chapter-rail .chapter-rail-dot{transition:none!important}
+}
