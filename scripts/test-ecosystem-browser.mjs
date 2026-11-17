@@ -23,8 +23,8 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     page.on('requestfailed', request => { const reason = request.failure()?.errorText || 'unknown'; if (reason !== 'net::ERR_ABORTED') failed.push(request.url() + ' — ' + reason); });
     page.on('response', response => {
-      if (/\\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(response.url()) && response.status() >= 400) {
-        badImageResponses.push(response.url() + ' — HTTP ' + response.status());
+      if (/\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(response.url()) && response.status() >= 400) {
+      if (/\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(response.url()) && response.status() >= 400) {
       }
     });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
