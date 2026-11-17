@@ -464,3 +464,60 @@ html body[data-domain] .universe-home-link {
     transition:none !important;
   }
 }
+
+
+/* PASS 141 — precise interaction states.
+   Keep the established graphite surfaces and workspace accents; improve only
+   focus visibility, disabled clarity and touch target consistency. */
+html body[data-domain] :is(
+  .card button,
+  .section-nav a,
+  .overview-shortcut,
+  .culture-catalog-action,
+  .universe-home-link
+):focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:3px !important;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--workspace-accent) 15%,transparent) !important;
+}
+html body[data-domain] .card button:disabled,
+html body[data-domain] .card [aria-disabled="true"] {
+  cursor:not-allowed !important;
+  opacity:.48 !important;
+  filter:saturate(.55) !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card :is(
+  button:not(.small-button),
+  input[type="checkbox"],
+  input[type="radio"],
+  select
+) {
+  accent-color:var(--workspace-accent) !important;
+}
+html body[data-domain] .card :is(input[type="checkbox"],input[type="radio"]) {
+  width:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] .card :is(
+    button,
+    .culture-catalog-action,
+    .overview-shortcut
+  ) {
+    min-height:42px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] :is(
+    .card button,
+    .section-nav a,
+    .overview-shortcut,
+    .culture-catalog-action
+  ) {
+    scroll-behavior:auto !important;
+    transition:none !important;
+  }
+}
