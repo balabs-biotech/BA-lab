@@ -62,7 +62,7 @@ assert.ok(greenClimate.includes('document.querySelectorAll("#envWeatherCharts > 
 assert.ok(greenClimate.includes('svg.querySelectorAll("circle")') && greenClimate.includes('circle.querySelector("title")'), "GreenTech visualization must derive plotted points and labels from real chart data");
 assert.ok(greenClimate.includes("next.stop()"), "GreenTech PixiJS visualization must render on demand without a permanent ticker");
 assert.ok(greenClimate.includes("resizeObserver.disconnect()"), "GreenTech visualization must clean up resize observers");
-assert.ok(greenClimate.includes("Les graphiques météo natifs restent actifs"), "GreenTech visualization must preserve native charts as fallback");
+assert.ok(greenClimate.includes("plot.replaceChildren()") && !greenClimate.includes("charts.replaceChildren()"), "GreenTech visualization must leave the native NASA POWER chart cards intact");
 assert.ok(greenClimateStyles.includes(".greentech-climate-signature"), "GreenTech climate signature must have its own visual system");
 assert.ok(greenClimateStyles.includes("greentech-climate-values"), "GreenTech visual summary must expose accessible textual values");
 assert.ok(greenTechEntry.includes("20261117-climate-signature-162"), "GreenTech must load the climate signature runtime");
