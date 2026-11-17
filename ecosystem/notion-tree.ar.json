@@ -667,22 +667,22 @@
               "id": "iot-temperature",
               "title": "درجة الحرارة",
               "description": "متابعة التغيّرات والدورات واستقرار الحرارة في فضاءات الزراعة.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-humidity",
               "title": "الرطوبة",
               "description": "مراقبة رطوبة الهواء وظروف توفر الماء.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-gas",
               "title": "تبادل الغازات والتهوية",
               "description": "دراسة التهوية وتبادل الغازات داخل فضاءات الزراعة.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-instrumentation",
@@ -693,22 +693,22 @@
               "id": "iot-sensors-types",
               "title": "الحساسات والمجسّات",
               "description": "مقارنة تقنيات القياس والمدى والدقة والحدود.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-microcontrollers",
               "title": "المتحكمات الدقيقة",
               "description": "استكشاف قراءة الإشارات والمداخل والمخارج والوحدات المدمجة.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-power",
               "title": "التغذية والحماية",
               "description": "توثيق التغذية الكهربائية والحماية وموثوقية التركيب.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-control",
@@ -719,22 +719,22 @@
               "id": "iot-airflow",
               "title": "التهوية وتدفق الهواء",
               "description": "تصميم متابعة وتجديد الهواء.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-humidification",
               "title": "الترطيب",
               "description": "دراسة تنظيم الرطوبة وتوزيع الماء.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-lighting",
               "title": "الإضاءة والدورات",
               "description": "تحديد سيناريوهات الإضاءة والتوقيت للتجارب.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-data",
@@ -745,22 +745,22 @@
               "id": "iot-logging",
               "title": "تسجيل مستمر",
               "description": "تأريخ القياسات وحفظ البيانات الخام مع سياقها.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-dashboard",
               "title": "العرض والتنبيهات",
               "description": "عرض الاتجاهات والحدود والتغيرات لتسهيل المتابعة.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-quality",
               "title": "جودة القياس",
               "description": "كشف الانحراف والقيم الناقصة والمعايرة وعدم اليقين.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-traceability-detail",
@@ -771,22 +771,22 @@
               "id": "iot-batch-links",
               "title": "الدفعات والزراعات",
               "description": "ربط القراءات بمعرّفات الدفعات ومراحل الزراعة.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-protocol-links",
               "title": "البروتوكولات والأحداث",
               "description": "تسجيل تغييرات الإعدادات والتدخلات والحوادث.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-comparison",
               "title": "السجل والمقارنة",
               "description": "مقارنة الدورات التجريبية مع الحفاظ على ظروفها الأصلية.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         }
       ],
       "description": "أجهزة القياس والحساسات والأتمتة: كيف نجمع بيانات المختبر والبيئة ونحوّلها إلى متابعة عملية.",
