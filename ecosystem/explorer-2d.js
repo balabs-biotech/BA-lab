@@ -102,6 +102,7 @@ function buildNetwork(){
  canvas.dataset.universeCount=String(roots);
  canvas.dataset.nodeCount=String(nodes.length);
  canvas.dataset.edgeCount=String(edges.length);
+ canvas.dataset.rootTitles=JSON.stringify(tree.map(root=>root.title));
 }
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
