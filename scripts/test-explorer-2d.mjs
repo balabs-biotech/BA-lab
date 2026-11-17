@@ -32,6 +32,8 @@ try {
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
+    const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
+    assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
     const initialUrl = page.url();
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
