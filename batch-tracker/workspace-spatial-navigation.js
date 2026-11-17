@@ -21,28 +21,28 @@
 
   const translations = {
     fr: {
-      nav: "Navigation spatiale CultureOps", kicker: "ESPACE ACTIF",
+      nav: "Navigation spatiale CultureOps", group: "Déplacements entre modules", kicker: "ESPACE ACTIF",
       primary: "Pilotage & opérations", secondary: "Données & analyse",
       up: "Monter vers le pilotage", down: "Descendre vers les données",
       left: "Module précédent", right: "Module suivant", active: "Espace actif : ",
       labels: { overviewCard: "Vue générale", trackerCard: "Cultures", plantCard: "Cultures végétales", batchCard: "Lots de production", measurementCard: "Données & observations", statisticsCard: "Analyse" }
     },
     en: {
-      nav: "CultureOps spatial navigation", kicker: "ACTIVE SPACE",
+      nav: "CultureOps spatial navigation", group: "Move between modules", kicker: "ACTIVE SPACE",
       primary: "Operations & control", secondary: "Data & analysis",
       up: "Move up to control", down: "Move down to data",
       left: "Previous module", right: "Next module", active: "Active space: ",
       labels: { overviewCard: "Overview", trackerCard: "Cultures", plantCard: "Plant cultures", batchCard: "Production batches", measurementCard: "Data & observations", statisticsCard: "Analysis" }
     },
     pt: {
-      nav: "Navegação espacial CultureOps", kicker: "ESPAÇO ATIVO",
+      nav: "Navegação espacial CultureOps", group: "Mover entre módulos", kicker: "ESPAÇO ATIVO",
       primary: "Gestão & operações", secondary: "Dados & análise",
       up: "Subir para gestão", down: "Descer para dados",
       left: "Módulo anterior", right: "Módulo seguinte", active: "Espaço ativo: ",
       labels: { overviewCard: "Visão geral", trackerCard: "Culturas", plantCard: "Culturas vegetais", batchCard: "Lotes de produção", measurementCard: "Dados & observações", statisticsCard: "Análise" }
     },
     ar: {
-      nav: "التنقل المكاني CultureOps", kicker: "المساحة النشطة",
+      nav: "التنقل المكاني CultureOps", group: "التنقل بين الوحدات", kicker: "المساحة النشطة",
       primary: "الإدارة والعمليات", secondary: "البيانات والتحليل",
       up: "الصعود إلى الإدارة", down: "النزول إلى البيانات",
       left: "الوحدة السابقة", right: "الوحدة التالية", active: "المساحة النشطة: ",
@@ -125,6 +125,7 @@
     const t = translations[language] || translations.fr;
     dock.setAttribute("aria-label", t.nav);
     dock.querySelector(".ba-spatial-kicker").textContent = t.kicker;
+    dock.querySelector(".ba-spatial-pad").setAttribute("aria-label", t.group);
     controls.up.setAttribute("aria-label", t.up);
     controls.up.title = t.up;
     controls.down.setAttribute("aria-label", t.down);
