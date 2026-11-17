@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const expectedLanguages = ['fr', 'ar', 'en', 'pt'];
-const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'work', 'learn'];
+const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'work', 'evidence'];
 
 for (const language of expectedLanguages) {
   const path = new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url);
   const manifest = JSON.parse(await readFile(path, 'utf8'));
-  assert.equal(manifest.version, 1, language + ': unsupported manifest version');
+  assert.equal(manifest.version, 2, language + ': unsupported manifest version');
   assert.equal(manifest.language, language, language + ': language marker mismatch');
   assert.ok(Array.isArray(manifest.domains), language + ': domains must be an array');
   assert.deepEqual(
@@ -27,19 +27,13 @@ for (const language of expectedLanguages) {
     assert.ok(!ids.has(node.id), trail + ': duplicate node id ' + node.id);
     ids.add(node.id);
     assert.ok(typeof node.title === 'string' && node.title.trim(), trail + ': missing localized title');
-    if (node.id === 'learn') {
-      assert.ok(!node.url && !node.notionId, trail + ': knowledge-transfer hub must not invent a parent Notion destination');
-      assert.equal(node.children?.length, 4, trail + ': knowledge-transfer hub must expose four public resource links');
-    } else if (node.kind === 'section') {
+    if (node.kind === 'section') {
       assert.ok(!node.url && !node.notionId, trail + ': a heading-derived section must not invent a Notion page destination');
       assert.ok((node.children || []).length > 0, trail + ': a heading-derived section must contain verified Notion pages');
     } else if (node.kind === 'reference') {
       assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-universe Notion reference URL');
       assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': reference URL and page ID must match');
       references.push({ url: node.url, trail });
-    } else if (node.id.startsWith('learn-')) {
-      assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-linked public Notion URL');
-      assert.ok(!node.notionId, trail + ': cross-domain links must not duplicate source-page identifiers');
     } else {
       assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid public Notion URL');
       assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': Notion URL and page ID must match');
@@ -51,6 +45,8 @@ for (const language of expectedLanguages) {
     for (const child of children) visit(child, trail);
   };
 
+  const evidence = manifest.domains.find((domain) => domain.id === 'evidence');
+  assert.ok(evidence?.notionId && evidence.url === 'https://app.notion.com/p/' + evidence.notionId, language + ': evidence universe must link to its real Notion page');
   for (const domain of manifest.domains) visit(domain);
   for (const reference of references) assert.ok(urls.has(reference.url), reference.trail + ': cross-universe reference must point to a canonical mapped page');
   assert.ok(nodeCount >= 100, language + ': the manifest must retain the complete mapped Notion hierarchy');

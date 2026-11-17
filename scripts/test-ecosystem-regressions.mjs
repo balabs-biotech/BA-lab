@@ -7,6 +7,7 @@ const previewHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
+const expectedExplorerDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'evidence'];
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
 const baseCss = readFileSync('ecosystem/site-base.css', 'utf8');
 const overridesCss = readFileSync('ecosystem/site-overrides.css', 'utf8');
@@ -62,7 +63,7 @@ const languageTrees = Object.fromEntries(['fr', 'en', 'ar', 'pt'].map((language)
 ]));
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   const ids = languageTrees[language].domains.map((domain) => domain.id).sort();
-  assert.deepEqual(ids, [...expectedDomains].sort(), language + ' manifest must expose exactly the eight public universes');
+  assert.deepEqual(ids, [...expectedExplorerDomains].sort(), language + ' Vernpixi manifest must expose exactly eight real Notion universes');
 }
 const englishAgrotechnology = languageTrees.en.domains.find((domain) => domain.id === 'soil');
 for (const id of [
@@ -168,6 +169,7 @@ function domainRootFromEngine(source, domain, language) {
 for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   for (const language of ['fr', 'en', 'ar', 'pt']) {
     for (const domain of languageTrees[language].domains) {
+      if (domain.id === 'evidence') continue; // Vernpixi-only universe; legacy 3D entry pages are retired.
       const expectedId = domain.notionId || domain.url?.match(/\/p\/([a-f0-9]{32})/)?.[1];
       if (!expectedId) continue;
       const actualUrl = domainRootFromEngine(source, domain.id, language);
@@ -243,21 +245,14 @@ assert.deepEqual(htmlDomains, expectedDomains, 'Public HTML must preserve all ei
 
 for (const language of ['fr', 'ar', 'en', 'pt']) {
   const tree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
-  assert.deepEqual(tree.domains.map(domain => domain.id).sort(), [...expectedDomains].sort(), language + ' manifest must expose all eight universes');
-  const knowledgeHub = tree.domains.find(domain => domain.id === 'learn');
-  assert.ok(!knowledgeHub.url && !knowledgeHub.notionId, language + ' knowledge-transfer hub must not invent a parent Notion destination');
-  assert.equal(knowledgeHub.children?.length, 4, language + ' knowledge-transfer universe must expose four public resource links');
-  for (const resource of knowledgeHub.children) {
-    assert.ok(/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(resource.url), language + ' knowledge resource must use a verified Notion page URL');
-    assert.ok(!resource.notionId, language + ' cross-domain resource links must not duplicate source-page identifiers');
-  }
-  for (const domain of tree.domains.filter(item => item.id !== 'learn')) {
-    assert.ok(domain.notionId && domain.url === 'https://app.notion.com/p/' + domain.notionId, language + ' domain ' + domain.id + ' must point to its matching Notion page');
-  }
+  assert.deepEqual(tree.domains.map(domain => domain.id).sort(), [...expectedExplorerDomains].sort(), language + ' manifest must expose eight real Notion universes');
+  const evidence = tree.domains.find(domain => domain.id === 'evidence');
+  assert.ok(evidence?.notionId && evidence.url === 'https://app.notion.com/p/' + evidence.notionId, language + ' evidence universe must link to its real Notion page');
+  for (const domain of tree.domains) assert.ok(domain.notionId && domain.url === 'https://app.notion.com/p/' + domain.notionId, language + ' domain ' + domain.id + ' must point to its matching Notion page');
   const seen = new Set();
   const walk = nodes => nodes.forEach(node => {
-    if (node.notionId) {
-      assert.ok(!seen.has(node.notionId), language + ' manifest must not duplicate Notion page ' + node.notionId);
+    if (node.notionId && node.kind !== 'reference') {
+      assert.ok(!seen.has(node.notionId), language + ' manifest must not duplicate canonical Notion page ' + node.notionId);
       seen.add(node.notionId);
     }
     walk(node.children || []);
@@ -266,7 +261,7 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
 }
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
-  assert.equal(products.children.length, 5, language + ' catalogue branch must expose only the five currently verified public entry points');
+  assert.equal(products.children.length, 9, language + ' product branch must retain five public entry points and four mapped Notion sections');
 }
 const arabicProducts = JSON.parse(readFileSync('ecosystem/notion-tree.ar.json', 'utf8')).domains.find((domain) => domain.id === 'products');
 assert.equal(arabicProducts.children.filter((node) => /WA/i.test(node.id)).length, 1, 'Arabic catalogue must expose one canonical WA entry, not a duplicate cross-language record');
@@ -451,9 +446,14 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
   const publicTree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
   const previewTree = JSON.parse(readFileSync('ecosystem-preview/notion-tree.' + language + '.json', 'utf8'));
   assert.deepEqual(
-    previewTree.domains,
-    publicTree.domains,
-    language + ' preview hierarchy and Notion destinations must exactly match the public site',
+    publicTree.domains.map(domain => domain.id).sort(),
+    [...expectedExplorerDomains].sort(),
+    language + ' Vernpixi public explorer must use the evidence universe',
+  );
+  assert.deepEqual(
+    previewTree.domains.map(domain => domain.id).sort(),
+    [...expectedDomains].sort(),
+    language + ' legacy 3D preview must retain its own compatible universe registry',
   );
 }
 

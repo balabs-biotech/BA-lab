@@ -1,8 +1,8 @@
 {
-  "version": 1,
-  "source": "Verified public Arabic pages linked from the Arabic BA Labs entry page",
+  "version": 2,
+  "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "ar",
-  "coverage": "nested_public_pages_verified_from_arabic_parent_content_and_notion_paths; linked pages organized by verified parent; no unverified pages inferred_eight_universes_including_planned_resources_transmission",
+  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
   "domains": [
     {
       "id": "myco",
@@ -1072,36 +1072,44 @@
       "description": "مشاريع BA Labs وأعمال البحث والتطوير: النماذج التجريبية، النتائج الموثقة، وفرص التعاون."
     },
     {
-      "id": "learn",
-      "title": "الموارد ونقل المعرفة",
-      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
+      "id": "evidence",
+      "title": "ما الذي تدعمه الأدلة حاليًا؟",
+      "notionId": "40173152f17181eb86f6f623452f9f5d",
+      "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
+      "description": "Evidence, documented observations and limits of current work.",
       "children": [
         {
-          "id": "learn-resource-1",
+          "id": "evidence-resource-1",
           "title": "الأعمال الموثقة",
           "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
-          "children": []
+          "children": [],
+          "kind": "reference",
+          "notionId": "40173152f171811aaac8db82b1c7a9fe"
         },
         {
-          "id": "learn-resource-2",
+          "id": "evidence-resource-2",
           "title": "منهجية البحث والتطوير",
           "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
-          "children": []
+          "children": [],
+          "kind": "reference",
+          "notionId": "40273152f1718172aabbe09bb712c3d1"
         },
         {
-          "id": "learn-resource-3",
+          "id": "evidence-resource-3",
           "title": "الكتالوج العام",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "children": []
+          "children": [],
+          "kind": "reference",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
         },
         {
-          "id": "learn-resource-4",
+          "id": "evidence-resource-4",
           "title": "التعاون مع BA Labs",
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
+          "notionId": "40173152f17181598fc7f2f5a3e64e8a",
           "children": []
         }
-      ],
-      "kind": "section"
+      ]
     }
   ],
   "hub": null

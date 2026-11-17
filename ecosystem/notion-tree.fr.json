@@ -1,8 +1,8 @@
 {
-  "version": 1,
-  "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
+  "version": 2,
+  "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "fr",
-  "coverage": "7_public_roots_identified; nested_public_pages_verified_from_root_content; R&D branch expanded_eight_universes_including_planned_resources_transmission",
+  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
   "domains": [
     {
       "id": "myco",
@@ -1014,7 +1014,8 @@
               "title": "Ce qui est effectivement démontré",
               "notionId": "3e973152f171816781fbf56674cfe55c",
               "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
-              "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation."
+              "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation.",
+              "kind": "reference"
             }
           ],
           "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
@@ -1061,36 +1062,44 @@
       "description": "Parcourir les travaux de recherche et développement, leur méthodologie, leurs essais, leurs itérations et les éléments effectivement documentés."
     },
     {
-      "id": "learn",
-      "title": "RESSOURCES & TRANSMISSION",
-      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
+      "id": "evidence",
+      "title": "Ce qui est effectivement démontré",
+      "notionId": "3e973152f171816781fbf56674cfe55c",
+      "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
+      "description": "Niveaux de preuve, observations documentées et limites des travaux actuels.",
       "children": [
         {
-          "id": "learn-resource-1",
+          "id": "evidence-resource-1",
           "title": "Travaux documentés",
           "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
-          "children": []
+          "children": [],
+          "kind": "reference",
+          "notionId": "3f273152f171815597b6c696402b42c0"
         },
         {
-          "id": "learn-resource-2",
+          "id": "evidence-resource-2",
           "title": "Méthodologie de R&D",
           "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
-          "children": []
+          "children": [],
+          "kind": "reference",
+          "notionId": "3e273152f17181ab88bfe456f838b011"
         },
         {
-          "id": "learn-resource-3",
+          "id": "evidence-resource-3",
           "title": "Catalogue public",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "children": []
+          "children": [],
+          "kind": "reference",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
         },
         {
-          "id": "learn-resource-4",
+          "id": "evidence-resource-4",
           "title": "Collaborer avec BA Labs",
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
+          "notionId": "3e273152f17181a8bedae0bfd2452543",
           "children": []
         }
-      ],
-      "kind": "section"
+      ]
     }
   ],
   "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs.",
