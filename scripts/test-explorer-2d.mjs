@@ -88,7 +88,8 @@ try {
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');
     for (const language of ['en', 'ar', 'pt', 'fr']) {
       await page.locator('#language').selectOption(language);
-      await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
+      await page.waitForFunction(() => { const loading = document.querySelector('#loading'); return loading?.hidden === true || Boolean(loading?.querySelector('p')?.textContent && loading.querySelector('p').textContent !== ''); }, undefined, { timeout: 20000 });
+      assert.equal(await page.locator('#loading').isHidden(), true, `The ${language} tree must reload successfully: ${await page.locator('#loading p').innerText().catch(() => 'no diagnostic')}`);
       await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
       assert.equal(await page.locator('#language').inputValue(), language);
       const languageNodeCount = Number(await page.locator('#field').getAttribute('data-node-count') || 0);
