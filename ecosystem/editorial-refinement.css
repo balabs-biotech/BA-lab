@@ -1234,3 +1234,34 @@
  #app.balabs-ui > main .universe-index .universe-index-card:before,
  #app.balabs-ui > main .universe-index .universe-index-card:after{animation:none!important;transition:none!important}
 }
+
+
+/* Phase 36 — Vanta + living shader field + central motion layer.
+   The effects are isolated to the hero and Field Atlas; the 2D explorer stays untouched. */
+#app.balabs-ui > main #accueil{position:relative;isolation:isolate;overflow:hidden}
+#app.balabs-ui > main #accueil .vanta-canvas{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ z-index:0!important;opacity:.42;pointer-events:none!important
+}
+#app.balabs-ui > main #accueil>.hero-credit{z-index:3}
+#app.balabs-ui > main #accueil>.aside,
+#app.balabs-ui > main #accueil>div{position:relative;z-index:1}
+#app.balabs-ui > main .field-atlas{position:relative;isolation:isolate;overflow:hidden}
+#app.balabs-ui > main .field-atlas>.balabs-shader-gradient{
+ position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;
+ opacity:.68;mix-blend-mode:screen
+}
+#app.balabs-ui > main .field-atlas-head,
+#app.balabs-ui > main .field-atlas-grid{position:relative;z-index:1}
+#app.balabs-ui > main .field-frame{will-change:opacity,transform}
+@media(max-width:760px){
+ #app.balabs-ui > main #accueil .vanta-canvas{opacity:.24}
+ #app.balabs-ui > main .field-atlas>.balabs-shader-gradient{opacity:.4}
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui > main #accueil .vanta-canvas,
+ #app.balabs-ui > main .field-atlas>.balabs-shader-gradient{display:none!important}
+ #app.balabs-ui > main .field-frame,
+ #app.balabs-ui > main .universe-index-card,
+ #app.balabs-ui > main .work-card{will-change:auto!important}
+}
