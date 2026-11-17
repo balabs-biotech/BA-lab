@@ -30,6 +30,26 @@ try {
       edges: Number(el.dataset.edgeCount || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
+    const mappedTree = await page.evaluate(async () => {
+      const response = await fetch('./notion-tree.fr.json');
+      const tree = await response.json();
+      const nodes = [];
+      const walk = list => (list || []).forEach(node => { nodes.push(node); walk(node.children); });
+      walk(tree.domains);
+      return {
+        roots: tree.domains.map(node => ({ id: node.id, title: node.title, notionId: node.notionId, url: node.url })),
+        nodes: nodes.length,
+        unmapped: nodes.filter(node => !node.notionId || !node.url).map(node => node.title),
+        uniquePages: new Set(nodes.map(node => node.notionId)).size,
+        catalogueRecords: nodes.filter(node => node.id.startsWith('catalog-')).length
+      };
+    });
+    assert.equal(mappedTree.roots.length, 8, 'Eight universes must be backed by actual Notion pages');
+    assert.ok(mappedTree.roots.every(root => root.notionId && root.url), 'Every universe root must link to a real Notion page');
+    assert.deepEqual(mappedTree.unmapped, [], 'No synthetic folders or unlinked placeholder nodes');
+    assert.equal(mappedTree.uniquePages, mappedTree.nodes, 'A Notion page must not be duplicated under multiple fake parents');
+    assert.ok(mappedTree.catalogueRecords >= 25, 'The live Notion catalogue records must be mapped into the explorer');
+
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
