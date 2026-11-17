@@ -432,3 +432,25 @@
  #app.balabs-ui .chapter-rail .filament-progress,
  #app.balabs-ui .chapter-rail .chapter-rail-dot{transition:none!important}
 }
+
+
+/* The chapter rail is appended directly to body, outside #app: keep these rules global. */
+.chapter-rail{
+ position:fixed!important;z-index:2147483647!important;
+ inset-inline-start:clamp(4px,.65vw,12px)!important;
+ top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;
+ width:58px!important;height:min(64vh,520px)!important;opacity:1!important;
+ pointer-events:none!important;
+}
+.chapter-rail-nodes,.chapter-rail-node{pointer-events:auto!important}
+.chapter-rail-node{min-width:40px!important;min-height:40px!important;touch-action:manipulation!important}
+.chapter-filament .filament-base{stroke:#71877b99!important;stroke-width:1.6!important;stroke-dasharray:2 5!important}
+.chapter-filament .filament-progress{stroke:#b96b4d!important;stroke-width:2.6!important}
+.chapter-rail .chapter-rail-dot{border-color:#d1d0c5!important;box-shadow:0 0 0 4px #172522e8,0 0 0 5px #78958a55!important}
+.chapter-rail .chapter-rail-node.is-active .chapter-rail-dot{width:14px!important;height:14px!important;background:#b96b4d!important;border-color:#f0e7dc!important;box-shadow:0 0 0 5px #b96b4d35,0 0 18px #b96b4dcc!important}
+.chapter-rail .chapter-rail-name{background:#172522f5!important;border-color:#b96b4d88!important;color:#f1eee5!important}
+@media(max-width:760px){
+ .chapter-rail{inset-inline-start:0!important;width:38px!important;height:min(58vh,420px)!important}
+ .chapter-rail-node{min-width:40px!important;min-height:40px!important}
+ [dir=rtl] .chapter-rail{inset-inline-start:auto!important;inset-inline-end:0!important}
+}
