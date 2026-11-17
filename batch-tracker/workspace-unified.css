@@ -521,3 +521,67 @@ html body[data-domain] .card :is(input[type="checkbox"],input[type="radio"]) {
     transition:none !important;
   }
 }
+
+
+/* PASS 157 — form readability: distinguish field labels, hints, required and invalid states. */
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(label,.field-label) {
+  display:block !important;
+  margin:0 0 6px !important;
+  color:#d2ddd4 !important;
+  font-size:11px !important;
+  font-weight:720 !important;
+  line-height:1.45 !important;
+  letter-spacing:.012em !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
+  min-height:42px !important;
+  padding:10px 12px !important;
+  border:1px solid rgba(169,192,179,.25) !important;
+  border-radius:9px !important;
+  background:linear-gradient(180deg,rgba(7,15,15,.78),rgba(11,19,18,.88)) !important;
+  color:#edf2ed !important;
+  font-size:12px !important;
+  line-height:1.45 !important;
+  transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) textarea {
+  min-height:88px !important;
+  resize:vertical !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea)::placeholder {
+  color:#84968b !important;
+  opacity:1 !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea):focus-visible {
+  border-color:var(--workspace-accent) !important;
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 18%,transparent) !important;
+  outline-offset:2px !important;
+  background:#101b19 !important;
+  box-shadow:0 0 0 1px var(--workspace-accent-border),0 0 20px color-mix(in srgb,var(--workspace-accent) 10%,transparent) !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea):user-invalid,
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea)[aria-invalid="true"] {
+  border-color:#c77c70 !important;
+  box-shadow:0 0 0 2px rgba(199,124,112,.13) !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(small,.muted,.field-hint) {
+  color:#9eafa5 !important;
+  font-size:10px !important;
+  line-height:1.55 !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea):disabled {
+  opacity:.55 !important;
+  cursor:not-allowed !important;
+  background:#17211f !important;
+}
+@media(max-width:600px) {
+  html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
+    min-height:44px !important;
+    font-size:16px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
+    transition:none !important;
+  }
+}
