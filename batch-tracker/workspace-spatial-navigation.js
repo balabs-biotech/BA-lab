@@ -151,7 +151,11 @@
     syncDock();
     if (observer) observer.disconnect();
     observer = new MutationObserver(syncDock);
-    observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-domain"], subtree: true });
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-domain"] });
+    [...mapForDomain().primary, ...mapForDomain().secondary].forEach(id => {
+      const panel = document.getElementById(id);
+      if (panel) observer.observe(panel, { attributes: true, attributeFilter: ["class", "hidden"] });
+    });
   }
 
   document.addEventListener("keydown", event => {
@@ -174,7 +178,7 @@
   let touchStart = null;
   document.addEventListener("pointerdown", event => {
     if (event.pointerType !== "touch" || !(event.target instanceof Element)) return;
-    if (event.target.closest("input,textarea,select,button,a,summary,canvas,[role='slider']")) return;
+    if (event.target.closest("input,textarea,select,button,a,summary,canvas,[role='slider'],.statistics-table-wrap,.culture-catalog-list,.measurement-history,[data-horizontal-scroll]")) return;
     if (!event.target.closest(".app-hero,.card")) return;
     touchStart = { x: event.clientX, y: event.clientY };
   }, { passive: true });
