@@ -169,6 +169,7 @@ function domainRootFromEngine(source, domain, language) {
 for (const [label, source] of [['public', html], ['preview', previewHtml]]) {
   for (const language of ['fr', 'en', 'ar', 'pt']) {
     for (const domain of languageTrees[language].domains) {
+      if (domain.id === 'evidence') continue; // Vernpixi-only universe; legacy 3D entry pages are retired.
       const expectedId = domain.notionId || domain.url?.match(/\/p\/([a-f0-9]{32})/)?.[1];
       if (!expectedId) continue;
       const actualUrl = domainRootFromEngine(source, domain.id, language);
