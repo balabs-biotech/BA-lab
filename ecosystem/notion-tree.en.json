@@ -1,8 +1,8 @@
 {
-  "version": 1,
-  "source": "Verified public language-specific BA Labs pages from the corresponding public language entry and Notion page search",
+  "version": 2,
+  "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "en",
-  "coverage": "expanded_verified_topic_pages; landing-page destinations reconciled against live English Notion page; only verified public pages linked; eight universes including planned resources transmission",
+  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
   "domains": [
     {
       "id": "myco",
@@ -1088,36 +1088,34 @@
       "description": "Research and development at BA Labs: documented work, experimental questions, prototypes, measurements and the limits of current evidence."
     },
     {
-      "id": "learn",
-      "title": "Resources & knowledge transfer",
-      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
+      "id": "evidence",
+      "title": "What the evidence currently supports",
+      "notionId": "40173152f17181e99831c9e40fb8e614",
+      "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614",
+      "description": "Evidence levels, documented observations and limitations of current work.",
       "children": [
         {
-          "id": "learn-resource-1",
+          "id": "evidence-resource-1",
           "title": "Documented work",
           "url": "https://app.notion.com/p/40173152f17181baa905d6afb836f038",
+          "notionId": "40173152f17181baa905d6afb836f038",
           "children": []
         },
         {
-          "id": "learn-resource-2",
-          "title": "Evidence and research",
-          "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614",
-          "children": []
-        },
-        {
-          "id": "learn-resource-3",
+          "id": "evidence-resource-3",
           "title": "Public catalogue",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "children": []
+          "children": [],
+          "kind": "reference"
         },
         {
-          "id": "learn-resource-4",
+          "id": "evidence-resource-4",
           "title": "Collaborate with BA Labs",
           "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
+          "notionId": "40173152f1718118ac1ad58358720ae4",
           "children": []
         }
-      ],
-      "kind": "section"
+      ]
     }
   ],
   "hub": {
