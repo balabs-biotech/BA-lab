@@ -60,7 +60,7 @@ def download(url):
     last = None
     for attempt in range(2):
         try:
-            req = Request(url, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.1 (https://balabs-biotech.github.io/BA-lab/)", "Referer": "https://balabs-biotech.github.io/BA-lab/"})
+            req = Request(url, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.1 (https://balabs-biotech.github.io/BA-lab/)", "Referer": "https://balabs-biotech.github.io/BA-lab/", "Accept": "image/jpeg"})
             with urlopen(req, timeout=18) as response:
                 data = response.read(20 * 1024 * 1024 + 1)
                 if len(data) > 20 * 1024 * 1024:
