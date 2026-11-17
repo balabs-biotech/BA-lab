@@ -1,0 +1,58 @@
+/* BA Labs — living motion direction: organic depth, tactile response, quiet curiosity. */
+:root{--motion-ease:cubic-bezier(.16,1,.3,1)}
+/* Ambient mycelial light drifts behind each chapter. */
+#app.balabs-ui .experience-page:before{
+ content:"";position:absolute;inset:-18%;z-index:0;pointer-events:none;opacity:.26;
+ background:
+  radial-gradient(ellipse at 18% 22%,rgba(126,170,163,.11),transparent 34%),
+  radial-gradient(ellipse at 78% 70%,rgba(185,107,77,.09),transparent 31%);
+ transform:translate3d(0,0,0);animation:balabs-ambient-drift 24s ease-in-out infinite alternate;
+}
+#app.balabs-ui .experience-page>*{position:relative;z-index:1}
+@keyframes balabs-ambient-drift{0%{transform:translate3d(-1.5%,0,0) scale(1)}100%{transform:translate3d(1.5%,-1.2%,0) scale(1.035)}}
+/* Short, cinematic entry — fades away before it can become a loading barrier. */
+.balabs-entry-loader{position:fixed;inset:0;z-index:9999;display:grid;align-content:center;justify-items:center;gap:18px;background:#111b1d;color:#f2f1e9;opacity:1;transition:opacity .55s var(--motion-ease),visibility .55s;pointer-events:none}
+.balabs-entry-loader.is-leaving{opacity:0;visibility:hidden}
+.entry-loader-mark{font:700 clamp(19px,3vw,27px)/1 ui-monospace,monospace;letter-spacing:.24em}
+.entry-loader-mark span{color:#b96b4d}
+.entry-loader-line{width:min(190px,42vw);height:1px;background:#526a60;overflow:hidden}
+.entry-loader-line i{display:block;width:100%;height:100%;background:#b96b4d;transform:scaleX(0);transform-origin:left;animation:entry-loader-progress 1.15s var(--motion-ease) forwards}
+.entry-loader small{color:#9aafa2;font:600 8px/1.4 ui-monospace,monospace;letter-spacing:.19em}
+@keyframes entry-loader-progress{to{transform:scaleX(1)}}
+/* Scroll reveal with stagger, applied only after the JS observer sees the element. */
+#app.balabs-ui .living-reveal{opacity:0;transform:translate3d(0,22px,0) scale(.985);filter:blur(3px);transition:opacity .85s var(--motion-ease),transform .95s var(--motion-ease),filter .85s var(--motion-ease);transition-delay:var(--living-delay,0ms)}
+#app.balabs-ui .living-reveal.is-in-view{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+/* Depth-aware surfaces and a restrained moving light that follows the pointer. */
+#app.balabs-ui .living-surface{transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translate3d(0,0,0);transform-style:preserve-3d;transition:transform .42s var(--motion-ease),border-color .35s ease,box-shadow .45s ease;will-change:transform}
+#app.balabs-ui .living-surface:before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background:radial-gradient(280px circle at var(--pointer-x,50%) var(--pointer-y,50%),rgba(209,208,197,.13),transparent 68%);transition:opacity .35s ease}
+#app.balabs-ui .living-surface.is-pointed{z-index:4;border-color:rgba(185,107,77,.65)!important;box-shadow:0 18px 48px rgba(0,0,0,.26),0 0 0 1px rgba(185,107,77,.12)}
+#app.balabs-ui .living-surface.is-pointed:before{opacity:1}
+#app.balabs-ui .living-surface>*{transform:translateZ(7px)}
+/* Parallax only moves the image layer, not text or hit areas. */
+#app.balabs-ui .chapter-atmosphere{transform:translate3d(0,var(--scroll-depth,0),0)}
+#app.balabs-ui .hero-micrograph,#app.balabs-ui .work-media img,#app.balabs-ui .editorial-art img{transform:translate3d(0,var(--scroll-depth,0),0) scale(1.035);will-change:transform}
+#app.balabs-ui .experience-page.is-motion-active .hero-micrograph{animation:balabs-image-breathe 18s ease-in-out infinite alternate}
+@keyframes balabs-image-breathe{from{transform:translate3d(0,var(--scroll-depth,0),0) scale(1.035)}to{transform:translate3d(0,var(--scroll-depth,0),0) scale(1.085)}}
+/* Micro-interactions: focus, hover and press share one tactile language. */
+#app.balabs-ui .hero-action-primary,#app.balabs-ui .hero-action-secondary,#app.balabs-ui .work-card-link,#app.balabs-ui .experience-controls button,#app.balabs-ui .site-nav a{transition:transform .28s var(--motion-ease),color .25s ease,background .25s ease,border-color .25s ease,box-shadow .3s ease}
+#app.balabs-ui .hero-action-primary:hover,#app.balabs-ui .hero-action-secondary:hover,#app.balabs-ui .work-card-link:hover,#app.balabs-ui .experience-controls button:hover,#app.balabs-ui .site-nav a:hover{transform:translate3d(var(--mag-x,0),var(--mag-y,0),0)}
+#app.balabs-ui .chapter-rail-node .chapter-rail-dot{transition:transform .35s var(--motion-ease),box-shadow .35s ease,background .3s ease}
+#app.balabs-ui .chapter-rail-node:hover .chapter-rail-dot,#app.balabs-ui .chapter-rail-node:focus-visible .chapter-rail-dot{transform:scale(1.45);box-shadow:0 0 0 6px rgba(185,107,77,.13),0 0 19px rgba(185,107,77,.65)}
+#app.balabs-ui .motion-tap{animation:balabs-tap .42s var(--motion-ease)}
+@keyframes balabs-tap{45%{filter:brightness(1.35)}}
+/* Curiosity cue: quiet, living underline on links and navigation. */
+#app.balabs-ui .work-card-link,#app.balabs-ui .hero-action-primary{position:relative}
+#app.balabs-ui .work-card-link:after{content:"";position:absolute;inset-inline-start:0;bottom:-3px;width:100%;height:1px;background:#b96b4d;transform:scaleX(.16);transform-origin:left;transition:transform .45s var(--motion-ease)}
+#app.balabs-ui .work-card-link:hover:after,#app.balabs-ui .work-card-link:focus-visible:after{transform:scaleX(1)}
+@media(max-width:760px){
+ #app.balabs-ui .living-surface{transform:none!important;will-change:auto}
+ #app.balabs-ui .hero-micrograph,#app.balabs-ui .work-media img,#app.balabs-ui .editorial-art img{will-change:auto}
+ #app.balabs-ui .experience-page:before{opacity:.16}
+}
+@media(prefers-reduced-motion:reduce){
+ .balabs-entry-loader{display:none!important}
+ #app.balabs-ui .experience-page:before{animation:none!important}
+ #app.balabs-ui .living-reveal{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
+ #app.balabs-ui .living-surface,#app.balabs-ui .living-surface:before{transform:none!important;transition:none!important;animation:none!important}
+ #app.balabs-ui .hero-micrograph,#app.balabs-ui .work-media img,#app.balabs-ui .editorial-art img{animation:none!important;transform:none!important}
+}
