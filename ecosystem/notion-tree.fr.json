@@ -635,7 +635,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-instrumentation",
@@ -661,7 +661,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-control",
@@ -687,7 +687,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-data",
@@ -713,7 +713,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-traceability-detail",
@@ -739,7 +739,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         }
       ],
       "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations.",
