@@ -1,4 +1,18 @@
 /* BA Labs CultureOps — spatial navigation dock and panel transitions. */
+/* The dock is a dedicated grid row between the global toolbar and workspace hero. */
+html body[data-domain] .container {
+  grid-template-areas:
+    "nav"
+    "spatial"
+    "hero"
+    "message"
+    "auth"
+    "workspace"
+    "result" !important;
+}
+html body[data-domain] .ba-spatial-dock { grid-area:spatial !important; }
+
+
 html body[data-domain] .ba-spatial-dock {
   position:sticky;
   top:76px;
