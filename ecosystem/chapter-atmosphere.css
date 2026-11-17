@@ -70,3 +70,16 @@
 @keyframes chapter-material-breathe{from{transform:scale(1.03) translate3d(.5%,.3%,0)}to{transform:scale(1.14) translate3d(-.8%,-.5%,0)}}
 @keyframes chapter-lab-scan{from{transform:scale(1.04) translate3d(-.4%,.5%,0)}to{transform:scale(1.13) translate3d(.8%,-.4%,0)}}
 @media(prefers-reduced-motion:reduce){.experience-page>.chapter-atmosphere.is-animated img{animation:none!important}}
+/* Chapter images are a background layer, not an extra card or UI panel. */
+.experience-page>.chapter-atmosphere{z-index:0}
+.experience-page>.chapter-atmosphere figcaption a{color:#f0b18f;text-decoration:underline;text-underline-offset:3px;font:600 7px/1.2 ui-monospace,monospace;pointer-events:auto}
+.experience-page>.chapter-atmosphere figcaption{pointer-events:none}
+.experience-page>.chapter-atmosphere figcaption a{pointer-events:auto}
+#app.balabs-ui > main .universe-index-card .universe-visual{z-index:0!important}
+#app.balabs-ui > main .universe-index-card .universe-visual:after{pointer-events:none}
+#app.balabs-ui > main .universe-index-card .universe-visual figcaption{left:16px;right:12px;bottom:12px;align-items:flex-start;gap:4px}
+#app.balabs-ui > main .universe-index-card .universe-visual figcaption small{display:block;color:#f2f1e9;font-size:6px;letter-spacing:.06em;text-shadow:0 1px 8px #000}
+#app.balabs-ui > main .universe-index-card .universe-visual figcaption a{display:block;color:#f0b18f;font-size:7px;letter-spacing:.12em;text-decoration:underline;text-underline-offset:2px;pointer-events:auto}
+#app.balabs-ui > main .universe-index-card .universe-visual{pointer-events:none!important}
+#app.balabs-ui > main .universe-index-card .universe-visual figcaption a{pointer-events:auto!important}
+@media(prefers-reduced-motion:reduce){.experience-page>.chapter-atmosphere svg path{stroke-dashoffset:0}}
