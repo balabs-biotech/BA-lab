@@ -8,6 +8,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.request import Request, urlopen
+from urllib.parse import quote, unquote
 
 SIGNATURES = {
     ".jpg": (b"\xff\xd8\xff",),
@@ -36,7 +37,25 @@ def audit_references(site, entries):
         raise SystemExit(f"Image coverage audit failed. Missing from manifest: {missing}; unused manifest files: {unused}")
     print(f"Image coverage audit passed: {len(referenced)} unique image references across all HTML/CSS/JS files.")
 
+def resolve_source(url):
+    """Resolve Commons file titles through imageinfo instead of the fragile Special:FilePath redirect."""
+    match = re.match(r"https://commons\\.wikimedia\\.org/wiki/Special:FilePath/(.+?)(?:\\?.*)?$", url)
+    if not match:
+        return url
+    filename = unquote(match.group(1))
+    api = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&iiurlwidth=960&titles=" + quote("File:" + filename, safe="")
+    req = Request(api, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.2 (https://balabs-biotech.github.io/BA-lab/)"})
+    with urlopen(req, timeout=18) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    pages = payload.get("query", {}).get("pages", {})
+    page = next(iter(pages.values()), {})
+    info = page.get("imageinfo", [])
+    if not info:
+        raise RuntimeError(f"Wikimedia Commons has no imageinfo for {filename}")
+    return info[0].get("thumburl") or info[0].get("url")
+
 def download(url):
+    url = resolve_source(url)
     last = None
     for attempt in range(2):
         try:
