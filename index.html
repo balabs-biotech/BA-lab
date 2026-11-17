@@ -24,7 +24,7 @@ h1{max-width:850px;margin:0;font-family:Georgia,"Times New Roman",serif;font-siz
 .lead{max-width:520px;margin:31px 0 0;color:#B8C0B9;font-size:clamp(15px,1.35vw,18px);line-height:1.8}
 .intro-note{position:relative;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:20px 0 38px 34px;border-left:1px solid var(--copper);color:var(--muted);font-size:12px;line-height:1.8}
 .intro-note strong{display:block;margin:25px 0 8px;color:var(--ink);font:400 24px/1.15 Georgia,serif}
-.hyphae-figure{width:100%;max-width:500px;height:auto;overflow:visible}.hyphae-figure path{fill:none;stroke:#80958A;stroke-width:1.15;opacity:.82}.hyphae-figure .main-filament{stroke:var(--copper);stroke-width:1.7;opacity:1}.hyphae-figure circle{fill:var(--copper);stroke:var(--paper);stroke-width:2}.hyphae-caption{margin-top:8px;color:#77867F;font:9px ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase}
+.hyphae-caption{margin-top:8px;color:#77867F;font:9px ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase}
 .section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:23px 0 11px;border-bottom:1px solid var(--line)}.section-head h2{margin:0;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase}.section-head p{margin:0;color:#78857F;font:9px ui-monospace,monospace;letter-spacing:.12em}
 .universes{display:block}.universe{--accent:var(--copper);position:relative;display:grid;grid-template-columns:80px minmax(190px,.8fr) minmax(240px,1.2fr) 150px;align-items:center;gap:24px;min-height:142px;padding:22px 10px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;transition:background .2s ease,padding .2s ease}
 .universe:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform:scaleY(0);transform-origin:bottom;transition:transform .2s ease}.universe:hover{padding-left:23px;background:rgba(38,59,56,.38)}.universe:hover:before,.universe:focus-visible:before{transform:scaleY(1)}
@@ -126,5 +126,133 @@ html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);p
   apply(select.value); select.addEventListener("change", () => apply(select.value));
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js" defer></script><script type="module">import{Application,Graphics}from"https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.mjs";const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches,colors={agronomy:0xa8b69b,myco:0xb96b4d,lab:0xa7b7bd};if(!reduced)for(const el of document.querySelectorAll(".universe-photo")){const c=el.parentElement.classList,key=c.contains("agronomy")?"agronomy":c.contains("myco")?"myco":"lab";try{const app=new Application();await app.init({resizeTo:el,backgroundAlpha:0,antialias:true,autoDensity:true,resolution:Math.min(devicePixelRatio||1,1.5)});app.canvas.className="sector-motion";app.canvas.setAttribute("aria-hidden","true");el.appendChild(app.canvas);const dots=[];for(let i=0;i<16;i++){const d=new Graphics().circle(0,0,key==="myco"?1.7:1.2).fill({color:colors[key],alpha:.7});d.x=Math.random()*el.clientWidth;d.y=Math.random()*el.clientHeight;d.vx=(Math.random()-.5)*.24;d.vy=(Math.random()-.5)*.24;app.stage.addChild(d);dots.push(d)}app.ticker.add(()=>dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>el.clientWidth)d.vx*=-1;if(d.y<0||d.y>el.clientHeight)d.vy*=-1}))}catch(e){}}window.addEventListener("load",()=>{if(reduced||!window.tsParticles)return;window.tsParticles.load({id:"cultureops-particles",options:{fullScreen:{enable:false},particles:{number:{value:20},color:{value:["#a8b69b","#b96b4d","#a7b7bd"]},opacity:{value:{min:.12,max:.3}},size:{value:{min:1,max:2}},move:{enable:true,speed:.2,outModes:{default:"out"}},links:{enable:false}},detectRetina:true}})});</script></body>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js" defer></script>
+<script type="module">
+import { Application, Graphics } from "https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.mjs";
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const palette = { agronomy: 0xa8b69b, myco: 0xb96b4d, lab: 0xa7b7bd };
+
+function addLine(g, points, color, alpha = 0.42, width = 1) {
+  if (!points.length) return;
+  g.moveTo(points[0][0], points[0][1]);
+  for (const [x, y] of points.slice(1)) g.lineTo(x, y);
+  g.stroke({ color, alpha, width });
+}
+
+async function mountSectorMotion(el) {
+  const classes = el.parentElement.classList;
+  const kind = classes.contains("agronomy") ? "agronomy" : classes.contains("myco") ? "myco" : "lab";
+  const color = palette[kind];
+  const app = new Application();
+  await app.init({
+    resizeTo: el, backgroundAlpha: 0, antialias: true,
+    autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 1.5)
+  });
+  app.canvas.className = "sector-motion";
+  app.canvas.setAttribute("aria-hidden", "true");
+  el.appendChild(app.canvas);
+
+  const w = () => Math.max(1, el.clientWidth);
+  const h = () => Math.max(1, el.clientHeight);
+  const overlay = new Graphics();
+  app.stage.addChild(overlay);
+  const movers = [];
+
+  if (kind === "agronomy") {
+    // Irrigation channels with droplets moving along each row.
+    for (let row = 0; row < 5; row++) {
+      const y = 14 + row * Math.max(12, (h() - 28) / 4);
+      addLine(overlay, [[0,y],[w()*.28,y-3],[w()*.62,y+2],[w(),y-1]], color, .34, 1);
+      for (let j = 0; j < 2; j++) {
+        const bead = new Graphics().circle(0,0,2.1).fill({color,alpha:.9});
+        bead.y = y + (j ? 3 : -2);
+        bead.x = Math.random() * w();
+        bead.speed = .35 + Math.random() * .45;
+        app.stage.addChild(bead); movers.push(bead);
+      }
+    }
+  } else if (kind === "myco") {
+    // Branching hyphal network, rooted at the lower edge.
+    const branch = (x, y, angle, length, depth) => {
+      if (depth <= 0 || length < 5) return;
+      const nx = x + Math.cos(angle) * length;
+      const ny = y + Math.sin(angle) * length;
+      addLine(overlay, [[x,y],[nx,ny]], color, .22 + depth * .09, Math.max(.65, depth * .22));
+      if (depth <= 3) {
+        const node = new Graphics().circle(nx,ny,depth === 3 ? 2.3 : 1.5).fill({color,alpha:.8});
+        app.stage.addChild(node);
+        node.pulse = Math.random() * Math.PI * 2;
+        movers.push(node);
+      }
+      const spread = .34 + Math.random() * .22;
+      branch(nx,ny,angle-spread,length*.76,depth-1);
+      branch(nx,ny,angle+spread,length*.72,depth-1);
+    };
+    for (let root = 0; root < 4; root++) {
+      const x = w() * (.12 + root * .25);
+      branch(x,h()+3,-Math.PI/2 + (root-1.5)*.12,Math.min(w(),h())*.32,5);
+    }
+  } else {
+    // Laboratory: orbital measurement paths and moving sensor points.
+    const cx = w() * .5, cy = h() * .5;
+    for (let ring = 0; ring < 3; ring++) {
+      const rx = Math.max(12, w() * (.15 + ring * .12));
+      const ry = Math.max(10, h() * (.18 + ring * .14));
+      overlay.ellipse(cx,cy,rx,ry).stroke({color,alpha:.27,width:1});
+      const dot = new Graphics().circle(0,0,2 + ring*.35).fill({color,alpha:.9});
+      dot.phase = ring * 2.1;
+      dot.rx = rx; dot.ry = ry; dot.cx = cx; dot.cy = cy;
+      app.stage.addChild(dot); movers.push(dot);
+    }
+    const center = new Graphics().circle(cx,cy,2.4).fill({color,alpha:.65});
+    app.stage.addChild(center);
+  }
+
+  app.ticker.add((ticker) => {
+    const dt = ticker.deltaTime;
+    if (kind === "agronomy") {
+      for (const bead of movers) {
+        bead.x += bead.speed * dt;
+        if (bead.x > w()+3) bead.x = -3;
+      }
+    } else if (kind === "myco") {
+      for (const node of movers) {
+        node.pulse += .018 * dt;
+        node.alpha = .52 + (Math.sin(node.pulse)+1)*.2;
+      }
+    } else {
+      for (const dot of movers) {
+        dot.phase += .006 * dt;
+        dot.x = dot.cx + Math.cos(dot.phase) * dot.rx;
+        dot.y = dot.cy + Math.sin(dot.phase) * dot.ry;
+      }
+    }
+  });
+}
+
+if (!reduceMotion) {
+  for (const el of document.querySelectorAll(".universe-photo")) {
+    mountSectorMotion(el).catch(() => {});
+  }
+  window.addEventListener("load", () => {
+    if (!window.tsParticles) return;
+    window.tsParticles.load({
+      id: "cultureops-particles",
+      options: {
+        fullScreen: { enable: false },
+        particles: {
+          number: { value: 15 },
+          color: { value: ["#a8b69b", "#b96b4d", "#a7b7bd"] },
+          opacity: { value: { min: .08, max: .22 } },
+          size: { value: { min: 1, max: 1.8 } },
+          move: { enable: true, speed: .16, outModes: { default: "out" } },
+          links: { enable: false }
+        },
+        detectRetina: true
+      }
+    }).catch(() => {});
+  });
+}
+</script></body>
 </html>
