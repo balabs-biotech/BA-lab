@@ -63,7 +63,7 @@
   // Anime.js is the single timing layer for editorial reveals; no layout-affecting loops.
   import('https://cdn.jsdelivr.net/npm/animejs@4.1.3/+esm').then(({animate,stagger})=>{
     if(!animate || reduce) return;
-    const groups=['.field-atlas .field-frame','.universe-index-card','.work-card'];
+    const groups=['.field-atlas .field-frame','.universe-index-card','.work-card','.product-catalogue-card','.editorial-feature .editorial-art','.editorial-about .editorial-art','.method-steps li','.value-item'];
     groups.forEach(selector=>{
       document.querySelectorAll(selector).forEach((el,i)=>{
         el.style.opacity='0'; el.style.transform='translateY(14px)';
