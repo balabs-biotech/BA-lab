@@ -11,7 +11,7 @@
   lab:{src:'./assets/universe-lab.jpg',page:'https://commons.wikimedia.org/wiki/File:Penicillium_in_LPCB_Tease_Mount_Microscopy.jpg',label:'MICROBIOLOGY / LPCB',alt:'Préparation microscopique de Penicillium colorée au lactophénol coton bleu',credit:'Ajay Kumar Chaurasiya · CC BY-SA'},
   products:{src:'./assets/universe-products.jpg',page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_098-127.jpg',label:'PLEUROTUS / CULTIVATION KIT',alt:'Pleurotes gris cultivés sur substrat de copeaux de bois',credit:'Zinnmann · Wikimedia Commons'},
   work:{src:'./assets/universe-work.jpg',page:'https://webstories.fontagro.org/',label:'COLONY / RADIAL GROWTH',alt:'Colonie fongique en croissance radiale sur milieu de culture',credit:'FONTAGRO · source image'},
-  learn:{src:'./assets/universe-learn.jpg',page:'https://commons.wikimedia.org/wiki/File:Fungi_seen_with_fluorescence_microscope.jpg',label:'FUNGAL CELLS / FLUORESCENCE',alt:'Champignons observés en microscopie à fluorescence',credit:'Juan Carlos Fonseca Mata · CC BY 4.0'}
+  evidence:{src:'./assets/universe-evidence.jpg',page:'https://commons.wikimedia.org/wiki/File:Fungi_seen_with_fluorescence_microscope.jpg',label:'FUNGAL CELLS / FLUORESCENCE',alt:'Champignons observés en microscopie à fluorescence',credit:'Juan Carlos Fonseca Mata · CC BY 4.0'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  cards.forEach((card,index)=>{
