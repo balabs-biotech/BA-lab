@@ -64,6 +64,23 @@
 .inline-explorer .child-branches .btn{max-width:100%;height:auto;min-height:27px;padding:5px 8px;line-height:1.25;text-align:left;white-space:normal;font-size:10px;color:#c3cec4}
 @media(max-width:700px){.inline-explorer{margin-top:12px;border-radius:12px}.inline-explorer-stage{height:68vh;min-height:490px}.inline-explorer-title{top:14px;left:13px;max-width:calc(100% - 112px)}.inline-explorer-title p{font-size:10px}.inline-explorer-controls{top:13px;right:12px}.inline-explorer-controls .btn{width:34px;height:34px;min-height:34px}#hint{display:none}#selection{bottom:12px;left:12px;width:min(330px,calc(100% - 24px));max-height:33%}}
 @media(prefers-reduced-motion:reduce){.inline-explorer *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Focus-first explorer: keep the mycelium visible, not covered by stacked UI. */
+#selection{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+#hint,.relation-legend,.inline-explorer-title p{display:none!important}
+.inline-explorer-title{left:16px;top:14px;opacity:.58;max-width:210px}
+.inline-explorer-title h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0}
+.inline-explorer-title .eyebrow{font-size:8px}
+.universe-rail{left:10px;gap:5px;padding:4px;background:transparent;border:0;backdrop-filter:none}
+.universe-rail button{position:relative;justify-content:center;gap:0;width:18px;min-width:18px;height:18px;padding:0;border-radius:50%;background:transparent!important;outline:0!important}
+.universe-rail button i{width:7px;height:7px;flex-basis:7px;transition:transform .16s,box-shadow .16s}
+.universe-rail button span{position:absolute;left:25px;top:50%;transform:translateY(-50%) translateX(-4px);padding:5px 7px;border:1px solid #82998a38;border-radius:5px;background:#111b1df0;color:#d1d0c5;font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;opacity:0;pointer-events:none;white-space:nowrap;transition:opacity .16s,transform .16s}
+.universe-rail button:hover i,.universe-rail button:focus-visible i,.universe-rail button[aria-current="location"] i{transform:scale(1.45);box-shadow:0 0 12px var(--dot)}
+.universe-rail button:hover span,.universe-rail button:focus-visible span{opacity:1;transform:translateY(-50%) translateX(0)}
+.inline-explorer-controls{right:12px;top:12px;display:flex;gap:4px;opacity:.48;transition:opacity .18s}
+.inline-explorer-controls:hover,.inline-explorer-controls:focus-within{opacity:1}
+.inline-explorer-controls .btn{width:29px;height:29px;min-height:29px;font-size:14px;border-radius:50%;padding:0}
+@media(max-width:700px){.inline-explorer-title{left:10px;top:10px}.universe-rail{left:5px;gap:4px}.universe-rail button{width:15px;min-width:15px;height:15px}.inline-explorer-controls{right:8px;top:8px}.inline-explorer-controls .btn{width:27px;height:27px;min-height:27px}}
 </style>
 </head>
 <body>
