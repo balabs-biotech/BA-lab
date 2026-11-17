@@ -1231,3 +1231,125 @@ html body[data-domain="mycology"] #trackerCard .culture-detail-timeline .culture
     transition:none !important;
   }
 }
+
+
+/* PASS 158 — culture registry cards: clarify specimen identity, type and actions.
+   Presentation-only layer; catalog content and event handlers remain unchanged. */
+html body[data-domain="mycology"] #trackerCard .culture-catalog-row {
+  position:relative !important;
+  gap:15px !important;
+  padding:17px 17px 15px !important;
+  border-color:rgba(201,130,89,.19) !important;
+  border-inline-start-width:3px !important;
+  border-inline-start-color:rgba(201,130,89,.82) !important;
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(201,130,89,.075),transparent 58%),
+    linear-gradient(155deg,#263431 0%,#202d2b 58%,#1b2725 100%) !important;
+  box-shadow:0 10px 24px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.035) !important;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease,background-color .18s ease !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-main {
+  gap:10px !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-code {
+  display:block !important;
+  width:fit-content !important;
+  max-width:100% !important;
+  color:#f0eee8 !important;
+  font-size:clamp(15px,1.35vw,17px) !important;
+  line-height:1.35 !important;
+  letter-spacing:-.018em !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-meta {
+  align-items:center !important;
+  gap:7px 9px !important;
+  color:#aebdb4 !important;
+  font-size:10px !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-kind {
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:25px !important;
+  padding:4px 8px !important;
+  border:1px solid rgba(201,130,89,.24) !important;
+  border-radius:6px !important;
+  background:rgba(201,130,89,.09) !important;
+  color:#e1ad8f !important;
+  font-size:10px !important;
+  font-weight:740 !important;
+  line-height:1.35 !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-started {
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:25px !important;
+  color:#aebdb4 !important;
+  font-size:10px !important;
+  line-height:1.45 !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-actions {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:8px !important;
+  padding-top:12px !important;
+  border-top:1px solid rgba(174,190,180,.12) !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-action {
+  min-height:40px !important;
+  border:1px solid rgba(174,190,180,.19) !important;
+  border-radius:8px !important;
+  background:rgba(9,17,16,.27) !important;
+  color:#d5dfd7 !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+  letter-spacing:.005em !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-action[data-culture-action="observe"] {
+  border-color:rgba(201,130,89,.32) !important;
+  background:rgba(201,130,89,.105) !important;
+  color:#e8b99d !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-action[data-culture-action="history"] {
+  grid-column:1/-1 !important;
+  justify-content:center !important;
+  border-color:rgba(201,130,89,.22) !important;
+  background:rgba(201,130,89,.055) !important;
+  color:#dca88a !important;
+}
+html body[data-domain="mycology"] #trackerCard .culture-catalog-action:focus-visible {
+  outline:2px solid #e0ad91 !important;
+  outline-offset:3px !important;
+}
+@media(hover:hover) and (pointer:fine) {
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-row:hover {
+    transform:translateY(-2px) !important;
+    border-color:rgba(201,130,89,.34) !important;
+    box-shadow:0 16px 32px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.05) !important;
+  }
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-action:hover {
+    border-color:rgba(201,130,89,.36) !important;
+    background:rgba(201,130,89,.105) !important;
+  }
+}
+@media(max-width:600px) {
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-row {
+    gap:13px !important;
+    padding:14px !important;
+  }
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-actions {
+    gap:7px !important;
+    padding-top:10px !important;
+  }
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-action {
+    min-height:42px !important;
+    padding:9px 8px !important;
+    font-size:11px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-row,
+  html body[data-domain="mycology"] #trackerCard .culture-catalog-action {
+    transition:none !important;
+  }
+}
