@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fetch and validate BA Labs public-site image assets for GitHub Pages."""
 import argparse, json, pathlib, sys, time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
@@ -14,7 +15,7 @@ def download(url):
     for attempt in range(3):
         try:
             req = Request(url, headers={"User-Agent":"BALabs-SiteAssetBuilder/1.0 (GitHub Pages image packaging)"})
-            with urlopen(req, timeout=35) as response:
+            with urlopen(req, timeout=18) as response:
                 data = response.read(20 * 1024 * 1024 + 1)
                 if len(data) > 20 * 1024 * 1024:
                     raise RuntimeError("image exceeds 20 MB")
@@ -37,20 +38,25 @@ def main():
     entries = json.loads(pathlib.Path(args.manifest).read_text(encoding="utf-8"))
     out = pathlib.Path(args.output); out.mkdir(parents=True, exist_ok=True)
     failures = []
-    for item in entries:
-        try:
-            data, final_url, mime = download(item["url"])
-            ext = pathlib.Path(item["file"]).suffix.lower()
-            valid = any(data.startswith(sig) for sig in SIGNATURES.get(ext, ()))
-            if ext == ".webp":
-                valid = data.startswith(b"RIFF") and data[8:12] == b"WEBP"
-            if not valid:
-                raise RuntimeError(f"response is not a valid {ext} image (Content-Type: {mime}; final URL: {final_url})")
-            (out / item["file"]).write_bytes(data)
-            print(f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}")
-        except Exception as exc:
-            failures.append((item["id"], str(exc)))
-            print(f"FAIL {item['id']}: {exc}", file=sys.stderr)
+    def fetch_one(item):
+        data, final_url, mime = download(item["url"])
+        ext = pathlib.Path(item["file"]).suffix.lower()
+        valid = any(data.startswith(sig) for sig in SIGNATURES.get(ext, ()))
+        if ext == ".webp":
+            valid = data.startswith(b"RIFF") and data[8:12] == b"WEBP"
+        if not valid:
+            raise RuntimeError(f"response is not a valid {ext} image (Content-Type: {mime}; final URL: {final_url})")
+        (out / item["file"]).write_bytes(data)
+        return f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}"
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        jobs = {pool.submit(fetch_one, item): item for item in entries}
+        for future in as_completed(jobs):
+            item = jobs[future]
+            try:
+                print(future.result())
+            except Exception as exc:
+                failures.append((item["id"], str(exc)))
+                print(f"FAIL {item['id']}: {exc}", file=sys.stderr)
     if failures:
         print(f"\n{len(failures)} image(s) failed; refusing to publish a partial image set.", file=sys.stderr)
         sys.exit(1)
