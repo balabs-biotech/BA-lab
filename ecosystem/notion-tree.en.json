@@ -670,7 +670,7 @@
     },
     {
       "id": "work",
-      "title": "Research and development",
+      "title": "Documented work & projects",
       "notionId": "40173152f171812084fcc3e45ece4ec9",
       "url": "https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9",
       "children": [
@@ -744,9 +744,10 @@
   },
   "mappingAudit": {
     "verifiedAt": "2026-11-17",
-    "scope": "public language-specific Notion branches",
+    "scope": "public English Notion navigation links",
     "realNotionUniverses": 7,
     "curatedNavigationHubs": 1,
-    "method": "page-block children and explicit same-language page links"
+    "method": "page-block children and explicit same-language page links",
+    "correction": "The Research and development universe uses its exact public Notion page title: Documented work & projects."
   }
 }
