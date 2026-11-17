@@ -89,6 +89,67 @@
 .inline-explorer-controls .btn{width:29px;height:29px;min-height:29px;font-size:14px;border-radius:50%;padding:0}
 @media(max-width:700px){.inline-explorer-title{left:10px;top:10px}.universe-rail{left:5px;gap:3px}.universe-rail button{width:30px;min-width:30px;height:30px}.universe-rail button span{left:28px}.inline-explorer-controls{right:8px;top:8px}.inline-explorer-controls .btn{width:27px;height:27px;min-height:27px}}
 </style>
+<style id="universe-rail-organic">
+#app.balabs-ui .inline-explorer .universe-rail{
+ position:absolute!important;left:clamp(10px,1.6vw,22px)!important;top:50%!important;bottom:auto!important;
+ width:64px!important;height:304px!important;transform:translateY(-50%)!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;
+ gap:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;
+ background:transparent!important;backdrop-filter:none!important;box-shadow:none!important;z-index:24!important;
+}
+#app.balabs-ui .universe-rail-filament{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+#app.balabs-ui .universe-filament-base,#app.balabs-ui .universe-filament-glow,#app.balabs-ui .universe-filament-branch{fill:none;stroke-linecap:round;stroke-linejoin:round}
+#app.balabs-ui .universe-filament-base{stroke:#a9b8aa88;stroke-width:1.4;stroke-dasharray:1.5 4}
+#app.balabs-ui .universe-filament-glow{stroke:#b96b4d;stroke-width:2.1;stroke-dasharray:1 7;opacity:.7;filter:drop-shadow(0 0 4px #b96b4d)}
+#app.balabs-ui .universe-filament-branch{stroke:#9aafa266;stroke-width:1.05;stroke-dasharray:1 4;opacity:.8}
+#app.balabs-ui .inline-explorer .universe-rail button{
+ position:relative!important;z-index:1!important;display:grid!important;place-items:center!important;
+ width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;
+ border:0!important;border-radius:50%!important;background:transparent!important;color:#d1d0c5!important;
+ transform:none!important;outline:0!important;transition:transform .22s ease,filter .22s ease!important;
+}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(2){transform:translateX(5px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(3){transform:translateX(-8px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(4){transform:translateX(6px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(5){transform:translateX(-9px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(6){transform:translateX(4px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(7){transform:translateX(-5px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button:nth-of-type(8){transform:translateX(-1px)!important}
+#app.balabs-ui .inline-explorer .universe-rail button i{
+ width:9px!important;height:9px!important;flex:0 0 9px!important;border:1px solid #d1d0c5!important;
+ background:var(--dot)!important;box-shadow:0 0 8px color-mix(in srgb,var(--dot) 58%,transparent)!important;
+ transition:width .22s,height .22s,box-shadow .22s,background .22s!important;
+}
+#app.balabs-ui .inline-explorer .universe-rail button span{
+ position:absolute!important;left:35px!important;top:50%!important;transform:translateY(-50%) translateX(-5px)!important;
+ padding:5px 8px!important;border:1px solid #b96b4d88!important;border-radius:6px!important;
+ background:#111b1df2!important;color:#f2f1e9!important;font:700 8px/1 system-ui,sans-serif!important;
+ letter-spacing:.08em!important;opacity:0!important;visibility:hidden!important;white-space:nowrap!important;
+ pointer-events:none!important;transition:opacity .18s,transform .18s,visibility .18s!important;
+}
+#app.balabs-ui .inline-explorer .universe-rail button:hover i,
+#app.balabs-ui .inline-explorer .universe-rail button:focus-visible i,
+#app.balabs-ui .inline-explorer .universe-rail button[aria-current="location"] i{
+ width:14px!important;height:14px!important;border:2px solid #f4eee5!important;
+ box-shadow:0 0 0 4px #b96b4d2b,0 0 17px var(--dot)!important;
+}
+#app.balabs-ui .inline-explorer .universe-rail button[aria-current="location"] span,
+#app.balabs-ui .inline-explorer .universe-rail button:hover span,
+#app.balabs-ui .inline-explorer .universe-rail button:focus-visible span{
+ opacity:1!important;visibility:visible!important;transform:translateY(-50%) translateX(0)!important;
+}
+#app.balabs-ui .inline-explorer .universe-rail button:focus-visible{outline:2px solid #f2f1e9!important;outline-offset:3px!important}
+@media(max-width:700px){
+ #app.balabs-ui .inline-explorer .universe-rail{left:8px!important;right:auto!important;top:50%!important;bottom:auto!important;width:42px!important;height:276px!important;transform:translateY(-50%)!important}
+ #app.balabs-ui .inline-explorer .universe-rail button{width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important}
+ #app.balabs-ui .inline-explorer .universe-rail button i{width:8px!important;height:8px!important;flex-basis:8px!important}
+ #app.balabs-ui .inline-explorer .universe-rail button[aria-current="location"] i{width:12px!important;height:12px!important}
+ #app.balabs-ui .inline-explorer .universe-rail button span{left:30px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui .universe-filament-glow,#app.balabs-ui .inline-explorer .universe-rail button,#app.balabs-ui .inline-explorer .universe-rail button i{transition:none!important;animation:none!important}
+}
+</style>
 </head>
 <body>
 <div class="wrap balabs-ui" id="app" dir="ltr">
@@ -156,6 +217,11 @@
   <canvas id="field" aria-label="Réseau mycélien interactif des huit univers BA Labs"></canvas>
   <div class="inline-explorer-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h2 id="heading">Réseau vivant</h2><p id="description">Huit univers reliés dans un même espace vivant.</p><div class="relation-legend" id="relationLegend" aria-label="Légende des connexions"></div></div>
   <nav class="universe-rail" aria-label="Accès direct aux huit univers">
+   <svg class="universe-rail-filament" viewBox="0 0 64 304" preserveAspectRatio="none" aria-hidden="true">
+    <path class="universe-filament-base" d="M32 16 C48 28 15 42 37 56 C55 69 14 82 24 96 C38 110 50 124 38 136 C22 149 10 163 23 176 C37 189 49 202 36 216 C21 229 15 243 27 256 C39 270 46 284 31 296"/>
+    <path class="universe-filament-glow" d="M32 16 C48 28 15 42 37 56 C55 69 14 82 24 96 C38 110 50 124 38 136 C22 149 10 163 23 176 C37 189 49 202 36 216 C21 229 15 243 27 256 C39 270 46 284 31 296"/>
+    <path class="universe-filament-branch" d="M31 39 C19 35 13 28 8 20 M40 78 C51 74 56 66 60 58 M23 119 C12 114 8 106 4 99 M39 160 C51 155 56 147 61 139 M23 201 C12 196 8 188 4 181 M38 241 C50 236 55 228 60 220 M29 279 C18 275 12 267 7 259"/>
+   </svg>
    <button type="button" data-universe="myco" title="Mycologie" aria-label="Mycologie" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'myco'}}))"><i></i><span>MYCO</span></button>
    <button type="button" data-universe="bio" title="Biotechnologie" aria-label="Biotechnologie" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'bio'}}))"><i></i><span>BIO</span></button>
    <button type="button" data-universe="iot" title="Ingénierie et IoT" aria-label="Ingénierie et IoT" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'iot'}}))"><i></i><span>IoT</span></button>
@@ -567,7 +633,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script src="./product-catalogue-filters.js?v=1"></script>
 <script src="./vengeance-adaptation.js?v=3"></script>
 <script type="importmap">{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}</script>
-<script type="module" src="./explorer-2d.js?v=contrast-cleanup-1"></script>
+<script type="module" src="./explorer-2d.js?v=organic-rail-2"></script>
 <script src="./motion-system.js?v=1" defer></script>
 <script src="./motion-director.js?v=1" defer></script>
 
