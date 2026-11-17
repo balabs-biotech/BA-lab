@@ -29,6 +29,9 @@ for (const language of expectedLanguages) {
     if (node.id === 'learn') {
       assert.ok(!node.url && !node.notionId, trail + ': knowledge-transfer hub must not invent a parent Notion destination');
       assert.equal(node.children?.length, 4, trail + ': knowledge-transfer hub must expose four public resource links');
+    } else if (node.kind === 'section') {
+      assert.ok(!node.url && !node.notionId, trail + ': a heading-derived section must not invent a Notion page destination');
+      assert.ok((node.children || []).length > 0, trail + ': a heading-derived section must contain verified Notion pages');
     } else if (node.id.startsWith('learn-')) {
       assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-linked public Notion URL');
       assert.ok(!node.notionId, trail + ': cross-domain links must not duplicate source-page identifiers');
@@ -44,5 +47,8 @@ for (const language of expectedLanguages) {
   };
 
   for (const domain of manifest.domains) visit(domain);
-  console.log(language + ': ' + manifest.domains.length + ' public roots, ' + nodeCount + ' linked pages — valid');
+  assert.ok(nodeCount >= 100, language + ': the manifest must retain the complete mapped Notion hierarchy');
+  const productSections = manifest.domains.find((domain) => domain.id === 'products').children.filter((node) => node.kind === 'section');
+  assert.equal(productSections.length, 4, language + ': product-page headings must remain represented as four explicit navigable sections');
+  console.log(language + ': ' + manifest.domains.length + ' public roots, ' + nodeCount + ' mapped nodes — valid');
 }
