@@ -77,7 +77,7 @@ function buildNetwork(){
   const candidates=[];
   const nearestDistances=[];
   group.forEach((a,i)=>{
-   const nearby=group.filter((b,j)=>j!==i&&a.parent!==b.parent)
+   const nearby=group.filter((b,j)=>j!==i)
     .map(b=>({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)}))
     .sort((x,y)=>x.d-y.d).slice(0,3);
    if(nearby.length)nearestDistances.push(nearby[0].d);
