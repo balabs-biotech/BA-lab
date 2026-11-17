@@ -240,3 +240,20 @@ html,body{
     transition:none!important;
   }
 }
+
+/* Semantic color mapping for the eight universes: biology is green, engineering is electric blue. */
+#app.balabs-ui .universe-index-card{--universe-accent:#A8B8C9}
+#app.balabs-ui .universe-index-card[data-domain-page="myco"],
+#app.balabs-ui .universe-index-card[data-domain-page="bio"],
+#app.balabs-ui .universe-index-card[data-domain-page="soil"]{--universe-accent:#A7B8A4}
+#app.balabs-ui .universe-index-card[data-domain-page="iot"]{--universe-accent:#6C9BFF}
+#app.balabs-ui .universe-index-card[data-domain-page="lab"]{--universe-accent:#D6AD5B}
+#app.balabs-ui .universe-index-card[data-domain-page="products"]{--universe-accent:#C87952}
+#app.balabs-ui .universe-index-card[data-domain-page="work"]{--universe-accent:#D6AD5B}
+#app.balabs-ui .universe-index-card[data-domain-page="learn"]{--universe-accent:#A8B8C9}
+#app.balabs-ui .universe-index-card>span,
+#app.balabs-ui .universe-index-card>em{color:var(--universe-accent)!important}
+#app.balabs-ui .universe-index-card:hover{
+  border-color:color-mix(in srgb,var(--universe-accent) 52%,transparent)!important;
+  box-shadow:0 14px 36px rgba(8,18,29,.2),inset 0 0 0 1px color-mix(in srgb,var(--universe-accent) 25%,transparent)!important;
+}
