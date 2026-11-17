@@ -246,3 +246,47 @@
  color:#f2f1e9;font-size:10px;line-height:1.4;text-shadow:0 1px 8px #000;text-decoration:none
 }
 #app.balabs-ui .experience-page .field-frame figcaption a:hover{text-decoration:underline;text-decoration-color:#b96b4d}
+
+
+/* Responsive editorial rhythm: preserve the full canvas, never stack UI over content. */
+#app.balabs-ui :focus-visible{
+ outline:2px solid #c8876d!important;outline-offset:3px;
+}
+@media(max-width:760px){
+ #app.balabs-ui .top{padding-inline:14px}
+ #app.balabs-ui .site-nav{
+  max-width:100%;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  mask-image:linear-gradient(90deg,#000 0%,#000 92%,transparent 100%);
+ }
+ #app.balabs-ui .site-nav::-webkit-scrollbar{display:none}
+ #app.balabs-ui .site-nav a{flex:0 0 auto;white-space:nowrap}
+ #app.balabs-ui .experience-page{scroll-margin-inline:0}
+ #app.balabs-ui .experience-page h2{max-width:100%;font-size:clamp(29px,8vw,48px);line-height:1.02}
+ #app.balabs-ui .experience-page .work-heading>p,
+ #app.balabs-ui .experience-page .product-catalogue-intro p,
+ #app.balabs-ui .experience-page .field-atlas-head p{font-size:14px;line-height:1.65}
+ #app.balabs-ui .experience-page .field-frame,
+ #app.balabs-ui .experience-page .work-media,
+ #app.balabs-ui .experience-page .editorial-art,
+ #app.balabs-ui .experience-page .product-catalogue-card figure{min-height:180px}
+ #app.balabs-ui .experience-page .field-frame figcaption{inset:auto 10px 9px}
+ #app.balabs-ui .experience-page .field-frame figcaption a{font-size:9px}
+ #app.balabs-ui .experience-page .work-card,
+ #app.balabs-ui .experience-page .universe-index-card,
+ #app.balabs-ui .experience-page .product-catalogue-card,
+ #app.balabs-ui .experience-page .value-item{min-width:0}
+}
+@media(max-width:420px){
+ #app.balabs-ui .top{padding-inline:10px}
+ #app.balabs-ui .site-nav a{padding-inline:7px;font-size:7px;letter-spacing:.07em}
+ #app.balabs-ui .experience-page h2{font-size:clamp(27px,8.4vw,38px)}
+ #app.balabs-ui .experience-page .field-frame,
+ #app.balabs-ui .experience-page .work-media,
+ #app.balabs-ui .experience-page .editorial-art,
+ #app.balabs-ui .experience-page .product-catalogue-card figure{min-height:155px}
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui .site-nav a,
+ #app.balabs-ui .brand:after{transition:none!important}
+}
