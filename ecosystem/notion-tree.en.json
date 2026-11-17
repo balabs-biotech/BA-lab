@@ -647,7 +647,8 @@
               "title": "Gas exchange & airflow",
               "description": "Study ventilation and gas exchange in cultivation enclosures."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-instrumentation",
@@ -669,7 +670,8 @@
               "title": "Power & safety",
               "description": "Document power supply, electrical protection and setup reliability."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-control",
@@ -691,7 +693,8 @@
               "title": "Lighting & cycles",
               "description": "Define lighting and timing scenarios for experimental trials."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-data",
@@ -713,7 +716,8 @@
               "title": "Measurement quality",
               "description": "Identify drift, missing values, calibration needs and uncertainty."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-traceability-detail",
@@ -735,7 +739,8 @@
               "title": "History & comparisons",
               "description": "Compare experimental cycles without losing their initial conditions."
             }
-          ]
+          ],
+          "kind": "section"
         }
       ],
       "notionParentId": "hub",
