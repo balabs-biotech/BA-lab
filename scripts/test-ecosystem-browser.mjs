@@ -19,10 +19,30 @@ try {
     });
     const errors = [];
     const failed = [];
+    const badImageResponses = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('requestfailed', request => { const reason = request.failure()?.errorText || 'unknown'; if (reason !== 'net::ERR_ABORTED') failed.push(request.url() + ' — ' + reason); });
+    page.on('response', response => {
+      if (/\\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(response.url()) && response.status() >= 400) {
+        badImageResponses.push(response.url() + ' — HTTP ' + response.status());
+      }
+    });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('#app .editorial-method').waitFor({ state: 'visible', timeout: 15000 });
+    // Test the actual packaged image files, not merely whether the page JS starts.
+    const imageAudit = await page.evaluate(async () => {
+      const images = [...document.images];
+      images.forEach(image => { image.loading = 'eager'; });
+      await Promise.all(images.map(image => image.decode().catch(() => null)));
+      return images.map(image => ({
+        src: image.currentSrc || image.src,
+        loaded: image.complete && image.naturalWidth > 0,
+        width: image.naturalWidth
+      }));
+    });
+    const brokenImages = imageAudit.filter(image => !image.loaded);
+    assert.deepEqual(badImageResponses, [], 'No image asset may return an HTTP error');
+    assert.deepEqual(brokenImages, [], 'Every rendered site image must decode successfully');
     assert.equal(await page.locator('script[src*="engine-v2.js"]').count(), 0, 'The legacy 3D engine must not load on the primary site');
     assert.equal(await page.locator('#mainView:visible,#miniView:visible').count(), 0, 'Legacy 3D scene must not remain visible');
     await page.locator('#inlineExplorer').waitFor({ state: 'visible' });
@@ -59,7 +79,7 @@ try {
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(failed, [], 'No failed network requests');
     await page.screenshot({ path: outputDir + '/' + viewport.name + '-vernpixi-primary.png', fullPage: false });
-    results.push({ viewport: viewport.name, renderer: 'PixiJS 2D embedded in homepage', universes: 8, directDomainEntry: true, staysOnHomepage: true, browserErrors: errors.length });
+    results.push({ viewport: viewport.name, renderer: 'PixiJS 2D embedded in homepage', universes: 8, directDomainEntry: true, staysOnHomepage: true, imagesChecked: imageAudit.length, browserErrors: errors.length });
     await page.close();
   }
   const route = await browser.newPage();
