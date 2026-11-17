@@ -18,6 +18,7 @@ for (const language of expectedLanguages) {
 
   const ids = new Set();
   const urls = new Set();
+  const references = [];
   let nodeCount = 0;
   const visit = (node, parentPath = language) => {
     nodeCount += 1;
@@ -32,6 +33,10 @@ for (const language of expectedLanguages) {
     } else if (node.kind === 'section') {
       assert.ok(!node.url && !node.notionId, trail + ': a heading-derived section must not invent a Notion page destination');
       assert.ok((node.children || []).length > 0, trail + ': a heading-derived section must contain verified Notion pages');
+    } else if (node.kind === 'reference') {
+      assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-universe Notion reference URL');
+      assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': reference URL and page ID must match');
+      references.push({ url: node.url, trail });
     } else if (node.id.startsWith('learn-')) {
       assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-linked public Notion URL');
       assert.ok(!node.notionId, trail + ': cross-domain links must not duplicate source-page identifiers');
@@ -47,6 +52,7 @@ for (const language of expectedLanguages) {
   };
 
   for (const domain of manifest.domains) visit(domain);
+  for (const reference of references) assert.ok(urls.has(reference.url), reference.trail + ': cross-universe reference must point to a canonical mapped page');
   assert.ok(nodeCount >= 100, language + ': the manifest must retain the complete mapped Notion hierarchy');
   const productSections = manifest.domains.find((domain) => domain.id === 'products').children.filter((node) => node.kind === 'section');
   assert.equal(productSections.length, 4, language + ': product-page headings must remain represented as four explicit navigable sections');
