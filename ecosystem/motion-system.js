@@ -24,7 +24,7 @@
         window.__balabsVanta=window.VANTA.CELLS({
           el:hero, THREE:window.THREE, mouseControls:true, touchControls:false, gyroControls:false,
           minHeight:260, minWidth:260, scale:1, scaleMobile:1,
-          color:0x263b38, color2:0xb96b4d, backgroundColor:0x111b1d,
+          color:0x4778ff, color2:0xd6ad5b, backgroundColor:0x10182a,
           size:1.15, speed:0.55
         });
       }).catch(()=>{ /* CSS/image hero remains the fallback. */ });
@@ -44,7 +44,7 @@
         'float a=blob(p,vec2(sin(t*.17)*.34,cos(t*.13)*.22),.20);'+
         'float b=blob(p,vec2(cos(t*.11)*.36,sin(t*.19)*.25),.24);'+
         'float c=blob(p,vec2(sin(t*.09+.8)*.12,cos(t*.15+.6)*.36),.18);'+
-        'vec3 col=vec3(.067,.106,.114)+a*vec3(.035,.13,.105)+b*vec3(.16,.065,.043)+c*vec3(.06,.10,.08);'+
+        'vec3 col=vec3(.063,.094,.16)+a*vec3(.055,.12,.28)+b*vec3(.20,.12,.035)+c*vec3(.12,.065,.12);'+
         'gl_FragColor=vec4(col,.62);}';
       const compile=(type,src)=>{const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;};
       try{
