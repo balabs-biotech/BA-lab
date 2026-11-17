@@ -705,7 +705,8 @@
               "title": "Trocas gasosas e ventilação",
               "description": "Estudar a ventilação e as trocas gasosas nas câmaras de cultivo."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-instrumentation",
@@ -727,7 +728,8 @@
               "title": "Alimentação e segurança",
               "description": "Documentar alimentação, proteção elétrica e fiabilidade da montagem."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-control",
@@ -749,7 +751,8 @@
               "title": "Iluminação e ciclos",
               "description": "Definir cenários de iluminação e temporização para ensaios."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-data",
@@ -771,7 +774,8 @@
               "title": "Qualidade das medições",
               "description": "Identificar deriva, valores em falta, calibração e incerteza."
             }
-          ]
+          ],
+          "kind": "section"
         },
         {
           "id": "iot-traceability-detail",
@@ -793,7 +797,8 @@
               "title": "Histórico e comparações",
               "description": "Comparar ciclos experimentais sem perder as condições iniciais."
             }
-          ]
+          ],
+          "kind": "section"
         }
       ],
       "notionParentId": "hub",
