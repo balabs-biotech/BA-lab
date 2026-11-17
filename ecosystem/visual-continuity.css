@@ -191,3 +191,45 @@
  #app.balabs-ui .experience-page .editorial-art img,
  #app.balabs-ui .experience-page .product-catalogue-card img{transition:none!important}
 }
+
+/* Kinetic editorial typography — real selectors from the live chapters. */
+#app.balabs-ui .experience-page .hero h1,
+#app.balabs-ui .experience-page .work-heading h2,
+#app.balabs-ui .experience-page .universe-index-heading h2,
+#app.balabs-ui .experience-page .product-catalogue-head h2,
+#app.balabs-ui .experience-page .editorial-about h2,
+#app.balabs-ui .experience-page .editorial-method h2,
+#app.balabs-ui .experience-page .value-heading h2,
+#app.balabs-ui .experience-page .bridge-copy h2{
+ transition:opacity .85s ease,transform .95s var(--bal-ease),clip-path .95s var(--bal-ease);
+}
+#app.balabs-ui .experience-page .rb-sequence-armed{
+ opacity:0;transform:translate3d(0,22px,0);
+ transition:opacity .8s ease,transform .95s var(--bal-ease),filter .8s ease;
+ transition-delay:var(--reveal-delay,0ms);
+}
+#app.balabs-ui .experience-page .rb-sequence-armed.is-sequence-visible{
+ opacity:1;transform:translate3d(0,0,0)
+}
+#app.balabs-ui .experience-page .rb-motion-media{
+ clip-path:inset(7% 5% 7% 5% round 1px);
+ transition:clip-path 1.1s var(--bal-ease),transform 1.2s var(--bal-ease),filter .9s ease;
+}
+#app.balabs-ui .experience-page .rb-motion-media.is-motion-visible{clip-path:inset(0 round 1px)}
+#app.balabs-ui .experience-page .rb-motion-media img,
+#app.balabs-ui .experience-page .rb-motion-media video{transform:scale(1.055)}
+#app.balabs-ui .experience-page .rb-motion-media.is-motion-visible img,
+#app.balabs-ui .experience-page .rb-motion-media.is-motion-visible video{transform:scale(1)}
+#app.balabs-ui .experience-page .chapter-atmosphere.rb-motion-media{clip-path:none}
+#app.balabs-ui .experience-page .chapter-atmosphere.rb-motion-media img{transform:scale(1.04)}
+#app.balabs-ui .experience-page .chapter-atmosphere.rb-motion-media.is-motion-visible img{transform:scale(1.08)}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui .experience-page .rb-sequence-armed,
+ #app.balabs-ui .experience-page .rb-sequence-armed.is-sequence-visible,
+ #app.balabs-ui .experience-page .rb-motion-media,
+ #app.balabs-ui .experience-page .rb-motion-media.is-motion-visible,
+ #app.balabs-ui .experience-page .rb-motion-media img,
+ #app.balabs-ui .experience-page .rb-motion-media video{
+  opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important;filter:none!important
+ }
+}
