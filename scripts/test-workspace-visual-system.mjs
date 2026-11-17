@@ -94,6 +94,7 @@ for (const [label, entry] of [["GreenTech", greenTechEntry], ["Mycology", mycolo
 }
 assert.ok(spatialStyles.includes(".ba-spatial-dock") && spatialStyles.includes("@keyframes ba-spatial-arrive"), "The navigation dock and panel transition must have a dedicated visual layer");
 assert.ok(spatialNavigation.includes("toolbar.appendChild(dock)") && spatialStyles.includes("flex:1 0 100%"), "Spatial controls must stay inside the existing toolbar without changing workspace grid rows");
+assert.ok(!spatialStyles.includes("grid-template-areas:"), "Spatial navigation must not add implicit grid rows to the legacy workspace");
 assert.ok(spatialNavigation.includes("plantCard") && spatialNavigation.includes("agronomy"), "GreenTech plant workspace must remain in the spatial navigation map");
 assert.ok(spatialNavigation.includes("ba-spatial-enter-x") && spatialNavigation.includes("ba-spatial-enter-y") && spatialStyles.includes("translate3d(var(--ba-spatial-enter-x"), "Panel transitions must follow the chosen left, right, up or down direction");
 assert.ok(["fr:", "en:", "pt:", "ar:"].every(language => spatialNavigation.includes(language)), "Spatial navigation must be available in all four CultureOps languages");
