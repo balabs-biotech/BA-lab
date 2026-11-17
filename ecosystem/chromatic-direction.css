@@ -1,0 +1,150 @@
+/* BA Labs — chromatic direction v1
+   Electric blue + deep ink + warm gold/copper. Keep generous mineral-light surfaces.
+   This is a controlled overlay: existing editorial structure and content remain intact. */
+:root{
+  --balabs-ink:#10182A;
+  --balabs-ink-soft:#18243A;
+  --balabs-blue:#4778FF;
+  --balabs-blue-bright:#6C9BFF;
+  --balabs-blue-pale:#E8EEF9;
+  --balabs-gold:#D6AD5B;
+  --balabs-copper:#C87952;
+  --balabs-paper:#F4F1E8;
+  --balabs-mineral:#D9DDE5;
+  --balabs-muted:#AAB6C9;
+  --balabs-line:rgba(132,157,204,.26);
+  --balabs-glow:rgba(71,120,255,.22);
+  --balabs-focus-ring:0 0 0 3px var(--balabs-ink),0 0 0 5px var(--balabs-gold);
+}
+#app.balabs-ui>.top{
+  background:linear-gradient(100deg,rgba(13,21,39,.98),rgba(24,36,60,.96))!important;
+  border-bottom:1px solid rgba(104,143,230,.34)!important;
+  box-shadow:0 8px 28px rgba(5,12,27,.16)!important;
+}
+#app.balabs-ui>.top .brand strong{color:#F4F1E8!important}
+#app.balabs-ui>.top .brand small{color:#AAB9D2!important}
+#app.balabs-ui>.top .brand:after{background:linear-gradient(90deg,#4778FF,#D6AD5B)!important}
+#app.balabs-ui>.top .lang{
+  color:#D9E3F6!important;background:#202F4A!important;
+  border-color:rgba(132,157,204,.32)!important;
+}
+#app.balabs-ui>.top .lang[aria-pressed=true]{
+  color:#10182A!important;background:#D6AD5B!important;border-color:#D6AD5B!important;
+}
+#app.balabs-ui>.site-nav{
+  border-color:rgba(132,157,204,.2)!important;
+  background:rgba(16,24,42,.94)!important;
+}
+#app.balabs-ui>.site-nav a{color:#BAC8DF!important}
+#app.balabs-ui>.site-nav a:hover{
+  color:#fff!important;background:rgba(71,120,255,.16)!important;
+  border-color:rgba(108,155,255,.5)!important;
+}
+#app.balabs-ui>.site-nav a[aria-current=page],
+#app.balabs-ui>.site-nav a.chapter-active{
+  color:#fff!important;background:rgba(71,120,255,.2)!important;
+  border-color:rgba(108,155,255,.65)!important;
+}
+#app.balabs-ui>.site-nav a[aria-current=page]:after{
+  background:linear-gradient(90deg,#4778FF,#D6AD5B)!important;
+}
+#app.balabs-ui .experience-page{
+  --chapter-accent:#D6AD5B!important;
+  background:
+    radial-gradient(ellipse at 84% 7%,rgba(71,120,255,.19),transparent 35%),
+    radial-gradient(ellipse at 8% 82%,rgba(200,121,82,.09),transparent 34%),
+    linear-gradient(145deg,#17243B 0%,#10182A 54%,#111B2B 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=home]{--chapter-accent:#6C9BFF!important}
+#app.balabs-ui .experience-page[data-chapter=research]{--chapter-accent:#D6AD5B!important}
+#app.balabs-ui .experience-page[data-chapter=network]{--chapter-accent:#83A9FF!important}
+#app.balabs-ui .experience-page[data-chapter=catalogue]{--chapter-accent:#C87952!important}
+#app.balabs-ui .experience-page[data-chapter=about]{--chapter-accent:#D6AD5B!important}
+#app.balabs-ui .experience-page h1 span,
+#app.balabs-ui .experience-page h2 em,
+#app.balabs-ui .experience-page .eyebrow,
+#app.balabs-ui .experience-page .experience-page-label{
+  color:#D6AD5B!important;
+}
+#app.balabs-ui .experience-page .experience-page-label{
+  border-inline-start-color:var(--chapter-accent)!important;
+  background:rgba(16,24,42,.38)!important;
+}
+#app.balabs-ui .experience-page:before{
+  background:linear-gradient(90deg,transparent,#4778FF 30%,#D6AD5B 72%,transparent)!important;
+  opacity:.72!important;
+}
+#app.balabs-ui .experience-page .work-heading,
+#app.balabs-ui .experience-page .universe-index-heading,
+#app.balabs-ui .experience-page .product-catalogue-head,
+#app.balabs-ui .experience-page .field-atlas-head,
+#app.balabs-ui .experience-page .value-heading{
+  border-color:rgba(132,157,204,.32)!important;
+}
+#app.balabs-ui .experience-page .work-heading>p,
+#app.balabs-ui .experience-page .product-catalogue-intro p,
+#app.balabs-ui .experience-page .field-atlas-head p{
+  color:#C5D0E2!important;
+}
+#app.balabs-ui .experience-page .work-card,
+#app.balabs-ui .experience-page .product-catalogue-card,
+#app.balabs-ui .experience-page .method-steps li,
+#app.balabs-ui .experience-page .value-item{
+  border-color:rgba(132,157,204,.24)!important;
+}
+#app.balabs-ui .experience-page .work-card:hover,
+#app.balabs-ui .experience-page .product-catalogue-card:hover,
+#app.balabs-ui .experience-page .value-item:hover{
+  border-color:rgba(108,155,255,.72)!important;
+  box-shadow:0 16px 44px rgba(5,13,31,.24),0 0 0 1px rgba(108,155,255,.12)!important;
+}
+#app.balabs-ui .experience-page a:focus-visible,
+#app.balabs-ui .experience-page button:focus-visible,
+#app.balabs-ui>.top a:focus-visible,
+#app.balabs-ui>.top button:focus-visible{
+  outline:2px solid #D6AD5B!important;outline-offset:4px!important;
+}
+/* Keep the light editorial chapters light: blue ink and warm gold details, not dark overlays. */
+#app.balabs-ui .experience-page .under,
+#app.balabs-ui .experience-page .universe-index-card{
+  background-color:#EEF1F7!important;color:#17243A!important;
+}
+#app.balabs-ui .experience-page .universe-index-card>b{color:#17243A!important}
+#app.balabs-ui .experience-page .universe-index-card>small,
+#app.balabs-ui .experience-page .universe-index-card>p{color:#52627A!important}
+#app.balabs-ui .experience-page .universe-index-card>span,
+#app.balabs-ui .experience-page .universe-index-card>em{color:#A86E35!important}
+#app.balabs-ui .experience-page .universe-index-card:hover{
+  background:#E2EAF9!important;box-shadow:inset 0 0 0 1px rgba(71,120,255,.38)!important;
+}
+#app.balabs-ui .experience-page .editorial-method{
+  background:linear-gradient(125deg,#17243B,#202E49)!important;
+  color:#F4F1E8!important;border-color:rgba(108,155,255,.34)!important;
+}
+#app.balabs-ui .experience-page .editorial-method .method-top .eyebrow,
+#app.balabs-ui .experience-page .editorial-method .method-no{color:#D6AD5B!important}
+#app.balabs-ui .experience-page .universe-bridge{
+  background:linear-gradient(120deg,#10182A,#17243B)!important;
+  border-color:rgba(108,155,255,.28)!important;
+}
+#app.balabs-ui .experience-page .universe-bridge .bridge-kicker,
+#app.balabs-ui .experience-page .universe-bridge .bridge-action{color:#E1BD75!important}
+#app.balabs-ui .experience-page .universe-bridge .bridge-action{border-color:#C87952!important}
+@media(prefers-reduced-motion:no-preference){
+  #app.balabs-ui .experience-page:after{
+    content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 0%,rgba(71,120,255,.07),transparent 52%);
+    animation:balabsChromaticBreath 14s ease-in-out infinite alternate;
+  }
+  @keyframes balabsChromaticBreath{
+    from{opacity:.38;transform:translate3d(-1%,0,0)}
+    to{opacity:.9;transform:translate3d(1%,1.2%,0)}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-page:after{animation:none!important}
+}
+@media(max-width:760px){
+  #app.balabs-ui>.top{box-shadow:0 4px 18px rgba(5,12,27,.14)!important}
+  #app.balabs-ui .experience-page:after{display:none!important}
+}
