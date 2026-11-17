@@ -49,3 +49,14 @@
 @media(prefers-reduced-motion:reduce){
  .experience-page>.chapter-atmosphere img,.experience-page>.chapter-atmosphere svg path{animation:none!important;transition:none!important;stroke-dashoffset:0}
 }
+/* Site-wide media response: the same restrained reveal rhythm across every chapter. */
+.experience-page .rb-image-armed{
+ transition:filter .9s cubic-bezier(.2,.7,.2,1),opacity .9s ease;
+ filter:saturate(.68) contrast(1.02);
+}
+.experience-page .rb-image-revealed{filter:saturate(.94) contrast(1.07)}
+.experience-page .editorial-about svg.rb-image-armed{opacity:.58;transition:opacity 1s ease,filter 1s ease}
+.experience-page .editorial-about svg.rb-image-revealed{opacity:1}
+@media(prefers-reduced-motion:reduce){
+ .experience-page .rb-image-armed,.experience-page .rb-image-revealed{transition:none!important;animation:none!important}
+}
