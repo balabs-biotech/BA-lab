@@ -4,7 +4,7 @@ Les 29 images du site sont téléchargées, contrôlées et empaquetées dans `/
 
 | Emplacement | Fichier local | Auteur / œuvre | Source et licence |
 |---|---|---|---|
-| Accueil — micrographie | `home-hero.jpg` | Christian Scheckhuber · *Mycelium.JPG* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mycelium.JPG) · CC BY-SA 4.0 |
+| Accueil — micrographie | `home-hero.jpg` | Maseko et al. · *P. ostreatus mycelial growth morphology* (Fig. 1) | [International Journal of Food Science / PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/) · CC BY 4.0 |
 | Accueil — instrumentation | `home-iot.jpg` | Cjp24 · *Data logger.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Data_logger.jpg) · voir licence sur la source |
 | Accueil — microscopie fongique | `home-hyphae.jpg` | Juan Carlos Fonseca Mata · *Fungi seen with fluorescence microscope.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungi_seen_with_fluorescence_microscope.jpg) · CC BY 4.0 |
 | Accueil — matière organique | `home-compost.jpg` | Red58bill · *Compost.layers.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Compost.layers.jpg) · CC BY 3.0 |
@@ -13,11 +13,11 @@ Les 29 images du site sont téléchargées, contrôlées et empaquetées dans `/
 | Atlas — Pleurotus / substrat | `home-substrate.jpg` | Zinnmann · *20210719 Pleurotus ostreatus 098-127.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_098-127.jpg) · CC BY-SA 3.0 |
 | Atlas — paillasse | `home-lab.jpg` | Cjp24 · *Laboratory bench.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Laboratory_bench.jpg) · voir licence sur la source |
 | Projet à la une — microscopie | `home-coffee.jpg` | Emilio Bosch · *Microscope view of fungus.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Microscope_view_of_fungus.jpg) · CC BY-SA 4.0 |
-| Chapitre — Accueil | `chapter-home.jpg` | Ajay Kumar Chaurasiya · *Fungal mycelium.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungal_mycelium.jpg) · voir licence sur la source |
-| Chapitre — Explorations | `chapter-research.jpg` | Yakuzakorat · *Fungus in glass dish28.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish28.jpg) · CC BY 4.0 |
+| Chapitre — Accueil | `chapter-home.jpg` | Maseko et al. · *P. ostreatus mycelial growth at different pH levels* (Fig. 2) | [International Journal of Food Science / PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/) · CC BY 4.0 |
+| Chapitre — Explorations | `chapter-research.jpg` | Maseko et al. · *P. ostreatus mycelial growth on nutrient-based media* (Fig. 3) | [International Journal of Food Science / PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/) · CC BY 4.0 |
 | Chapitre — Univers | `chapter-network.jpg` | Luis Fernando Flores LAB · *Petri dish with solid-state fermentation.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Petri_dish_with_solid-state_fermentation.jpg) · CC BY-SA 4.0 |
 | Chapitre — Catalogue | `chapter-catalogue.jpg` | Zinnmann · *20210719 Pleurotus ostreatus 025-047.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_025-047.jpg) · CC BY-SA 3.0 |
-| Chapitre — BA Labs | `chapter-about.jpg` | Ajay Kumar Chaurasiya · *Fungal hyphae in LPCB preparation of culture microscopic examination.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg) · CC BY 4.0 |
+| Chapitre — BA Labs | `chapter-about.jpg` | Maseko et al. · *P. ostreatus mycelium morphology and SEM microstructure* (Fig. 4) | [International Journal of Food Science / PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/) · CC BY 4.0 |
 | Chapitre — méthode | `chapter-about-method.jpg` | Yakuzakorat · *Fungus in glass dish3.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish3.jpg) · CC BY 4.0 |
 | Univers — Mycologie | `universe-myco.jpg` | Michał Wadas · *Pleurotus ostreatus on agar.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pleurotus_ostreatus_on_agar.jpg) · CC BY-SA 4.0 |
 | Univers — Biotechnologies | `universe-bio.jpg` | Syed Sajidul Islam · *Microscopic Image of Penicillium conidial fungi.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Microscopic_Image_of_Penicillium_conidial_fungi.jpg) · voir licence sur la source |
