@@ -153,7 +153,17 @@ function updateSelection(){
  card.append(body);box.append(card);renderAccessible();
 }
 function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.filter(n=>levelOpacity(n.level)>.15).forEach(n=>{const b=el("button","",n.title);b.onclick=()=>focusNode(n);nav.append(b);});}
-function updateUI(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("heading").textContent=t("title");$("description").textContent=t("desc");$("hint").textContent=t("hint");$("kicker").textContent=t("home");$("language").value=lang;if(!document.getElementById("inlineExplorer"))document.title="BA Labs — "+t("title");}
+function updateUI(){
+ document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ $("heading").textContent=t("title");$("description").textContent=t("desc");$("hint").textContent=t("hint");$("kicker").textContent=t("home");$("language").value=lang;
+ const legend=$("relationLegend");
+ if(legend){
+  const labels={fr:["Lien Notion","Lien de contenu","Ramification"],en:["Notion link","Content relation","Hyphal branch"],ar:["رابط Notion","صلة في المحتوى","تفرّع خيطي"],pt:["Ligação Notion","Relação no conteúdo","Ramificação"]}[lang]||["Notion link","Content relation","Hyphal branch"];
+  legend.replaceChildren();
+  ["notion","content","hypha"].forEach((kind,i)=>{const item=el("span",kind);item.append(el("i",""),document.createTextNode(labels[i]));legend.append(item);});
+ }
+ if(!document.getElementById("inlineExplorer"))document.title="BA Labs — "+t("title");
+}
 function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,12),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
 function pointerDown(e){canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragged=false;gesture={x:e.clientX,y:e.clientY,ox:targetOffset.x,oy:targetOffset.y};canvas.classList.add("dragging");}
 function pointerMove(e){if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1&&gesture){const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(Math.abs(dx)+Math.abs(dy)>5)dragged=true;if(dragged){targetOffset.x=gesture.ox+dx;targetOffset.y=gesture.oy+dy;if(reduced){offset={...targetOffset};draw();}}}else if(pointers.size===2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(!pointerMove.last)pointerMove.last=d;const rect=canvas.getBoundingClientRect();zoom(d/pointerMove.last,(p[0].x+p[1].x)/2-rect.left,(p[0].y+p[1].y)/2-rect.top);pointerMove.last=d;dragged=true;}}
