@@ -292,3 +292,134 @@
  #app.balabs-ui .experience-page[data-chapter="catalogue"] .product-catalogue-card:before,
  #app.balabs-ui .experience-page[data-chapter="about"] .method-arrow{transition:none!important}
 }
+
+
+/* PHASE 16 — site-wide visual finish.
+   Strengthens hierarchy and transitions around the 2D network without touching its canvas or data. */
+#app.balabs-ui>.top{
+  position:relative!important;
+  background:linear-gradient(100deg,#111b1d 0%,#172522 58%,#111b1d 100%)!important;
+}
+#app.balabs-ui>.top:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background:repeating-linear-gradient(115deg,transparent 0 42px,rgba(209,208,197,.06) 43px,transparent 44px 86px);
+}
+#app.balabs-ui>.top .brand,#app.balabs-ui>.top .tools{position:relative;z-index:1}
+#app.balabs-ui>.site-nav{
+  border-bottom-color:rgba(209,208,197,.22)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+#app.balabs-ui>.site-nav a{
+  position:relative;transition:color .2s ease,opacity .2s ease!important;
+}
+#app.balabs-ui>.site-nav a:after{
+  content:"";position:absolute;left:0;right:0;bottom:5px;height:1px;
+  background:#b96b4d;transform:scaleX(0);transform-origin:left;
+  transition:transform .24s ease;
+}
+#app.balabs-ui>.site-nav a:hover:after,
+#app.balabs-ui>.site-nav a.chapter-active:after{transform:scaleX(1)}
+#app.balabs-ui .experience-page-label{box-shadow:0 5px 20px rgba(0,0,0,.12)}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-feature .editorial-copy{
+  position:relative;display:flex;flex-direction:column;justify-content:center;
+}
+#app.balabs-ui .experience-page[data-chapter="research"]>.editorial-feature .editorial-copy:before{
+  content:"SPECIMEN / FIELD STUDY";display:block;margin-bottom:22px;
+  color:#8a513e;font:700 8px/1.4 ui-monospace,monospace;letter-spacing:.18em;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy{
+  position:relative;z-index:1;max-width:720px;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy h2{
+  max-width:11ch;text-wrap:balance;letter-spacing:-.055em;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .about-copy p{
+  max-width:58ch;line-height:1.85;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art{
+  min-height:360px;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art svg{
+  width:100%;height:100%;max-height:520px;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .art-caption{
+  font:700 8px/1.5 ui-monospace,monospace;letter-spacing:.15em;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-top{
+  max-width:900px;margin-inline:auto;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-top h2{
+  max-width:13ch;text-wrap:balance;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-steps{
+  max-width:1320px;margin-inline:auto;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-no{
+  color:#d28c6e!important;font:700 10px/1.4 ui-monospace,monospace!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-heading{
+  padding:clamp(28px,4vw,54px) clamp(18px,3vw,38px);
+  border-inline-end:1px solid rgba(17,27,29,.18);
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-heading h2{
+  max-width:10ch;font:400 clamp(30px,4vw,54px)/1.02 Georgia,serif;
+  letter-spacing:-.045em;color:#111b1d;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.foot{
+  padding:clamp(24px,4vw,48px) clamp(20px,5vw,64px)!important;
+  background:#101819!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.foot a{
+  text-underline-offset:4px;text-decoration-color:rgba(185,107,77,.55);
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.scene .scenehead{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+  padding:12px 0 22px;border-bottom:1px solid rgba(209,208,197,.18);
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.scene .scenehead strong{
+  display:block;max-width:24ch;margin-top:8px;
+  color:#f2f1e9;font:400 clamp(26px,3.6vw,44px)/1.08 Georgia,serif;
+  letter-spacing:-.035em;
+}
+#app.balabs-ui .experience-page[data-chapter="network"]>.scene .scenehead small{
+  color:#d28c6e;font:700 9px/1.4 ui-monospace,monospace;letter-spacing:.16em;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] .inline-explorer{
+  border:1px solid rgba(209,208,197,.2)!important;border-radius:3px!important;
+  box-shadow:0 28px 70px rgba(0,0,0,.24)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] .inline-explorer-title h2{
+  font:400 clamp(21px,2.5vw,32px)/1.05 Georgia,serif!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] .inline-explorer-controls .btn{
+  border-radius:2px!important;transition:background .2s,border-color .2s,transform .2s;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] .inline-explorer-controls .btn:active{
+  transform:scale(.94);
+}
+#app.balabs-ui a:focus-visible,#app.balabs-ui button:focus-visible{
+  outline:2px solid #d28c6e!important;outline-offset:4px!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about{
+    grid-template-columns:1fr!important;gap:20px!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art{
+    min-height:250px!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="about"]>.under{
+    grid-template-columns:1fr!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="about"]>.under .value-heading{
+    border-inline-end:0;border-bottom:1px solid rgba(17,27,29,.18);
+  }
+  #app.balabs-ui .experience-page[data-chapter="network"]>.scene .scenehead{
+    align-items:flex-start;flex-direction:column;
+  }
+  #app.balabs-ui .experience-page[data-chapter="network"] .inline-explorer{
+    margin-top:14px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui>.site-nav a:after{transition:none}
+}
