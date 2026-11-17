@@ -81,7 +81,10 @@ try {
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
     assert.equal(await page.locator('#selection .card-title').innerText(), selectedRoot, 'Back must restore the selected branch as well as the camera');
-    assert.equal(await page.locator('#back').isDisabled(), true, 'Back control must return to a stable state after restoring the previous view');
+    assert.equal(await page.locator('#back').isDisabled(), false, 'Back must retain the overview in the navigation history');
+    await page.locator('#back').click();
+    assert.equal(await page.locator('#selection .card-title').count(), 0, 'A second Back must return to the overview');
+    assert.equal(await page.locator('#back').isDisabled(), true, 'Back must disable only when the full history is exhausted');
     const domainUrl = new URL(base);
     domainUrl.searchParams.set('domain', 'myco');
     domainUrl.searchParams.set('lang', 'fr');
