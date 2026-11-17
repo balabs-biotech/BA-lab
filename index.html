@@ -38,7 +38,7 @@ h1{max-width:850px;margin:0;font-family:Georgia,"Times New Roman",serif;font-siz
 html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);padding-left:0;padding-right:34px}html[dir="rtl"] .universe:before{left:auto;right:0}html[dir="rtl"] .universe:hover{padding-left:10px;padding-right:23px}html[dir="rtl"] .enter{flex-direction:row-reverse}html[dir="rtl"] .enter .arrow{transform:scaleX(-1)}
 @media(max-width:850px){html[dir="rtl"] .intro-note{padding-right:20px}}@media(max-width:520px){html[dir="rtl"] .intro-note{padding-right:15px}html[dir="rtl"] .universe:hover{padding-right:13px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
-</style>
+.intro{grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:5vw}.intro-note{display:block;padding:12px 0 35px 28px}.hero-image-stack{display:grid;grid-template-columns:1.2fr .8fr;grid-template-rows:128px 128px;gap:9px;margin:0 0 22px}.hero-image-stack figure{position:relative;margin:0;overflow:hidden;background:#182326}.hero-image-stack figure:first-child{grid-row:1/3}.hero-image-stack img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) contrast(1.08);transition:transform .7s}.hero-image-stack figure:hover img{transform:scale(1.06)}.hero-image-stack figure:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(5,10,11,.82))}.hero-image-stack figcaption{position:absolute;z-index:1;left:9px;bottom:8px;color:#f0eee4;font:8px ui-monospace,monospace;letter-spacing:.12em}.universe{grid-template-columns:64px 168px minmax(190px,.8fr) minmax(220px,1.2fr) 145px;min-height:160px}.universe-index{grid-column:1;grid-row:1/4}.universe-photo{position:relative;grid-column:2;grid-row:1/4;width:100%;height:112px;overflow:hidden}.universe-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.75);transition:transform .7s}.universe:hover .universe-photo img{transform:scale(1.06)}.universe-label{grid-column:3;grid-row:1}.universe h3{grid-column:3;grid-row:2}.universe p{grid-column:4;grid-row:1/4}.enter{grid-column:5;grid-row:1/4}.sector-motion{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.72}@media(max-width:850px){.intro{grid-template-columns:1fr}.intro-note{padding:12px 0 35px 20px}.hero-image-stack{grid-template-rows:105px 105px}.universe{grid-template-columns:48px 130px minmax(0,1fr) 105px;gap:12px;min-height:130px}.universe-index{grid-column:1;grid-row:1/4}.universe-photo{grid-column:2;grid-row:1/4;height:96px}.universe-label{grid-column:3;grid-row:1}.universe h3{grid-column:3;grid-row:2}.universe p{grid-column:3;grid-row:3}.enter{grid-column:4;grid-row:1/4}}@media(max-width:520px){.hero-image-stack{grid-template-rows:92px 92px;gap:6px}.universe{grid-template-columns:34px minmax(0,1fr);gap:8px 12px}.universe-index{grid-column:1;grid-row:1/4}.universe-photo{grid-column:2;grid-row:1;height:125px}.universe-label{grid-column:2;grid-row:2}.universe h3{grid-column:2;grid-row:3}.universe p{grid-column:2;grid-row:4}.enter{grid-column:2;grid-row:5;flex-direction:row;align-items:center}}</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Aller au contenu principal</a>
@@ -55,35 +55,24 @@ html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);p
       <h1 id="page-title">Chaque culture<br>a son <span>univers.</span></h1>
       <p class="lead">Un espace de travail conçu pour suivre le vivant avec méthode : des cultures aux lots, des observations aux résultats.</p>
     </div>
-    <aside class="intro-note">
-      <svg class="hyphae-figure" viewBox="0 0 520 260" aria-hidden="true">
-        <path class="main-filament" d="M18 228 C90 198 92 146 158 137 S236 160 286 111 S371 87 493 18"/>
-        <path d="M83 192 C51 154 54 122 24 99 M91 180 C123 159 134 128 130 92 M157 137 C154 102 181 81 173 38 M180 139 C223 119 225 82 215 52 M285 111 C264 75 280 45 267 16 M308 101 C355 123 383 110 410 82 M371 87 C375 54 401 40 400 13 M421 58 C452 65 473 52 503 44"/>
-        <path d="M52 212 C83 222 109 240 118 256 M128 153 C108 121 102 104 107 70 M215 127 C243 145 250 176 246 204 M268 123 C301 149 302 180 292 214 M339 97 C335 66 348 44 342 22 M398 72 C430 97 449 110 483 105"/>
-        <path d="M25 99l-9-10 M130 92l-4-13 M173 38l-7-12 M215 52l-1-15 M267 16l-5-12 M410 82l10-4 M400 13l4-10 M503 44l11-2 M118 256l-2 4 M107 70l-1-12 M246 204l5 9 M292 214l-1 12 M342 22l-1-12 M483 105l12 5"/>
-        <circle cx="158" cy="137" r="4"/><circle cx="286" cy="111" r="4"/><circle cx="371" cy="87" r="3"/><circle cx="83" cy="192" r="3"/>
-      </svg>
-      <strong>Une plateforme. Trois espaces spécialisés.</strong>
-      <span class="intro-note-copy">Une même exigence de traçabilité biologique, avec des outils adaptés à chaque activité.</span>
-      <span class="hyphae-caption">FIG. 01 / BRANCHED BIOLOGICAL NETWORK</span>
-    </aside>
+    <aside class="intro-note"><div class="hero-image-stack"><figure><img src="https://mycology-supply.com/cdn/shop/collections/MyceliumGeneric.jpg?v=1635648060" alt="Mycélium dans une boîte de Petri"><figcaption>MYCOLOGY / CULTURE</figcaption></figure><figure><img src="https://www.marcoser.ro/images/produse/1467_0_2_banda-de-irigare-prin-picurare-sunstream-dg10.jpg" alt="Tomates sous serre et irrigation"><figcaption>GREENTECH / ENVIRONMENT</figcaption></figure><figure><img src="https://cdn.sanity.io/images/w4l988al/production/8d6ea54850e3466d2d46dfaaec23a73e8b650ffd-4096x2732.jpg?auto=format&q=85&w=900" alt="Bioréacteurs de laboratoire"><figcaption>LAB / BIOPROCESS</figcaption></figure></div><strong>Trois disciplines. Une traçabilité commune.</strong><span class="intro-note-copy">Des espaces distincts, chacun avec ses propres outils et son identité scientifique.</span><span class="hyphae-caption">BA LABS / BIOLOGICAL OPERATIONS</span></aside>
   </section>
   <section aria-labelledby="workspace-title">
     <div class="section-head"><h2 id="workspace-title">Choisir votre espace de travail</h2><p>BA LABS / CULTURE &amp; BATCH TRACKER</p></div>
     <nav class="universes" aria-label="Choisir un univers de travail">
-      <a class="universe agronomy" href="batch-tracker/green-tech/">
+      <a class="universe agronomy" href="batch-tracker/green-tech/"><span class="universe-photo"><img src="https://www.marcoser.ro/images/produse/1467_0_2_banda-de-irigare-prin-picurare-sunstream-dg10.jpg" alt="Tomates sous serre et irrigation" loading="lazy"></span>
         <div class="universe-top"><span class="universe-label">Agritech &amp; environnement</span><span class="universe-index">01</span></div>
         <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M8 30c0-12 8-20 24-21-1 15-9 23-21 23"/><path d="M9 32c4-8 10-13 18-17"/></svg></span>
         <h3>Green Tech</h3><p>Plantes, substrats, serre, irrigation et suivi des paramètres environnementaux.</p>
         <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
       </a>
-      <a class="universe myco" href="batch-tracker/mycology/">
+      <a class="universe myco" href="batch-tracker/mycology/"><span class="universe-photo"><img src="https://mycology-supply.com/cdn/shop/collections/MyceliumGeneric.jpg?v=1635648060" alt="Mycélium de Pleurotus en boîte de Petri" loading="lazy"></span>
         <div class="universe-top"><span class="universe-label">Mycologie &amp; cultures fongiques</span><span class="universe-index">02</span></div>
         <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 20c1-9 7-14 14-14s13 5 14 14H6Z"/><path d="M15 20v7c0 5 10 5 10 0v-7M20 27v7M10 34h20"/></svg></span>
         <h3>Mycologie</h3><p>Souches, lignées, générations, transferts, morphologie et fructification.</p>
         <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
       </a>
-      <a class="universe lab" href="batch-tracker/laboratory/">
+      <a class="universe lab" href="batch-tracker/laboratory/"><span class="universe-photo"><img src="https://cdn.sanity.io/images/w4l988al/production/8d6ea54850e3466d2d46dfaaec23a73e8b650ffd-4096x2732.jpg?auto=format&q=85&w=900" alt="Bioréacteurs et instrumentation" loading="lazy"></span>
         <div class="universe-top"><span class="universe-label">Recherche &amp; laboratoire</span><span class="universe-index">03</span></div>
         <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M15 6h10M18 6v12L9 32c-1 2 1 3 3 3h16c2 0 4-1 3-3L22 18V6"/><path d="M13 28h14M16 23h8"/></svg></span>
         <h3>Laboratoire</h3><p>Milieux, protocoles, mesures, paramètres expérimentaux et résultats.</p>
@@ -136,5 +125,5 @@ html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);p
   apply(select.value); select.addEventListener("change", () => apply(select.value));
 })();
 </script>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js" defer></script><script type="module">import{Application,Graphics}from"https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.mjs";const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches,colors={agronomy:0xa8b69b,myco:0xb96b4d,lab:0xa7b7bd};if(!reduced)for(const el of document.querySelectorAll(".universe-photo")){const c=el.parentElement.classList,key=c.contains("agronomy")?"agronomy":c.contains("myco")?"myco":"lab";try{const app=new Application();await app.init({resizeTo:el,backgroundAlpha:0,antialias:true,autoDensity:true,resolution:Math.min(devicePixelRatio||1,1.5)});app.canvas.className="sector-motion";app.canvas.setAttribute("aria-hidden","true");el.appendChild(app.canvas);const dots=[];for(let i=0;i<16;i++){const d=new Graphics().circle(0,0,key==="myco"?1.7:1.2).fill({color:colors[key],alpha:.7});d.x=Math.random()*el.clientWidth;d.y=Math.random()*el.clientHeight;d.vx=(Math.random()-.5)*.24;d.vy=(Math.random()-.5)*.24;app.stage.addChild(d);dots.push(d)}app.ticker.add(()=>dots.forEach(d=>{d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>el.clientWidth)d.vx*=-1;if(d.y<0||d.y>el.clientHeight)d.vy*=-1}))}catch(e){}}window.addEventListener("load",()=>{if(reduced||!window.tsParticles)return;window.tsParticles.load({id:"cultureops-particles",options:{fullScreen:{enable:false},particles:{number:{value:20},color:{value:["#a8b69b","#b96b4d","#a7b7bd"]},opacity:{value:{min:.12,max:.3}},size:{value:{min:1,max:2}},move:{enable:true,speed:.2,outModes:{default:"out"}},links:{enable:false}},detectRetina:true}})});</script></body>
 </html>
