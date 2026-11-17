@@ -12,7 +12,7 @@ const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
 const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'learn'];
 assert.ok(previewExplorerHtml.includes('id="field"') && previewExplorerHtml.includes('pixi.js@8.23.0'), 'Preview entry must mount the PixiJS 2D canvas, not the retired 3D scene');
 assert.ok(previewExplorerHtml.includes('./explorer-2d.js?v=pixijs-2') && !previewExplorerHtml.includes('engine-v2.js'), 'Preview entry must load Vernpixi 2D and never load the 3D engine');
-assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes("fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
+assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes('fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
 assert.ok(previewPixiJs.includes('pixijs-webgl') && previewPixiJs.includes('filaments'), 'Preview Vernpixi renderer must draw the biological filament network');
 
 const expectedExplorerDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work', 'evidence'];
