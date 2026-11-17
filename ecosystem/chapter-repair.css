@@ -566,3 +566,9 @@
 #app.balabs-ui .experience-page[data-chapter="home"]>.hero{overflow:visible!important}
 .chapter-rail .chapter-rail-node{min-width:44px!important;min-height:44px!important}
 .chapter-rail .chapter-rail-node .chapter-rail-dot{pointer-events:none!important}
+
+/* PASS 50b — the legacy hero crop must not override the chapter image reveal state. */
+#app.balabs-ui > main .experience-page[data-chapter="home"]>.hero .hero-micrograph.rb-image-armed,
+#app.balabs-ui > main .experience-page[data-chapter="home"]>.hero .hero-micrograph.rb-image-armed.rb-image-revealed{
+ clip-path:none!important;transform:none!important;will-change:auto!important;
+}
