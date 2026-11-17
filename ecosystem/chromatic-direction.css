@@ -207,3 +207,36 @@ html,body{
     padding:6px 8px!important;font-size:10px!important;
   }
 }
+
+/* Chapter transitions: the accent changes with the subject, without abrupt flashes. */
+#app.balabs-ui .experience-page{
+  --chapter-transition:760ms cubic-bezier(.2,.7,.2,1);
+}
+#app.balabs-ui .experience-page:before{
+  background-size:220% 100%!important;
+  background-position:50% 0!important;
+  opacity:.38!important;
+  transition:background-position 1.15s cubic-bezier(.16,1,.3,1),opacity .8s ease!important;
+}
+#app.balabs-ui .experience-page.is-motion-active:before{
+  background-position:100% 0!important;
+  opacity:.78!important;
+}
+#app.balabs-ui .experience-page :is(h1 span,h2 em,.eyebrow,.experience-page-label,.value-no,.method-no){
+  transition:color var(--chapter-transition),border-color var(--chapter-transition),text-shadow var(--chapter-transition)!important;
+}
+#app.balabs-ui .experience-page :is(.work-heading,.universe-index-heading,.product-catalogue-head,.field-atlas-head,.value-heading){
+  transition:border-color var(--chapter-transition),transform .85s cubic-bezier(.16,1,.3,1),opacity .7s ease!important;
+}
+#app.balabs-ui .experience-page[data-chapter=network] .universe-index-card{
+  border-color:rgba(167,184,164,.34)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=network] .universe-index-card:hover{
+  box-shadow:0 14px 36px rgba(8,18,29,.2),inset 0 0 0 1px rgba(167,184,164,.35)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-page:before,
+  #app.balabs-ui .experience-page :is(h1 span,h2 em,.eyebrow,.experience-page-label,.value-no,.method-no,.work-heading,.universe-index-heading,.product-catalogue-head,.field-atlas-head,.value-heading){
+    transition:none!important;
+  }
+}
