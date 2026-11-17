@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "ar",
   "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
@@ -337,7 +337,21 @@
           "children": []
         }
       ],
-      "description": "استكشف عالم الفطريات: الأنواع المزروعة، مواردها، طرق الإكثار، والتفاعلات التي تربطها بالتربة والمواد العضوية."
+      "description": "استكشف عالم الفطريات: الأنواع المزروعة، مواردها، طرق الإكثار، والتفاعلات التي تربطها بالتربة والمواد العضوية.",
+      "relations": [
+        {
+          "target": "products",
+          "label": "الموارد الفطرية ومنتجات الزراعة",
+          "basis": "notion-link",
+          "evidence": "علم الفطريات"
+        },
+        {
+          "target": "bio",
+          "label": "التطبيقات الفطرية ↔ التكنولوجيا الحيوية",
+          "basis": "notion-link",
+          "evidence": "التطبيقات الفطرية"
+        }
+      ]
     },
     {
       "id": "bio",
@@ -547,7 +561,15 @@
           "children": []
         }
       ],
-      "description": "مسارات التكنولوجيا الحيوية التطبيقية: التخمير، الأوساط والركائز، وأنظمة الزراعة والعمليات التجريبية."
+      "description": "مسارات التكنولوجيا الحيوية التطبيقية: التخمير، الأوساط والركائز، وأنظمة الزراعة والعمليات التجريبية.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "الموارد الميكروبية · مستويات الإثبات",
+          "basis": "notion-link",
+          "evidence": "الكائنات الدقيقة ذات الأهمية الزراعية"
+        }
+      ]
     },
     {
       "id": "soil",
@@ -596,7 +618,15 @@
           "children": []
         }
       ],
-      "description": "تعرّف على الكائنات الدقيقة والتفاعلات الجذرية والحلول البيولوجية التي يمكن دراستها لدعم الأنظمة الزراعية."
+      "description": "تعرّف على الكائنات الدقيقة والتفاعلات الجذرية والحلول البيولوجية التي يمكن دراستها لدعم الأنظمة الزراعية.",
+      "relations": [
+        {
+          "target": "lab",
+          "label": "Technosoil · التجارب النباتية",
+          "basis": "page-content",
+          "evidence": "التكنولوجيا الزراعية — أوساط الزراعة وتثمين الكتلة الحيوية"
+        }
+      ]
     },
     {
       "id": "iot",
@@ -629,7 +659,33 @@
           "children": []
         }
       ],
-      "description": "أجهزة القياس والحساسات والأتمتة: كيف نجمع بيانات المختبر والبيئة ونحوّلها إلى متابعة عملية."
+      "description": "أجهزة القياس والحساسات والأتمتة: كيف نجمع بيانات المختبر والبيئة ونحوّلها إلى متابعة عملية.",
+      "relations": [
+        {
+          "target": "myco",
+          "label": "Batch Tracker · تتبع المزارع",
+          "basis": "page-content",
+          "evidence": "قسم Batch Tracker"
+        },
+        {
+          "target": "bio",
+          "label": "Batch Tracker · تتبع الدفعات الحيوية",
+          "basis": "page-content",
+          "evidence": "قسم Batch Tracker"
+        },
+        {
+          "target": "soil",
+          "label": "قياس أوساط الزراعة",
+          "basis": "page-content",
+          "evidence": "قسم Batch Tracker"
+        },
+        {
+          "target": "lab",
+          "label": "متابعة التجارب النباتية",
+          "basis": "page-content",
+          "evidence": "قسم Batch Tracker"
+        }
+      ]
     },
     {
       "id": "lab",
@@ -646,7 +702,15 @@
           "children": []
         }
       ],
-      "description": "مساحة العمل المخبري: الأدوات، إجراءات العمل، والتحضيرات التي تدعم التجارب والتوثيق."
+      "description": "مساحة العمل المخبري: الأدوات، إجراءات العمل، والتحضيرات التي تدعم التجارب والتوثيق.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "الملاحظات · مستويات الإثبات",
+          "basis": "notion-link",
+          "evidence": "التجارب النباتية"
+        }
+      ]
     },
     {
       "id": "products",
@@ -1004,7 +1068,33 @@
           ]
         }
       ],
-      "description": "تصفّح الموارد والمنتجات البيولوجية، مع معلومات الاستخدام والصيغ والتوفر وحدود الأدلة لكل بطاقة."
+      "description": "تصفّح الموارد والمنتجات البيولوجية، مع معلومات الاستخدام والصيغ والتوفر وحدود الأدلة لكل بطاقة.",
+      "relations": [
+        {
+          "target": "bio",
+          "label": "الموارد الميكروبية",
+          "basis": "notion-link",
+          "evidence": "المنتجات والموارد الحيوية"
+        },
+        {
+          "target": "myco",
+          "label": "الموارد الفطرية",
+          "basis": "notion-link",
+          "evidence": "المنتجات والموارد الحيوية"
+        },
+        {
+          "target": "work",
+          "label": "الأعمال الموثقة",
+          "basis": "notion-link",
+          "evidence": "المنتجات والموارد الحيوية"
+        },
+        {
+          "target": "evidence",
+          "label": "مستويات الإثبات",
+          "basis": "notion-link",
+          "evidence": "المنتجات والموارد الحيوية"
+        }
+      ]
     },
     {
       "id": "work",
@@ -1069,7 +1159,15 @@
           "children": []
         }
       ],
-      "description": "مشاريع BA Labs وأعمال البحث والتطوير: النماذج التجريبية، النتائج الموثقة، وفرص التعاون."
+      "description": "مشاريع BA Labs وأعمال البحث والتطوير: النماذج التجريبية، النتائج الموثقة، وفرص التعاون.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "الأعمال والإنجازات الموثقة",
+          "basis": "notion-link",
+          "evidence": "البحث والتطوير"
+        }
+      ]
     },
     {
       "id": "evidence",
@@ -1109,8 +1207,10 @@
           "notionId": "40173152f17181598fc7f2f5a3e64e8a",
           "children": []
         }
-      ]
+      ],
+      "relations": []
     }
   ],
-  "hub": null
+  "hub": null,
+  "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }
