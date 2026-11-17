@@ -61,7 +61,9 @@ function buildNetwork(){
    if(source.level>0)nodeLevelRelationCount++;
    const target=byId.get(relation.target);if(!target||target.id===source.id)continue;
    const key=[source.id,target.id].sort().join("|");if(relationPairs.has(key))continue;
-   relationPairs.add(key);\n   if(source.rootId!==target.rootId)crossUniverseConnectionCount++;\n   const basis=relation.basis==="notion-link"?"notion-link":"page-content";
+   relationPairs.add(key);
+   if(source.rootId!==target.rootId)crossUniverseConnectionCount++;
+   const basis=relation.basis==="notion-link"?"notion-link":"page-content";
    edges.push({a:source,b:target,depth:Math.max(source.level,target.level),cross:source.rootId!==target.rootId,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
    verifiedRelationCount++;
    if(basis==="notion-link")explicitRelationCount++;else contentRelationCount++;
