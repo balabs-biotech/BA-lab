@@ -625,3 +625,62 @@
 @media(prefers-reduced-motion:reduce){
   #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-action-primary{transition:none}
 }
+
+
+/* PHASE 19 — chapter navigation: make the journey legible without adding overlays. */
+#app.balabs-ui .experience-page-label{
+  min-height:27px;padding-inline:10px 13px;
+  border-color:rgba(185,107,77,.26);
+  background:linear-gradient(90deg,rgba(38,59,56,.62),rgba(17,27,29,.38));
+  color:#c5cfc5;letter-spacing:.16em;
+}
+#app.balabs-ui .experience-page[aria-current="page"]>.experience-page-label{
+  color:#f2f1e9;border-color:rgba(185,107,77,.52);
+  box-shadow:inset 2px 0 #b96b4d,0 5px 20px rgba(0,0,0,.12);
+}
+#app.balabs-ui .experience-page-label:before{
+  width:23px;height:2px;background:linear-gradient(90deg,#b96b4d,#d28c6e);
+  box-shadow:0 0 9px rgba(185,107,77,.28);
+}
+#app.balabs-ui .experience-progress{
+  height:3px;background:rgba(120,149,138,.16);
+}
+#app.balabs-ui .experience-progress span{
+  background:linear-gradient(90deg,#8da99a 0%,#b96b4d 72%,#d28c6e 100%);
+  box-shadow:0 0 10px rgba(185,107,77,.35);
+}
+#app.balabs-ui .experience-controls{
+  border-radius:3px;border-color:rgba(185,107,77,.3);
+  background:rgba(17,27,29,.9);box-shadow:0 12px 32px rgba(0,0,0,.24);
+}
+#app.balabs-ui .experience-controls button{
+  border-radius:2px;border-color:rgba(209,208,197,.2);
+  background:#263b38;transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+#app.balabs-ui .experience-controls button:hover:not(:disabled){
+  border-color:#b96b4d;background:#385044;
+}
+#app.balabs-ui .experience-count{
+  color:#d28c6e;font:700 9px/1.2 ui-monospace,monospace;letter-spacing:.12em;
+}
+#app.balabs-ui .chapter-rail-node.is-active .chapter-rail-dot{
+  background:#d28c6e;border-color:#f2d6c7;
+  box-shadow:0 0 0 5px rgba(185,107,77,.2),0 0 18px rgba(185,107,77,.72);
+}
+#app.balabs-ui .chapter-rail-node.is-past .chapter-rail-dot{
+  background:#b96b4d;border-color:#d28c6e;
+}
+#app.balabs-ui .chapter-rail-node:focus-visible .chapter-rail-dot{
+  outline:2px solid #f2f1e9;outline-offset:4px;
+}
+#app.balabs-ui .experience-page[aria-current="page"]{
+  scrollbar-color:rgba(185,107,77,.55) transparent;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page-label{font-size:8px;letter-spacing:.12em}
+  #app.balabs-ui .experience-controls{bottom:max(10px,env(safe-area-inset-bottom))}
+  #app.balabs-ui .experience-progress{height:3px}
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-controls button{transition:none}
+}
