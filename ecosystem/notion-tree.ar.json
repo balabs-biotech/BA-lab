@@ -343,55 +343,6 @@
       "url": "https://app.notion.com/p/40173152f17181bc87b1c17830686007",
       "children": [
         {
-          "id": "ar-bio-fermentation",
-          "title": "التخمير البيولوجي",
-          "notionId": "40173152f17181319400c0c68635241b",
-          "url": "https://app.notion.com/p/40173152f17181319400c0c68635241b",
-          "description": "عمليات التخمير وتحويل المواد الحيوية.",
-          "children": []
-        },
-        {
-          "id": "ar-bio-reactors",
-          "title": "المفاعلات الحيوية والعمليات الأولية",
-          "notionId": "40173152f17181c0af95d99c3e5e2908",
-          "url": "https://app.notion.com/p/40173152f17181c0af95d99c3e5e2908",
-          "description": "أنظمة الزراعة والعمليات التجريبية المرتبطة بها.",
-          "children": []
-        },
-        {
-          "id": "ar-bio-substrates",
-          "title": "الركائز والدعامات البيولوجية",
-          "notionId": "40173152f17181bb91b5d8326978d664",
-          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
-          "description": "مواد وأوساط داعمة للعمليات والأنظمة البيولوجية.",
-          "children": []
-        },
-        {
-          "id": "ar-bio-micropropagation",
-          "title": "الإكثار الدقيق للنباتات",
-          "notionId": "40173152f171819797b1c99f4bdefd2c",
-          "url": "https://app.notion.com/p/40173152f171819797b1c99f4bdefd2c",
-          "description": "تقنيات الإكثار النباتي الدقيق ومراحل التحضير والمتابعة.",
-          "children": []
-        }
-      ],
-      "description": "مسارات التكنولوجيا الحيوية التطبيقية: التخمير، الأوساط والركائز، وأنظمة الزراعة والعمليات التجريبية."
-    },
-    {
-      "id": "soil",
-      "title": "التكنولوجيا الزراعية",
-      "notionId": "40173152f17181488cf8ec1851cddb56",
-      "url": "https://app.notion.com/p/40173152f17181488cf8ec1851cddb56",
-      "children": [
-        {
-          "id": "ar-soil-biostimulants",
-          "title": "المحفزات الحيوية والحلول البيولوجية",
-          "notionId": "40173152f17181849ca3e8e0b2475b37",
-          "url": "https://app.notion.com/p/40173152f17181849ca3e8e0b2475b37",
-          "description": "موارد وحلول بيولوجية قيد الدراسة والتوثيق.",
-          "children": []
-        },
-        {
           "id": "ar-soil-microbes",
           "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
           "notionId": "40173152f17181f18a55d7ba9a90a713",
@@ -559,6 +510,55 @@
               "children": []
             }
           ]
+        },
+        {
+          "id": "ar-bio-fermentation",
+          "title": "التخمير البيولوجي",
+          "notionId": "40173152f17181319400c0c68635241b",
+          "url": "https://app.notion.com/p/40173152f17181319400c0c68635241b",
+          "description": "عمليات التخمير وتحويل المواد الحيوية.",
+          "children": []
+        },
+        {
+          "id": "ar-bio-reactors",
+          "title": "المفاعلات الحيوية والعمليات الأولية",
+          "notionId": "40173152f17181c0af95d99c3e5e2908",
+          "url": "https://app.notion.com/p/40173152f17181c0af95d99c3e5e2908",
+          "description": "أنظمة الزراعة والعمليات التجريبية المرتبطة بها.",
+          "children": []
+        },
+        {
+          "id": "ar-bio-substrates",
+          "title": "الركائز والدعامات البيولوجية",
+          "notionId": "40173152f17181bb91b5d8326978d664",
+          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+          "description": "مواد وأوساط داعمة للعمليات والأنظمة البيولوجية.",
+          "children": []
+        },
+        {
+          "id": "ar-bio-micropropagation",
+          "title": "الإكثار الدقيق للنباتات",
+          "notionId": "40173152f171819797b1c99f4bdefd2c",
+          "url": "https://app.notion.com/p/40173152f171819797b1c99f4bdefd2c",
+          "description": "تقنيات الإكثار النباتي الدقيق ومراحل التحضير والمتابعة.",
+          "children": []
+        }
+      ],
+      "description": "مسارات التكنولوجيا الحيوية التطبيقية: التخمير، الأوساط والركائز، وأنظمة الزراعة والعمليات التجريبية."
+    },
+    {
+      "id": "soil",
+      "title": "التكنولوجيا الزراعية",
+      "notionId": "40173152f17181488cf8ec1851cddb56",
+      "url": "https://app.notion.com/p/40173152f17181488cf8ec1851cddb56",
+      "children": [
+        {
+          "id": "ar-soil-biostimulants",
+          "title": "المحفزات الحيوية والحلول البيولوجية",
+          "notionId": "40173152f17181849ca3e8e0b2475b37",
+          "url": "https://app.notion.com/p/40173152f17181849ca3e8e0b2475b37",
+          "description": "موارد وحلول بيولوجية قيد الدراسة والتوثيق.",
+          "children": []
         },
         {
           "id": "ar-soil-equipment",
@@ -1066,7 +1066,7 @@
     {
       "id": "learn",
       "title": "الموارد ونقل المعرفة",
-      "description": "موارد عامة لاستكشاف الأعمال الموثّقة وفهم حدود الأدلة والتعرّف على طرق التعاون مع BA Labs.",
+      "description": "Univers de navigation virtuel : regroupe des pages publiques existantes, sans page racine Notion distincte.",
       "children": [
         {
           "id": "learn-resource-1",
@@ -1092,7 +1092,8 @@
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
           "children": []
         }
-      ]
+      ],
+      "kind": "section"
     }
   ],
   "hub": null
