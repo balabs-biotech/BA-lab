@@ -572,3 +572,40 @@
 #app.balabs-ui > main .experience-page[data-chapter="home"]>.hero .hero-micrograph.rb-image-armed.rb-image-revealed{
  clip-path:none!important;transform:none!important;will-change:auto!important;
 }
+
+
+/* PASS 51 — mobile catalogue readability and a legible, photographic home hero.
+   Keep documentary photos intact; correct only the presentation layer. */
+@media(max-width:760px){
+ #app.balabs-ui > main .product-catalogue-visuals{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:16px!important;
+ }
+ #app.balabs-ui > main .product-catalogue-visual-img{
+  height:clamp(190px,58vw,260px)!important;
+  object-position:center 48%!important;
+ }
+ #app.balabs-ui > main .product-catalogue-visual figcaption{
+  padding:12px 14px 14px!important;
+ }
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+ background:linear-gradient(105deg,#111b1d 0%,#172725 58%,#263b38 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero:after{
+ content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;
+ background:linear-gradient(90deg,rgba(17,27,29,.96) 0%,rgba(17,27,29,.84) 42%,rgba(17,27,29,.30) 100%),linear-gradient(0deg,rgba(17,27,29,.20),transparent 38%)!important;
+ opacity:1!important;filter:none!important;pointer-events:none!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
+ opacity:.92!important;filter:grayscale(.62) contrast(1.08) brightness(.88)!important;
+ mix-blend-mode:normal!important;
+}
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero:after{
+  background:linear-gradient(180deg,rgba(17,27,29,.20) 0%,rgba(17,27,29,.48) 46%,rgba(17,27,29,.94) 100%)!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
+  opacity:.86!important;filter:grayscale(.58) contrast(1.08) brightness(.9)!important;
+ }
+}
