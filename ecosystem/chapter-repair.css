@@ -121,3 +121,41 @@
  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:before,
  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:after{animation:none!important}
 }
+
+
+/* Image resilience and mobile art direction: never let a failed remote image erase a chapter. */
+#app.balabs-ui .experience-page>.chapter-atmosphere.is-unavailable{
+  display:block!important;position:absolute!important;inset:clamp(78px,11vh,126px) 3.5% auto auto!important;
+  width:min(46%,650px)!important;height:clamp(230px,32vw,390px)!important;
+  opacity:.9!important;isolation:isolate!important;
+  background:
+    radial-gradient(ellipse at 72% 42%,rgba(185,107,77,.24),transparent 30%),
+    radial-gradient(ellipse at 34% 66%,rgba(126,170,163,.25),transparent 36%),
+    repeating-linear-gradient(128deg,transparent 0 28px,rgba(209,208,197,.12) 29px,transparent 30px 58px),
+    linear-gradient(135deg,#263b38,#111b1d 72%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.35) 12%,#000 48%,#000 82%,transparent 100%)!important;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.35) 12%,#000 48%,#000 82%,transparent 100%)!important;
+}
+#app.balabs-ui .experience-page>.chapter-atmosphere.is-unavailable img{display:none!important}
+#app.balabs-ui .experience-page>.chapter-atmosphere.is-unavailable svg{opacity:.9!important}
+#app.balabs-ui .experience-page>.chapter-atmosphere.is-unavailable figcaption{display:flex!important}
+
+/* Chapter photography must remain perceptible on narrow screens without becoming an orange overlay. */
+@media(max-width:760px){
+ #app.balabs-ui .experience-page>.chapter-atmosphere{
+  width:64%!important;height:clamp(150px,39vw,190px)!important;opacity:.76!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 16%,#000 54%,#000 86%,transparent 100%),linear-gradient(180deg,#000 0%,rgba(0,0,0,.86) 72%,transparent 100%)!important;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 16%,#000 54%,#000 86%,transparent 100%),linear-gradient(180deg,#000 0%,rgba(0,0,0,.86) 72%,transparent 100%)!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere{
+  position:relative!important;width:100%!important;height:clamp(150px,43vw,220px)!important;opacity:1!important;
+ }
+}
+@media(max-width:420px){
+ #app.balabs-ui .experience-page>.chapter-atmosphere{
+  width:66%!important;height:clamp(150px,43vw,176px)!important;opacity:.72!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere{
+  width:100%!important;height:clamp(150px,43vw,190px)!important;
+ }
+}
