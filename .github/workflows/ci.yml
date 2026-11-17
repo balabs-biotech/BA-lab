@@ -90,6 +90,7 @@ jobs:
           node scripts/test-environmental-fallback.mjs
           node scripts/test-greentech-ndvi-chart.mjs
           node scripts/test-laboratory-measurement-history-ui.mjs
+          node scripts/test-workspace-visual-system.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
           node scripts/test-smart-entry.mjs
