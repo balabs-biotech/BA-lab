@@ -1,0 +1,587 @@
+@import url("./styles/design-tokens.css?v=20261116-interior-pass-1");
+@import url("./styles/workspace-components.css?v=20261117-global-visual-system-1");
+@import url("./styles/mycology-workspace.css?v=20261117-pixi-graph-controls-159");
+@import url("./styles/laboratory-workspace.css?v=20261117-analytics-1");
+@import url("./styles/greentech-workspace.css?v=20261117-ndvi-chart-1");
+@import url("./styles/motion.css?v=20261117-sector-motion-156");
+@import url("./styles/responsive.css?v=20261116-interior-pass-1");
+
+/* Existing navigation refinements are retained while the shared component
+   foundation is progressively extracted from the legacy stylesheet. */
+
+
+/* PASS 113 — one navigation system across all three workspaces. */
+html body[data-domain].workspace-authenticated .app-toolbar {
+  gap:12px !important;
+}
+
+html body[data-domain] .section-nav {
+  align-items:center !important;
+  gap:6px !important;
+}
+
+html body[data-domain] .section-nav a {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  min-height:38px !important;
+  padding:8px 11px !important;
+  border:1px solid transparent !important;
+  border-radius:9px !important;
+  background:transparent !important;
+  color:var(--muted) !important;
+  font-size:.69rem !important;
+  font-weight:680 !important;
+  line-height:1.2 !important;
+  text-decoration:none !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+html body[data-domain] .section-nav a[aria-current="page"] {
+  border-color:var(--workspace-accent-border) !important;
+  background:var(--workspace-accent-soft) !important;
+  color:var(--paper) !important;
+  box-shadow:inset 0 -2px 0 var(--domain-accent) !important;
+}
+
+html body[data-domain] .section-nav a .nav-number {
+  display:inline-grid !important;
+  place-items:center !important;
+  min-width:20px !important;
+  height:18px !important;
+  padding:0 4px !important;
+  border:1px solid var(--border) !important;
+  border-radius:5px !important;
+  background:var(--surface-raised) !important;
+  color:var(--domain-accent) !important;
+  font-size:8px !important;
+  font-weight:800 !important;
+}
+
+html body[data-domain] .section-nav a[aria-current="page"] .nav-number {
+  border-color:var(--domain-accent) !important;
+  background:var(--domain-accent) !important;
+  color:#11191a !important;
+}
+
+html body[data-domain] .section-nav a:focus-visible,
+html body[data-domain] .universe-home-link:focus-visible {
+  outline:2px solid var(--domain-accent) !important;
+  outline-offset:3px !important;
+}
+
+@media(max-width:760px) {
+  html body[data-domain].workspace-authenticated .app-toolbar {
+    gap:0 !important;
+  }
+
+  html body[data-domain].workspace-authenticated .section-nav {
+    display:flex !important;
+    flex:1 1 100% !important;
+    flex-direction:row !important;
+    align-items:stretch !important;
+    justify-content:space-between !important;
+    gap:4px !important;
+    min-width:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    overflow:visible !important;
+  }
+
+  html body[data-domain].workspace-authenticated .section-nav a {
+    display:flex !important;
+    flex:1 1 0 !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
+    min-width:0 !important;
+    min-height:48px !important;
+    padding:5px 2px !important;
+    border-radius:9px !important;
+    font-size:9px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+  }
+
+  html body[data-domain].workspace-authenticated .section-nav .nav-number {
+    min-width:18px !important;
+    width:18px !important;
+    height:16px !important;
+    padding:0 !important;
+    font-size:7px !important;
+  }
+}
+
+@media(max-width:390px) {
+  html body[data-domain].workspace-authenticated .section-nav {
+    gap:2px !important;
+  }
+
+  html body[data-domain].workspace-authenticated .section-nav a {
+    padding-inline:1px !important;
+    font-size:8px !important;
+    letter-spacing:-.01em !important;
+  }
+
+  html body[data-domain].workspace-authenticated .section-nav .nav-number {
+    display:none !important;
+  }
+}
+
+
+/* PASS 114 — restrained motion language inspired by OriginKit.
+   Shared across workspaces; only the domain accent changes. */
+body[data-domain] .app-hero {
+  isolation: isolate;
+}
+body[data-domain] .hero-copy,
+body[data-domain] .hero-art {
+  z-index: 1;
+}
+body[data-domain] .hero-particle-field {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: .62;
+  pointer-events: none;
+}
+body[data-domain] .hero-core {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+body[data-domain] .hero-core svg[hidden] {
+  display: none !important;
+}
+body[data-domain] .hero-pixi-canvas {
+  position: absolute !important;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  pointer-events: none;
+}
+body[data-domain] .app-hero h1 span {
+  color: var(--workspace-accent, #b4f477);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--workspace-accent, #b4f477) 24%, transparent);
+}
+body[data-domain] .card {
+  transition:
+    transform 220ms cubic-bezier(.2,.75,.25,1),
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease;
+}
+body[data-domain] button:not(:disabled),
+body[data-domain] [role="button"]:not([aria-disabled="true"]) {
+  transition:
+    transform 160ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  body[data-domain] .card:not(.hidden):hover {
+    transform: translateY(-2px);
+  }
+  body[data-domain] button:not(:disabled):hover,
+  body[data-domain] [role="button"]:not([aria-disabled="true"]):hover {
+    transform: translateY(-1px);
+  }
+}
+@media (max-width: 640px) {
+  body[data-domain] .hero-particle-field {
+    opacity: .42;
+  }
+  body[data-domain] .card {
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-domain] .card,
+  body[data-domain] button,
+  body[data-domain] [role="button"] {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+
+
+/* PASS 117 — canonical single-workspace grid.
+   The old multi-panel/sidebar grid created implicit rows and columns when the
+   navigation was made sticky. The current product is a single active workspace:
+   navigation, hero, session, active module, then result. */
+html body[data-domain] {
+  padding:22px 22px 44px !important;
+}
+html body[data-domain] .container {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-template-areas:
+    "nav"
+    "hero"
+    "message"
+    "auth"
+    "workspace"
+    "result" !important;
+  width:100% !important;
+  max-width:1440px !important;
+  margin-inline:auto !important;
+  gap:16px !important;
+}
+html body[data-domain] .app-toolbar {
+  position:sticky !important;
+  inset:auto !important;
+  top:8px !important;
+  grid-area:nav !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:64px !important;
+  max-height:none !important;
+  padding:10px 16px !important;
+  margin:0 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:16px !important;
+  overflow:visible !important;
+  border:1px solid var(--border) !important;
+  border-radius:14px !important;
+  background:rgba(27,37,37,.96) !important;
+  box-shadow:0 12px 28px rgba(0,0,0,.18) !important;
+  backdrop-filter:blur(14px) !important;
+}
+html body[data-domain] .toolbar-brand {
+  flex:0 0 auto !important;
+  min-width:130px !important;
+  padding:0 !important;
+  border:0 !important;
+}
+html body[data-domain] .toolbar-divider {
+  display:block !important;
+  flex:0 0 1px !important;
+  height:28px !important;
+  background:var(--border) !important;
+}
+html body[data-domain] .section-nav {
+  display:flex !important;
+  flex:1 1 auto !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  flex-wrap:wrap !important;
+  gap:6px !important;
+  min-width:0 !important;
+}
+html body[data-domain] .toolbar-status {
+  display:flex !important;
+  flex:0 0 auto !important;
+  margin:0 0 0 auto !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+  grid-area:workspace !important;
+  min-width:0 !important;
+}
+html body[data-domain] #contextPanel { display:none !important; }
+@media(max-width:820px) {
+  html body[data-domain] { padding:12px 12px 30px !important; }
+  html body[data-domain] .container { gap:12px !important; }
+  html body[data-domain] .app-toolbar {
+    position:relative !important;
+    top:auto !important;
+    min-height:58px !important;
+    padding:8px 10px !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+  }
+  html body[data-domain] :is(.toolbar-divider,.toolbar-status) { display:none !important; }
+  html body[data-domain] .toolbar-brand { min-width:0 !important; }
+  html body[data-domain] .section-nav {
+    flex:1 0 auto !important;
+    flex-wrap:nowrap !important;
+    justify-content:space-between !important;
+    overflow:visible !important;
+  }
+}
+@media(max-width:480px) {
+  html body[data-domain] { padding:8px 8px 24px !important; }
+  html body[data-domain] .app-toolbar { min-height:54px !important; }
+}
+
+
+/* PASS 118 — constrain intrinsic desktop widths before they enlarge the document. */
+html body[data-domain],
+html body[data-domain] *,
+html body[data-domain] *::before,
+html body[data-domain] *::after {
+  box-sizing:border-box !important;
+}
+html body[data-domain] {
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:clip !important;
+}
+html body[data-domain] .container {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:1440px !important;
+  overflow-x:clip !important;
+}
+html body[data-domain] .container > * {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] .overview-metrics {
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] .overview-metric {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] :is(.overview-heading,.overview-metrics,.overview-panels,.overview-panel,.overview-chart,.overview-activity) {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+@media(max-width:900px) {
+  html body[data-domain] .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+@media(max-width:560px) {
+  html body[data-domain] .overview-metrics { grid-template-columns:minmax(0,1fr) !important; }
+}
+
+
+/* PASS 125 — Laboratory catalogue: explicit opaque surface for the browser contrast audit. */
+html body[data-domain="laboratory"] #cultureCatalogList > .culture-catalog-row {
+  background-color:#243439 !important;
+  background-image:linear-gradient(145deg,rgba(36,52,57,.96),rgba(25,38,41,.98)) !important;
+  border:1px solid rgba(120,184,232,.2) !important;
+  border-inline-start:3px solid rgba(120,184,232,.78) !important;
+  border-radius:10px !important;
+  padding:13px !important;
+}
+html body[data-domain="laboratory"] #cultureCatalogList > .culture-catalog-row:hover {
+  background-color:#2a3d43 !important;
+  background-image:linear-gradient(145deg,rgba(42,61,67,.98),rgba(28,43,47,.99)) !important;
+}
+
+
+/* PASS 126 — override legacy tracker.css shorthand at the catalogue row itself. */
+html body[data-domain="laboratory"] #trackerCard #cultureCatalogList > .culture-catalog-row {
+  background:#243439 !important;
+  background-color:#243439 !important;
+  background-image:linear-gradient(145deg,rgba(36,52,57,.96),rgba(25,38,41,.98)) !important;
+}
+html body[data-domain="laboratory"] #trackerCard #cultureCatalogList > .culture-catalog-row:hover {
+  background:#2a3d43 !important;
+  background-color:#2a3d43 !important;
+  background-image:linear-gradient(145deg,rgba(42,61,67,.98),rgba(28,43,47,.99)) !important;
+}
+
+
+/* PASS 140 — navigation feedback and module-to-module orientation. */
+html body[data-domain] .section-nav {
+  scrollbar-width:thin !important;
+  scrollbar-color:var(--workspace-accent-border) transparent !important;
+  overscroll-behavior-inline:contain !important;
+}
+html body[data-domain] .section-nav a {
+  position:relative !important;
+  isolation:isolate !important;
+  transition:color .18s ease,border-color .18s ease,background-color .18s ease !important;
+}
+html body[data-domain] .section-nav a::after {
+  content:"" !important;
+  position:absolute !important;
+  inset-inline:12px !important;
+  inset-block-end:3px !important;
+  height:2px !important;
+  border-radius:2px !important;
+  background:var(--workspace-accent) !important;
+  transform:scaleX(0) !important;
+  transform-origin:center !important;
+  opacity:0 !important;
+  transition:transform .18s ease,opacity .18s ease !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .section-nav a:hover {
+  color:var(--paper) !important;
+  border-color:var(--border) !important;
+  background:rgba(255,255,255,.035) !important;
+}
+html body[data-domain] .section-nav a[aria-current="page"]::after {
+  transform:scaleX(1) !important;
+  opacity:1 !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
+  scroll-margin-block-start:18px !important;
+  scroll-margin-block-end:24px !important;
+}
+html body[data-domain] .overview-shortcut,
+html body[data-domain] .section-nav a,
+html body[data-domain] .universe-home-link {
+  -webkit-tap-highlight-color:transparent !important;
+}
+@media(max-width:420px) {
+  html body[data-domain].workspace-authenticated .section-nav {
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    scroll-snap-type:x proximity !important;
+    padding:2px 1px 5px !important;
+  }
+  html body[data-domain].workspace-authenticated .section-nav a {
+    flex:0 0 auto !important;
+    min-width:66px !important;
+    scroll-snap-align:start !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .section-nav a,
+  html body[data-domain] .section-nav a::after {
+    transition:none !important;
+  }
+}
+
+
+/* PASS 141 — precise interaction states.
+   Keep the established graphite surfaces and workspace accents; improve only
+   focus visibility, disabled clarity and touch target consistency. */
+html body[data-domain] :is(
+  .card button,
+  .section-nav a,
+  .overview-shortcut,
+  .culture-catalog-action,
+  .universe-home-link
+):focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:3px !important;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--workspace-accent) 15%,transparent) !important;
+}
+html body[data-domain] .card button:disabled,
+html body[data-domain] .card [aria-disabled="true"] {
+  cursor:not-allowed !important;
+  opacity:.48 !important;
+  filter:saturate(.55) !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
+html body[data-domain] .card :is(
+  button:not(.small-button),
+  input[type="checkbox"],
+  input[type="radio"],
+  select
+) {
+  accent-color:var(--workspace-accent) !important;
+}
+html body[data-domain] .card :is(input[type="checkbox"],input[type="radio"]) {
+  width:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] .card :is(
+    button,
+    .culture-catalog-action,
+    .overview-shortcut
+  ) {
+    min-height:42px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] :is(
+    .card button,
+    .section-nav a,
+    .overview-shortcut,
+    .culture-catalog-action
+  ) {
+    scroll-behavior:auto !important;
+    transition:none !important;
+  }
+}
+
+
+/* PASS 157 — form readability: distinguish field labels, hints, required and invalid states. */
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(label,.field-label) {
+  display:block !important;
+  margin:0 0 6px !important;
+  color:#d2ddd4 !important;
+  font-size:11px !important;
+  font-weight:720 !important;
+  line-height:1.45 !important;
+  letter-spacing:.012em !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
+  min-height:42px !important;
+  padding:10px 12px !important;
+  border:1px solid rgba(169,192,179,.25) !important;
+  border-radius:9px !important;
+  background:linear-gradient(180deg,rgba(7,15,15,.78),rgba(11,19,18,.88)) !important;
+  color:#edf2ed !important;
+  font-size:12px !important;
+  line-height:1.45 !important;
+  transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) textarea {
+  min-height:88px !important;
+  resize:vertical !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea)::placeholder {
+  color:#84968b !important;
+  opacity:1 !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea):focus-visible {
+  border-color:var(--workspace-accent) !important;
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 18%,transparent) !important;
+  outline-offset:2px !important;
+  background:#101b19 !important;
+  box-shadow:0 0 0 1px var(--workspace-accent-border),0 0 20px color-mix(in srgb,var(--workspace-accent) 10%,transparent) !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea):user-invalid,
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea)[aria-invalid="true"] {
+  border-color:#c77c70 !important;
+  box-shadow:0 0 0 2px rgba(199,124,112,.13) !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(small,.muted,.field-hint) {
+  color:#9eafa5 !important;
+  font-size:10px !important;
+  line-height:1.55 !important;
+}
+html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea):disabled {
+  opacity:.55 !important;
+  cursor:not-allowed !important;
+  background:#17211f !important;
+}
+@media(max-width:600px) {
+  html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
+    min-height:44px !important;
+    font-size:16px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
+    transition:none !important;
+  }
+}

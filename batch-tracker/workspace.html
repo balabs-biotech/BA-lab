@@ -10,7 +10,7 @@
       <span class="brand-wordmark"><strong>BA LABS</strong><small>CULTUREOPS</small></span>
     </a>
     <div class="toolbar-divider" aria-hidden="true"></div>
-    <nav class="section-nav" aria-label="Navigation des modules">
+    <nav id="sectionNavigation" class="section-nav" aria-label="Navigation des modules" hidden>
       <a href="#overviewCard"><span class="nav-number">01</span> Vue générale</a>
       <a href="#trackerCard" data-domain-nav="biological"><span class="nav-number">02</span> Cultures biologiques</a>
       <a href="#plantCard" data-domain-nav="agronomy"><span class="nav-number">02</span> Cultures végétales</a>
@@ -35,21 +35,7 @@
         <span><span aria-hidden="true">✓</span> Contrôle qualité</span>
       </div>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="hero-orbit orbit-one"></div>
-      <div class="hero-orbit orbit-two"></div>
-      <div class="hero-core">
-        <svg viewBox="0 0 120 120" role="presentation">
-          <path d="M60 18v20M60 82v20M18 60h20M82 60h20M30 30l14 14M76 76l14 14M90 30 76 44M44 76 30 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="60" cy="60" r="25" fill="none" stroke="currentColor" stroke-width="2.5"/>
-          <circle cx="60" cy="60" r="12" fill="currentColor" opacity=".22"/>
-          <circle cx="60" cy="60" r="5" fill="currentColor"/>
-          <circle cx="60" cy="18" r="4" fill="#d6a85c"/><circle cx="102" cy="60" r="4" fill="#d6a85c"/>
-          <circle cx="60" cy="102" r="4" fill="#d6a85c"/><circle cx="18" cy="60" r="4" fill="#d6a85c"/>
-        </svg>
-      </div>
-      <div class="hero-note"><span class="hero-note-mark"></span><span><strong>BA LABS</strong><small>Applied biotechnology</small></span></div>
-    </div>
+    <div class="hero-art" aria-hidden="true"></div>
   </header>
 
   <section class="card hidden workspace-inactive" id="overviewCard" aria-labelledby="overviewTitle">
@@ -121,7 +107,7 @@
 
     <input id="authEmail" type="email" required inputmode="email" aria-describedby="authStatus"
       autocomplete="email"
-      value="ba.labs.redev@gmail.com"
+      placeholder="Adresse email BA Labs"
     >
 
     <label for="authPassword">
@@ -501,7 +487,8 @@
     </div>
 
 
-    <h3>Nouveau batch</h3>
+    <div class="batch-create-panel" aria-labelledby="batchCreateTitle">
+      <div class="batch-create-heading"><div><span class="entry-step-mark">NOUVELLE PRODUCTION</span><h3 id="batchCreateTitle">Créer un lot</h3><p class="muted">Identifiez le lot, reliez-le à sa culture source, puis renseignez les quantités et le lieu de production.</p></div><span class="batch-required-note"><span aria-hidden="true">*</span> Champs obligatoires</span></div>
 
 
     <div class="grid">
@@ -512,10 +499,11 @@
       Code du batch<span class="req" aria-hidden="true"> *</span>
     </label>
 
-        <input id="batchCode" aria-required="true"
+        <input id="batchCode" required aria-required="true" aria-describedby="batchCodeHint"
           type="text"
           placeholder="Ex. BATCH-PO-P80-001"
         >
+        <small class="hint" id="batchCodeHint">Identifiant unique du lot, conservé dans toute sa traçabilité.</small>
 
       </div>
 
@@ -526,10 +514,11 @@
       Nom du batch<span class="req" aria-hidden="true"> *</span>
     </label>
 
-        <input id="batchName" aria-required="true"
+        <input id="batchName" required aria-required="true" aria-describedby="batchNameHint"
           type="text"
           placeholder="Ex. Grain P80 G1"
         >
+        <small class="hint" id="batchNameHint">Nom court permettant de reconnaître le lot dans les listes.</small>
 
       </div>
 
@@ -541,7 +530,7 @@
       <div>
 
         <label for="batchType">
-          Type de batch
+          Type de batch<span class="req" aria-hidden="true"> *</span>
         </label>
 
         <select id="batchType" required aria-describedby="batchTypeHint">
@@ -636,6 +625,7 @@
     >
       Créer le batch
     </button>
+    </div>
 
 
     <h3>Batchs existants</h3>
@@ -900,7 +890,7 @@
       </div>
       <label for="observationNote">Contexte / note (facultatif)</label>
       <input id="observationNote" type="text" maxlength="1200" placeholder="Emplacement, conditions, incertitude…">
-      <button id="saveObservationButton" type="button">Enregistrer l’observation</button>
+      <button id="saveObservationButton" type="button" aria-label="Enregistrer l’observation">Enregistrer l’observation</button>
       <div class="context-divider"></div>
       <div class="context-eyebrow">OBSERVATIONS RÉCENTES</div>
       <div id="observationHistory" class="measurement-history" aria-live="polite"><p class="muted">Les observations apparaîtront ici après connexion.</p></div>

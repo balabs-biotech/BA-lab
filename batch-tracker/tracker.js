@@ -61,6 +61,11 @@ function isCurrentWorkspaceRevision(revision, expectedOrganizationId) {
 
 
 function clearAuthenticatedWorkspaceState() {
+
+  document.body?.classList.remove("workspace-authenticated");
+
+  const sectionNavigation = document.getElementById("sectionNavigation");
+  if (sectionNavigation) sectionNavigation.hidden = true;
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
   organization = null;
@@ -362,6 +367,13 @@ function showMessage(
     block: "nearest",
     behavior: reduceMotion ? "auto" : "smooth"
   });
+}
+
+
+function setButtonBusy(button, busy) {
+  if (!button) return;
+  if (busy) button.setAttribute("aria-busy", "true");
+  else button.removeAttribute("aria-busy");
 }
 
 
@@ -1018,6 +1030,8 @@ async function initializeAuthenticatedTracker(
     showElement(measurementCard);
     showElement(document.getElementById("statisticsCard"));
     showElement(document.getElementById("overviewCard"));
+    document.body.classList.add("workspace-authenticated");
+    document.getElementById("sectionNavigation")?.removeAttribute("hidden");
     updateOverview();
 
 
@@ -2732,50 +2746,44 @@ function renderBatchList() {
 
     button.className =
       "batch-item";
+    button.setAttribute("aria-pressed", String(batch.id === selectedBatchId));
+    button.classList.toggle("is-selected", batch.id === selectedBatchId);
 
 
-    button.innerHTML = `
+    const heading = document.createElement("span");
+    heading.className = "batch-item-heading";
 
-      <strong>
-        ${escapeHtml(
-          batch.batch_code
-        )}
-      </strong>
+    const code = document.createElement("strong");
+    code.className = "batch-item-code";
+    code.textContent = batch.batch_code || "Lot sans code";
 
-      <br>
+    const status = document.createElement("span");
+    status.className = "batch-item-status";
+    status.textContent = batch.status || "Statut non renseigné";
 
-      <span class="muted">
-        ${escapeHtml(
-          batch.name ||
-          "Sans nom"
-        )}
-        —
-        ${escapeHtml(
-          batch.batch_type ||
-          "—"
-        )}
-        —
-        ${escapeHtml(
-          batch.current_stage ||
-          "—"
-        )}
-        —
-        ${escapeHtml(
-          batch.status ||
-          "—"
-        )}
-      </span>
+    heading.append(code, status);
 
-    `;
+    const meta = document.createElement("span");
+    meta.className = "batch-item-meta";
+    [batch.name || "Sans nom", batch.batch_type || "Type non renseigné", batch.current_stage || "Étape non renseignée"].forEach((value, index) => {
+      const part = document.createElement("span");
+      part.className = index === 0 ? "batch-item-name" : "batch-item-detail";
+      part.textContent = value;
+      meta.appendChild(part);
+    });
+
+    button.append(heading, meta);
 
 
-    button.addEventListener(
-      "click",
-      () =>
-        loadBatch(
-          batch.id
-        )
-    );
+    button.addEventListener("click", () => {
+      batchList.querySelectorAll(".batch-item").forEach(item => {
+        item.classList.remove("is-selected");
+        item.setAttribute("aria-pressed", "false");
+      });
+      button.classList.add("is-selected");
+      button.setAttribute("aria-pressed", "true");
+      loadBatch(batch.id);
+    });
 
 
     batchList.appendChild(
@@ -3508,13 +3516,16 @@ function renderBatchQc(
       );
 
 
-    row.className =
-      "qc-row";
+    row.className = "qc-row";
 
-
-    const status =
-      check.status ||
-      "pending";
+    const status = check.status || "pending";
+    const statusLabels = {
+      pending: "En attente",
+      pass: "Conforme",
+      fail: "Échec",
+      waived: "Dérogation"
+    };
+    row.dataset.qcStatus = status;
 
 
     row.innerHTML = `
@@ -3532,6 +3543,10 @@ function renderBatchQc(
           ${escapeHtml(
             check.check_code
           )}
+        </span>
+
+        <span class="qc-state-indicator" data-qc-state-label>
+          ${escapeHtml(statusLabels[status] || "Statut non reconnu")}
         </span>
 
       </div>
@@ -3590,9 +3605,14 @@ function renderBatchQc(
     `;
 
 
-    batchQcList.appendChild(
-      row
-    );
+    batchQcList.appendChild(row);
+
+    const statusSelect = row.querySelector("[data-qc-status]");
+    statusSelect?.addEventListener("change", () => {
+      row.dataset.qcStatus = statusSelect.value;
+      const indicator = row.querySelector("[data-qc-state-label]");
+      if (indicator) indicator.textContent = statusLabels[statusSelect.value] || "Statut non reconnu";
+    });
 
   }
 
@@ -5251,6 +5271,7 @@ async function saveMeasurement() {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       saveMeasurementButton.disabled = false;
+      setButtonBusy(saveMeasurementButton, false);
       saveMeasurementButton.textContent = cultureWorkflowText("saveMeasure");
     }
   }
@@ -5471,6 +5492,7 @@ async function saveObservation() {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       saveObservationButton.disabled = false;
+      setButtonBusy(saveObservationButton, false);
       saveObservationButton.textContent = cultureWorkflowText("saveObservation");
     }
   }
@@ -5646,9 +5668,11 @@ function renderCultureCatalog() {
     const meta = document.createElement("div");
     meta.className = "culture-catalog-meta";
     const type = document.createElement("span");
+    type.className = "culture-catalog-kind";
     type.textContent = culture.culture_type || "Type non renseigné";
     meta.appendChild(type);
     const date = document.createElement("span");
+    date.className = "culture-catalog-started";
     date.textContent = culture.started_at
       ? "Démarrage : " + new Date(culture.started_at).toLocaleDateString("fr-FR")
       : "Date de démarrage non renseignée";
@@ -5747,7 +5771,7 @@ async function loadStatistics() {
   if (!loadOrganizationId) { status.textContent = L.login; return; }
   if (!variableCode) { status.textContent = L.variable; return; }
   const button = document.getElementById("loadStatisticsButton");
-  button.disabled = true; button.textContent = L.buttonLoading;
+  button.disabled = true; setButtonBusy(button, true); button.textContent = L.buttonLoading;
   status.textContent = L.loading; chart.innerHTML = '<p class="muted">' + L.loadingData + '</p>'; summary.innerHTML = ""; tbody.innerHTML = "";
   try {
     let batchEventIds = null;
@@ -5850,7 +5874,7 @@ async function loadStatistics() {
     } else {
       const width=760,height=270,left=64,right=20,top=22,bottom=50,values=plotted.map(row=>row.plotValue),min=Math.min(...values),max=Math.max(...values),span=max-min||Math.max(Math.abs(max)*.1,1);
       const x=i=>left+i*(width-left-right)/(plotted.length-1), y=value=>top+(max-value)*(height-top-bottom)/span, ns="http://www.w3.org/2000/svg", svg=document.createElementNS(ns,"svg");
-      svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Évolution de "+(variable?.label||variableCode)+", unité "+(canonical||plotted[0].plotUnit||"non renseignée"));
+      svg.setAttribute("viewBox","0 0 "+width+" "+height); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Évolution de "+(variable?.label||variableCode)+", unité "+(canonical||plotted[0].plotUnit||"non renseignée")); svg.classList.add("statistics-data-svg");
       for(let tick=0;tick<5;tick++){const value=min+(max-min)*tick/4,yy=y(value),line=document.createElementNS(ns,"line");line.setAttribute("x1",left);line.setAttribute("x2",width-right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("stroke","#e5ebe1");svg.appendChild(line);const label=document.createElementNS(ns,"text");label.setAttribute("x",left-9);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("font-size","11");label.setAttribute("fill","#657267");label.textContent=Number(value.toPrecision(4)).toString();svg.appendChild(label);}
       const polyline=document.createElementNS(ns,"polyline");polyline.setAttribute("points",plotted.map((row,i)=>x(i)+","+y(row.plotValue)).join(" "));polyline.setAttribute("fill","none");polyline.setAttribute("stroke","#47764d");polyline.setAttribute("stroke-width","2.5");polyline.setAttribute("stroke-linejoin","round");svg.appendChild(polyline);
       plotted.forEach((row,i)=>{const circle=document.createElementNS(ns,"circle");circle.setAttribute("cx",x(i));circle.setAttribute("cy",y(row.plotValue));circle.setAttribute("r","3.5");circle.setAttribute("fill","#47764d");const title=document.createElementNS(ns,"title");title.textContent=(row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):L.unknownDate)+": "+row.plotValue+" "+(row.plotUnit||"");circle.appendChild(title);svg.appendChild(circle);});
@@ -5861,7 +5885,7 @@ async function loadStatistics() {
     if(!rows.length) tbody.innerHTML='<tr><td colspan="5">' + L.noRows + '</td></tr>';
     else { rows.slice().reverse().slice(0,200).forEach(row=>{const tr=document.createElement("tr"),culture=cultureById.get(row.culture_id),cells=[row.measured_at?new Date(row.measured_at).toLocaleString("fr-FR"):"Date inconnue",culture?.code||(row.culture_id?L.cultureLinked:L.noCulture),String(row.raw_value??"—"),row.raw_unit_code||"Unité non renseignée",row.method||"—"];cells.forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});tbody.appendChild(tr);});if(rows.length>200){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=L.limited(rows.length);tr.appendChild(td);tbody.appendChild(tr);}}
   } catch(error) { if (requestId !== statisticsRequestId || !isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) || domain !== (document.body.dataset.domain || "mycology")) return; console.error("Analyse des mesures impossible :",error); status.textContent=L.loadError+error.message; chart.innerHTML='<p class="muted">' + L.graphError + '</p>'; summary.innerHTML=""; tbody.innerHTML='<tr><td colspan="5">' + L.unavailable + '</td></tr>'; }
-  finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) && domain === (document.body.dataset.domain || "mycology")) { button.disabled=false; button.textContent=L.buttonAnalyze; } }
+  finally { if (requestId === statisticsRequestId && isCurrentWorkspaceRevision(loadRevision, loadOrganizationId) && domain === (document.body.dataset.domain || "mycology")) { button.disabled=false; setButtonBusy(button, false); button.textContent=L.buttonAnalyze; } }
 }
 
 function biologicalWorkflowText(key, count = 0) {
@@ -5904,18 +5928,62 @@ async function loadBiologicalLineage(cultureId) {
     while (parentId && guard++ < 50) { const parent = byId.get(parentId); if (!parent) break; ancestors.unshift(parent); parentId = parent.parent_culture_id; }
     const descendants = []; const queue = [{ id: current.id, depth: 0 }]; const visited = new Set([current.id]);
     while (queue.length && descendants.length < 200) { const node = queue.shift(); for (const child of rows.filter(row => row.parent_culture_id === node.id)) { if (visited.has(child.id)) continue; visited.add(child.id); descendants.push({ ...child, depth: node.depth + 1 }); queue.push({ id: child.id, depth: node.depth + 1 }); } }
-    const renderNode = (row, label) => { const node = document.createElement('button'); node.type = 'button'; node.className = 'culture-lineage-node'; node.addEventListener('click', () => loadCultureDetail(row.id)); node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode"))); const strong = document.createElement('strong'); strong.textContent = row.code || 'Culture sans code'; const small = document.createElement('small'); small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing")); node.append(strong, small); return node; };
+    const renderNode = (row, label, role = 'related', depth = 0) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'culture-lineage-node';
+      node.dataset.lineageRole = role;
+      node.dataset.lineageDepth = String(depth);
+      node.dataset.cultureId = row.id || '';
+      node.dataset.parentCultureId = row.parent_culture_id || '';
+      node.addEventListener('click', () => loadCultureDetail(row.id));
+      node.setAttribute('aria-label', biologicalWorkflowText("open") + (row.code || biologicalWorkflowText("noCode")));
+      const strong = document.createElement('strong');
+      strong.textContent = row.code || 'Culture sans code';
+      const small = document.createElement('small');
+      small.textContent = label + ' · ' + (row.culture_type || biologicalWorkflowText("typeMissing"));
+      node.append(strong, small);
+      return node;
+    };
     target.replaceChildren();
-    const makeGroup = (title, items) => { const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = title; section.appendChild(heading); const list = document.createElement('div'); list.className = 'culture-lineage-list'; items.forEach((item, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } list.appendChild(renderNode(item.row, item.label)); }); section.appendChild(list); target.appendChild(section); };
+    const makeGroup = (title, items, role = 'related') => {
+      const section = document.createElement('section');
+      section.dataset.lineageGroup = role;
+      const heading = document.createElement('p');
+      heading.className = 'muted';
+      heading.textContent = title;
+      section.appendChild(heading);
+      const list = document.createElement('div');
+      list.className = 'culture-lineage-list';
+      items.forEach((item, index) => {
+        if (index) {
+          const arrow = document.createElement('span');
+          arrow.className = 'culture-lineage-arrow';
+          arrow.setAttribute('aria-hidden', 'true');
+          arrow.textContent = '→';
+          list.appendChild(arrow);
+        }
+        list.appendChild(renderNode(item.row, item.label, role, item.depth || 0));
+      });
+      section.appendChild(list);
+      target.appendChild(section);
+    };
     if (materialChain.length) {
       const section = document.createElement('section'); const heading = document.createElement('p'); heading.className = 'muted'; heading.textContent = biologicalWorkflowText("materialOrigin"); section.appendChild(heading);
       const list = document.createElement('div'); list.className = 'culture-lineage-list';
       materialChain.forEach((material, index) => { if (index) { const arrow = document.createElement('span'); arrow.className = 'culture-lineage-arrow'; arrow.textContent = '→'; list.appendChild(arrow); } const node = document.createElement('div'); node.className = 'culture-lineage-node'; const strong = document.createElement('strong'); strong.textContent = material.material_code || biologicalWorkflowText("materialNoCode"); const small = document.createElement('small'); small.textContent = (material.material_type || biologicalWorkflowText("unknownType")) + (material.generation == null ? '' : ' · ' + biologicalWorkflowText("generation") + material.generation) + (material.state ? ' · ' + material.state : ''); node.append(strong,small); list.appendChild(node); });
       section.appendChild(list); target.appendChild(section);
     }
-    if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })));
-    makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }]);
-    if (descendants.length) makeGroup(biologicalWorkflowText("descendants") + ' (' + descendants.length + ')', descendants.map(row => ({ row, label: biologicalWorkflowText("generation") + (row.depth || 1) })));
+    if (ancestors.length) makeGroup(biologicalWorkflowText("parents"), ancestors.map(row => ({ row, label: biologicalWorkflowText("parentCulture") })), 'ancestor');
+    makeGroup(biologicalWorkflowText("selected"), [{ row: current, label: biologicalWorkflowText("openSheet") }], 'current');
+    if (descendants.length) {
+      const generations = [...new Set(descendants.map(row => row.depth))].sort((a, b) => a - b);
+      generations.forEach(depth => {
+        const generationRows = descendants.filter(row => row.depth === depth);
+        makeGroup(biologicalWorkflowText("descendants") + ' · ' + biologicalWorkflowText("generation") + depth + ' (' + generationRows.length + ')',
+          generationRows.map(row => ({ row, label: biologicalWorkflowText("generation") + depth, depth })), 'descendant');
+      });
+    }
     if (!ancestors.length && !descendants.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = biologicalWorkflowText("noLineage"); target.appendChild(p); }
     if (rows.length >= 1000) { const note = document.createElement('p'); note.className = 'muted'; note.textContent = biologicalWorkflowText("partial"); target.appendChild(note); }
   } catch (error) { if (!isCurrentWorkspaceRevision(loadRevision, loadOrganizationId)) return; target.textContent = biologicalWorkflowText("loadError") + (error.message || error); }
@@ -5939,7 +6007,7 @@ async function saveBiologicalOperation(event) {
   if (!dateValue) { message.textContent = biologicalWorkflowText("dateRequired"); return; }
   if (childCodes.length > 12) { message.textContent = biologicalWorkflowText("childLimit"); return; }
   if (childCodes.length && !['repiquage','passage','transfert','division_aliquotes','changement_milieu','conservation'].includes(operationType)) { message.textContent = biologicalWorkflowText("invalidPropagation"); return; }
-  button.disabled = true; button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
+  button.disabled = true; setButtonBusy(button, true); button.textContent = biologicalWorkflowText("saving"); message.textContent = '';
   try {
     if (!isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) throw new Error("Session ou espace de travail modifié pendant l’opération. Recommencez.");
     const { data, error } = await supabaseClient.rpc('record_biological_operation', {
@@ -5967,6 +6035,7 @@ async function saveBiologicalOperation(event) {
   finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       button.disabled = false;
+      setButtonBusy(button, false);
       button.textContent = biologicalWorkflowText("save");
     }
   }
@@ -6455,9 +6524,16 @@ function setupUiEnhancements() {
 
   document.querySelectorAll("[data-workspace-target]").forEach((button) => {
     button.addEventListener("click", () => {
-      const target = button.getAttribute("data-workspace-target");
+      const requestedTarget = button.getAttribute("data-workspace-target");
+      // The overview shortcut is shared by all universes; route the biological
+      // culture action to the plant register inside the agronomy workspace.
+      const target = domain === "agronomy" && requestedTarget === "trackerCard"
+        ? "plantCard"
+        : requestedTarget;
+      const targetPanel = document.getElementById(target);
+      if (!targetPanel || targetPanel.hidden || targetPanel.classList.contains("hidden")) return;
       activateWorkspaceModule(target);
-      document.getElementById(target)?.scrollIntoView({
+      targetPanel.scrollIntoView({
         block: "start",
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
       });
@@ -6661,7 +6737,8 @@ function renderPlantCultureList(rows) {
   const statusLabels = { planned: "Planifiée", active: "En culture", harvested: "Récoltée", lost: "Perdue / arrêtée", archived: "Archivée" };
   rows.forEach(row => {
     const article = document.createElement("article");
-    article.className = "culture-catalog-row";
+    article.className = "culture-catalog-row plant-culture-row";
+    article.dataset.plantStatus = row.status || "unknown";
     const main = document.createElement("div");
     main.className = "culture-catalog-main";
     const code = document.createElement("strong");
@@ -6677,7 +6754,10 @@ function renderPlantCultureList(rows) {
     const environment = batchEnvironmentOptions.find(item => item.id === row.environment_id);
     place.textContent = [location?.name, environment?.name, row.substrate].filter(Boolean).join(" · ") || "Emplacement / substrat non précisé";
     const status = document.createElement("span");
+    status.className = "plant-culture-status";
+    status.dataset.status = row.status || "unknown";
     status.textContent = statusLabels[row.status] || row.status || "État non renseigné";
+    status.setAttribute("aria-label", "État de la culture : " + status.textContent);
     meta.append(details, place, status);
     if (row.started_at) {
       const date = document.createElement("span");
@@ -6753,6 +6833,7 @@ async function savePlantCulture(event) {
     return;
   }
   button.disabled = true;
+  setButtonBusy(button, true);
   const oldLabel = button.textContent;
   button.textContent = "Enregistrement…";
   if (status) status.textContent = "Enregistrement de la fiche végétale…";
@@ -6801,6 +6882,7 @@ async function savePlantCulture(event) {
   } finally {
     if (isCurrentWorkspaceRevision(operationRevision, operationOrganizationId)) {
       button.disabled = false;
+      setButtonBusy(button, false);
       button.textContent = oldLabel;
     }
   }
@@ -6877,6 +6959,8 @@ function setupDomainWorkspaces() {
     }
     if (toolbarStatus) toolbarStatus.textContent = config.status;
     document.documentElement.dataset.domain = activeDomain;
+    // Every domain switch returns to a deterministic landing module and clears stale nav state.
+    activateWorkspaceModule("overviewCard");
     if (persist) {
       try { localStorage.setItem("baLabsCultureTrackerDomain", activeDomain); } catch (_) {}
     }
