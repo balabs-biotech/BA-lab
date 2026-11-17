@@ -1184,7 +1184,7 @@
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(2n):after{animation-delay:-8s}
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(1):before{
-  background-image:linear-gradient(180deg,transparent 42%,rgba(17,27,29,.6)),url("./assets/editorial-penicillium.jpg");
+  background-image:linear-gradient(180deg,transparent 42%,rgba(17,27,29,.6)),url("./assets/editorial-penicillium.png");
 }
 #app.balabs-ui > main .universe-index .universe-index-card:nth-child(2):before{
   background-image:linear-gradient(180deg,transparent 35%,rgba(17,27,29,.68)),url("./assets/universe-work.jpg");
@@ -1293,7 +1293,7 @@
  background-image:linear-gradient(180deg,rgba(17,27,29,.06),rgba(17,27,29,.8)),url("./assets/product-card-medium.jpg");
 }
 #app.balabs-ui > main .product-catalogue-card:nth-child(4n+3):after{
- background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-penicillium.jpg");
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-penicillium.png");
 }
 #app.balabs-ui > main .product-catalogue-card:nth-child(4n):after{
  background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("./assets/editorial-soil.jpg");
@@ -1372,7 +1372,7 @@
  pointer-events:none;
 }
 #app.balabs-ui > main .universe-index-card:nth-child(1):before{
- background-image:url("./assets/editorial-penicillium.jpg");
+ background-image:url("./assets/editorial-penicillium.png");
 }
 #app.balabs-ui > main .universe-index-card:nth-child(2):before{
  background-image:radial-gradient(ellipse at 32% 40%,rgba(185,107,77,.6),transparent 30%),repeating-radial-gradient(ellipse at 68% 50%,rgba(209,208,197,.42) 0 1px,transparent 2px 13px),linear-gradient(120deg,#263b38,#111b1d);
