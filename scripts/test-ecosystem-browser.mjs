@@ -35,7 +35,6 @@ try {
     await page.locator('[data-lang="fr"]').first().click();
     await page.locator('a[data-domain-page="myco"]').first().click();
     await page.waitForURL(/explorer-2d\.html\?domain=myco&lang=fr|explorer-2d\.html\?lang=fr&domain=myco/, { timeout: 10000 });
-    await page.locator('#loading').waitFor({ state: 'visible' });
     await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 30000 });
     await page.locator('#field').waitFor({ state: 'visible' });
     await page.waitForFunction(() => document.querySelector('#field')?.dataset.renderer === 'pixijs-webgl', undefined, { timeout: 20000 });
