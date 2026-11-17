@@ -8,6 +8,7 @@
   <title>BA Labs CultureOps — Mycology</title>
   <link rel="stylesheet" href="../tracker.css?v=20261116-ba-unified-110">
   <link rel="stylesheet" href="../workspace-unified.css?v=20261117-form-fields-157">
+  <link rel="stylesheet" href="../styles/mycology-activity-timeline.css?v=20261117-mycology-activity-163">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="mycology">
@@ -45,6 +46,10 @@
             lineageVisuals.src = "../mycology-lineage-visuals.js?v=20261117-pixi-graph-controls-159";
             lineageVisuals.onerror = () => console.info("BA Labs: liste de filiation disponible sans graphe PixiJS.");
             document.body.appendChild(lineageVisuals);
+            const activityTimeline = document.createElement("script");
+            activityTimeline.src = "../mycology-activity-timeline.js?v=20261117-mycology-activity-163";
+            activityTimeline.onerror = () => console.info("BA Labs: historique textuel disponible sans chronologie PixiJS.");
+            document.body.appendChild(activityTimeline);
             const assisted = document.createElement("script");
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
