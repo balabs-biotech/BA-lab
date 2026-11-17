@@ -51,7 +51,9 @@ try {
         ptMycorrhizae: find(pt, '40173152f1718134a778d4c8d405ca62')?.children?.length || 0,
         ptMicrobes: find(pt, '40173152f171814ca1cae513ca2f0427')?.children?.length || 0,
         ptWorkTitle: pt.domains.find(n => n.id === 'work')?.title,
-        enWorkTitle: en.domains.find(n => n.id === 'work')?.title,\n        arMicrobesUnderBio: (find(ar, '40173152f17181bc87b1c17830686007')?.children || []).some(n => n.notionId === '40173152f17181f18a55d7ba9a90a713'),\n        arMicrobesUnderSoil: (find(ar, '40173152f17181488cf8ec1851cddb56')?.children || []).some(n => n.notionId === '40173152f17181f18a55d7ba9a90a713'),
+        enWorkTitle: en.domains.find(n => n.id === 'work')?.title,
+        arMicrobesUnderBio: (find(ar, '40173152f17181bc87b1c17830686007')?.children || []).some(n => n.notionId === '40173152f17181f18a55d7ba9a90a713'),
+        arMicrobesUnderSoil: (find(ar, '40173152f17181488cf8ec1851cddb56')?.children || []).some(n => n.notionId === '40173152f17181f18a55d7ba9a90a713'),
         frLabTitle: fr.domains.find(n => n.id === 'lab')?.title
       };
     });
@@ -59,7 +61,8 @@ try {
     assert.ok(auditedTrees.enMicrobes >= 7 && !auditedTrees.enMicrobesUnderSoil, 'Agricultural microorganisms must be under Biotechnology, not Agrotechnology');
     assert.ok(auditedTrees.ptFungal >= 2 && auditedTrees.ptMycorrhizae >= 2 && auditedTrees.ptMicrobes >= 7, 'Portuguese mycology and microbiology branches must expose their verified subfolders');
     assert.equal(auditedTrees.ptWorkTitle, 'Trabalho documentado e projetos', 'Portuguese R&D universe must use the actual Notion page title');
-    assert.equal(auditedTrees.enWorkTitle, 'Documented work & projects', 'English R&D universe must use the actual Notion page title');\n    assert.ok(auditedTrees.arMicrobesUnderBio && !auditedTrees.arMicrobesUnderSoil, 'Arabic agricultural microorganisms must be mapped under Biotechnology, matching the Notion page links');
+    assert.equal(auditedTrees.enWorkTitle, 'Documented work & projects', 'English R&D universe must use the actual Notion page title');
+    assert.ok(auditedTrees.arMicrobesUnderBio && !auditedTrees.arMicrobesUnderSoil, 'Arabic agricultural microorganisms must be mapped under Biotechnology, matching the Notion page links');
     assert.equal(auditedTrees.frLabTitle, 'LE LABORATOIRE', 'French laboratory universe must use the actual Notion page title');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
