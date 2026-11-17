@@ -293,27 +293,3 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
  .experience-controls button{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;border-radius:7px!important}
  .experience-count{min-width:38px!important}
 }
-
-
-/* Organic filament: the chapter path branches like a living hypha, not a ruler. */
-.chapter-rail{width:64px!important}
-.chapter-filament{overflow:visible;filter:drop-shadow(0 0 7px #b96b4d24)}
-.chapter-filament .filament-base{stroke:#9aafa266;stroke-width:1.4;stroke-dasharray:1.5 5}
-.chapter-filament .filament-progress{stroke:#c47b5c;stroke-width:2.5;stroke-linecap:round;filter:drop-shadow(0 0 4px #c47b5c99)}
-.chapter-filament .filament-branch{stroke:#9aafa277;stroke-width:1.15;stroke-dasharray:1 4;opacity:.78}
-.chapter-rail-node{background:radial-gradient(circle,rgba(185,107,77,.045),transparent 68%)}
-.chapter-rail-dot{transition:width .24s ease,height .24s ease,background .24s ease,box-shadow .24s ease,border-color .24s ease}
-.chapter-rail-node.is-approaching .chapter-rail-dot{background:#b96b4d88;border-color:#e0a58d;box-shadow:0 0 0 4px #b96b4d18,0 0 12px #b96b4d66}
-.chapter-rail-node.is-active .chapter-rail-dot{background:#c47b5c;box-shadow:0 0 0 5px #b96b4d30,0 0 20px #c47b5c}
-.chapter-rail-node:nth-child(2),.chapter-rail-node:nth-child(4){transform:translateX(2px)}
-.chapter-rail-node:nth-child(3){transform:translateX(-2px)}
-.chapter-rail-node:hover .chapter-rail-dot{transform:scale(1.22)}
-.chapter-rail-node:active .chapter-rail-dot{transform:scale(.9)}
-@media(max-width:760px){
- .chapter-rail{width:40px!important}
- .chapter-rail-node:nth-child(2),.chapter-rail-node:nth-child(4){transform:translateX(1px)}
- .chapter-rail-node:nth-child(3){transform:translateX(-1px)}
-}
-@media(prefers-reduced-motion:reduce){
- .chapter-rail-node .chapter-rail-dot{transition:none!important}
-}
