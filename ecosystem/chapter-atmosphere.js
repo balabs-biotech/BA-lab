@@ -2,18 +2,17 @@
 (()=> {
  const track=document.getElementById('experienceTrack');if(!track||track.dataset.atmosphereReady)return;track.dataset.atmosphereReady='true';
  const visuals={
-  home:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20hyphae.jpg',alt:'Réseau de hyphes et mycélium observé en microscopie',tag:'LIVING NETWORK',credit:'Wikimedia Commons · fichier sous licence libre',page:'https://commons.wikimedia.org/wiki/File:Fungal_hyphae_and_mycelium.jpg'},
-  research:{src:'https://www.collezionemicrobica.enea.it/images/uo/brindisi/uo09_foto-1.jpg',alt:'Instrumentation et environnement de laboratoire de recherche',tag:'FIELD INSTRUMENTATION',credit:'ENEA Brindisi · source image',page:'https://www.collezionemicrobica.enea.it/en/sus-mirri/operative-unit-enea-c-r-brindisi.html'},
-  network:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Microscope%20view%20of%20fungus.jpg',alt:'Hyphes fongiques observées au microscope',tag:'BIOLOGICAL NETWORK',credit:'Emilio Bosch · CC BY-SA 4.0',page:'https://commons.wikimedia.org/wiki/File:Microscope_view_of_fungus.jpg'},
-  catalogue:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20hyphae%20in%20LPCB%20preparation%20of%20culture%20microscopic%20examination.jpg',alt:'Substrat de production pour la culture des pleurotes',tag:'CULTURES & MATERIALS',credit:'Kolindros Mushrooms · source image',page:'https://www.manitariakolindrou.gr/en/mushrooms/pleurotus-mushroom-substrate'},
-  about:{src:'https://iiif.wellcomecollection.org/image/B0004843/full/800%2C/0/default.jpg',alt:'Photographie scientifique de culture fongique',tag:'BIOLOGIE EXPÉRIMENTALE',credit:'Wellcome Collection · image scientifique',page:'https://wellcomecollection.org/works/s38jqfs8'}
+  home:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20mycelium.jpg',alt:'Mycélium fongique dans une préparation microscopique LPCB',tag:'LIVING NETWORK',credit:'Ajay Kumar Chaurasiya · CC BY',page:'https://commons.wikimedia.org/wiki/File:Fungal_mycelium.jpg'},
+  research:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungus%20in%20glass%20dish28.jpg',alt:'Culture fongique en boîte de Petri dans un contexte de recherche biochimique',tag:'EXPERIMENTAL CULTURE',credit:'Yakuzakorat · CC BY',page:'https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish28.jpg'},
+  network:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Petri%20dish%20with%20solid-state%20fermentation.jpg',alt:'Croissance fongique en boîte de Petri lors d’une fermentation à l’état solide',tag:'BIOPROCESS / CULTURE',credit:'Luis Fernando Flores LAB · CC BY',page:'https://commons.wikimedia.org/wiki/File:Petri_dish_with_solid-state_fermentation.jpg'},
+  catalogue:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/20210719%20Pleurotus%20ostreatus%20025-047.jpg',alt:'Pleurotus ostreatus cultivé sur substrat à base de copeaux de bois',tag:'CULTURES & MATERIALS',credit:'Zinnmann · Wikimedia Commons',page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_025-047.jpg'},
+  about:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20hyphae%20in%20LPCB%20preparation%20of%20culture%20microscopic%20examination.jpg',alt:'Hyphes fongiques dans une préparation microscopique LPCB',tag:'BIOLOGIE EXPÉRIMENTALE',credit:'Ajay Kumar Chaurasiya · CC BY 4.0',page:'https://commons.wikimedia.org/wiki/File:Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  Object.entries(visuals).forEach(([key,data])=>{
   const page=track.querySelector('.experience-page[data-chapter="'+key+'"]');if(!page)return;
   const figure=document.createElement('figure');figure.className='chapter-atmosphere';
-  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=key==='home'?'eager':'lazy';img.decoding='async';
-  const fallback=null;
+  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=key==='home'?'eager':'lazy';img.decoding='async';img.addEventListener('error',()=>figure.remove(),{once:true});
 
   const caption=document.createElement('figcaption');const tag=document.createElement('span');tag.textContent=data.tag;
   const credit=document.createElement('small');credit.textContent='IMAGE / '+data.credit;
