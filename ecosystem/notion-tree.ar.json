@@ -682,7 +682,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-instrumentation",
@@ -708,7 +708,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-control",
@@ -734,7 +734,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-data",
@@ -760,7 +760,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         },
         {
           "id": "iot-traceability-detail",
@@ -786,7 +786,7 @@
               "kind": "label"
             }
           ],
-          "kind": "label"
+          "kind": "section"
         }
       ],
       "description": "أجهزة القياس والحساسات والأتمتة: كيف نجمع بيانات المختبر والبيئة ونحوّلها إلى متابعة عملية.",
