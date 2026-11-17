@@ -76,8 +76,8 @@
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{
    const distance=Math.abs(rawProgress-i);
    b.classList.toggle('is-active',i===idx);
-   b.classList.toggle('is-past',i<rawProgress-.08);
-   b.classList.toggle('is-approaching',i!==idx&&distance<1&&rawProgress>i);
+   b.classList.toggle('is-past',i<Math.floor(rawProgress));
+   b.classList.toggle('is-approaching',i>idx&&distance<1&&rawProgress>idx);
    b.setAttribute('aria-current',i===idx?'step':'false');
    b.setAttribute('aria-label',(groups[i].label[lang()]||groups[i].label.fr)+' — '+(i+1)+' / '+pages.length);
   });
