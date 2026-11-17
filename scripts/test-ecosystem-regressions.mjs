@@ -90,8 +90,12 @@ for (const id of [
 const englishBiotechnology = languageTrees.en.domains.find((domain) => domain.id === 'bio');
 const englishWork = languageTrees.en.domains.find((domain) => domain.id === 'work');
 assert.ok(englishBiotechnology.children.some((node) => node.notionId === '40173152f17181e1aa6eebe9f6c26c46'), 'English biotechnology universe must include the verified Plant micropropagation page linked from its public landing page');
-assert.ok(englishWork.children.some((node) => node.notionId === '40173152f17181baa905d6afb836f038'), 'English R&D universe must include the verified Documented work page linked from its public landing page');
-assert.ok(englishWork.children.some((node) => node.notionId === '40173152f1718173ae6bc8cce9f0ba52'), 'English R&D universe must include the verified Research and development page linked from its public landing page');
+assert.equal(englishWork.notionId, '40173152f1718173ae6bc8cce9f0ba52', 'English R&D universe must point to the actual Research and development root page');
+assert.equal(englishWork.url, 'https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52');
+for (const id of ['40273152f17181299be1d95c37976d9d', '40273152f171811684d1ccce5374a6c3', '40273152f17181f896c7c040f4402212', '40273152f17181a7be0add6fe6b35581', '40273152f17181bb8f9ff2c94524c6e2']) assert.ok(englishWork.children.some((node) => node.notionId === id), 'English R&D must expose each direct child page from the actual Notion root');
+const portugueseWork = languageTrees.pt.domains.find((domain) => domain.id === 'work');
+assert.equal(portugueseWork.notionId, '40173152f171810f95b9d36ac1b04533', 'Portuguese R&D universe must point to the actual Investigação e desenvolvimento root page');
+for (const id of ['40273152f1718113a306fa764c01b62b', '40273152f17181ed8c23f8efa76a2587', '40273152f1718150b2beccb7c12d0792', '40273152f1718144ac4ddd7a46c410d8', '40273152f17181ee8b40f19e198d8ffc']) assert.ok(portugueseWork.children.some((node) => node.notionId === id), 'Portuguese R&D must expose each direct child page from the actual Notion root');
 
 function flattenManifest(node, out = []) {
   out.push(node);
@@ -110,8 +114,11 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
         const match = node.url.match(/^https:\/\/app\.notion\.com\/p\/([a-f0-9]{32})$/);
         assert.ok(match, language + ' ' + node.id + ' must use a valid Notion page URL');
         if (node.notionId) assert.equal(node.notionId, match[1], language + ' ' + node.id + ' notionId must match its URL');
+      } else if (node.kind === 'section') {
+        assert.ok(!node.notionId, language + ' ' + node.id + ' heading-derived section must not invent a Notion page ID');
+        assert.ok((node.children || []).length > 0, language + ' ' + node.id + ' section must contain verified Notion pages');
       } else {
-        assert.equal(node, domain, language + ' only a universe root may omit its own Notion URL');
+        assert.equal(node, domain, language + ' only a universe root or explicit section may omit its own Notion URL');
         assert.ok((node.children || []).length > 0, language + ' an unlinked universe root must still expose real child pages');
       }
     }
