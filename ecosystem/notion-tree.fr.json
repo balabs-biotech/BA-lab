@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "fr",
   "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
@@ -359,7 +359,21 @@
           "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées."
         }
       ],
-      "description": "Explorer les champignons cultivés ou étudiés par BA Labs, leurs ressources biologiques, leurs méthodes de multiplication et leurs applications."
+      "description": "Explorer les champignons cultivés ou étudiés par BA Labs, leurs ressources biologiques, leurs méthodes de multiplication et leurs applications.",
+      "relations": [
+        {
+          "target": "products",
+          "label": "Ressources fongiques et produits de culture",
+          "basis": "notion-link",
+          "evidence": "MYCOLOGIE"
+        },
+        {
+          "target": "bio",
+          "label": "Applications mycologiques ↔ biotechnologie",
+          "basis": "notion-link",
+          "evidence": "Applications mycologiques"
+        }
+      ]
     },
     {
       "id": "bio",
@@ -560,7 +574,15 @@
           "description": "Expérimentation de systèmes de micropropagation végétale contrôlée, notamment l’architecture Twin Bottle, avec une attention portée à la reproductibilité, aux échanges gazeux et à l’environnement de culture."
         }
       ],
-      "description": "Découvrir les microorganismes d’intérêt agricole, les biostimulants, les substrats biologiques et les procédés de fermentation."
+      "description": "Découvrir les microorganismes d’intérêt agricole, les biostimulants, les substrats biologiques et les procédés de fermentation.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Ressources microbiennes · niveaux de preuve",
+          "basis": "notion-link",
+          "evidence": "Microorganismes d’intérêt agricole"
+        }
+      ]
     },
     {
       "id": "iot",
@@ -590,7 +612,33 @@
           "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats."
         }
       ],
-      "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations."
+      "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations.",
+      "relations": [
+        {
+          "target": "myco",
+          "label": "Batch Tracker · traçabilité des cultures",
+          "basis": "page-content",
+          "evidence": "Section Batch Tracker"
+        },
+        {
+          "target": "bio",
+          "label": "Batch Tracker · lots biologiques",
+          "basis": "page-content",
+          "evidence": "Section Batch Tracker"
+        },
+        {
+          "target": "soil",
+          "label": "Mesures des matrices de culture",
+          "basis": "page-content",
+          "evidence": "Section Batch Tracker"
+        },
+        {
+          "target": "lab",
+          "label": "Suivi des cultures expérimentales",
+          "basis": "page-content",
+          "evidence": "Section Batch Tracker"
+        }
+      ]
     },
     {
       "id": "soil",
@@ -634,7 +682,15 @@
           "description": "Relier les équipements, les capteurs, les données et les actions pour rendre les procédés biologiques observables."
         }
       ],
-      "description": "Présenter les équipements, matériaux, substrats et procédés développés pour les essais agrotechniques et les prototypes."
+      "description": "Présenter les équipements, matériaux, substrats et procédés développés pour les essais agrotechniques et les prototypes.",
+      "relations": [
+        {
+          "target": "lab",
+          "label": "Technosoil · expérimentation végétale",
+          "basis": "page-content",
+          "evidence": "AGROTECHNOLOGIE — Milieux de culture et valorisation de biomasses"
+        }
+      ]
     },
     {
       "id": "lab",
@@ -650,7 +706,15 @@
           "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
         }
       ],
-      "description": "Découvrir les espaces et démarches d’expérimentation, notamment les essais végétaux et les dispositifs de laboratoire."
+      "description": "Découvrir les espaces et démarches d’expérimentation, notamment les essais végétaux et les dispositifs de laboratoire.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Observations · niveaux de preuve",
+          "basis": "notion-link",
+          "evidence": "Expérimentation végétale"
+        }
+      ]
     },
     {
       "id": "products",
@@ -995,7 +1059,33 @@
           ]
         }
       ],
-      "description": "Consulter les ressources biologiques, prototypes et produits présentés publiquement par BA Labs, avec leur niveau de maturité explicité."
+      "description": "Consulter les ressources biologiques, prototypes et produits présentés publiquement par BA Labs, avec leur niveau de maturité explicité.",
+      "relations": [
+        {
+          "target": "bio",
+          "label": "Ressources microbiennes",
+          "basis": "notion-link",
+          "evidence": "PRODUITS & RESSOURCES BIOLOGIQUES"
+        },
+        {
+          "target": "myco",
+          "label": "Ressources fongiques",
+          "basis": "notion-link",
+          "evidence": "PRODUITS & RESSOURCES BIOLOGIQUES"
+        },
+        {
+          "target": "work",
+          "label": "Travaux documentés",
+          "basis": "notion-link",
+          "evidence": "PRODUITS & RESSOURCES BIOLOGIQUES"
+        },
+        {
+          "target": "evidence",
+          "label": "Niveaux de preuve",
+          "basis": "notion-link",
+          "evidence": "PRODUITS & RESSOURCES BIOLOGIQUES"
+        }
+      ]
     },
     {
       "id": "work",
@@ -1059,7 +1149,15 @@
           "notionId": "3e973152f17181cba839c6eba742310b"
         }
       ],
-      "description": "Parcourir les travaux de recherche et développement, leur méthodologie, leurs essais, leurs itérations et les éléments effectivement documentés."
+      "description": "Parcourir les travaux de recherche et développement, leur méthodologie, leurs essais, leurs itérations et les éléments effectivement documentés.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Travaux & réalisations documentés",
+          "basis": "notion-link",
+          "evidence": "R&D"
+        }
+      ]
     },
     {
       "id": "evidence",
@@ -1099,9 +1197,11 @@
           "notionId": "3e273152f17181a8bedae0bfd2452543",
           "children": []
         }
-      ]
+      ],
+      "relations": []
     }
   ],
   "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs.",
-  "hub": null
+  "hub": null,
+  "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }

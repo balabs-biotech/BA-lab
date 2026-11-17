@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "pt",
   "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
@@ -361,6 +361,20 @@
           "description": "Campos científicos onde se estudam fungos e as suas funções.",
           "children": []
         }
+      ],
+      "relations": [
+        {
+          "target": "products",
+          "label": "Recursos fúngicos e produtos de cultivo",
+          "basis": "notion-link",
+          "evidence": "MICOLOGIA"
+        },
+        {
+          "target": "bio",
+          "label": "Aplicações micológicas ↔ biotecnologia",
+          "basis": "notion-link",
+          "evidence": "Aplicações micológicas"
+        }
       ]
     },
     {
@@ -573,7 +587,15 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Biotecnologia aplicada a microrganismos, substratos biológicos, fermentação e sistemas de cultura vegetal. Explore os temas documentados e o respetivo contexto experimental."
+      "description": "Biotecnologia aplicada a microrganismos, substratos biológicos, fermentação e sistemas de cultura vegetal. Explore os temas documentados e o respetivo contexto experimental.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Recursos microbianos · níveis de evidência",
+          "basis": "notion-link",
+          "evidence": "Microrganismos de interesse agrícola"
+        }
+      ]
     },
     {
       "id": "soil",
@@ -623,7 +645,15 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Equipamentos, substratos, processos biológicos e protótipos desenvolvidos ou estudados para investigação aplicada e experimentação agrotecnológica."
+      "description": "Equipamentos, substratos, processos biológicos e protótipos desenvolvidos ou estudados para investigação aplicada e experimentação agrotecnológica.",
+      "relations": [
+        {
+          "target": "lab",
+          "label": "Technosoil · experimentação vegetal",
+          "basis": "page-content",
+          "evidence": "AGROTECNOLOGIA — Meios de cultivo e valorização de biomassa"
+        }
+      ]
     },
     {
       "id": "iot",
@@ -657,7 +687,33 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Medição, sensores e automação: observar sistemas experimentais, recolher dados fiáveis e desenvolver progressivamente processos de controlo."
+      "description": "Medição, sensores e automação: observar sistemas experimentais, recolher dados fiáveis e desenvolver progressivamente processos de controlo.",
+      "relations": [
+        {
+          "target": "myco",
+          "label": "Batch Tracker · rastreabilidade das culturas",
+          "basis": "page-content",
+          "evidence": "Secção Batch Tracker"
+        },
+        {
+          "target": "bio",
+          "label": "Batch Tracker · lotes biológicos",
+          "basis": "page-content",
+          "evidence": "Secção Batch Tracker"
+        },
+        {
+          "target": "soil",
+          "label": "Medição das matrizes de cultivo",
+          "basis": "page-content",
+          "evidence": "Secção Batch Tracker"
+        },
+        {
+          "target": "lab",
+          "label": "Acompanhamento das culturas experimentais",
+          "basis": "page-content",
+          "evidence": "Secção Batch Tracker"
+        }
+      ]
     },
     {
       "id": "lab",
@@ -675,7 +731,15 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Espaço de trabalho laboratorial dedicado a métodos, preparação e experiências controladas, ligando ensaios vegetais a observações documentadas."
+      "description": "Espaço de trabalho laboratorial dedicado a métodos, preparação e experiências controladas, ligando ensaios vegetais a observações documentadas.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Observações · níveis de evidência",
+          "basis": "notion-link",
+          "evidence": "Experimentação vegetal"
+        }
+      ]
     },
     {
       "id": "products",
@@ -1034,7 +1098,33 @@
         }
       ],
       "notionParentId": "language",
-      "description": "Recursos biológicos públicos e protótipos de produtos, distinguindo claramente os itens do catálogo dos conceitos ainda em desenvolvimento."
+      "description": "Recursos biológicos públicos e protótipos de produtos, distinguindo claramente os itens do catálogo dos conceitos ainda em desenvolvimento.",
+      "relations": [
+        {
+          "target": "bio",
+          "label": "Recursos microbianos",
+          "basis": "notion-link",
+          "evidence": "PRODUTOS E RECURSOS BIOLÓGICOS"
+        },
+        {
+          "target": "myco",
+          "label": "Recursos fúngicos",
+          "basis": "notion-link",
+          "evidence": "PRODUTOS E RECURSOS BIOLÓGICOS"
+        },
+        {
+          "target": "work",
+          "label": "Trabalhos documentados",
+          "basis": "notion-link",
+          "evidence": "PRODUTOS E RECURSOS BIOLÓGICOS"
+        },
+        {
+          "target": "evidence",
+          "label": "Níveis de evidência",
+          "basis": "notion-link",
+          "evidence": "PRODUTOS E RECURSOS BIOLÓGICOS"
+        }
+      ]
     },
     {
       "id": "work",
@@ -1084,7 +1174,15 @@
         }
       ],
       "notionParentId": "language",
-      "description": "Investigação e desenvolvimento na BA Labs: trabalho documentado, questões experimentais, protótipos, medições e limites da evidência atual."
+      "description": "Investigação e desenvolvimento na BA Labs: trabalho documentado, questões experimentais, protótipos, medições e limites da evidência atual.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Trabalhos e realizações documentados",
+          "basis": "notion-link",
+          "evidence": "I&D"
+        }
+      ]
     },
     {
       "id": "evidence",
@@ -1116,7 +1214,8 @@
           "notionId": "40173152f17181f194deca033c534128",
           "children": []
         }
-      ]
+      ],
+      "relations": []
     }
   ],
   "hub": {
@@ -1124,5 +1223,6 @@
     "notionId": "40173152f171811ba1f0f58fd7dd239d",
     "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
     "parentId": "language"
-  }
+  },
+  "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }

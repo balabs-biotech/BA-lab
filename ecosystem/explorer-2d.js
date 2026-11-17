@@ -2,12 +2,12 @@ import { createPixiRenderer } from "./explorer-2d-pixi.js";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={bio:"#79a991",myco:"#b18fc2",soil:"#c19b73",lab:"#80aeb8",products:"#c88773",iot:"#7eaaa3",work:"#aa9cbb",evidence:"#b5b58d"};
 const COPY={
-fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · TOUCHER POUR EXPLORER",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments"},
-en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · TAP TO EXPLORE",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items"},
-ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · المس للاستكشاف",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر"},
-pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · TOCAR PARA EXPLORAR",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens"}};
+fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · TOUCHER POUR EXPLORER",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
+en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · TAP TO EXPLORE",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
+ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · المس للاستكشاف",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
+pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · TOCAR PARA EXPLORAR",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
 const $=id=>document.getElementById(id),canvas=$("field"),reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-let pixiRenderer=null;
+let pixiRenderer=null,relationIndex=new Map();
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,previousView=null;
 const t=k=>COPY[lang][k]||COPY.fr[k],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
@@ -51,21 +51,30 @@ function buildNetwork(){
   };
   walk(root,rootNode,1,angle,[]);
  });
- // Inter-universe hyphae form a sparse, biologically plausible mesh.
- // Connect each universe to its nearest spatial neighbours, not to the next item in a ring.
- const rootNodes=tree.map(root=>byId.get(root.id)).filter(Boolean),rootPairs=[];
- rootNodes.forEach((a,i)=>rootNodes.slice(i+1).forEach(b=>rootPairs.push({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})));
- rootPairs.sort((a,b)=>a.d-b.d);
- const rootDegree=new Map();
- for(const pair of rootPairs){if((rootDegree.get(pair.a.id)||0)>=2||(rootDegree.get(pair.b.id)||0)>=2)continue;edges.push({a:pair.a,b:pair.b,depth:0,cross:true,seed:hash(pair.a.id+pair.b.id)});rootDegree.set(pair.a.id,(rootDegree.get(pair.a.id)||0)+1);rootDegree.set(pair.b.id,(rootDegree.get(pair.b.id)||0)+1);}
- // Anastomose nearby first-generation hyphae across neighbouring universes.
- for(const pair of rootPairs.slice(0,Math.min(rootPairs.length,roots+2))){
-  const left=nodes.filter(n=>n.rootId===pair.a.id&&n.level===1),right=nodes.filter(n=>n.rootId===pair.b.id&&n.level===1),candidates=[];
-  left.forEach(a=>right.forEach(b=>candidates.push({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})));
-  candidates.sort((a,b)=>a.d-b.d);
-  const usedA=new Set(),usedB=new Set();let linked=0;
-  for(const candidate of candidates){if(usedA.has(candidate.a.id)||usedB.has(candidate.b.id))continue;edges.push({a:candidate.a,b:candidate.b,depth:1,cross:true,seed:hash(candidate.a.id+candidate.b.id)});usedA.add(candidate.a.id);usedB.add(candidate.b.id);if(++linked===2)break;}
- }
+ // Cross-universe connections come only from the Notion relation manifest.
+ // page-content links are explicitly distinguished from direct Notion hyperlinks.
+ relationIndex=new Map();const relationPairs=new Set();
+ let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0;
+ const addRelationIndex=(id,entry)=>{if(!relationIndex.has(id))relationIndex.set(id,[]);relationIndex.get(id).push(entry);};
+ tree.forEach(root=>{
+  const source=byId.get(root.id);if(!source)return;
+  for(const relation of root.relations||[]){
+   const target=byId.get(relation.target);if(!target||target.level!==0||target.id===source.id)continue;
+   const key=[source.id,target.id].sort().join("|");if(relationPairs.has(key))continue;
+   relationPairs.add(key);
+   const basis=relation.basis==="notion-link"?"notion-link":"page-content";
+   edges.push({a:source,b:target,depth:0,cross:true,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
+   verifiedRelationCount++;
+   if(basis==="notion-link")explicitRelationCount++;else contentRelationCount++;
+   addRelationIndex(source.id,{target:target.id,label:relation.label,basis,evidence:relation.evidence});
+   addRelationIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
+  }
+ });
+ const crossUniverseConnections=relationPairs.size;
+ canvas.dataset.verifiedRelations=String(verifiedRelationCount);
+ canvas.dataset.explicitRelations=String(explicitRelationCount);
+ canvas.dataset.contentRelations=String(contentRelationCount);
+ canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);
  // Local anastomoses follow spatial proximity, not array order. Each hypha can
  // form one restrained side-connection at its depth, creating irregular meshes
  // while avoiding long chords and the visual regularity of a grid.
@@ -132,6 +141,13 @@ function updateSelection(){
   const childNav=el("nav","child-branches");childNav.setAttribute("aria-label",t("children"));
   children.forEach(child=>{const button=el("button","btn btn-ghost btn-xs",child.title);button.type="button";button.onclick=()=>focusNode(child);childNav.append(button);});
   body.append(childNav);
+ }
+ const related=relationIndex.get(n.id)||[];
+ if(related.length){
+  const relationNav=el("nav","related-universes");relationNav.setAttribute("aria-label",t("relations"));
+  const heading=el("small","relation-heading",t("relations"));relationNav.append(heading);
+  related.forEach(relation=>{const target=byId.get(relation.target);if(!target)return;const button=el("button","btn btn-outline btn-xs",relation.label);button.type="button";button.title=relation.evidence+" · "+(relation.basis==="notion-link"?"Notion":"contenu documenté");button.onclick=()=>focusNode(target);relationNav.append(button);});
+  body.append(relationNav);
  }
  card.append(body);box.append(card);renderAccessible();
 }

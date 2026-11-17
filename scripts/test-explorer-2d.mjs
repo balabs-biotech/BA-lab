@@ -27,9 +27,13 @@ try {
     const topology = await page.locator('#field').evaluate(el => ({
       universes: Number(el.dataset.universeCount || 0),
       nodes: Number(el.dataset.nodeCount || 0),
-      edges: Number(el.dataset.edgeCount || 0)
+      edges: Number(el.dataset.edgeCount || 0),
+      verifiedRelations: Number(el.dataset.verifiedRelations || 0),
+      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
+    assert.ok(topology.verifiedRelations >= 10, 'Cross-universe filaments must come from documented Notion relationships, not spatial proximity');
+    assert.ok(topology.crossUniverseConnections >= 8, 'The overview must expose a connected evidence-backed universe network');
     const mappedTree = await page.evaluate(async () => {
       const response = await fetch('./notion-tree.fr.json');
       const tree = await response.json();
@@ -66,6 +70,7 @@ try {
     // on a guessed canvas coordinate that varies with viewport and layout.
     await nav.first().evaluate(button => button.click());
     await page.locator('#selection .card').waitFor({ state: 'visible' });
+    await page.locator('#selection .related-universes button').first().waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
     const childBranches = page.locator('#selection .child-branches button');
     await childBranches.first().waitFor({ state: 'visible' });
