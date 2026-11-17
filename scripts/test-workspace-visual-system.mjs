@@ -85,7 +85,7 @@ const spatialStyles = fs.readFileSync("batch-tracker/styles/workspace-spatial-na
 const unifiedWorkspace = fs.readFileSync("batch-tracker/workspace-unified.css", "utf8");
 assert.ok(unifiedWorkspace.includes("workspace-spatial-navigation.css"), "All workspaces must load the spatial navigation visual layer");
 assert.ok(spatialNavigation.includes("overviewCard") && spatialNavigation.includes("measurementCard") && spatialNavigation.includes("statisticsCard"), "Spatial navigation must connect overview, data and analysis modules");
-assert.ok(spatialNavigation.includes('direction === "left" || direction === "right"') && spatialNavigation.includes('direction === "up" || direction === "down"'), "Spatial navigation must support all four directions");
+assert.ok(spatialNavigation.includes('direction === "left" || direction === "right"') && spatialNavigation.includes('const other = row === "primary" ? "secondary" : "primary"'), "Spatial navigation must support all four directions");
 assert.ok(spatialNavigation.includes("ArrowLeft") && spatialNavigation.includes("ArrowRight") && spatialNavigation.includes("ArrowUp") && spatialNavigation.includes("ArrowDown"), "Spatial navigation must support keyboard arrows");
 assert.ok(spatialNavigation.includes('event.pointerType !== "touch"') && spatialNavigation.includes("Math.abs(dx) < 70"), "Mobile users must be able to move between modules with deliberate horizontal swipes");
 assert.ok(spatialNavigation.includes("prefers-reduced-motion") && spatialStyles.includes("prefers-reduced-motion:reduce"), "Spatial transitions must respect reduced-motion preferences");
