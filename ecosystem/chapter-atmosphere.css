@@ -1,0 +1,51 @@
+/* BA Labs — image-led chapter atmosphere. Visuals sit behind the reading flow, never as extra panels. */
+.experience-page{position:relative;isolation:isolate}
+.experience-page>.chapter-atmosphere{
+ position:absolute;z-index:0;inset:28px 3.5% auto auto;
+ width:min(37%,470px);height:clamp(130px,20vw,220px);
+ margin:0;overflow:hidden;pointer-events:none;
+ opacity:.72;
+ -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.32) 18%,#000 62%,transparent 100%),linear-gradient(180deg,#000 0%,rgba(0,0,0,.82) 62%,transparent 100%);
+ mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.32) 18%,#000 62%,transparent 100%),linear-gradient(180deg,#000 0%,rgba(0,0,0,.82) 62%,transparent 100%);
+}
+.experience-page>.chapter-atmosphere img{
+ display:block;width:100%;height:100%;object-fit:cover;
+ filter:saturate(.68) contrast(1.12) brightness(.76);
+ transform:scale(1.04);transition:transform 1.2s cubic-bezier(.2,.7,.2,1),filter .8s ease;
+}
+.experience-page>.chapter-atmosphere svg{
+ position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+ fill:none;stroke:#d1d0c5;stroke-width:1.15;stroke-linecap:round;
+ opacity:.62;filter:drop-shadow(0 0 4px #b96b4d66);
+}
+.experience-page>.chapter-atmosphere svg path{
+ stroke-dasharray:360;stroke-dashoffset:360;
+}
+.experience-page>.chapter-atmosphere figcaption{
+ position:absolute;right:10px;bottom:10px;
+ color:#d1d0c5;font:600 8px/1.2 ui-monospace,monospace;
+ letter-spacing:.18em;text-shadow:0 1px 8px #111b1d;
+}
+.experience-page>.chapter-atmosphere.is-animated img{animation:chapter-image-drift 18s ease-in-out infinite alternate}
+.experience-page>.chapter-atmosphere.is-animated svg path{animation:chapter-filament-draw 7s ease-in-out infinite alternate}
+.experience-page>.chapter-atmosphere.is-unavailable{display:none}
+@keyframes chapter-image-drift{from{transform:scale(1.02) translate3d(-1%,0,0)}to{transform:scale(1.13) translate3d(1.5%,-1%,0)}}
+@keyframes chapter-filament-draw{from{stroke-dashoffset:360;opacity:.22}to{stroke-dashoffset:0;opacity:.78}}
+.experience-page[data-chapter="home"]>.chapter-atmosphere{width:min(33%,410px);height:clamp(150px,22vw,245px)}
+.experience-page[data-chapter="research"]>.chapter-atmosphere{filter:hue-rotate(-8deg)}
+.experience-page[data-chapter="network"]>.chapter-atmosphere{width:min(42%,520px)}
+.experience-page[data-chapter="catalogue"]>.chapter-atmosphere{filter:saturate(.78)}
+.experience-page[data-chapter="about"]>.chapter-atmosphere{width:min(34%,420px)}
+@media(max-width:760px){
+ .experience-page>.chapter-atmosphere{inset:18px 2% auto auto;width:42%;height:112px;opacity:.48}
+ .experience-page[data-chapter="home"]>.chapter-atmosphere{width:39%;height:132px}
+ .experience-page[data-chapter="network"]>.chapter-atmosphere{width:45%}
+ .experience-page>.chapter-atmosphere figcaption{font-size:6px;right:6px;bottom:6px;letter-spacing:.1em}
+}
+@media(max-width:420px){
+ .experience-page>.chapter-atmosphere{width:36%;height:92px;opacity:.36}
+ .experience-page>.chapter-atmosphere figcaption{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .experience-page>.chapter-atmosphere img,.experience-page>.chapter-atmosphere svg path{animation:none!important;transition:none!important;stroke-dashoffset:0}
+}
