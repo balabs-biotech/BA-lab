@@ -547,3 +547,22 @@
  #app.balabs-ui .experience-page[data-chapter="home"]>.hero .aside{order:2!important;margin:0!important;max-width:100%!important}
  #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-credit{display:none!important}
 }
+
+
+/* PASS 50 — restore full headline measure and keep the chapter rail aligned to real page geometry. */
+@media(min-width:1100px){
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+  grid-template-columns:minmax(0,1.55fr) minmax(230px,.55fr)!important;
+  column-gap:clamp(28px,4vw,72px)!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero>div:first-of-type{
+  min-width:0!important;width:100%!important;max-width:100%!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero h1{
+  width:100%!important;max-width:14ch!important;overflow:visible!important;
+  text-wrap:balance!important;overflow-wrap:normal!important;
+ }
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero{overflow:visible!important}
+.chapter-rail .chapter-rail-node{min-width:44px!important;min-height:44px!important}
+.chapter-rail .chapter-rail-node .chapter-rail-dot{pointer-events:none!important}
