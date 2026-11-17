@@ -2,10 +2,10 @@
 (()=> {
  const track=document.getElementById('experienceTrack');if(!track||track.dataset.atmosphereReady)return;track.dataset.atmosphereReady='true';
  const visuals={
-  home:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20hyphae%20and%20mycelium.jpg',alt:'Réseau de hyphes et mycélium observé en microscopie',tag:'LIVING NETWORK',credit:'Wikimedia Commons · fichier sous licence libre',page:'https://commons.wikimedia.org/wiki/File:Fungal_hyphae_and_mycelium.jpg'},
+  home:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20hyphae.jpg',alt:'Réseau de hyphes et mycélium observé en microscopie',tag:'LIVING NETWORK',credit:'Wikimedia Commons · fichier sous licence libre',page:'https://commons.wikimedia.org/wiki/File:Fungal_hyphae_and_mycelium.jpg'},
   research:{src:'https://www.collezionemicrobica.enea.it/images/uo/brindisi/uo09_foto-1.jpg',alt:'Instrumentation et environnement de laboratoire de recherche',tag:'FIELD INSTRUMENTATION',credit:'ENEA Brindisi · source image',page:'https://www.collezionemicrobica.enea.it/en/sus-mirri/operative-unit-enea-c-r-brindisi.html'},
   network:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Microscope%20view%20of%20fungus.jpg',alt:'Hyphes fongiques observées au microscope',tag:'BIOLOGICAL NETWORK',credit:'Emilio Bosch · CC BY-SA 4.0',page:'https://commons.wikimedia.org/wiki/File:Microscope_view_of_fungus.jpg'},
-  catalogue:{src:'https://www.manitariakolindrou.gr/sites/default/files/styles/basicpagetop/public/ypostroma_top.jpg?itok=NjLTvxKs',alt:'Substrat de production pour la culture des pleurotes',tag:'CULTURES & MATERIALS',credit:'Kolindros Mushrooms · source image',page:'https://www.manitariakolindrou.gr/en/mushrooms/pleurotus-mushroom-substrate'},
+  catalogue:{src:'https://commons.wikimedia.org/wiki/Special:FilePath/Fungal%20hyphae%20in%20LPCB%20preparation%20of%20culture%20microscopic%20examination.jpg',alt:'Substrat de production pour la culture des pleurotes',tag:'CULTURES & MATERIALS',credit:'Kolindros Mushrooms · source image',page:'https://www.manitariakolindrou.gr/en/mushrooms/pleurotus-mushroom-substrate'},
   about:{src:'https://iiif.wellcomecollection.org/image/B0004843/full/800%2C/0/default.jpg',alt:'Photographie scientifique de culture fongique',tag:'BIOLOGIE EXPÉRIMENTALE',credit:'Wellcome Collection · image scientifique',page:'https://wellcomecollection.org/works/s38jqfs8'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
