@@ -844,3 +844,215 @@
 @media(prefers-reduced-motion:reduce){
   #app.balabs-ui .site-nav a{transition:none}
 }
+
+
+
+/* PHASE 33 — site-wide editorial finish.
+   The same visual grammar now carries through projects, catalogue, feature,
+   about, method, principles and footer. No new persistent overlays. */
+#app.balabs-ui .experience-page{
+  --chapter-gutter:clamp(18px,4vw,58px);
+  padding-inline:var(--chapter-gutter);
+}
+#app.balabs-ui .experience-page :where(.work-heading,.universe-index-heading,.product-catalogue-head,.method-top,.value-heading){
+  margin-block:clamp(22px,4vh,48px) clamp(18px,3vh,30px);
+}
+#app.balabs-ui .experience-page :where(.work-heading h2,.universe-index-heading h2,.product-catalogue-head h2,.method-top h2,.value-heading h2,.about-copy h2,.editorial-copy h2){
+  font-size:clamp(30px,4.2vw,58px);
+  line-height:1.04;
+}
+#app.balabs-ui .experience-page :where(.work-heading em,.product-catalogue-head em,.method-top em,.about-copy em,.editorial-copy em){
+  color:var(--balabs-copper);
+  font-style:normal;
+}
+#app.balabs-ui .experience-page .work-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(16px,2.4vw,32px);
+  align-items:stretch;
+}
+#app.balabs-ui .experience-page .work-card{
+  min-width:0;display:flex;flex-direction:column;
+  padding:0 0 16px!important;
+  border-top:1px solid rgba(209,208,197,.28)!important;
+  border-bottom:1px solid rgba(209,208,197,.2)!important;
+  background:transparent!important;
+  transition:border-color .2s ease,transform .2s ease;
+}
+#app.balabs-ui .experience-page .work-card:hover{
+  border-top-color:var(--balabs-copper)!important;
+  transform:translateY(-3px);
+}
+#app.balabs-ui .experience-page .work-card .work-media{
+  width:100%;aspect-ratio:16/10;margin:14px 0 18px;
+  overflow:hidden;background:var(--balabs-forest);
+}
+#app.balabs-ui .experience-page .work-card .work-media img{
+  width:100%;height:100%;object-fit:cover;
+  filter:saturate(.78) contrast(1.04);
+  transition:transform .45s ease,filter .3s ease;
+}
+#app.balabs-ui .experience-page .work-card:hover .work-media img{
+  transform:scale(1.035);filter:saturate(.96) contrast(1.04);
+}
+#app.balabs-ui .experience-page .work-card h3{
+  margin:0 0 9px;font-size:clamp(19px,2vw,25px);line-height:1.15;
+}
+#app.balabs-ui .experience-page .work-card>p:not(.work-topics){
+  font-size:13px;line-height:1.75;
+}
+#app.balabs-ui .experience-page .work-card .work-topics{
+  margin-top:auto;padding-top:14px;font:600 9px/1.6 ui-monospace,monospace;
+  letter-spacing:.045em;color:var(--balabs-muted);
+}
+#app.balabs-ui .experience-page .work-card-link{
+  display:inline-flex;align-items:center;gap:8px;width:max-content;
+  max-width:100%;margin-top:14px;color:var(--balabs-paper);
+  font-size:11px;text-decoration:none;border-bottom:1px solid var(--balabs-copper);
+  padding:0 0 5px;
+}
+#app.balabs-ui .experience-page .work-explore{
+  display:inline-flex;margin-top:clamp(20px,3vh,34px);
+  padding:10px 0;border-bottom:1px solid var(--balabs-copper);
+  color:var(--balabs-paper);font-size:12px;text-decoration:none;
+}
+#app.balabs-ui .experience-page .product-catalogue-meta{
+  display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 22px;
+  padding:13px 0;border-block:1px solid rgba(209,208,197,.2);
+  color:var(--balabs-muted);font:600 9px/1.5 ui-monospace,monospace;
+  letter-spacing:.055em;
+}
+#app.balabs-ui .experience-page .product-filters{
+  display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px;
+}
+#app.balabs-ui .experience-page .product-filter{
+  min-height:40px;padding:9px 13px;border:1px solid rgba(209,208,197,.2);
+  border-radius:2px;background:transparent;color:var(--balabs-mineral);
+  font-size:11px;transition:background .2s ease,border-color .2s ease;
+}
+#app.balabs-ui .experience-page .product-filter:hover,
+#app.balabs-ui .experience-page .product-filter.is-active{
+  border-color:var(--balabs-copper);background:rgba(185,107,77,.12);
+}
+#app.balabs-ui .experience-page .product-catalogue-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0 clamp(14px,2vw,26px);
+}
+#app.balabs-ui .experience-page .product-catalogue-card{
+  position:relative;min-width:0;min-height:210px;
+  padding:18px 28px 20px 0!important;
+  border-top:1px solid rgba(209,208,197,.22)!important;
+  background:transparent!important;box-shadow:none!important;
+  text-decoration:none;transition:border-color .2s ease,transform .2s ease;
+}
+#app.balabs-ui .experience-page .product-catalogue-card:hover{
+  border-top-color:var(--balabs-copper)!important;transform:translateY(-2px);
+}
+#app.balabs-ui .experience-page .product-catalogue-card h3{
+  margin:12px 0 8px;font-size:16px;line-height:1.35;
+}
+#app.balabs-ui .experience-page .product-catalogue-card>p{
+  font-size:11px;line-height:1.65;color:rgba(209,208,197,.72);
+}
+#app.balabs-ui .experience-page .product-catalogue-card .product-ref{
+  color:var(--balabs-muted);font:600 8px/1.4 ui-monospace,monospace;
+  letter-spacing:.08em;
+}
+#app.balabs-ui .experience-page .editorial-feature,
+#app.balabs-ui .experience-page .editorial-about{
+  display:grid;grid-template-columns:minmax(0,1.08fr) minmax(280px,.92fr);
+  align-items:center;gap:clamp(28px,6vw,84px);
+  padding-block:clamp(30px,6vh,76px);
+  border-top:1px solid rgba(209,208,197,.18);
+}
+#app.balabs-ui .experience-page .editorial-feature .editorial-art,
+#app.balabs-ui .experience-page .editorial-about .editorial-art{
+  min-width:0;aspect-ratio:5/4;overflow:hidden;
+}
+#app.balabs-ui .experience-page .editorial-feature .editorial-copy,
+#app.balabs-ui .experience-page .editorial-about .about-copy{
+  max-width:620px;
+}
+#app.balabs-ui .experience-page :where(.editorial-copy>p,.about-copy>p){
+  max-width:58ch;margin-top:18px;font-size:14px;line-height:1.9;
+}
+#app.balabs-ui .experience-page .editorial-link{
+  display:inline-flex;margin-top:22px;padding-bottom:6px;
+  border-bottom:1px solid var(--balabs-copper);font-size:11px;
+  text-decoration:none;
+}
+#app.balabs-ui .experience-page .method-steps{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(10px,2vw,24px);padding:0;margin:22px 0 0;list-style:none;
+}
+#app.balabs-ui .experience-page .method-steps>li{
+  min-width:0;border-top:1px solid rgba(209,208,197,.25);
+  border-bottom:0!important;
+}
+#app.balabs-ui .experience-page .method-trigger{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:start;
+  gap:10px;width:100%;height:100%;padding:16px 0;
+  border:0;background:transparent;text-align:start;color:var(--balabs-mineral);
+  cursor:pointer;
+}
+#app.balabs-ui .experience-page .method-trigger[aria-expanded=true]{
+  border-top:2px solid var(--balabs-copper);padding-top:15px;
+}
+#app.balabs-ui .experience-page .method-trigger-copy b{
+  display:block;color:var(--balabs-paper);font-size:15px;
+}
+#app.balabs-ui .experience-page .method-trigger-copy p{
+  margin-top:8px;color:rgba(209,208,197,.7);font-size:11px;line-height:1.7;
+}
+#app.balabs-ui .experience-page .method-detail{
+  max-width:780px;margin:20px 0 0 auto;padding:20px 22px;
+  border-inline-start:2px solid var(--balabs-copper);
+  background:rgba(38,59,56,.42);
+}
+#app.balabs-ui .experience-page .value-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(18px,3vw,38px);
+}
+#app.balabs-ui .experience-page .value-item{
+  min-width:0;padding-top:16px;
+}
+#app.balabs-ui .experience-page .value-item h3{
+  margin:18px 0 10px;font-size:clamp(17px,2vw,22px);line-height:1.3;
+}
+#app.balabs-ui .experience-page .value-item p{
+  font-size:12px;line-height:1.8;
+}
+#app.balabs-ui .foot{
+  display:grid;grid-template-columns:1fr auto;gap:18px 30px;
+  align-items:end;padding:28px 0 18px;
+}
+#app.balabs-ui .foot-nav{
+  display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:flex-end;
+}
+#app.balabs-ui .asset-credit{grid-column:1/-1;max-width:100%;font-size:9px;line-height:1.7}
+@media(max-width:900px){
+ #app.balabs-ui .experience-page .work-grid,
+ #app.balabs-ui .experience-page .product-catalogue-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app.balabs-ui .experience-page .method-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+ #app.balabs-ui .experience-page{--chapter-gutter:12px}
+ #app.balabs-ui .experience-page .work-grid,
+ #app.balabs-ui .experience-page .product-catalogue-grid,
+ #app.balabs-ui .experience-page .method-steps,
+ #app.balabs-ui .experience-page .value-grid{grid-template-columns:minmax(0,1fr)}
+ #app.balabs-ui .experience-page .work-card{padding-bottom:18px!important}
+ #app.balabs-ui .experience-page .product-catalogue-card{min-height:0;padding:16px 24px 18px 0!important}
+ #app.balabs-ui .experience-page .editorial-feature,
+ #app.balabs-ui .experience-page .editorial-about{
+   grid-template-columns:minmax(0,1fr);gap:20px;padding-block:26px;
+ }
+ #app.balabs-ui .experience-page .editorial-feature .editorial-art,
+ #app.balabs-ui .experience-page .editorial-about .editorial-art{order:-1;aspect-ratio:16/10}
+ #app.balabs-ui .experience-page .foot{grid-template-columns:minmax(0,1fr);align-items:start}
+ #app.balabs-ui .experience-page .foot-nav{justify-content:flex-start}
+ #app.balabs-ui .experience-page .asset-credit{grid-column:auto}
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui .experience-page :where(.work-card,.work-media img,.product-catalogue-card){transition:none!important}
+}
