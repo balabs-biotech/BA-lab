@@ -80,7 +80,7 @@ try {
         }));
         const backgroundUrls = [...new Set([...root.querySelectorAll('*')].flatMap(el => {
           const value = getComputedStyle(el).backgroundImage || '';
-          return [...value.matchAll(/url\\(["']?(.*?)["']?\\)/g)].map(match => match[1]).filter(url => url && !url.startsWith('data:') && !url.startsWith('blob:'));
+          return [...value.matchAll(/url\(["']?(.*?)["']?\)/g)].map(match => match[1]).filter(url => url && !url.startsWith('data:') && !url.startsWith('blob:'));
         }))];
         const backgrounds = await Promise.all(backgroundUrls.map(url => new Promise(resolve => {
           const image = new Image();
