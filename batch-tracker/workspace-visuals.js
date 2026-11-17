@@ -40,7 +40,11 @@
     },
     agronomy: {
       label: "Feuille stylisée avec balayage lumineux le long de la nervure",
-      particles: { count: compact ? 4 : 7, color: "#b4f477", direction: "top", speed: 0.1 },
+      particles: {
+        count: compact ? 5 : 10, color: "#b4f477", direction: "top", speed: 0.13,
+        shape: "circle",
+        interactivity: { hover: { enable: true, mode: "repulse" }, click: { enable: true, mode: "push" } }
+      },
       markup: `
         <div class="ba-sector-visual ba-sector-visual--greentech" data-sector="agronomy">
           <svg class="ba-sector-svg" viewBox="0 0 260 200" role="img" aria-label="Feuille stylisée et nervure centrale">
@@ -64,6 +68,11 @@
     },
     laboratory: {
       label: "Bioréacteur avec niveau de liquide et bulles de gaz",
+      particles: {
+        count: compact ? 4 : 8, color: ["#8ec6e8", "#b9e1f5"], direction: "top", speed: 0.075,
+        shape: "circle",
+        interactivity: { hover: { enable: true, mode: "bubble" } }
+      },
       markup: `
         <div class="ba-sector-visual ba-sector-visual--laboratory" data-sector="laboratory">
           <svg class="ba-sector-svg" viewBox="0 0 260 200" role="img" aria-label="Bioréacteur avec agitation, liquide et bulles">
@@ -136,8 +145,21 @@
             },
             opacity: { value: { min: 0.12, max: 0.42 } },
             size: { value: { min: 1, max: 2.1 } },
-            shape: { type: "circle" }
-          }
+            shape: { type: scene.particles.shape || "circle" }
+          },
+          interactivity: scene.particles.interactivity ? {
+            detectsOn: "canvas",
+            events: {
+              onHover: { enable: Boolean(scene.particles.interactivity.hover?.enable), mode: scene.particles.interactivity.hover?.mode || "repulse" },
+              onClick: { enable: Boolean(scene.particles.interactivity.click?.enable), mode: scene.particles.interactivity.click?.mode || "push" },
+              resize: { enable: true }
+            },
+            modes: {
+              repulse: { distance: 88, duration: 0.35 },
+              push: { quantity: 2 },
+              bubble: { distance: 90, size: 4, duration: 1.2, opacity: 0.45 }
+            }
+          } : { events: { onHover: { enable: false }, onClick: { enable: false } } }
         }
       });
     } catch (error) {
