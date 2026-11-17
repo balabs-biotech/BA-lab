@@ -3,17 +3,17 @@
  const track=document.getElementById('experienceTrack');if(!track||track.dataset.atmosphereReady)return;track.dataset.atmosphereReady='true';
  const visuals={
   home:{src:'https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG',alt:'Hyphes de Podospora anserina observées en microscopie à fluorescence',tag:'LIVING SYSTEMS',credit:'Christian Scheckhuber · CC BY-SA 4.0',page:'https://commons.wikimedia.org/wiki/File:Mycelium.JPG'},
-  research:{src:'https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg',alt:'Enregistreur de données IoT pour le suivi de paramètres environnementaux',tag:'FIELD INSTRUMENTATION',credit:'Niau33 · CC BY-SA 4.0',page:'https://commons.wikimedia.org/wiki/File:LPMDL-110X_IoT_solar_level_monitoring_data_logger.jpg'},
-  network:{src:'https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg',alt:'Mycélium de Pleurotus ostreatus se développant sur du marc de café dans une boîte de culture',tag:'BIOLOGICAL NETWORK',credit:'Tobi Kellner · CC BY-SA 3.0',page:'https://commons.wikimedia.org/wiki/File:Oyster_mushroom_(Pleurotus_ostreatus)_mycelium_in_petri_dish_on_coffee_grounds.JPG'},
-  catalogue:{src:'https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w',alt:'Pleurotes en développement sur des blocs de substrat colonisés',tag:'CULTURES & MATERIALS',credit:'Mushroom Materials · source image',page:'https://www.mushroommaterials.com/'},
-  about:{src:'https://upload.wikimedia.org/wikipedia/commons/8/82/Fungus_in_glass_dish3.jpg',alt:'Culture fongique en boîte de Petri, photographiée en gros plan dans un laboratoire de biologie',tag:'BIOLOGIE EXPÉRIMENTALE',credit:'Yakuzakorat · CC BY 4.0',page:'https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish3.jpg'}
+  research:{src:'https://www.collezionemicrobica.enea.it/images/uo/brindisi/uo09_foto-1.jpg',alt:'Enregistreur de données IoT pour le suivi de paramètres environnementaux',tag:'FIELD INSTRUMENTATION',credit:'Niau33 · CC BY-SA 4.0',page:'https://commons.wikimedia.org/wiki/File:LPMDL-110X_IoT_solar_level_monitoring_data_logger.jpg'},
+  network:{src:'https://upload.wikimedia.org/wikipedia/commons/0/0b/Pleurotus_ostreatus_on_agar.jpg',alt:'Mycélium de Pleurotus ostreatus se développant sur du marc de café dans une boîte de culture',tag:'BIOLOGICAL NETWORK',credit:'Tobi Kellner · CC BY-SA 3.0',page:'https://commons.wikimedia.org/wiki/File:Oyster_mushroom_(Pleurotus_ostreatus)_mycelium_in_petri_dish_on_coffee_grounds.JPG'},
+  catalogue:{src:'https://www.manitariakolindrou.gr/sites/default/files/styles/basicpagetop/public/ypostroma_top.jpg?itok=NjLTvxKs',alt:'Pleurotes en développement sur des blocs de substrat colonisés',tag:'CULTURES & MATERIALS',credit:'Mushroom Materials · source image',page:'https://www.mushroommaterials.com/'},
+  about:{src:'https://iiif.wellcomecollection.org/image/B0004843/full/800%2C/0/default.jpg',alt:'Culture fongique en boîte de Petri, photographiée en gros plan dans un laboratoire de biologie',tag:'BIOLOGIE EXPÉRIMENTALE',credit:'Yakuzakorat · CC BY 4.0',page:'https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish3.jpg'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  Object.entries(visuals).forEach(([key,data])=>{
   const page=track.querySelector('.experience-page[data-chapter="'+key+'"]');if(!page)return;
   const figure=document.createElement('figure');figure.className='chapter-atmosphere';
   const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=key==='home'?'eager':'lazy';img.decoding='async';
-  const fallback=key==='research'?'https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg':key==='catalogue'?'https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w':'https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg';
+  const fallback=key==='research'?'https://www.collezionemicrobica.enea.it/images/uo/brindisi/uo09_foto-1.jpg':key==='catalogue'?'https://www.manitariakolindrou.gr/sites/default/files/styles/basicpagetop/public/ypostroma_top.jpg?itok=NjLTvxKs':'https://upload.wikimedia.org/wikipedia/commons/0/0b/Pleurotus_ostreatus_on_agar.jpg';
 
   const caption=document.createElement('figcaption');const tag=document.createElement('span');tag.textContent=data.tag;
   const credit=document.createElement('small');credit.textContent='IMAGE / '+data.credit;
