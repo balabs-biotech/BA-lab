@@ -36,8 +36,17 @@ try {
     }
     await page.locator('[data-lang="fr"]').first().click();
     await page.waitForFunction(() => document.documentElement.lang === 'fr' && document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
+
+    // Capture and validate each editorial chapter, not only the embedded explorer.
+    for (const [index, chapter] of ['home','research','network','catalogue','about'].entries()) {
+      await page.locator('.chapter-rail-node').nth(index).click();
+      await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
+      await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
+    }
     const originalUrl = page.url();
-    await page.locator('a[data-domain-page="myco"]').first().click();
+    await page.locator('.chapter-rail-node').nth(2).click();
+    await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
+    await page.locator('#chapter-network a[data-domain-page="myco"]').click();
     await page.waitForFunction(() => document.querySelector('#selection .card-title')?.textContent === 'MYCOLOGIE', undefined, { timeout: 15000 });
     assert.equal(page.url(), originalUrl, 'Selecting a universe must stay inside the normal BA Labs homepage');
     assert.ok((await page.locator('#selection .card-title').innerText()).length > 0, 'Direct domain selection must focus the requested universe in the embedded scene');
