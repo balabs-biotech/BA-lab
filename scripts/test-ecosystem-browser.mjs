@@ -24,7 +24,7 @@ try {
     page.on('requestfailed', request => { const reason = request.failure()?.errorText || 'unknown'; if (reason !== 'net::ERR_ABORTED') failed.push(request.url() + ' — ' + reason); });
     page.on('response', response => {
       if (/\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(response.url()) && response.status() >= 400) {
-      if (/\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(response.url()) && response.status() >= 400) {
+        badImageResponses.push(response.url() + ' — HTTP ' + response.status());
       }
     });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
