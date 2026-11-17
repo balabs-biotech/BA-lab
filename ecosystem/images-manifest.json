@@ -75,11 +75,6 @@
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/20210719_Pleurotus_ostreatus_017-024.jpg"
   },
   {
-    "id": "universe-evidence",
-    "file": "universe-evidence.jpg",
-    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Microscopic_View_of_Penicillium_Conidia.jpg"
-  },
-  {
     "id": "chapter-about-method",
     "file": "chapter-about-method.jpg",
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungus_in_glass_dish3.jpg"
@@ -98,5 +93,15 @@
     "id": "editorial-preview",
     "file": "editorial-preview.jpg",
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Mycelium.jpg"
+  },
+  {
+    "id": "catalogue-liquid-culture",
+    "file": "catalogue-liquid-culture.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungal_growth_in_erlenmeyer.jpg"
+  },
+  {
+    "id": "catalogue-water-agar",
+    "file": "catalogue-water-agar.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/White_mycelium_growing_on_agar.jpg"
   }
 ]
