@@ -257,3 +257,92 @@ html,body{
   border-color:color-mix(in srgb,var(--universe-accent) 52%,transparent)!important;
   box-shadow:0 14px 36px rgba(8,18,29,.2),inset 0 0 0 1px color-mix(in srgb,var(--universe-accent) 25%,transparent)!important;
 }
+
+
+/* V3 — material textures: mineral paper, anodised blue, oxidised copper and living fibres.
+   Texture is baked into backgrounds (no extra DOM, no image dependency). */
+:root{
+  --balabs-noise:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.76' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.16'/%3E%3C/svg%3E");
+  --balabs-brushed:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018 .72' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='.12'/%3E%3C/svg%3E");
+}
+/* Deep ink: fine grain + directional anodised-metal brushing. */
+#app.balabs-ui>.top,
+#app.balabs-ui>.site-nav,
+#app.balabs-ui .experience-page[data-chapter=home]>.hero,
+#app.balabs-ui .experience-page[data-chapter=research]>.editorial-work,
+#app.balabs-ui .experience-page[data-chapter=catalogue]>.product-catalogue,
+#app.balabs-ui .experience-page[data-chapter=about]>.editorial-method{
+  background-blend-mode:soft-light,overlay,normal!important;
+  background-image:var(--balabs-noise),var(--balabs-brushed),linear-gradient(145deg,rgba(108,155,255,.055),transparent 52%)!important;
+}
+/* Blue light: subtle technical grain, not a flat electric-blue slab. */
+#app.balabs-ui .experience-page[data-chapter=home]>.hero{
+  background-image:
+    var(--balabs-noise),
+    repeating-linear-gradient(118deg,rgba(108,155,255,.025) 0 1px,transparent 1px 13px),
+    radial-gradient(ellipse at 78% 18%,rgba(71,120,255,.18),transparent 48%),
+    linear-gradient(135deg,#1A2B49 0%,#121D32 58%,#10182A 100%)!important;
+  background-blend-mode:soft-light,screen,normal,normal!important;
+}
+/* Gold / copper: warm, finely striated surfaces. */
+#app.balabs-ui .experience-page[data-chapter=research]>.editorial-work{
+  background-image:
+    var(--balabs-noise),
+    repeating-linear-gradient(0deg,rgba(214,173,91,.025) 0 1px,transparent 1px 7px),
+    radial-gradient(ellipse at 88% 5%,rgba(214,173,91,.12),transparent 36%),
+    linear-gradient(145deg,#1A2940 0%,#121D30 68%,#10182A 100%)!important;
+  background-blend-mode:soft-light,overlay,normal,normal!important;
+}
+#app.balabs-ui .experience-page[data-chapter=catalogue]>.product-catalogue{
+  background-image:
+    var(--balabs-noise),
+    repeating-linear-gradient(112deg,rgba(200,121,82,.035) 0 1px,transparent 1px 11px),
+    radial-gradient(ellipse at 90% 0%,rgba(200,121,82,.14),transparent 34%),
+    linear-gradient(180deg,#172235 0%,#10182A 100%)!important;
+  background-blend-mode:soft-light,screen,normal,normal!important;
+}
+/* Biological chapter: branching fibre-like contours in mineral green. */
+#app.balabs-ui .experience-page[data-chapter=network]>.universe-index{
+  background-image:
+    var(--balabs-noise),
+    repeating-radial-gradient(ellipse at 18% 24%,transparent 0 27px,rgba(167,184,164,.045) 28px 29px,transparent 30px 54px),
+    radial-gradient(ellipse at 12% 20%,rgba(120,146,125,.2),transparent 42%),
+    linear-gradient(145deg,#17283A 0%,#101A2B 72%)!important;
+  background-blend-mode:soft-light,screen,normal,normal!important;
+}
+/* Light panels: tactile mineral paper, enough contrast to keep text crisp. */
+#app.balabs-ui .experience-page .universe-index-card,
+#app.balabs-ui .experience-page .under{
+  background-image:
+    var(--balabs-noise),
+    repeating-linear-gradient(0deg,rgba(16,24,42,.018) 0 1px,transparent 1px 5px),
+    linear-gradient(135deg,#F2F4F8,#E8EDF5)!important;
+  background-blend-mode:multiply,normal,normal!important;
+}
+#app.balabs-ui .experience-page .product-catalogue-card{
+  background-image:
+    var(--balabs-noise),
+    repeating-linear-gradient(112deg,rgba(200,121,82,.035) 0 1px,transparent 1px 9px),
+    linear-gradient(145deg,rgba(35,51,73,.94),rgba(17,27,45,.98))!important;
+  background-blend-mode:soft-light,screen,normal!important;
+}
+/* Gold and copper accents get a brushed highlight rather than a flat fill. */
+#app.balabs-ui .experience-page .experience-page-label,
+#app.balabs-ui .experience-page .universe-index-card>em,
+#app.balabs-ui .experience-page .product-ref{
+  text-shadow:0 1px 10px rgba(214,173,91,.12);
+}
+#app.balabs-ui .experience-page .work-card,
+#app.balabs-ui .experience-page .method-steps li,
+#app.balabs-ui .experience-page .value-item{
+  background-image:var(--balabs-noise),linear-gradient(145deg,rgba(108,155,255,.045),transparent 68%)!important;
+  background-blend-mode:soft-light,normal!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter=network]>.universe-index{
+    background-size:auto,auto,auto,auto!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .experience-page:after{display:none!important}
+}
