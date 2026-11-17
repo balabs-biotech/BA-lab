@@ -1078,3 +1078,161 @@ html body[data-domain].workspace-authenticated .app-hero h1 {
 html body[data-domain].workspace-authenticated .app-hero h1 br {
   display:none !important;
 }
+
+
+/* PASS 149 — analytical plots: legible axes, series and data context on dark surfaces. */
+html body[data-domain] .card:not(.app-hero) .statistics-chart {
+  display:grid !important;
+  gap:10px !important;
+  padding:clamp(10px,1.5vw,16px) !important;
+  overflow:hidden !important;
+  background:
+    radial-gradient(ellipse at 12% 0%,color-mix(in srgb,var(--workspace-accent) 9%,transparent),transparent 62%),
+    rgba(9,16,17,.48) !important;
+}
+html body[data-domain] .statistics-chart > svg {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  min-width:0 !important;
+  overflow:visible !important;
+  color:#c8d5ce !important;
+  font-family:var(--ba-font,Arial,sans-serif) !important;
+}
+html body[data-domain] .statistics-chart > svg text {
+  fill:#c4d0c9 !important;
+  font-family:var(--ba-font,Arial,sans-serif) !important;
+  font-size:11px !important;
+}
+html body[data-domain] .statistics-chart > svg line {
+  stroke:rgba(190,207,197,.2) !important;
+  stroke-width:1 !important;
+}
+html body[data-domain] .statistics-chart > svg polyline {
+  stroke:var(--workspace-accent) !important;
+  stroke-width:3 !important;
+  filter:drop-shadow(0 0 4px color-mix(in srgb,var(--workspace-accent) 30%,transparent)) !important;
+}
+html body[data-domain] .statistics-chart > svg circle {
+  fill:var(--workspace-accent) !important;
+  stroke:#172321 !important;
+  stroke-width:1.5 !important;
+}
+html body[data-domain] .statistics-chart > .statistics-demo-note {
+  margin:0 !important;
+  padding:9px 11px !important;
+  border-inline-start:2px solid var(--workspace-accent) !important;
+  border-radius:0 7px 7px 0 !important;
+  background:rgba(24,36,34,.7) !important;
+  color:#d6c7a8 !important;
+  font-size:9px !important;
+  font-weight:750 !important;
+  letter-spacing:.045em !important;
+  line-height:1.55 !important;
+}
+html body[data-domain] .statistics-chart > .muted {
+  margin:0 !important;
+  color:#aab9b0 !important;
+  font-size:11px !important;
+  line-height:1.6 !important;
+}
+html body[data-domain] .statistics-summary {
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:9px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+html body[data-domain] .statistics-summary > .statistics-summary-item {
+  display:grid !important;
+  align-content:space-between !important;
+  gap:7px !important;
+  min-height:70px !important;
+  padding:12px !important;
+}
+html body[data-domain] .statistics-summary-item span {
+  color:#9eafa5 !important;
+  font-size:9px !important;
+  font-weight:750 !important;
+  letter-spacing:.055em !important;
+  line-height:1.35 !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] .statistics-summary-item strong {
+  color:var(--paper) !important;
+  font-size:clamp(18px,2vw,24px) !important;
+  font-variant-numeric:tabular-nums !important;
+  letter-spacing:-.035em !important;
+}
+html body[data-domain] #trackerCard .culture-lineage > section[data-lineage-group] {
+  position:relative !important;
+  overflow:hidden !important;
+}
+html body[data-domain] #trackerCard .culture-lineage > section[data-lineage-group] > p {
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin:0 0 10px !important;
+  color:#aebdb4 !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  letter-spacing:.075em !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] #trackerCard .culture-lineage > section[data-lineage-group="current"] {
+  border-color:color-mix(in srgb,var(--workspace-accent) 45%,var(--border)) !important;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--workspace-accent) 9%,#1c2927),#172220) !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node {
+  display:grid !important;
+  gap:5px !important;
+  min-width:145px !important;
+  max-width:240px !important;
+  padding:10px 12px !important;
+  border:1px solid color-mix(in srgb,var(--workspace-accent) 24%,var(--border)) !important;
+  border-radius:9px !important;
+  background:#202e2b !important;
+  text-align:start !important;
+  transition:border-color .16s ease,background-color .16s ease,transform .16s ease !important;
+}
+html body[data-domain] #trackerCard button.culture-lineage-node:hover {
+  border-color:var(--workspace-accent) !important;
+  background:#293a35 !important;
+  transform:translateY(-1px) !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node strong {
+  color:#e7eee8 !important;
+  font-size:11px !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node small {
+  color:#a7b7ad !important;
+  font-size:9px !important;
+  line-height:1.45 !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-arrow {
+  color:var(--workspace-accent) !important;
+  font-size:17px !important;
+  font-weight:800 !important;
+}
+@media(max-width:600px) {
+  html body[data-domain] .statistics-summary {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  html body[data-domain] .statistics-summary > .statistics-summary-item:last-child:nth-child(odd) {
+    grid-column:1/-1 !important;
+  }
+  html body[data-domain] .statistics-chart > svg text {
+    font-size:10px !important;
+  }
+  html body[data-domain] #trackerCard .culture-lineage-node {
+    min-width:min(145px,65vw) !important;
+    max-width:100% !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] #trackerCard .culture-lineage-node {
+    transition:none !important;
+  }
+}
