@@ -1298,7 +1298,7 @@ html body[data-domain]::before {
   content:"" !important;
   position:fixed !important;
   inset:0 !important;
-  z-index:-1 !important;
+  z-index:0 !important;
   pointer-events:none !important;
   opacity:.24 !important;
   background-image:
