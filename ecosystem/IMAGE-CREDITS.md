@@ -5,7 +5,7 @@ Les 29 images du site sont téléchargées, contrôlées et empaquetées dans `/
 | Emplacement | Fichier local | Auteur / œuvre | Source et licence |
 |---|---|---|---|
 | Accueil — micrographie | `home-hero.jpg` | Maseko et al. · *P. ostreatus mycelial growth morphology* (Fig. 1) | [International Journal of Food Science / PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/) · CC BY 4.0 |
-| Accueil — instrumentation | `home-iot.jpg` | Cjp24 · *Data logger.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Data_logger.jpg) · voir licence sur la source |
+| Accueil — instrumentation / architecture IoT | `home-iot.jpg` | Méndez-Guzmán et al. · architecture IoT d'une serre aéroponique (Fig. 3) | [Sensors 22(15), 5646](https://doi.org/10.3390/s22155646) · CC BY 4.0 |
 | Accueil — microscopie fongique | `home-hyphae.jpg` | Juan Carlos Fonseca Mata · *Fungi seen with fluorescence microscope.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungi_seen_with_fluorescence_microscope.jpg) · CC BY 4.0 |
 | Accueil — matière organique | `home-compost.jpg` | Red58bill · *Compost.layers.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Compost.layers.jpg) · CC BY 3.0 |
 | Atlas — Penicillium | `home-penicillium.jpg` | Jon Houseman & Matthew Ford · *Asco1013.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Asco1013.jpg) · voir licence sur la source |
@@ -21,15 +21,15 @@ Les 29 images du site sont téléchargées, contrôlées et empaquetées dans `/
 | Chapitre — méthode | `chapter-about-method.jpg` | Yakuzakorat · *Fungus in glass dish3.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish3.jpg) · CC BY 4.0 |
 | Univers — Mycologie | `universe-myco.jpg` | Michał Wadas · *Pleurotus ostreatus on agar.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pleurotus_ostreatus_on_agar.jpg) · CC BY-SA 4.0 |
 | Univers — Biotechnologies | `universe-bio.jpg` | Syed Sajidul Islam · *Microscopic Image of Penicillium conidial fungi.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Microscopic_Image_of_Penicillium_conidial_fungi.jpg) · voir licence sur la source |
-| Univers — IoT | `universe-iot.jpg` | Aperegoy · *Data Logger.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Data_Logger.jpg) · voir licence sur la source |
-| Univers — TechnoSoil | `universe-soil.jpg` | Avetisyan91 · *Soil layers.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Soil_layers.jpg) · CC BY-SA 4.0 |
+| Univers — IoT | `universe-iot.jpg` | Méndez-Guzmán et al. · instrumentation et capteurs sur culture aéroponique (Fig. 2) | [Sensors 22(15), 5646](https://doi.org/10.3390/s22155646) · CC BY 4.0 |
+| Univers — TechnoSoil | `universe-soil.jpg` | Bandara et al. · coupe microscopique d'une colonne de sol et interface racine-minéraux (Fig. 3) | [Frontiers in Plant Science 12:668929](https://doi.org/10.3389/fpls.2021.668929) · CC BY 4.0 |
 | Univers — Laboratoire | `universe-lab.jpg` | Jba.batista · *Lab bench with lab equipment.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lab_bench_with_lab_equipment.jpg) · CC BY-SA 4.0 |
 | Univers — Produits | `universe-products.jpg` | Zinnmann · *20210719 Pleurotus ostreatus 017-024.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_017-024.jpg) · CC BY-SA 3.0 |
 | Univers — Projets scientifiques | `universe-work.jpg` | Ivan Pashkov · *Candida fungus colony grown on agar media.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Candida_fungus_colony_grown_on_agar_media.jpg) · voir licence sur la source |
 | Univers — Ressources & transmission | `universe-evidence.jpg` | Ajay Kumar Chaurasiya · *Microscopic View of Penicillium Conidia.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Microscopic_View_of_Penicillium_Conidia.jpg) · voir licence sur la source |
 | Éditorial — Penicillium | `editorial-penicillium.png` | Fraunhofer IFAM | [DeDrug-Bio](https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio.html) · image institutionnelle |
 | Éditorial — IoT | `editorial-iot.jpg` | DataCMS / éditeur source | [Image source](https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg) · image fournisseur |
-| Éditorial — sol | `editorial-soil.jpg` | Rivadavia.vila · *Soil profile with silt, loam, and clay.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Soil_profile_with_silt,_loam,_and_clay.jpg) · CC0 1.0 |
+| Éditorial — sol | `editorial-soil.jpg` | Bandara et al. · coupe microscopique d'une colonne de sol et interface racine-minéraux (Fig. 3) | [Frontiers in Plant Science 12:668929](https://doi.org/10.3389/fpls.2021.668929) · CC BY 4.0 |
 | Éditorial — marc de café | `editorial-coffee.jpg` | Tobi Kellner · *Oyster mushroom mycelium in petri dish on coffee grounds.JPG* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Oyster_mushroom_(Pleurotus_ostreatus)_mycelium_in_petri_dish_on_coffee_grounds.JPG) · CC BY-SA 3.0 |
 | Catalogue — milieu de culture | `product-card-medium.jpg` | Wikimedia Commons contributor · *Mushroom medium.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mushroom_medium.jpg) · voir licence sur la source |
 | Aperçu éditorial | `editorial-preview.jpg` | Sneha jayaraman · *Mycelium.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mycelium.jpg) · CC BY-SA 4.0 |
