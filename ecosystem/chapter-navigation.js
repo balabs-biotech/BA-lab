@@ -50,7 +50,7 @@
  // Reveal editorial imagery only when it enters its own chapter viewport.
  if('IntersectionObserver' in window){
   pages.forEach(page=>{
-   const images=page.querySelectorAll('.hero-micrograph,.work-media img,.product-catalogue img,.universe-index-card,.feature-photo,.field-frame img,.editorial-about svg,.chapter-atmosphere img');
+   const images=page.querySelectorAll('.hero-micrograph,.work-media img,.product-catalogue img,.universe-visual img,.feature-photo,.field-frame img,.editorial-about svg,.chapter-atmosphere img');
    if(!images.length)return;
    const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
     if(!entry.isIntersecting)return;
