@@ -41,15 +41,27 @@
 #app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work{
   position:relative;isolation:isolate;
   background:
-    radial-gradient(ellipse at 92% 0%,rgba(185,107,77,.09),transparent 34%),
-    linear-gradient(135deg,#d7d7cc 0%,#c9cec3 100%)!important;
+    radial-gradient(ellipse at 92% 0%,rgba(185,107,77,.1),transparent 34%),
+    linear-gradient(145deg,#172522 0%,#111b1d 68%,#101819 100%)!important;
+  color:#d1d0c5!important;
 }
 #app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work:before{
   content:"BA LABS / FIELD NOTES";position:absolute;top:22px;inset-inline-end:clamp(22px,7vw,104px);
-  color:#647268;font:700 8px/1.2 ui-monospace,monospace;letter-spacing:.2em;
+  color:#b96b4d;font:700 8px/1.2 ui-monospace,monospace;letter-spacing:.2em;
 }
+#app.balabs-ui .experience-page[data-chapter="research"] .work-heading h2{color:#f2f1e9!important}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-heading h2 em{color:#b96b4d!important}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-heading>p{color:#c0cbc2!important}
 #app.balabs-ui .experience-page[data-chapter="research"] .work-card{
-  border-top:1px solid #8b9188!important;border-bottom:1px solid #a8aca2!important;
+  border-top:1px solid rgba(209,208,197,.28)!important;border-bottom:1px solid rgba(209,208,197,.28)!important;
+  color:#d1d0c5!important;
+}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card h3{color:#f2f1e9!important}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card>p:not(.work-topics){color:#d1d0c5!important}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-topics{color:#aab9ae!important}
+#app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-tag{
+  background:transparent!important;border:0!important;border-top:1px solid #b96b4d!important;
+  color:#d28c6e!important;
 }
 #app.balabs-ui .experience-page[data-chapter="research"] .work-card .work-media{
   position:relative;isolation:isolate;border:1px solid rgba(17,27,29,.2);
