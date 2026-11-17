@@ -27,6 +27,7 @@ const expectedExplorerDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot'
 const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
 const baseCss = readFileSync('ecosystem/site-base.css', 'utf8');
 const overridesCss = readFileSync('ecosystem/site-overrides.css', 'utf8');
+const editorialRefinementCss = readFileSync('ecosystem/editorial-refinement.css', 'utf8');
 const pageCss = [baseCss, brandCss, overridesCss].join('\n');
 assert.match(html, /<link rel="stylesheet" href="\.\/brand-system\.css\?v=\d+">/, 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
@@ -561,3 +562,17 @@ assert.ok(brandCss.includes('flex-wrap:nowrap !important') && brandCss.includes(
 assert.ok(brandCss.includes('#app.balabs-ui > .top .tools::-webkit-scrollbar'), 'Mobile language rail must scroll without visible scrollbar');
 assert.ok(brandCss.includes('padding:42px 22px 44px !important'), 'Mobile gateway hero must have safe horizontal breathing room');
 assert.ok( html.includes('brand-system.css?v=') &&  previewHtml.includes('brand-system.css?v='), 'Public and preview must share Phase 14 stylesheet');
+
+
+// Phase 15: the non-engine editorial chapters receive a dedicated refinement layer.
+assert.ok(html.includes('editorial-refinement.css?v=1'), 'Public site must load the editorial refinement layer');
+for (const selector of [
+  '[data-chapter="research"]',
+  '[data-chapter="network"]',
+  '[data-chapter="catalogue"]',
+  '[data-chapter="about"]',
+  '.product-catalogue-card:before',
+  '.method-trigger[aria-expanded="true"]',
+  '.value-item h3',
+]) assert.ok(editorialRefinementCss.includes(selector), 'Phase 15 must refine the public editorial experience: ' + selector);
+assert.ok(editorialRefinementCss.includes('prefers-reduced-motion:reduce'), 'Phase 15 must respect reduced-motion preferences');
