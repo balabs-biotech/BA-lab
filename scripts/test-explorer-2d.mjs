@@ -74,6 +74,8 @@ try {
     await page.locator('#selection .card').waitFor({ state: 'visible' });
     await page.locator('#selection .related-universes button').first().waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
+    await page.getByRole('button', { name: 'Culture & multiplication', exact: true }).click();
+    await page.locator('#selection .related-universes button').first().waitFor({ state: 'visible' });
     const childBranches = page.locator('#selection .child-branches button');
     await childBranches.first().waitFor({ state: 'visible' });
     const selectedRoot = await page.locator('#selection .card-title').innerText();
