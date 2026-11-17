@@ -5,6 +5,9 @@ const html = fs.readFileSync("batch-tracker/workspace.html", "utf8");
 const visuals = fs.readFileSync("batch-tracker/workspace-visuals.js", "utf8");
 const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
+const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
+const mycology = fs.readFileSync("batch-tracker/styles/mycology-workspace.css", "utf8");
+const mycologyEntry = fs.readFileSync("batch-tracker/mycology/index.html", "utf8");
 
 assert.ok(html.includes('class="app-hero"'), "Each sector must retain the shared workspace header");
 assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particle layer must be removed from the shared workspace markup");
@@ -23,5 +26,12 @@ assert.ok(motion.includes("workspace-authenticated .hero-art.ba-sector-art"), "S
 assert.ok(motion.includes("prefers-reduced-motion:reduce"), "CSS motion must include a reduced-motion fallback");
 assert.ok(shared.includes("backdrop-filter:blur(18px)"), "Workspace toolbar must retain the glass navigation treatment");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
+assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curved biological topology");
+assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
+assert.ok(lineage.includes('data-graph-zoom="fit"'), "PixiJS lineage graph must expose a recenter action");
+assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS lineage graph must support pointer panning without capturing node taps");
+assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
+assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
+assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
 
 console.log("✓ CultureOps sector-specific visual runtime contract");
