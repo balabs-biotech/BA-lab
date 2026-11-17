@@ -233,3 +233,16 @@
   opacity:1!important;transform:none!important;clip-path:none!important;transition:none!important;filter:none!important
  }
 }
+
+/* Eyecandy-style image captions: keep credits legible without turning frames into cards. */
+#app.balabs-ui .experience-page .field-frame figcaption{
+ display:flex;flex-direction:column;gap:5px;min-height:0;
+ padding:0;border:0;background:transparent;
+}
+#app.balabs-ui .experience-page .field-frame figcaption span{
+ color:#d28c6e;font:700 8px/1.35 ui-monospace,monospace;letter-spacing:.13em
+}
+#app.balabs-ui .experience-page .field-frame figcaption a{
+ color:#f2f1e9;font-size:10px;line-height:1.4;text-shadow:0 1px 8px #000;text-decoration:none
+}
+#app.balabs-ui .experience-page .field-frame figcaption a:hover{text-decoration:underline;text-decoration-color:#b96b4d}
