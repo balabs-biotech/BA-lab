@@ -79,7 +79,32 @@ function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selecte
 function focusNode(n,zoomTo){if(!n)return;previousView={scale:targetScale,offset:{...targetOffset}};const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;updateSelection();draw();}
 function hit(x,y){let found=null,best=22;for(const n of nodes){if(levelOpacity(n.level)<.12)continue;const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);if(d<limit){best=d;found=n;}}return found;}
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
-function updateSelection(){const box=$("selection");box.replaceChildren();if(!selected){renderAccessible();return;}const n=selected,data=n.data,card=el("div","card"),body=el("div","card-body"),badge=el("span","badge badge-outline",n.level===0?t("root"):data.children?.length?t("branch"):t("leaf")),title=el("h2","card-title",n.title),desc=el("p","",data.description||((data.children?.length||0)+" "+t("children")));const meta=el("small","",n.level+" / "+t("count"));const actions=el("div","card-actions");const focus=el("button","btn btn-primary btn-sm",t("focus"));focus.onclick=()=>focusNode(n);actions.append(focus);if(data.url){const a=el("a","btn btn-outline btn-sm",t("open"));a.href=data.url;a.target="_blank";a.rel="noopener noreferrer";actions.append(a);}body.append(badge,title,desc,meta,actions);card.append(body);box.append(card);renderAccessible();}
+function updateBreadcrumbs(){
+ const nav=$("crumbs");if(!nav)return;nav.replaceChildren();
+ const path=[];let current=selected;
+ while(current){path.unshift(current);current=current.parent?byId.get(current.parent):null;}
+ if(!path.length){const li=el("li","", "BA Labs");nav.append(li);return;}
+ path.forEach((node,index)=>{const li=el("li",""),button=el("button","breadcrumb-link",node.title);button.type="button";button.setAttribute("aria-current",index===path.length-1?"page":"false");button.onclick=()=>focusNode(node);li.append(button);nav.append(li);});
+}
+function updateSelection(){
+ const box=$("selection");box.replaceChildren();updateBreadcrumbs();
+ $("back").disabled=!previousView;
+ if(!selected){renderAccessible();return;}
+ const n=selected,data=n.data,card=el("div","card"),body=el("div","card-body");
+ const badge=el("span","badge badge-outline",n.level===0?t("root"):data.children?.length?t("branch"):t("leaf"));
+ const title=el("h2","card-title",n.title),desc=el("p","",data.description||((data.children?.length||0)+" "+t("children")));
+ const meta=el("small","",n.level+" / "+t("count")),actions=el("div","card-actions");
+ const focus=el("button","btn btn-primary btn-sm",t("focus"));focus.type="button";focus.onclick=()=>focusNode(n);actions.append(focus);
+ if(data.url){const a=el("a","btn btn-outline btn-sm",t("open"));a.href=data.url;a.target="_blank";a.rel="noopener noreferrer";actions.append(a);}
+ body.append(badge,title,desc,meta,actions);
+ const children=(data.children||[]).map(child=>byId.get(child.id)).filter(Boolean);
+ if(children.length){
+  const childNav=el("nav","child-branches");childNav.setAttribute("aria-label",t("children"));
+  children.forEach(child=>{const button=el("button","btn btn-ghost btn-xs",child.title);button.type="button";button.onclick=()=>focusNode(child);childNav.append(button);});
+  body.append(childNav);
+ }
+ card.append(body);box.append(card);renderAccessible();
+}
 function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.filter(n=>levelOpacity(n.level)>.15).forEach(n=>{const b=el("button","",n.title);b.onclick=()=>focusNode(n);nav.append(b);});}
 function updateUI(){document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";$("heading").textContent=t("title");$("description").textContent=t("desc");$("hint").textContent=t("hint");$("kicker").textContent=t("home");$("language").value=lang;document.title="BA Labs — "+t("title");}
 function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,12),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
