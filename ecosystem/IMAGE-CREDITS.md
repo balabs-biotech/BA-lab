@@ -5,7 +5,7 @@ Les 29 images du site sont téléchargées, contrôlées et empaquetées dans `/
 | Emplacement | Fichier local | Auteur / œuvre | Source et licence |
 |---|---|---|---|
 | Accueil — micrographie | `home-hero.jpg` | Maseko et al. · *P. ostreatus mycelial growth morphology* (Fig. 1) | [International Journal of Food Science / PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/) · CC BY 4.0 |
-| Accueil — architecture IoT | `home-iot.png` | Méndez-Guzmán et al. · emplacement des capteurs et du système d'inspection visuelle dans la serre aéroponique (Fig. 2) | [Sensors 22(15), 5646](https://doi.org/10.3390/s22155646) · CC BY 4.0 |
+| Accueil — capteurs IoT | `home-iot.png` | Méndez-Guzmán et al. · emplacement des capteurs et du système d'inspection visuelle dans la serre aéroponique (Fig. 2) | [Sensors 22(15), 5646](https://doi.org/10.3390/s22155646) · CC BY 4.0 |
 | Accueil — microscopie fongique | `home-hyphae.jpg` | Juan Carlos Fonseca Mata · *Fungi seen with fluorescence microscope.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fungi_seen_with_fluorescence_microscope.jpg) · CC BY 4.0 |
 | Accueil — matière organique | `home-compost.jpg` | Red58bill · *Compost.layers.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Compost.layers.jpg) · CC BY 3.0 |
 | Atlas — Penicillium | `home-penicillium.jpg` | Jon Houseman & Matthew Ford · *Asco1013.jpg* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Asco1013.jpg) · voir licence sur la source |
