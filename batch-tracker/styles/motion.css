@@ -305,16 +305,33 @@ html body[data-domain].workspace-authenticated .hero-tags {
   display:none !important;
 }
 @media(max-width:820px) {
+  html body[data-domain]:has(#authCard:not(.hidden)) .app-hero {
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) 54px !important;
+    align-items:center !important;
+    gap:8px !important;
+    padding-block:10px !important;
+  }
   html body[data-domain]:has(#authCard:not(.hidden)) .app-hero .hero-art {
+    display:flex !important;
+    width:54px !important;
+    min-height:42px !important;
+    align-self:center !important;
+  }
+  html body[data-domain]:has(#authCard:not(.hidden)) .ba-sector-visual {
+    width:54px !important;
+    aspect-ratio:1 / 1 !important;
+    max-height:42px !important;
+    border-radius:8px !important;
+  }
+  html body[data-domain]:has(#authCard:not(.hidden)) .ba-sector-svg {
+    max-height:42px !important;
+  }
+  html body[data-domain]:has(#authCard:not(.hidden)) .ba-visual-caption {
     display:none !important;
   }
   html body[data-domain]:has(#authCard:not(.hidden)) .app-hero .hero-description,
   html body[data-domain]:has(#authCard:not(.hidden)) .app-hero .hero-tags {
     display:none !important;
-  }
-  html body[data-domain]:has(#authCard:not(.hidden)) .app-hero {
-    min-height:0 !important;
-    padding-block:10px !important;
-    gap:0 !important;
   }
 }
