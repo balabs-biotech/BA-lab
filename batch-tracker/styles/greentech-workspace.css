@@ -656,3 +656,91 @@ html body[data-domain="agronomy"] #plantCard .plant-culture-row:focus-within {
   outline:2px solid rgba(180,244,119,.5) !important;
   outline-offset:2px !important;
 }
+
+
+/* PASS 146 — plant record entry: stronger grouping, clearer data-entry rhythm. */
+html body[data-domain="agronomy"] #plantCard #plantCultureForm {
+  gap:14px 16px !important;
+  padding:clamp(14px,2vw,21px) !important;
+  border-color:rgba(180,244,119,.2) !important;
+  background:
+    linear-gradient(90deg,rgba(180,244,119,.035),transparent 38%),
+    linear-gradient(145deg,#202d27,#18231e) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm > div {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:6px !important;
+  min-width:0 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm label {
+  margin:0 !important;
+  color:#c7d7c7 !important;
+  font-size:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.035em !important;
+  line-height:1.4 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm :is(input,select,textarea) {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:40px !important;
+  padding:9px 11px !important;
+  border:1px solid rgba(155,174,164,.23) !important;
+  border-radius:8px !important;
+  background:#111b18 !important;
+  color:#e5ede3 !important;
+  font-size:11px !important;
+  line-height:1.45 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm textarea {
+  min-height:82px !important;
+  resize:vertical !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm :is(input,select,textarea)::placeholder {
+  color:#778a7d !important;
+  opacity:1 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm :is(input,select,textarea):focus-visible {
+  outline:2px solid rgba(180,244,119,.68) !important;
+  outline-offset:2px !important;
+  border-color:rgba(180,244,119,.45) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm .req {
+  color:#d4b879 !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureForm .bio-operation-wide {
+  padding-top:12px !important;
+  border-top:1px solid rgba(155,174,164,.14) !important;
+}
+html body[data-domain="agronomy"] #plantCard #savePlantCultureButton {
+  min-height:42px !important;
+  padding:10px 16px !important;
+  border:1px solid rgba(180,244,119,.32) !important;
+  border-radius:8px !important;
+  background:linear-gradient(135deg,#36533a,#293f30) !important;
+  color:#e2f2d3 !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  box-shadow:0 5px 16px rgba(0,0,0,.13) !important;
+}
+html body[data-domain="agronomy"] #plantCard #savePlantCultureButton:hover {
+  border-color:rgba(180,244,119,.56) !important;
+  background:linear-gradient(135deg,#426544,#304a36) !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureStatus {
+  color:#a9bbaa !important;
+  font-size:10px !important;
+}
+html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-row:focus-within {
+  outline:2px solid rgba(180,244,119,.5) !important;
+  outline-offset:3px !important;
+}
+@media(max-width:620px) {
+  html body[data-domain="agronomy"] #plantCard #plantCultureForm { gap:11px !important; }
+  html body[data-domain="agronomy"] #plantCard #savePlantCultureButton { width:100% !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="agronomy"] #plantCard #savePlantCultureButton { transition:none !important; }
+}
