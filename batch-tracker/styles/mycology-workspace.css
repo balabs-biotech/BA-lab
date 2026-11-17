@@ -1027,7 +1027,8 @@ html body[data-domain="mycology"] #trackerCard .culture-detail-field {
   gap:9px !important;
   padding:11px 12px !important;
   border-color:rgba(126,151,140,.17) !important;
-  background:linear-gradient(145deg,rgba(12,20,19,.48),rgba(29,42,39,.72)) !important;
+  background-color:#1b2927 !important;
+  background-image:linear-gradient(145deg,rgba(12,20,19,.48),rgba(29,42,39,.72)) !important;
 }
 html body[data-domain="mycology"] #trackerCard .culture-detail-field span {
   font-size:9px !important;
