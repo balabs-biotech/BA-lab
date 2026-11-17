@@ -609,3 +609,39 @@
   opacity:.86!important;filter:grayscale(.58) contrast(1.08) brightness(.9)!important;
  }
 }
+
+
+/* PASS 52 — remove legacy polygon/crop treatment from the home documentary image. */
+#app.balabs-ui > main .experience-page[data-chapter="home"] > .hero{
+  isolation:isolate!important;overflow:hidden!important;
+  background:#111b1d!important;
+}
+#app.balabs-ui > main .experience-page[data-chapter="home"] > .hero::before{
+  content:none!important;display:none!important;
+}
+#app.balabs-ui > main .experience-page[data-chapter="home"] > .hero::after{
+  background:linear-gradient(90deg,rgba(17,27,29,.97) 0%,rgba(17,27,29,.84) 43%,rgba(17,27,29,.18) 100%)!important;
+  opacity:1!important;filter:none!important;
+}
+#app.balabs-ui > main .experience-page[data-chapter="home"] > .hero > .hero-micrograph,
+#app.balabs-ui > main .experience-page[data-chapter="home"] > .hero > .hero-micrograph.rb-image-armed,
+#app.balabs-ui > main .experience-page[data-chapter="home"] > .hero > .hero-micrograph.rb-image-armed.rb-image-revealed{
+  clip-path:none!important;-webkit-clip-path:none!important;
+  opacity:.88!important;filter:grayscale(.48) contrast(1.08) brightness(.94)!important;
+  transform:none!important;will-change:auto!important;visibility:visible!important;
+  mix-blend-mode:normal!important;
+}
+@media(max-width:760px){
+ #app.balabs-ui > main .experience-page[data-chapter="home"] > .hero::after{
+  background:linear-gradient(180deg,rgba(17,27,29,.08) 0%,rgba(17,27,29,.18) 58%,rgba(17,27,29,.68) 100%)!important;
+ }
+ #app.balabs-ui > main .experience-page[data-chapter="home"] > .hero > .hero-micrograph,
+ #app.balabs-ui > main .experience-page[data-chapter="home"] > .hero > .hero-micrograph.rb-image-armed,
+ #app.balabs-ui > main .experience-page[data-chapter="home"] > .hero > .hero-micrograph.rb-image-armed.rb-image-revealed{
+  clip-path:none!important;-webkit-clip-path:none!important;
+  height:clamp(210px,58vw,270px)!important;min-height:210px!important;
+  max-height:270px!important;opacity:.96!important;
+  filter:grayscale(.38) contrast(1.08) brightness(.98)!important;
+  object-position:center 42%!important;
+ }
+}
