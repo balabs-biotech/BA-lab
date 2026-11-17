@@ -43,6 +43,16 @@ try {
     await nav.first().evaluate(button => button.click());
     await page.locator('#selection .card').waitFor({ state: 'visible' });
     assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
+    const childBranches = page.locator('#selection .child-branches button');
+    await childBranches.first().waitFor({ state: 'visible' });
+    const selectedRoot = await page.locator('#selection .card-title').innerText();
+    await childBranches.first().click();
+    await page.waitForFunction(root => document.querySelector('#selection .card-title')?.textContent !== root, selectedRoot);
+    assert.equal(page.url(), initialUrl, 'Opening a child branch must stay inside the explorer scene');
+    assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
+    await page.locator('#back').click();
+    assert.equal(await page.locator('#selection .card-title').innerText(), selectedRoot, 'Back must restore the selected branch as well as the camera');
+    assert.equal(await page.locator('#back').isDisabled(), true, 'Back control must return to a stable state after restoring the previous view');
     await page.locator('#zoomIn').click();
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');
     for (const language of ['en', 'ar', 'pt', 'fr']) {
