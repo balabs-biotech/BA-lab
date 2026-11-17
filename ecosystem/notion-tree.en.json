@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "en",
   "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
@@ -361,6 +361,20 @@
           "description": "Scientific fields where fungi and their functions are studied.",
           "children": []
         }
+      ],
+      "relations": [
+        {
+          "target": "products",
+          "label": "Fungal resources and culture products",
+          "basis": "notion-link",
+          "evidence": "MYCOLOGY"
+        },
+        {
+          "target": "bio",
+          "label": "Mycological applications ↔ biotechnology",
+          "basis": "notion-link",
+          "evidence": "Mycological applications"
+        }
       ]
     },
     {
@@ -573,7 +587,15 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Applied biotechnology across microorganisms, biological substrates, fermentation and plant-culture systems. Explore the documented topics and their experimental context."
+      "description": "Applied biotechnology across microorganisms, biological substrates, fermentation and plant-culture systems. Explore the documented topics and their experimental context.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Microbial resources · evidence levels",
+          "basis": "notion-link",
+          "evidence": "Microorganisms of agricultural interest"
+        }
+      ]
     },
     {
       "id": "soil",
@@ -623,7 +645,15 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Equipment, substrates, biological processes and prototypes developed or studied for applied research and agrotechnical experimentation."
+      "description": "Equipment, substrates, biological processes and prototypes developed or studied for applied research and agrotechnical experimentation.",
+      "relations": [
+        {
+          "target": "lab",
+          "label": "Technosoil · plant experimentation",
+          "basis": "page-content",
+          "evidence": "AGROTECHNOLOGY — Growing media and biomass valorization"
+        }
+      ]
     },
     {
       "id": "iot",
@@ -657,7 +687,33 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "Measurement, sensors and automation: observing experimental systems, collecting reliable data and progressively developing control workflows."
+      "description": "Measurement, sensors and automation: observing experimental systems, collecting reliable data and progressively developing control workflows.",
+      "relations": [
+        {
+          "target": "myco",
+          "label": "Batch Tracker · culture traceability",
+          "basis": "page-content",
+          "evidence": "Batch Tracker section"
+        },
+        {
+          "target": "bio",
+          "label": "Batch Tracker · biological batches",
+          "basis": "page-content",
+          "evidence": "Batch Tracker section"
+        },
+        {
+          "target": "soil",
+          "label": "Culture-matrix measurements",
+          "basis": "page-content",
+          "evidence": "Batch Tracker section"
+        },
+        {
+          "target": "lab",
+          "label": "Experimental-culture monitoring",
+          "basis": "page-content",
+          "evidence": "Batch Tracker section"
+        }
+      ]
     },
     {
       "id": "lab",
@@ -675,7 +731,15 @@
         }
       ],
       "notionParentId": "hub",
-      "description": "A working space for laboratory methods, preparation and controlled experiments, connecting plant trials with documented observations."
+      "description": "A working space for laboratory methods, preparation and controlled experiments, connecting plant trials with documented observations.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Observations · evidence levels",
+          "basis": "notion-link",
+          "evidence": "Plant experimentation"
+        }
+      ]
     },
     {
       "id": "products",
@@ -1034,7 +1098,33 @@
         }
       ],
       "notionParentId": "language",
-      "description": "Public biological resources and product prototypes, with clear distinctions between available catalogue items and concepts still under development."
+      "description": "Public biological resources and product prototypes, with clear distinctions between available catalogue items and concepts still under development.",
+      "relations": [
+        {
+          "target": "bio",
+          "label": "Microbial resources",
+          "basis": "notion-link",
+          "evidence": "PRODUCTS & BIOLOGICAL RESOURCES"
+        },
+        {
+          "target": "myco",
+          "label": "Fungal resources",
+          "basis": "notion-link",
+          "evidence": "PRODUCTS & BIOLOGICAL RESOURCES"
+        },
+        {
+          "target": "work",
+          "label": "Documented work",
+          "basis": "notion-link",
+          "evidence": "PRODUCTS & BIOLOGICAL RESOURCES"
+        },
+        {
+          "target": "evidence",
+          "label": "Evidence levels",
+          "basis": "notion-link",
+          "evidence": "PRODUCTS & BIOLOGICAL RESOURCES"
+        }
+      ]
     },
     {
       "id": "work",
@@ -1085,7 +1175,15 @@
         }
       ],
       "notionParentId": "language",
-      "description": "Research and development at BA Labs: documented work, experimental questions, prototypes, measurements and the limits of current evidence."
+      "description": "Research and development at BA Labs: documented work, experimental questions, prototypes, measurements and the limits of current evidence.",
+      "relations": [
+        {
+          "target": "evidence",
+          "label": "Documented work and achievements",
+          "basis": "notion-link",
+          "evidence": "R&D"
+        }
+      ]
     },
     {
       "id": "evidence",
@@ -1116,7 +1214,8 @@
           "notionId": "40173152f1718118ac1ad58358720ae4",
           "children": []
         }
-      ]
+      ],
+      "relations": []
     }
   ],
   "hub": {
@@ -1124,5 +1223,6 @@
     "notionId": "40173152f171815f9f01ea5fd1add73f",
     "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
     "parentId": "language"
-  }
+  },
+  "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }
