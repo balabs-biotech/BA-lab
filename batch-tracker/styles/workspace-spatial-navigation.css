@@ -10,8 +10,8 @@ html body[data-domain] .ba-spatial-dock {
 }
 
 html body[data-domain] .ba-spatial-dock {
-  position:sticky;
-  top:76px;
+  position:relative;
+  top:auto;
   z-index:30;
   display:grid;
   grid-template-columns:minmax(150px,1fr) auto minmax(100px,.7fr);
