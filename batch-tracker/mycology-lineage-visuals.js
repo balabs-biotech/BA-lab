@@ -123,7 +123,10 @@
       let zoom = 1;
       const applyZoom = value => {
         zoom = Math.max(0.55, Math.min(1.8, value));
-        scene.scale.set(zoom);
+        if (nextApp.canvas) {
+          nextApp.canvas.style.width = Math.round(graph.width * zoom) + "px";
+          nextApp.canvas.style.height = Math.round(graph.height * zoom) + "px";
+        }
         if (zoomLabel) zoomLabel.textContent = Math.round(zoom * 100) + " %";
       };
       shell.querySelector('[data-graph-zoom="in"]').addEventListener("click", () => applyZoom(zoom + 0.15));
