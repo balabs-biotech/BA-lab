@@ -339,3 +339,32 @@
    max-width:26ch!important;font-size:9.5px!important;line-height:1.38!important;
  }
 }
+
+
+/* PHASE 48 — real DOM target: the method section is a direct child of main, not .experience-page. */
+#app.balabs-ui > main > section.editorial-method .method-top{
+  width:min(100%,920px)!important;max-width:920px!important;margin:0 auto 28px!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-top h2{
+  max-width:18ch!important;font-size:clamp(28px,3.2vw,42px)!important;
+  line-height:1.08!important;letter-spacing:-.035em!important;
+  font-weight:500!important;text-wrap:balance!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-top>p{
+  max-width:52ch!important;margin:12px 0 0!important;
+  font-size:12px!important;line-height:1.5!important;font-weight:400!important;letter-spacing:0!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-steps b{font-size:19px!important;line-height:1.12!important}
+#app.balabs-ui > main > section.editorial-method .method-steps p{max-width:30ch!important;font-size:11px!important;line-height:1.45!important}
+@media(max-width:760px){
+ #app.balabs-ui > main > section.editorial-method{padding:26px 18px 30px!important}
+ #app.balabs-ui > main > section.editorial-method .method-top{width:100%!important;max-width:100%!important;margin:0 auto 18px!important}
+ #app.balabs-ui > main > section.editorial-method .method-top h2{max-width:19ch!important;font-size:clamp(23px,5.7vw,27px)!important;line-height:1.08!important;letter-spacing:-.035em!important}
+ #app.balabs-ui > main > section.editorial-method .method-top>p{max-width:39ch!important;margin-top:8px!important;font-size:10.5px!important;line-height:1.42!important}
+ #app.balabs-ui > main > section.editorial-method .method-steps b{font-size:15px!important;line-height:1.12!important}
+ #app.balabs-ui > main > section.editorial-method .method-steps p{max-width:25ch!important;font-size:9px!important;line-height:1.35!important}
+}
+@media(max-width:420px){
+ #app.balabs-ui > main > section.editorial-method .method-top h2{font-size:23px!important;line-height:1.06!important}
+ #app.balabs-ui > main > section.editorial-method .method-top>p{font-size:10px!important;line-height:1.4!important}
+}
