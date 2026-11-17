@@ -565,7 +565,7 @@ assert.ok( html.includes('brand-system.css?v=') &&  previewHtml.includes('brand-
 
 
 // Phase 15: the non-engine editorial chapters receive a dedicated refinement layer.
-assert.ok(html.includes('editorial-refinement.css?v=2'), 'Public site must load the editorial refinement layer');
+assert.ok(html.includes('editorial-refinement.css?v=3'), 'Public site must load the editorial refinement layer');
 for (const selector of [
   '[data-chapter="research"]',
   '[data-chapter="network"]',
