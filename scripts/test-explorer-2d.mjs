@@ -51,6 +51,7 @@ try {
     assert.equal(page.url(), initialUrl, 'Opening a child branch must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
+    assert.equal(await page.locator('#selection .card-title').innerText(), selectedRoot, 'Back must restore the selected branch as well as the camera');
     assert.equal(await page.locator('#back').isDisabled(), true, 'Back control must return to a stable state after restoring the previous view');
     await page.locator('#zoomIn').click();
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');
