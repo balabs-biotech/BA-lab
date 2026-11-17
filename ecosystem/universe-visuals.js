@@ -3,18 +3,18 @@
  const cards=[...document.querySelectorAll('.universe-index-card[data-domain-page]')];
  if(!cards.length||document.documentElement.dataset.universeVisuals==='ready')return;
  document.documentElement.dataset.universeVisuals='ready';
+ const commons=file=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file)+'?width=1400';
  const images={
   myco:{src:commons('Pleurotus ostreatus on agar.jpg'),page:'https://commons.wikimedia.org/wiki/File:Pleurotus_ostreatus_on_agar.jpg',label:'PLEUROTUS / AGAR CULTURE',alt:'Mycélium de Pleurotus ostreatus en croissance sur milieu gélosé',credit:'Michał Wadas · CC BY-SA 4.0'},
-  bio:{src:commons('Microscopic Image of Penicillium conidial fungi.jpg'),page:'https://commons.wikimedia.org/wiki/File:Asco1013.jpg',label:'PENICILLIUM / CONIDIOPHORES',alt:'Conidiophores et conidies de Penicillium en microscopie optique',credit:'Jon Houseman & Matthew Ford · CC BY-SA'},
-  iot:{src:commons('Data Logger.jpg'),page:'https://commons.wikimedia.org/wiki/File:Data_logger.jpg',label:'FIELD SENSING / DATA LOGGER',alt:'Enregistreur portable de température et d’humidité relative',credit:'Cjp24 · CC BY-SA'},
-  soil:{src:commons('Soil layers.jpg'),page:'https://commons.wikimedia.org/wiki/File:Compost.layers.jpg',label:'SOIL / DECOMPOSITION PROFILE',alt:'Coupe d’un tas de compost montrant plusieurs stades de décomposition',credit:'Red58bill · CC BY 3.0'},
-  lab:{src:commons('Lab bench with lab equipment.jpg'),page:'https://commons.wikimedia.org/wiki/File:Penicillium_in_LPCB_Tease_Mount_Microscopy.jpg',label:'MICROBIOLOGY / LPCB',alt:'Préparation microscopique de Penicillium colorée au lactophénol coton bleu',credit:'Ajay Kumar Chaurasiya · CC BY-SA'},
-  products:{src:commons('20210719 Pleurotus ostreatus 017-024.jpg'),page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_098-127.jpg',label:'PLEUROTUS / CULTIVATION KIT',alt:'Pleurotes gris cultivés sur substrat de copeaux de bois',credit:'Zinnmann · Wikimedia Commons'},
-  work:{src:commons('Candida fungus colony grown on agar media.jpg'),page:'https://webstories.fontagro.org/',label:'COLONY / RADIAL GROWTH',alt:'Colonie fongique en croissance radiale sur milieu de culture',credit:'FONTAGRO · source image'},
-  evidence:{src:commons('Microscopic View of Penicillium Conidia.jpg'),page:'https://commons.wikimedia.org/wiki/File:Fungi_seen_with_fluorescence_microscope.jpg',label:'FUNGAL CELLS / FLUORESCENCE',alt:'Champignons observés en microscopie à fluorescence',credit:'Juan Carlos Fonseca Mata · CC BY 4.0'}
+  bio:{src:commons('Microscopic Image of Penicillium conidial fungi.jpg'),page:'https://commons.wikimedia.org/wiki/File:Microscopic_Image_of_Penicillium_conidial_fungi.jpg',label:'PENICILLIUM / CONIDIOPHORES',alt:'Conidiophores et conidies de Penicillium en microscopie optique',credit:'Syed Sajidul Islam · Wikimedia Commons'},
+  iot:{src:commons('Data Logger.jpg'),page:'https://commons.wikimedia.org/wiki/File:Data_Logger.jpg',label:'FIELD SENSING / DATA LOGGER',alt:'Enregistreur portable de température et d’humidité relative',credit:'Aperegoy · Wikimedia Commons'},
+  soil:{src:commons('Soil layers.jpg'),page:'https://commons.wikimedia.org/wiki/File:Soil_layers.jpg',label:'SOIL / SOIL HORIZONS',alt:'Profil naturel montrant les différentes couches du sol',credit:'Avetisyan91 · CC BY-SA 4.0'},
+  lab:{src:commons('Lab bench with lab equipment.jpg'),page:'https://commons.wikimedia.org/wiki/File:Lab_bench_with_lab_equipment.jpg',label:'LAB / INSTRUMENTATION',alt:'Paillasse avec plusieurs équipements de laboratoire',credit:'Jba.batista · CC BY-SA 4.0'},
+  products:{src:commons('20210719 Pleurotus ostreatus 017-024.jpg'),page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_017-024.jpg',label:'PLEUROTUS / CULTIVATION KIT',alt:'Pleurotes gris cultivés sur substrat de copeaux de bois',credit:'Zinnmann · Wikimedia Commons'},
+  work:{src:commons('Candida fungus colony grown on agar media.jpg'),page:'https://commons.wikimedia.org/wiki/File:Candida_fungus_colony_grown_on_agar_media.jpg',label:'FUNGAL COLONY / AGAR',alt:'Colonie de levure cultivée sur milieu gélosé',credit:'Ivan Pashkov · Wikimedia Commons'},
+  evidence:{src:commons('Microscopic View of Penicillium Conidia.jpg'),page:'https://commons.wikimedia.org/wiki/File:Microscopic_View_of_Penicillium_Conidia.jpg',label:'PENICILLIUM / CONIDIA',alt:'Conidies de Penicillium observées au microscope',credit:'Ajay Kumar Chaurasiya · Wikimedia Commons'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- const commons=file=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file)+'?width=1400';
  cards.forEach((card,index)=>{
   const data=images[card.dataset.domainPage];if(!data)return;
   const figure=document.createElement('figure');figure.className='universe-visual';
