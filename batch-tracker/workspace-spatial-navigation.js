@@ -129,6 +129,15 @@
     window.activateWorkspaceModule(target);
     const panel = document.getElementById(target);
     if (panel) {
+      const vectors = {
+        left: [-14, 0],
+        right: [14, 0],
+        up: [0, -12],
+        down: [0, 12]
+      };
+      const [enterX, enterY] = vectors[direction] || [12, 0];
+      panel.style.setProperty("--ba-spatial-enter-x", enterX + "px");
+      panel.style.setProperty("--ba-spatial-enter-y", enterY + "px");
       panel.classList.remove("ba-spatial-enter");
       void panel.offsetWidth;
       panel.classList.add("ba-spatial-enter");
