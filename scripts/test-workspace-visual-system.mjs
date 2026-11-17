@@ -66,3 +66,14 @@ assert.ok(greenClimate.includes("Les graphiques météo natifs restent actifs"),
 assert.ok(greenClimateStyles.includes(".greentech-climate-signature"), "GreenTech climate signature must have its own visual system");
 assert.ok(greenClimateStyles.includes("greentech-climate-values"), "GreenTech visual summary must expose accessible textual values");
 assert.ok(greenTechEntry.includes("20261117-climate-signature-162"), "GreenTech must load the climate signature runtime");
+
+const mycologyActivity = fs.readFileSync("batch-tracker/mycology-activity-timeline.js", "utf8");
+const mycologyActivityStyles = fs.readFileSync("batch-tracker/styles/mycology-activity-timeline.css", "utf8");
+assert.ok(mycologyActivity.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "Mycology activity timeline must use pinned PixiJS");
+assert.ok(mycologyActivity.includes('querySelectorAll(":scope > .culture-timeline-entry")'), "Mycology timeline must derive nodes from existing culture history entries");
+assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
+assert.ok(mycologyActivity.includes("next.stop()"), "Mycology timeline must render on demand without a permanent GPU ticker");
+assert.ok(mycologyActivity.includes("resizeObserver?.disconnect()"), "Mycology timeline must clean up resize observers");
+assert.ok(mycologyActivity.includes("L’historique détaillé reste accessible"), "Mycology timeline must preserve its text fallback");
+assert.ok(mycologyActivityStyles.includes(".mycology-activity-stage"), "Mycology timeline must provide a bounded scrollable visualization");
+assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology must load the activity timeline runtime");
