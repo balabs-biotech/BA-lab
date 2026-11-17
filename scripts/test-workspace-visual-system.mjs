@@ -78,3 +78,19 @@ assert.ok(mycologyActivity.includes("if (!shell.isConnected) target.prepend(shel
 assert.ok(mycologyActivity.includes("L’historique détaillé reste accessible"), "Mycology timeline must preserve its text fallback");
 assert.ok(mycologyActivityStyles.includes(".mycology-activity-stage"), "Mycology timeline must provide a bounded scrollable visualization");
 assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology must load the activity timeline runtime");
+
+
+const spatialNavigation = fs.readFileSync("batch-tracker/workspace-spatial-navigation.js", "utf8");
+const spatialStyles = fs.readFileSync("batch-tracker/styles/workspace-spatial-navigation.css", "utf8");
+const unifiedWorkspace = fs.readFileSync("batch-tracker/workspace-unified.css", "utf8");
+assert.ok(unifiedWorkspace.includes("workspace-spatial-navigation.css"), "All workspaces must load the spatial navigation visual layer");
+assert.ok(spatialNavigation.includes("overviewCard") && spatialNavigation.includes("measurementCard") && spatialNavigation.includes("statisticsCard"), "Spatial navigation must connect overview, data and analysis modules");
+assert.ok(spatialNavigation.includes('direction === "left" || direction === "right"') && spatialNavigation.includes('direction === "up" || direction === "down"'), "Spatial navigation must support all four directions");
+assert.ok(spatialNavigation.includes("ArrowLeft") && spatialNavigation.includes("ArrowRight") && spatialNavigation.includes("ArrowUp") && spatialNavigation.includes("ArrowDown"), "Spatial navigation must support keyboard arrows");
+assert.ok(spatialNavigation.includes('event.pointerType !== "touch"') && spatialNavigation.includes("Math.abs(dx) < 70"), "Mobile users must be able to move between modules with deliberate horizontal swipes");
+assert.ok(spatialNavigation.includes("prefers-reduced-motion") && spatialStyles.includes("prefers-reduced-motion:reduce"), "Spatial transitions must respect reduced-motion preferences");
+for (const [label, entry] of [["GreenTech", greenTechEntry], ["Mycology", mycologyEntry], ["Laboratory", laboratoryEntry]]) {
+  assert.ok(entry.includes("workspace-spatial-navigation.js?v=20261117-spatial-navigation-1"), label + " must load the shared spatial navigation runtime after the workspace engine");
+}
+assert.ok(spatialStyles.includes(".ba-spatial-dock") && spatialStyles.includes("@keyframes ba-spatial-arrive"), "The navigation dock and panel transition must have a dedicated visual layer");
+console.log("✓ CultureOps spatial navigation: four directions, keyboard, touch and reduced motion");
