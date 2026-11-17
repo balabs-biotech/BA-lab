@@ -59,11 +59,11 @@ function buildNetwork(){
  nodes.forEach(source=>{
   for(const relation of source.data.relations||[]){
    if(source.level>0)nodeLevelRelationCount++;
-   const target=byId.get(relation.target);if(!target||target.level!==0||target.id===source.id)continue;
+   const target=byId.get(relation.target);if(!target||target.id===source.id)continue;
    const key=[source.id,target.id].sort().join("|");if(relationPairs.has(key))continue;
    relationPairs.add(key);
    const basis=relation.basis==="notion-link"?"notion-link":"page-content";
-   edges.push({a:source,b:target,depth:0,cross:true,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
+   edges.push({a:source,b:target,depth:Math.max(source.level,target.level),cross:source.rootId!==target.rootId,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
    verifiedRelationCount++;
    if(basis==="notion-link")explicitRelationCount++;else contentRelationCount++;
    addRelationIndex(source.id,{target:target.id,label:relation.label,basis,evidence:relation.evidence});
