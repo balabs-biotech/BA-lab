@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="./chapter-atmosphere.css?v=6">
 <link rel="stylesheet" href="./motion-director.css?v=2">
 <link rel="stylesheet" href="./visual-continuity.css?v=3">
-<link rel="stylesheet" href="./chapter-repair.css?v=17">
+<link rel="stylesheet" href="./chapter-repair.css?v=18">
 <style>
 #mainView,#miniView,.cluster-key{display:none!important}
 .scene{min-height:0;padding-bottom:clamp(34px,5vw,72px)}
@@ -324,27 +324,10 @@
     <p data-i18n="aboutText">BA Labs explore les liens entre biologie, mycologie, matériaux organiques et ingénierie. Une démarche expérimentale où l’observation du vivant guide la conception de méthodes, de cultures et de prototypes.</p>
     <a class="editorial-link" href="#universe" data-i18n="aboutLink">Découvrir notre écosystème <span aria-hidden="true">↗</span></a>
   </div>
-  <div class="editorial-art editorial-art-about" aria-hidden="true">
-    <svg viewBox="0 0 560 420" role="img">
-      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M280 387 C279 337 281 299 277 261 C273 224 250 194 218 175 C187 156 150 153 120 168 C91 183 78 211 88 237 C98 263 128 274 151 260 C171 248 174 226 160 211"/>
-        <path d="M280 387 C287 341 311 305 344 276 C377 247 418 235 449 248 C478 260 488 286 472 307 C458 326 430 327 415 309"/>
-        <path d="M278 387 C250 348 223 324 188 314 C156 304 129 314 122 338 C116 358 133 375 153 371"/>
-        <path d="M283 387 C318 353 348 342 380 347 C408 352 422 374 410 394"/>
-        <path d="M120 168 C103 143 107 111 128 91 C150 70 183 69 205 85 C224 99 231 125 220 146"/>
-        <path d="M345 276 C344 247 359 222 385 209 C413 196 444 204 459 227"/>
-        <path d="M151 260 C127 277 105 279 84 267 M160 211 C178 196 201 190 222 195 M415 309 C439 299 460 303 478 319"/>
-        <path d="M153 371 C178 386 191 403 192 419 M410 394 C432 404 444 412 448 420"/>
-        <path d="M280 387 L280 420 M277 261 C300 239 322 228 348 225"/>
-      </g>
-      <g fill="currentColor">
-        <circle cx="160" cy="211" r="4"/><circle cx="415" cy="309" r="4"/><circle cx="153" cy="371" r="4"/><circle cx="410" cy="394" r="4"/>
-        <circle cx="128" cy="91" r="3"/><circle cx="459" cy="227" r="3"/><circle cx="84" cy="267" r="3"/><circle cx="478" cy="319" r="3"/>
-      </g>
-    </svg>
-    <span class="art-caption">BIOLOGY / OBSERVATION / PROTOTYPING</span>
-  </div>
-</section>
+  <figure class="editorial-art editorial-art-about">
+    <img src="https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png" alt="Réseau de mycélium de Penicillium observé en fluorescence, micrographie scientifique Fraunhofer IFAM" loading="lazy" decoding="async">
+    <figcaption class="art-caption">MICROSCOPIE / MYCÉLIUM DE PENICILLIUM · FRAUNHOFER IFAM</figcaption>
+  </figure></section>
 
 <section class="editorial-method" id="demarche" aria-label="Démarche scientifique BA Labs">
   <div class="method-top">
@@ -575,7 +558,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 </script>
 <!-- Vernpixi 2D is the primary explorer. The legacy 3D engine remains in Git history as a rollback reference. -->
 
-<script src="./chapter-navigation.js?v=21"></script>
+<script src="./chapter-navigation.js?v=22"></script>
 <script src="./chapter-atmosphere.js?v=14" defer></script>
 <script src="./universe-visuals.js?v=16" defer></script>
 <script src="./method-interaction.js?v=1"></script>
