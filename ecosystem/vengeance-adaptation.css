@@ -124,7 +124,7 @@ html.vng-ready{scroll-behavior:smooth}
 
 
 /* Product catalogue — Vengeance-inspired editorial commerce, not a card wall. */
-#app > main > .product-catalogue{
+#app > main .experience-page >.product-catalogue{
   color:var(--vng-foreground)!important;
   background:transparent!important;
   padding:clamp(18px,3vw,38px) clamp(12px,2vw,24px)!important;
