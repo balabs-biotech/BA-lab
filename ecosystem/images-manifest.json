@@ -100,6 +100,11 @@
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungal_growth_in_erlenmeyer.jpg"
   },
   {
+    "id": "catalogue-liquid-batch",
+    "file": "catalogue-liquid-batch.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Flask_batch_fermentation.jpg"
+  },
+  {
     "id": "catalogue-water-agar",
     "file": "catalogue-water-agar.jpg",
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/White_mycelium_growing_on_agar.jpg"
