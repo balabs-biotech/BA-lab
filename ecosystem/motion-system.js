@@ -60,20 +60,66 @@
     }else canvas.remove();
   }
 
-  // Anime.js is the single timing layer for editorial reveals; no layout-affecting loops.
+  // Anime.js 4 is the single motion engine: editorial choreography, not generic fade-up presets.
   import('https://cdn.jsdelivr.net/npm/animejs@4.1.3/+esm').then(({animate,stagger})=>{
     if(!animate || reduce) return;
-    const groups=['.field-atlas .field-frame','.universe-index-card','.work-card','.product-catalogue-card','.editorial-feature .editorial-art','.editorial-about .editorial-art','.method-steps li','.value-item'];
-    groups.forEach(selector=>{
-      document.querySelectorAll(selector).forEach((el,i)=>{
-        el.style.opacity='0'; el.style.transform='translateY(14px)';
-        const io=new IntersectionObserver(entries=>{
-          if(!entries[0].isIntersecting) return;
-          io.disconnect();
-          animate(el,{opacity:[0,1],translateY:[14,0],duration:720,delay:Math.min(i*55,330),ease:'out(3)'});
-        },{threshold:.12});
-        io.observe(el);
+    const track=document.querySelector('#experienceTrack');
+    const pages=[...(track||document).querySelectorAll('.experience-page')];
+    const observeRoot=track||null;
+    const armed=new WeakSet();
+
+    const reveal=(page)=>{
+      if(armed.has(page)) return;
+      armed.add(page);
+
+      const hero=page.querySelector('.hero');
+      if(hero){
+        const title=hero.querySelector('h1');
+        const image=hero.querySelector('.hero-micrograph');
+        if(title) animate(title,{opacity:[0,1],translateY:[28,0],duration:1150,ease:'out(4)'});
+        if(image) animate(image,{opacity:[.45,1],scale:[1.055,1],duration:1800,ease:'out(3)'});
+      }
+
+      const headings=[...page.querySelectorAll('.work-heading,.universe-index-heading,.value-heading,.product-catalogue-head,.editorial-about h2,.editorial-method h2,.bridge-copy h2,.field-atlas-head')];
+      headings.forEach((el,i)=>{
+        el.style.opacity='0';
+        animate(el,{opacity:[0,1],translateX:[i%2?-18:18,0],translateY:[10,0],duration:950,delay:i*85,ease:'out(4)'});
       });
-    });
-  }).catch(()=>{ /* Existing CSS transitions remain the fallback. */ });
-})();
+
+      const media=[...page.querySelectorAll('.field-frame,.editorial-art,.work-media,.product-catalogue-card figure,.feature-photo')].filter(el=>!el.closest('.inline-explorer'));
+      media.forEach(el=>{
+        el.style.opacity='0';
+        el.style.clipPath='inset(0 9% 0 9%)';
+      });
+      if(media.length) animate(media,{
+        opacity:[0,1],clipPath:['inset(0 9% 0 9%)','inset(0 0% 0 0%)'],
+        translateY:[14,0],duration:1250,delay:stagger(115,{start:80}),ease:'out(4)'
+      });
+
+      const cards=[...page.querySelectorAll('.work-card,.universe-index-card,.product-catalogue-card,.method-steps li,.value-item')].filter(el=>!el.closest('.inline-explorer'));
+      cards.forEach(el=>{el.style.opacity='0';});
+      if(cards.length) animate(cards,{
+        opacity:[0,1],translateY:[24,0],scale:[.975,1],
+        rotate:[el=>el.matches('.work-card,.universe-index-card')?-.35:0,0],
+        duration:980,delay:stagger(78,{start:130}),ease:'out(4)'
+      });
+
+      const copy=[...page.querySelectorAll('.hero p,.work-intro,.editorial-feature p,.editorial-about p,.editorial-method p,.bridge-copy p')];
+      copy.forEach((el,i)=>animate(el,{opacity:[0,1],translateY:[12,0],duration:800,delay:220+i*75,ease:'out(3)'}));
+    };
+
+    if(!('IntersectionObserver'in window)){pages.forEach(reveal);return;}
+    const pageObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting && entry.intersectionRatio>=.24){
+          reveal(entry.target);
+          pageObserver.unobserve(entry.target);
+        }
+      });
+    },{root:observeRoot,threshold:[.24,.42]});
+    pages.forEach(page=>pageObserver.observe(page));
+
+    // A slow, restrained breathing movement gives the hero image depth without competing with reading.
+    const heroImage=document.querySelector('.hero-micrograph');
+    if(heroImage) animate(heroImage,{scale:[1,1.018],duration:9500,ease:'inOutSine',alternate:true,loop:true});
+  }).catch(()=>{ /* The site remains readable and usable if the animation CDN is unavailable. */ });
