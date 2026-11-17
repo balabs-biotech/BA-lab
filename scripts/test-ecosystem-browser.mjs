@@ -78,7 +78,7 @@ try {
           width: image.naturalWidth,
           alt: image.alt || ''
         }));
-        const backgroundUrls = [...new Set([...root.querySelectorAll('*')].flatMap(el => {
+        const backgroundUrls = [...new Set([root, ...root.querySelectorAll('*')].flatMap(el => {
           const value = getComputedStyle(el).backgroundImage || '';
           return [...value.matchAll(/url\(["']?(.*?)["']?\)/g)].map(match => match[1]).filter(url => url && !url.startsWith('data:') && !url.startsWith('blob:'));
         }))];
