@@ -694,22 +694,22 @@
               "id": "iot-temperature",
               "title": "Temperatura",
               "description": "Acompanhar gradientes, ciclos e estabilidade térmica dos espaços de cultivo.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-humidity",
               "title": "Humidade",
               "description": "Observar a humidade do ar e as condições de disponibilidade de água.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-gas",
               "title": "Trocas gasosas e ventilação",
               "description": "Estudar a ventilação e as trocas gasosas nas câmaras de cultivo.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-instrumentation",
@@ -720,22 +720,22 @@
               "id": "iot-sensors-types",
               "title": "Sensores e sondas",
               "description": "Comparar tecnologias de medição, gamas, precisão e limitações.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-microcontrollers",
               "title": "Microcontroladores",
               "description": "Explorar interfaces de leitura, entradas, saídas e unidades integradas.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-power",
               "title": "Alimentação e segurança",
               "description": "Documentar alimentação, proteção elétrica e fiabilidade da montagem.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-control",
@@ -746,22 +746,22 @@
               "id": "iot-airflow",
               "title": "Ventilação e fluxo de ar",
               "description": "Desenhar a monitorização e o controlo da renovação do ar.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-humidification",
               "title": "Humidificação",
               "description": "Estudar a regulação da humidade e a distribuição de água.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-lighting",
               "title": "Iluminação e ciclos",
               "description": "Definir cenários de iluminação e temporização para ensaios.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-data",
@@ -772,22 +772,22 @@
               "id": "iot-logging",
               "title": "Registo contínuo",
               "description": "Datilhar medições e conservar dados brutos com o respetivo contexto.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-dashboard",
               "title": "Visualização e alertas",
               "description": "Representar tendências, limites e desvios para facilitar o acompanhamento.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-quality",
               "title": "Qualidade das medições",
               "description": "Identificar deriva, valores em falta, calibração e incerteza.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         },
         {
           "id": "iot-traceability-detail",
@@ -798,22 +798,22 @@
               "id": "iot-batch-links",
               "title": "Lotes e culturas",
               "description": "Associar leituras aos identificadores dos lotes e às fases de cultivo.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-protocol-links",
               "title": "Protocolos e eventos",
               "description": "Registar alterações de parâmetros, intervenções e incidentes.",
-              "kind": "section"
+              "kind": "label"
             },
             {
               "id": "iot-comparison",
               "title": "Histórico e comparações",
               "description": "Comparar ciclos experimentais sem perder as condições iniciais.",
-              "kind": "section"
+              "kind": "label"
             }
           ],
-          "kind": "section"
+          "kind": "label"
         }
       ],
       "notionParentId": "hub",
