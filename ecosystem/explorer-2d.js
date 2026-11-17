@@ -15,11 +15,15 @@ function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresh
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
- const roots=tree.length,rootRadius=300;
+ const roots=tree.length;
+ // Uneven biological field anchors: deliberately not an eight-spoke radial layout.
+ // Stable per-universe jitter keeps positions deterministic across reloads.
+ const anchors=[[-.62,-.34],[-.17,-.62],[.39,-.48],[.68,.08],[.24,.53],[-.34,.57],[-.70,.19],[.02,-.02]];
  tree.forEach((root,i)=>{
-  const angle=-Math.PI/2+i*Math.PI*2/roots+(((hash(root.id)%1000)/1000)-.5)*.22;
-  const radius=rootRadius+hash(root.id+":radius")%125-62;
-  const rx=Math.cos(angle)*radius,ry=Math.sin(angle)*radius*(.82+(hash(root.id+":axis")%20)/100);
+  const anchor=anchors[i%anchors.length],seed=hash(root.id);
+  const rx=anchor[0]*510+((seed&255)/255-.5)*58;
+  const ry=anchor[1]*430+(((seed>>>8)&255)/255-.5)*54;
+  const angle=Math.atan2(ry,rx)+(((seed>>>16)&255)/255-.5)*.34;
   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,parent:null,angle};
   nodes.push(rootNode);byId.set(root.id,rootNode);
   const walk=(data,parent,depth,branchAngle,path)=>{
@@ -29,33 +33,45 @@ function buildNetwork(){
    kids.forEach((child,j)=>{
     const hsh=hash(child.id),fraction=kids.length===1?0:(j/(kids.length-1)-.5);
     const jitter=((hsh%1000)/1000-.5)*.3;
-    const a=branchAngle+fraction*spread+jitter;
-    const bend=dist*(.82+((hsh>>>8)%40)/100);
-    const x=parent.x+Math.cos(a)*bend,y=parent.y+Math.sin(a)*bend;
+    // A smooth, position-dependent curl field bends neighbouring hyphae in related,
+    // but not identical, directions. This avoids a repeated starburst at every node.
+    const fieldX=Math.sin(parent.x*.0021+parent.y*.0013+depth*.73);
+    const fieldY=Math.cos(parent.y*.0018-parent.x*.0011-depth*.51);
+    const curl=Math.atan2(fieldY,fieldX)*.22;
+    const a=branchAngle+curl+fraction*spread+jitter;
+    const bend=dist*(.72+((hsh>>>8)%56)/100);
+    const lateral=((hsh>>>17)&255)/255-.5;
+    const sway=depth>1?lateral*Math.min(22,dist*.16):0;
+    const x=parent.x+Math.cos(a)*bend-Math.sin(a)*sway,y=parent.y+Math.sin(a)*bend+Math.cos(a)*sway;
     const n={id:child.id,title:child.title,x,y,r:Math.max(2.1,8-depth*1.25),level:depth,data:child,rootId:root.id,parent:parent.id,angle:a};
     nodes.push(n);byId.set(n.id,n);edges.push({a:parent,b:n,depth,seed:hsh});
-    walk(child,n,depth+1,a+(fraction*.34)+jitter,path.concat(child.id));
+    const nextDrift=Math.sin((n.x+n.y)*.0017+hsh*.000001)*.16;
+    walk(child,n,depth+1,a+(fraction*.22)+jitter*.45+nextDrift,path.concat(child.id));
    });
   };
   walk(root,rootNode,1,angle,[]);
  });
  // Inter-universe hyphae form a sparse, biologically plausible mesh.
- tree.forEach((root,i)=>{
-  const next=tree[(i+1)%roots];
-  const a=byId.get(root.id),b=byId.get(next.id);
-  if(a&&b)edges.push({a,b,depth:0,cross:true,seed:i*97});
-  if(i%2===0){const c=byId.get(tree[(i+3)%roots].id);if(c)edges.push({a,b:c,depth:0,cross:true,seed:i*131});}
-  const left=nodes.filter(n=>n.rootId===root.id&&n.level===1);
-  const right=nodes.filter(n=>n.rootId===next.id&&n.level===1);
-  const candidates=[];
-  left.forEach(na=>right.forEach(nb=>candidates.push({a:na,b:nb,d:Math.hypot(na.x-nb.x,na.y-nb.y)})));
-  candidates.sort((u,v)=>u.d-v.d);
+ // Connect each universe to its nearest spatial neighbours, not to the next item in a ring.
+ const rootNodes=tree.map(root=>byId.get(root.id)).filter(Boolean),rootPairs=[];
+ rootNodes.forEach((a,i)=>rootNodes.slice(i+1).forEach(b=>rootPairs.push({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})));
+ rootPairs.sort((a,b)=>a.d-b.d);
+ const rootDegree=new Map();
+ for(const pair of rootPairs){if((rootDegree.get(pair.a.id)||0)>=2||(rootDegree.get(pair.b.id)||0)>=2)continue;edges.push({a:pair.a,b:pair.b,depth:0,cross:true,seed:hash(pair.a.id+pair.b.id)});rootDegree.set(pair.a.id,(rootDegree.get(pair.a.id)||0)+1);rootDegree.set(pair.b.id,(rootDegree.get(pair.b.id)||0)+1);}
+ // Anastomose nearby first-generation hyphae across neighbouring universes.
+ for(const pair of rootPairs.slice(0,Math.min(rootPairs.length,roots+2))){
+  const left=nodes.filter(n=>n.rootId===pair.a.id&&n.level===1),right=nodes.filter(n=>n.rootId===pair.b.id&&n.level===1),candidates=[];
+  left.forEach(a=>right.forEach(b=>candidates.push({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})));
+  candidates.sort((a,b)=>a.d-b.d);
   const usedA=new Set(),usedB=new Set();let linked=0;
-  for(const pair of candidates){if(usedA.has(pair.a.id)||usedB.has(pair.b.id))continue;edges.push({a:pair.a,b:pair.b,depth:1,cross:true,seed:hash(pair.a.id+pair.b.id)});usedA.add(pair.a.id);usedB.add(pair.b.id);if(++linked===2)break;}
- });
+  for(const candidate of candidates){if(usedA.has(candidate.a.id)||usedB.has(candidate.b.id))continue;edges.push({a:candidate.a,b:candidate.b,depth:1,cross:true,seed:hash(candidate.a.id+candidate.b.id)});usedA.add(candidate.a.id);usedB.add(candidate.b.id);if(++linked===2)break;}
+ }
  // Anastomoses connect nearby branches at each level without turning the map into a grid.
  const levels=new Map();nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
  levels.forEach(group=>{group.forEach((n,i)=>{if(i%3===0&&group.length>3){const other=group[(i+2)%group.length];if(n.parent!==other.id&&other.parent!==n.id)edges.push({a:n,b:other,depth:n.level,cross:true,seed:hash(n.id+other.id)});}})});
+ canvas.dataset.universeCount=String(roots);
+ canvas.dataset.nodeCount=String(nodes.length);
+ canvas.dataset.edgeCount=String(edges.length);
 }
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}

@@ -26,7 +26,11 @@ export async function createPixiRenderer(canvas){
   const point=n=>({x:n.x,y:n.y});
   for(const e of edges){
    const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
-   const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,bend=Math.min(42,len*.14)*(e.seed%2?1:-1),cx=(a.x+b.x)/2-dy/len*bend,cy=(a.y+b.y)/2+dx/len*bend;
+   const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+   const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
+   const bend=Math.min(58,len*.19)*side*(.62+((seed>>>5)&63)/100);
+   const drift=(((seed>>>12)&255)/255-.5)*Math.min(24,len*.09);
+   const cx=(a.x+b.x)/2-dy/len*bend+dx/len*drift,cy=(a.y+b.y)/2+dx/len*bend+dy/len*drift;
    const color=PALETTE[e.a.rootId]||0x91a99b,widthBase=e.cross?.55:Math.max(.45,(e.depth===1?1.5:e.depth===2?1.15:.85));
    if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color,alpha:alpha*.12,width:widthBase*3.1,cap:"round"});
    filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:e.cross?0xb96b4d:color,alpha:alpha*(e.cross?.34:depth>=3?.42:depth===2?.62:.78),width:widthBase,cap:"round"});
