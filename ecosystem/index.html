@@ -34,6 +34,12 @@
 .relation-legend .content i{background:#7eaaa3;box-shadow:0 0 7px #7eaaa355}
 .relation-legend .hypha i{background:#b5c3b6;opacity:.65}
 @media(max-width:700px){.relation-legend{gap:5px 8px;margin-top:8px}.relation-legend span{font-size:7px}}
+.universe-rail{position:absolute;left:clamp(10px,1.6vw,22px);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:7px;padding:8px 6px;border:1px solid #82998a26;border-radius:999px;background:#101a1ad9;backdrop-filter:blur(12px)}
+.universe-rail button{display:flex;align-items:center;gap:7px;min-width:34px;height:27px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:#aebbb1;font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:.07em;cursor:pointer;transition:background .18s,color .18s,transform .18s}
+.universe-rail button i{display:block;width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:var(--dot);box-shadow:0 0 9px color-mix(in srgb,var(--dot) 55%,transparent)}
+.universe-rail button[data-universe="myco"]{--dot:#b18fc2}.universe-rail button[data-universe="bio"]{--dot:#79a991}.universe-rail button[data-universe="iot"]{--dot:#7eaaa3}.universe-rail button[data-universe="soil"]{--dot:#c19b73}.universe-rail button[data-universe="lab"]{--dot:#80aeb8}.universe-rail button[data-universe="products"]{--dot:#c88773}.universe-rail button[data-universe="work"]{--dot:#aa9cbb}.universe-rail button[data-universe="evidence"]{--dot:#b5b58d}
+.universe-rail button:hover,.universe-rail button:focus-visible{background:#263b38;color:#f0eee3;transform:translateX(2px);outline:1px solid #b96b4d}
+@media(max-width:700px){.universe-rail{left:7px;gap:4px;padding:6px 4px}.universe-rail button{height:25px;min-width:26px;padding:0 5px;gap:5px;font-size:7px}.universe-rail button i{width:6px;height:6px;flex-basis:6px}}
 .inline-explorer-controls{position:absolute;right:clamp(12px,2.5vw,28px);top:clamp(14px,2.5vw,26px);z-index:3;display:grid;gap:6px}
 .inline-explorer-controls .btn{width:38px;height:38px;min-height:38px;padding:0;font-size:17px;border:1px solid #7d958733;background:#172522e8;color:#d1d0c5}
 .inline-explorer-controls .btn:hover{border-color:#b96b4d;background:#243630}
@@ -124,6 +130,16 @@
  <div class="inline-explorer-stage">
   <canvas id="field" aria-label="Réseau mycélien interactif des huit univers BA Labs"></canvas>
   <div class="inline-explorer-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h2 id="heading">Réseau vivant</h2><p id="description">Huit univers reliés dans un même espace vivant.</p><div class="relation-legend" id="relationLegend" aria-label="Légende des connexions"></div></div>
+  <nav class="universe-rail" aria-label="Accès direct aux huit univers">
+   <button type="button" data-universe="myco" title="Mycologie" aria-label="Mycologie" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'myco'}}))"><i></i><span>MYCO</span></button>
+   <button type="button" data-universe="bio" title="Biotechnologie" aria-label="Biotechnologie" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'bio'}}))"><i></i><span>BIO</span></button>
+   <button type="button" data-universe="iot" title="Ingénierie et IoT" aria-label="Ingénierie et IoT" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'iot'}}))"><i></i><span>IoT</span></button>
+   <button type="button" data-universe="soil" title="Agrotechnologie et TechnoSoil" aria-label="Agrotechnologie et TechnoSoil" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'soil'}}))"><i></i><span>SOIL</span></button>
+   <button type="button" data-universe="lab" title="Laboratoire R&amp;D" aria-label="Laboratoire R&amp;D" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'lab'}}))"><i></i><span>LAB</span></button>
+   <button type="button" data-universe="products" title="Produits et ressources" aria-label="Produits et ressources" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'products'}}))"><i></i><span>PROD</span></button>
+   <button type="button" data-universe="work" title="Projets scientifiques" aria-label="Projets scientifiques" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'work'}}))"><i></i><span>R&amp;D</span></button>
+   <button type="button" data-universe="evidence" title="Preuves et documentation" aria-label="Preuves et documentation" onclick="window.dispatchEvent(new CustomEvent('balabs:focus-domain',{detail:{domain:'evidence'}}))"><i></i><span>PROOF</span></button>
+  </nav>
   <div class="inline-explorer-controls" aria-label="Contrôles du réseau"><button class="btn" id="zoomIn" type="button" aria-label="Zoom avant">+</button><button class="btn" id="zoomOut" type="button" aria-label="Zoom arrière">−</button><button class="btn" id="reset" type="button" aria-label="Vue globale">⌖</button><button class="btn" id="back" type="button" aria-label="Vue précédente" disabled>↶</button></div>
   <section id="selection" aria-live="polite"></section>
   <div id="hint">GLISSER · PINCER POUR ZOOMER · SÉLECTIONNER UN NŒUD</div>
