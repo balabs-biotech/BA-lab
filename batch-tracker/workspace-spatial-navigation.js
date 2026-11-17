@@ -91,7 +91,7 @@
       <span class="ba-spatial-live" id="baSpatialLive" aria-live="polite" aria-atomic="true"></span>
     `;
     const toolbar = document.querySelector(".app-toolbar");
-    toolbar.insertAdjacentElement("afterend", dock);
+    toolbar.appendChild(dock);
     status = dock.querySelector("#baSpatialLive");
     dock.querySelectorAll("[data-ba-direction]").forEach(button => {
       controls[button.dataset.baDirection] = button;
