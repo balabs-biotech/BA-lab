@@ -610,6 +610,116 @@
           "notionId": "3e273152f171811db9a6f46cc9959da4",
           "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
           "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats."
+        },
+        {
+          "id": "iot-environment",
+          "title": "Mesure des environnements",
+          "description": "Surveiller les paramètres physiques qui conditionnent les systèmes biologiques.",
+          "children": [
+            {
+              "id": "iot-temperature",
+              "title": "Température",
+              "description": "Suivre les gradients, les cycles et la stabilité thermique des espaces de culture."
+            },
+            {
+              "id": "iot-humidity",
+              "title": "Humidité & hygrométrie",
+              "description": "Observer l’humidité de l’air et les conditions de disponibilité en eau."
+            },
+            {
+              "id": "iot-gas",
+              "title": "Gaz & renouvellement d’air",
+              "description": "Étudier la ventilation et les échanges gazeux dans les enceintes de culture."
+            }
+          ]
+        },
+        {
+          "id": "iot-instrumentation",
+          "title": "Architecture instrumentale",
+          "description": "Assembler des capteurs, interfaces et unités de commande adaptés aux essais.",
+          "children": [
+            {
+              "id": "iot-sensors-types",
+              "title": "Capteurs & sondes",
+              "description": "Comparer les technologies de mesure, leurs plages, leur précision et leurs limites."
+            },
+            {
+              "id": "iot-microcontrollers",
+              "title": "Microcontrôleurs",
+              "description": "Explorer les interfaces de lecture, les entrées-sorties et les unités embarquées."
+            },
+            {
+              "id": "iot-power",
+              "title": "Alimentation & sécurité",
+              "description": "Documenter l’alimentation, la protection électrique et la fiabilité des montages."
+            }
+          ]
+        },
+        {
+          "id": "iot-control",
+          "title": "Pilotage des cultures",
+          "description": "Étudier le contrôle progressif des conditions de culture sans confondre prototype et système opérationnel.",
+          "children": [
+            {
+              "id": "iot-airflow",
+              "title": "Ventilation & flux d’air",
+              "description": "Concevoir le suivi et le pilotage du renouvellement d’air."
+            },
+            {
+              "id": "iot-humidification",
+              "title": "Humidification",
+              "description": "Étudier la régulation de l’humidité et la distribution de l’eau."
+            },
+            {
+              "id": "iot-lighting",
+              "title": "Éclairage & cycles",
+              "description": "Définir des scénarios d’éclairage et de temporisation selon les essais."
+            }
+          ]
+        },
+        {
+          "id": "iot-data",
+          "title": "Acquisition & traitement des données",
+          "description": "Transformer les signaux mesurés en séries temporelles exploitables et comparables.",
+          "children": [
+            {
+              "id": "iot-logging",
+              "title": "Enregistrement continu",
+              "description": "Horodater les mesures et conserver les données brutes avec leur contexte."
+            },
+            {
+              "id": "iot-dashboard",
+              "title": "Visualisation & alertes",
+              "description": "Représenter les tendances, seuils et écarts pour faciliter le suivi."
+            },
+            {
+              "id": "iot-quality",
+              "title": "Qualité des mesures",
+              "description": "Repérer dérives, valeurs manquantes, étalonnage et incertitudes."
+            }
+          ]
+        },
+        {
+          "id": "iot-traceability-detail",
+          "title": "Traçabilité expérimentale",
+          "description": "Relier chaque mesure à une culture, un lot, un protocole et une période d’essai.",
+          "children": [
+            {
+              "id": "iot-batch-links",
+              "title": "Lots & cultures",
+              "description": "Associer les relevés aux identifiants de lots et aux étapes de culture."
+            },
+            {
+              "id": "iot-protocol-links",
+              "title": "Protocoles & événements",
+              "description": "Consigner les changements de consigne, interventions et incidents."
+            },
+            {
+              "id": "iot-comparison",
+              "title": "Historique & comparaisons",
+              "description": "Comparer les cycles expérimentaux sans perdre les conditions initiales."
+            }
+          ]
         }
       ],
       "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations.",
