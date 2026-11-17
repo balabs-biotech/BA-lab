@@ -108,5 +108,35 @@
     "id": "universe-learn",
     "file": "universe-learn.jpg",
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungi%20seen%20with%20fluorescence%20microscope.jpg"
+  },
+  {
+    "id": "chapter-about-method",
+    "file": "chapter-about-method.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Fungus_in_glass_dish3.jpg"
+  },
+  {
+    "id": "editorial-penicillium",
+    "file": "editorial-penicillium.jpg",
+    "url": "https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png"
+  },
+  {
+    "id": "editorial-iot",
+    "file": "editorial-iot.jpg",
+    "url": "https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg"
+  },
+  {
+    "id": "editorial-soil",
+    "file": "editorial-soil.jpg",
+    "url": "https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w"
+  },
+  {
+    "id": "editorial-coffee",
+    "file": "editorial-coffee.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Oyster_mushroom_%28Pleurotus_ostreatus%29_mycelium_in_petri_dish_on_coffee_grounds.JPG"
+  },
+  {
+    "id": "product-card-medium",
+    "file": "product-card-medium.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Mushroom%20medium.jpg"
   }
 ]
