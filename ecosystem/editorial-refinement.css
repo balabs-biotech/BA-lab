@@ -1437,3 +1437,54 @@
 @keyframes universe-image-breath{from{transform:scale(1.045) translate3d(-.4%,0,0)}to{transform:scale(1.12) translate3d(.6%,-.7%,0)}}
 @media(max-width:720px){#app.balabs-ui > main .universe-index-card{padding-top:190px!important}#app.balabs-ui > main .universe-index-card .universe-visual{height:174px}#app.balabs-ui > main .universe-index-card>span:first-child{top:148px!important}}
 @media(prefers-reduced-motion:reduce){#app.balabs-ui > main .universe-index-card .universe-visual img{animation:none!important;transition:none!important;transform:none!important}}
+
+
+/* PHASE 40 — Vernpixi 2D usability and contrast audit. */
+#app.balabs-ui .inline-explorer{isolation:isolate}
+#app.balabs-ui .inline-explorer-stage{isolation:isolate}
+#app.balabs-ui .inline-explorer-controls{z-index:30!important;opacity:1!important;pointer-events:auto!important}
+#app.balabs-ui .inline-explorer-controls .btn{
+ opacity:1!important;background:rgba(17,27,29,.96)!important;
+ border:1px solid rgba(209,208,197,.58)!important;color:#f2f1e9!important;
+ box-shadow:0 3px 14px rgba(0,0,0,.35)!important;
+}
+#app.balabs-ui .inline-explorer-controls .btn:hover,
+#app.balabs-ui .inline-explorer-controls .btn:focus-visible{
+ border-color:#b96b4d!important;background:#263b38!important;color:#fff!important;
+}
+#app.balabs-ui .inline-explorer-controls .btn:disabled{opacity:.42!important}
+#app.balabs-ui .inline-explorer-title{opacity:.96!important;z-index:12!important}
+#app.balabs-ui .inline-explorer-title h2{color:#f2f1e9!important;text-shadow:0 2px 12px #000!important}
+#app.balabs-ui .inline-explorer-title .eyebrow{color:#d1d0c5!important}
+#app.balabs-ui .inline-explorer .universe-rail{
+ z-index:24!important;pointer-events:auto!important;
+ background:rgba(10,18,18,.94)!important;border-color:rgba(209,208,197,.38)!important;
+ box-shadow:0 5px 22px #0007!important;
+}
+#app.balabs-ui .inline-explorer .universe-point{
+ width:34px!important;height:34px!important;min-width:34px!important;
+ color:#f2f1e9!important;border-color:rgba(209,208,197,.62)!important;
+ background:rgba(38,59,56,.94)!important;font-size:9px!important;
+}
+#app.balabs-ui .inline-explorer .universe-point.is-active{
+ color:#fff!important;background:#75442f!important;border-color:#e19a76!important;
+ box-shadow:0 0 0 3px rgba(185,107,77,.3)!important;
+}
+#app.balabs-ui .inline-explorer .universe-point:hover{color:#fff!important;background:#405b50!important}
+#app.balabs-ui .inline-explorer .universe-point:focus-visible{outline:2px solid #f2f1e9!important;outline-offset:3px!important}
+#app.balabs-ui .inline-explorer #selection{
+ z-index:28!important;background:rgba(12,21,20,.97)!important;
+ border:1px solid rgba(209,208,197,.52)!important;color:#f2f1e9!important;
+ box-shadow:0 12px 36px #0009!important;
+}
+#app.balabs-ui .inline-explorer #selection :is(h1,h2,h3,strong,.card-title){color:#fff!important}
+#app.balabs-ui .inline-explorer #selection :is(p,small,li){color:#e1e6dc!important}
+#app.balabs-ui .inline-explorer #selection a{color:#f0b18f!important;text-decoration:underline;text-underline-offset:3px}
+#app.balabs-ui .inline-explorer #selection .btn{color:#f2f1e9!important;border-color:#9eaa9e!important}
+#app.balabs-ui .inline-explorer #field{z-index:1;position:absolute;inset:0;pointer-events:auto}
+#app.balabs-ui .inline-explorer-accessible{pointer-events:none!important}
+@media(max-width:700px){
+ #app.balabs-ui .inline-explorer .universe-rail{left:8px!important;bottom:10px!important;top:auto!important;transform:none!important;gap:4px!important;padding:5px!important}
+ #app.balabs-ui .inline-explorer .universe-point{width:29px!important;height:29px!important;min-width:29px!important;font-size:8px!important}
+ #app.balabs-ui .inline-explorer #selection{bottom:52px!important;max-height:35%!important}
+}
