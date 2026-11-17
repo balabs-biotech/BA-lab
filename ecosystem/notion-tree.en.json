@@ -1106,7 +1106,8 @@
           "title": "Public catalogue",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
         },
         {
           "id": "evidence-resource-4",
