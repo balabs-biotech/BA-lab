@@ -346,3 +346,29 @@ html,body{
 @media(prefers-reduced-motion:reduce){
   #app.balabs-ui .experience-page:after{display:none!important}
 }
+
+
+/* Mobile header cleanup: keep the language controls sized to their contents. */
+@media(max-width:760px){
+  #app.balabs-ui>.top .tools{
+    display:flex!important;
+    width:max-content!important;
+    max-width:100%!important;
+    flex:0 1 auto!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+  #app.balabs-ui>.top .tools:before,
+  #app.balabs-ui>.top .tools:after{
+    content:none!important;
+    display:none!important;
+  }
+  #app.balabs-ui>.top .lang{
+    flex:0 0 auto!important;
+  }
+}
