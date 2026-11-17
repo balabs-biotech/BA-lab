@@ -556,7 +556,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <!-- Vernpixi 2D is the primary explorer. The legacy 3D engine remains in Git history as a rollback reference. -->
 
 <script src="./chapter-navigation.js?v=17"></script>
-<script src="./chapter-atmosphere.js?v=6" defer></script>
+<script src="./chapter-atmosphere.js?v=7" defer></script>
 <script src="./universe-visuals.js?v=4" defer></script>
 <script src="./method-interaction.js?v=1"></script>
 
@@ -566,6 +566,24 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script type="module" src="./explorer-2d.js?v=contrast-cleanup-1"></script>
 <script src="./motion-system.js?v=1" defer></script>
 <script src="./motion-director.js?v=1" defer></script>
+
+<script>
+/* Resilient editorial imagery: retry with a subject-matched source, then a known mycelium image. */
+(()=>{
+ const fallbackFor=img=>{const hint=((img.alt||'')+' '+(img.className||'')).toLowerCase();
+  if(/sensor|iot|instrument|capteur|mesure|laboratoire|bench/.test(hint))return 'https://www.datocms-assets.com/31538/1604050588-sensingsolutionslab19.jpg';
+  if(/pleurot|mushroom|champignon|culture|substrat|oyster/.test(hint))return 'https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w';
+  return 'https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg';
+ };
+ document.addEventListener('error',event=>{
+  const img=event.target;if(!(img instanceof HTMLImageElement))return;
+  const step=Number(img.dataset.imageFallbackStep||0),candidates=[fallbackFor(img),'https://upload.wikimedia.org/wikipedia/commons/e/ee/Mycelium.JPG'];
+  const next=candidates.slice(step).find(url=>url!==img.src);
+  if(next){img.dataset.imageFallbackStep=String(step+1);img.src=next;}
+  else{img.classList.add('image-failed');}
+ },true);
+})();
+</script>
 </body>
 </html>
 
