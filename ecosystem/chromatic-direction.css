@@ -3,6 +3,8 @@
    This is a controlled overlay: existing editorial structure and content remain intact. */
 :root{
   --balabs-ink:#10182A;
+  --balabs-bio-green:#78927D;
+  --balabs-bio-green-soft:#A7B8A4;
   --balabs-ink-soft:#18243A;
   --balabs-blue:#4778FF;
   --balabs-blue-bright:#6C9BFF;
@@ -57,14 +59,14 @@
 }
 #app.balabs-ui .experience-page[data-chapter=home]{--chapter-accent:#6C9BFF!important}
 #app.balabs-ui .experience-page[data-chapter=research]{--chapter-accent:#D6AD5B!important}
-#app.balabs-ui .experience-page[data-chapter=network]{--chapter-accent:#83A9FF!important}
+#app.balabs-ui .experience-page[data-chapter=network]{--chapter-accent:var(--balabs-bio-green-soft)!important}
 #app.balabs-ui .experience-page[data-chapter=catalogue]{--chapter-accent:#C87952!important}
 #app.balabs-ui .experience-page[data-chapter=about]{--chapter-accent:#D6AD5B!important}
 #app.balabs-ui .experience-page h1 span,
 #app.balabs-ui .experience-page h2 em,
 #app.balabs-ui .experience-page .eyebrow,
 #app.balabs-ui .experience-page .experience-page-label{
-  color:#D6AD5B!important;
+  color:var(--chapter-accent)!important;
 }
 #app.balabs-ui .experience-page .experience-page-label{
   border-inline-start-color:var(--chapter-accent)!important;
@@ -147,4 +149,49 @@
 @media(max-width:760px){
   #app.balabs-ui>.top{box-shadow:0 4px 18px rgba(5,12,27,.14)!important}
   #app.balabs-ui .experience-page:after{display:none!important}
+}
+
+/* V2 chromatic balance: technology leads; green is reserved for living biology. */
+html,body{
+  background-color:#10182A!important;
+  background-image:
+    radial-gradient(ellipse at 12% 8%,rgba(71,120,255,.12),transparent 34%),
+    radial-gradient(ellipse at 88% 84%,rgba(120,146,125,.075),transparent 30%),
+    linear-gradient(145deg,#10182A 0%,#111C2D 58%,#121C2A 100%)!important;
+  background-attachment:fixed!important;
+}
+#app.balabs-ui .experience-page[data-chapter=home]>.hero{
+  background:linear-gradient(135deg,rgba(22,37,61,.97),rgba(16,24,42,.94))!important;
+}
+#app.balabs-ui .experience-page[data-chapter=research]>.editorial-work{
+  background:
+    radial-gradient(ellipse at 88% 5%,rgba(214,173,91,.09),transparent 32%),
+    linear-gradient(145deg,#1A2940 0%,#121D30 68%,#10182A 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=network]>.universe-index{
+  background:
+    radial-gradient(ellipse at 12% 20%,rgba(120,146,125,.16),transparent 38%),
+    linear-gradient(145deg,#17283A 0%,#101A2B 72%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=catalogue]>.product-catalogue{
+  background:
+    radial-gradient(ellipse at 90% 0%,rgba(200,121,82,.11),transparent 30%),
+    linear-gradient(180deg,#121E31 0%,#10182A 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=catalogue] .product-catalogue-card{
+  background:linear-gradient(145deg,rgba(30,46,68,.82),rgba(17,27,45,.94))!important;
+  border-color:rgba(132,157,204,.25)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=about]>.editorial-method{
+  background:
+    radial-gradient(ellipse at 84% 12%,rgba(120,146,125,.2),transparent 35%),
+    linear-gradient(125deg,#26382F 0%,#1D302C 56%,#172522 100%)!important;
+  border-color:rgba(120,146,125,.35)!important;
+}
+#app.balabs-ui .experience-page[data-chapter=network] .universe-index-heading .eyebrow,
+#app.balabs-ui .experience-page[data-chapter=network] .universe-index-card>span{
+  color:var(--balabs-bio-green-soft)!important;
+}
+@media(max-width:760px){
+  html,body{background-attachment:scroll!important}
 }
