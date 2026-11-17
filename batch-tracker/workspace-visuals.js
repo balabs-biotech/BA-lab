@@ -1,6 +1,6 @@
 /* BA Labs CultureOps — progressive visual runtime.
-   tsParticles provides a low-density ambient field; PixiJS renders the hero instrument.
-   Both are optional enhancements. Static SVG remains the fallback. */
+   tsParticles provides a low-density ambient field. Domain-specific scientific SVGs
+   remain the primary hero illustrations; PixiJS is reserved for data visualisations. */
 (() => {
   "use strict";
 
@@ -82,82 +82,7 @@
     }
   }
 
-  async function startPixiCore() {
-    if (!core || reducedMotion || compact) return;
-
-    try {
-      const { Application, Container, Graphics } = await import(
-        "https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs"
-      );
-      const app = new Application();
-      await app.init({
-        width: 116,
-        height: 116,
-        backgroundAlpha: 0,
-        antialias: true,
-        autoDensity: true,
-        resolution: Math.min(window.devicePixelRatio || 1, 1.5),
-        autoStart: false,
-        preference: "webgl"
-      });
-
-      const canvas = app.canvas;
-      canvas.className = "hero-pixi-canvas";
-      canvas.setAttribute("aria-hidden", "true");
-      core.appendChild(canvas);
-
-      const scene = new Container();
-      app.stage.addChild(scene);
-
-      const rings = new Graphics()
-        .circle(58, 58, 48).stroke({ color: accentNumber, alpha: 0.2, width: 1 })
-        .circle(58, 58, 34).stroke({ color: accentNumber, alpha: 0.32, width: 1 })
-        .circle(58, 58, 12).fill({ color: accentNumber, alpha: 0.12 })
-        .circle(58, 58, 5).fill({ color: accentNumber, alpha: 0.9 });
-      scene.addChild(rings);
-
-      const orbit = new Container();
-      scene.addChild(orbit);
-      for (let index = 0; index < 8; index += 1) {
-        const angle = (Math.PI * 2 * index) / 8;
-        const radius = index % 2 === 0 ? 43 : 31;
-        const node = new Graphics()
-          .circle(0, 0, index % 2 === 0 ? 2.8 : 2)
-          .fill({ color: accentNumber, alpha: index % 2 === 0 ? 0.92 : 0.58 });
-        node.position.set(58 + Math.cos(angle) * radius, 58 + Math.sin(angle) * radius);
-        orbit.addChild(node);
-      }
-
-      const pulse = new Graphics()
-        .circle(58, 58, 8)
-        .stroke({ color: accentNumber, alpha: 0.5, width: 1 });
-      scene.addChild(pulse);
-
-      const fallbackSvg = core.querySelector("svg");
-      if (fallbackSvg) fallbackSvg.hidden = true;
-      core.classList.add("is-pixi-ready");
-
-      app.ticker.add((ticker) => {
-        orbit.rotation += 0.0018 * ticker.deltaTime;
-        pulse.alpha = 0.48 + Math.sin(performance.now() / 850) * 0.2;
-      });
-
-      const onVisibilityChange = () => {
-        if (document.hidden) app.stop();
-        else app.start();
-      };
-      document.addEventListener("visibilitychange", onVisibilityChange);
-      window.addEventListener("pagehide", () => {
-        app.stop();
-        document.removeEventListener("visibilitychange", onVisibilityChange);
-      }, { once: true });
-      if (!document.hidden) app.start();
-    } catch (error) {
-      console.info("BA Labs: noyau PixiJS indisponible, rendu SVG conservé.", error);
-    }
-  }
-
-  const start = () => Promise.allSettled([startParticleField(), startPixiCore()]);
+  const start = () => startParticleField();
   if ("IntersectionObserver" in window && art) {
     const observer = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
