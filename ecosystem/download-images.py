@@ -40,7 +40,7 @@ def download(url):
     last = None
     for attempt in range(4):
         try:
-            req = Request(url, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.0 (public site image packaging)"})
+            req = Request(url, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.1 (https://balabs-biotech.github.io/BA-lab/)", "Referer": "https://balabs-biotech.github.io/BA-lab/"})
             with urlopen(req, timeout=22) as response:
                 data = response.read(20 * 1024 * 1024 + 1)
                 if len(data) > 20 * 1024 * 1024:
@@ -78,7 +78,7 @@ def main():
             raise RuntimeError(f"response is not a valid {ext} image (Content-Type: {mime}; final URL: {final_url})")
         (out / item["file"]).write_bytes(data)
         if "upload.wikimedia.org" in final_url:
-            time.sleep(1.5)
+            time.sleep(4.0)
         return f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}"
 
     with ThreadPoolExecutor(max_workers=1) as pool:
