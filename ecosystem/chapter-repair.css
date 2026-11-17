@@ -645,3 +645,19 @@
   object-position:center 42%!important;
  }
 }
+
+
+/* PASS 53 — bring the catalogue spread up; remove the oversized dead zone below its chapter marker. */
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue{
+  padding-top:clamp(18px,2.2vw,30px)!important;
+  padding-bottom:clamp(34px,4vw,54px)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="catalogue"]>.experience-page-label{
+  margin-bottom:clamp(8px,1vw,12px)!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="catalogue"]>.product-catalogue{
+    padding-top:18px!important;
+    padding-bottom:34px!important;
+  }
+}
