@@ -74,6 +74,7 @@ assert.ok(mycologyActivity.includes('querySelectorAll(":scope > .culture-timelin
 assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
 assert.ok(mycologyActivity.includes("next.stop()"), "Mycology timeline must render on demand without a permanent GPU ticker");
 assert.ok(mycologyActivity.includes("resizeObserver?.disconnect()"), "Mycology timeline must clean up resize observers");
+assert.ok(mycologyActivity.includes("if (!shell.isConnected) target.prepend(shell)"), "Mycology timeline must survive culture selection replacing the history container contents");
 assert.ok(mycologyActivity.includes("L’historique détaillé reste accessible"), "Mycology timeline must preserve its text fallback");
 assert.ok(mycologyActivityStyles.includes(".mycology-activity-stage"), "Mycology timeline must provide a bounded scrollable visualization");
 assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology must load the activity timeline runtime");
