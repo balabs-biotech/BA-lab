@@ -22,7 +22,7 @@ def audit_references(site, entries):
     urls = [item["url"] for item in entries]
     if len(ids) != len(set(ids)) or len(files) != len(set(files)) or len(urls) != len(set(urls)):
         raise SystemExit("Image manifest contains duplicate IDs, filenames or source URLs.")
-    pattern = re.compile(r"(?:[.]/assets/|/assets/)([A-Za-z0-9._-]+[.](?:jpg|jpeg|png|webp))", re.I)
+    pattern = re.compile(r"(?:[.]/assets/|/assets/)([A-Za-z0-9._-]+[.](?:jpg|jpeg|png|webp|svg))", re.I)
     referenced = set()
     for source in site.rglob("*"):
         if source.is_file() and source.suffix.lower() in {".html", ".css", ".js"}:
@@ -30,12 +30,21 @@ def audit_references(site, entries):
                 referenced.update(pattern.findall(source.read_text(encoding="utf-8")))
             except UnicodeDecodeError:
                 continue
-    packaged = set(files)
+    local_assets_dir = site / "assets"
+    local_svgs = {p.name for p in local_assets_dir.glob("*.svg")} if local_assets_dir.exists() else set()
+    packaged = set(files) | local_svgs
     missing = sorted(referenced - packaged)
-    unused = sorted(packaged - referenced)
-    if missing or unused:
-        raise SystemExit(f"Image coverage audit failed. Missing from manifest: {missing}; unused manifest files: {unused}")
-    print(f"Image coverage audit passed: {len(referenced)} unique image references across all HTML/CSS/JS files.")
+    unused = sorted(set(files) - referenced)
+    invalid_svg = []
+    for name in referenced & local_svgs:
+        try:
+            if "<svg" not in (local_assets_dir / name).read_text(encoding="utf-8")[:1200]:
+                invalid_svg.append(name)
+        except OSError:
+            invalid_svg.append(name)
+    if missing or unused or invalid_svg:
+        raise SystemExit(f"Image coverage audit failed. Missing: {missing}; unused manifest files: {unused}; invalid local SVG: {invalid_svg}")
+    print(f"Image coverage audit passed: {len(referenced)} unique image references ({len(local_svgs & referenced)} original local SVG assets).")
 
 def resolve_source(url):
     """Resolve Commons file titles through imageinfo instead of the fragile Special:FilePath redirect."""
@@ -113,7 +122,7 @@ def main():
     if failures:
         print(f"\n{len(failures)} image(s) failed; refusing to publish a partial image set.", file=sys.stderr)
         sys.exit(1)
-    print(f"Validated and packaged {len(entries)} unique BA Labs images.")
+    print(f"Validated and packaged {len(entries)} downloaded BA Labs images; original SVG artwork is included from the repository.")
 
 if __name__ == "__main__":
     main()
