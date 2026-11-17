@@ -52,12 +52,6 @@ export async function createPixiRenderer(canvas){
   filaments.position.set(width/2+offset.x,height/2+offset.y);filaments.scale.set(scale);
   junctions.position.copyFrom(filaments.position);junctions.scale.set(scale);
   const live=new Set();
-  const shortRoots={
-   fr:{bio:"BIOTECH",myco:"MYCO",soil:"TECHNOSOIL",lab:"LABO",products:"PRODUITS",iot:"IOT",work:"R&D",learn:"RESSOURCES"},
-   en:{bio:"BIOTECH",myco:"MYCOLOGY",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUCTS",iot:"IOT",work:"PROJECTS",learn:"RESOURCES"},
-   ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",learn:"موارد"},
-   pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",learn:"RECURSOS"}
-  };
   const candidates=[];
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
@@ -78,11 +72,12 @@ export async function createPixiRenderer(canvas){
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
-   const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
-   const fontSize=n.level===0?clamp(9+Math.log2(Math.max(.5,scale))*1.1,8,10.5):clamp(7.5+Math.log2(Math.max(.7,scale))*.65,7,9.5);
+   const title=n.title;
+   const fontSize=n.level===0?clamp(8.2+Math.log2(Math.max(.5,scale))*.85,7.8,9.8):clamp(7.5+Math.log2(Math.max(.7,scale))*.65,7,9.5);
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
+   label.style.wordWrap=true;label.style.wordWrapWidth=n.level===0?132:180;label.style.breakWords=true;label.style.align="center";
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
-   const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
+   const anchorX=n.level===0?.5:dx>.32?0:dx<-.32?1:.5,anchorY=n.level===0?.5:dy>.48?0:dy<-.48?1:.5;
    const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
    const x=clamp(sx+dx*radius,5,width-5),y=clamp(sy+dy*radius,64,height-18);
    label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=alpha;label.visible=true;

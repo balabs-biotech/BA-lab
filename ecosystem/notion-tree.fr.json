@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "source": "Notion public workspace search, French branch; entries verified by page IDs and URLs",
+  "source": "Audited against the public French Notion pages, page blocks and linked topic pages on 2026-11-17",
   "language": "fr",
-  "coverage": "7_public_roots_identified; nested_public_pages_verified_from_root_content; R&D branch expanded_eight_universes_including_planned_resources_transmission",
+  "coverage": "seven verified public Notion universes plus one curated resources hub; internal workspace pages excluded",
   "domains": [
     {
       "id": "myco",
@@ -638,7 +638,7 @@
     },
     {
       "id": "lab",
-      "title": "LABORATOIRE & EXPÉRIMENTATION",
+      "title": "LE LABORATOIRE",
       "notionId": "3e273152f17181e2aeaad4ed4ac3f230",
       "url": "https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230",
       "children": [
@@ -654,7 +654,7 @@
     },
     {
       "id": "products",
-      "title": "PRODUITS & RESSOURCES BIOLOGIQUES",
+      "title": "Produits & ressources biologiques",
       "notionId": "3ec73152f1718125b1a7c58bc58ebcaa",
       "url": "https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa",
       "children": [
@@ -698,7 +698,7 @@
     },
     {
       "id": "work",
-      "title": "RECHERCHE & DÉVELOPPEMENT",
+      "title": "R&D",
       "notionId": "3e273152f17181d8b65af8f6b7de0b0b",
       "url": "https://app.notion.com/p/3e273152f17181d8b65af8f6b7de0b0b",
       "children": [
@@ -788,9 +788,18 @@
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
           "children": []
         }
-      ]
+      ],
+      "sourceType": "curated-navigation-hub",
+      "notionId": null
     }
   ],
-  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs.",
-  "hub": null
+  "notes": "The French public landing page lists the seven mapped roots. No separate public learning/resources root is linked there; do not invent one. The landing page also links to evidence and collaboration pages, which are not separate top-level universes. R&D root audit: added Methodologie R&D, Iteration & validation, and Equipe/expertise pages; moved Prototypes & essais and Mesure & reproductibilite to R&D branch; removed collaboration proposal page from laboratory branch because its actual parent is Collaborer avec BA Labs. The eighth visual universe, Ressources & transmission, is a curated navigation hub built from existing public pages; it is not a separate Notion page.",
+  "hub": null,
+  "mappingAudit": {
+    "verifiedAt": "2026-11-17",
+    "scope": "public French Notion branches",
+    "realNotionUniverses": 7,
+    "curatedNavigationHubs": 1,
+    "method": "page-block children and explicit public page links"
+  }
 }
