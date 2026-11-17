@@ -138,5 +138,10 @@
     "id": "product-card-medium",
     "file": "product-card-medium.jpg",
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Mushroom_medium.jpg/1200px-Mushroom_medium.jpg"
+  },
+  {
+    "id": "editorial-preview",
+    "file": "editorial-preview.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Mycelium.jpg/1200px-Mycelium.jpg"
   }
 ]
