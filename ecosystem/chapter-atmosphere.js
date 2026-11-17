@@ -6,7 +6,7 @@
   research:{src:'./assets/chapter-research.jpg',alt:'Croissance de Pleurotus ostreatus sur plusieurs formulations de milieux nutritifs',tag:'NUTRIENT MEDIA / CULTURE',credit:'Maseko et al. · International Journal of Food Science · CC BY 4.0',page:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/'},
   network:{src:'./assets/chapter-network.jpg',alt:'Croissance fongique en boîte de Petri lors d’une fermentation à l’état solide',tag:'BIOPROCESS / CULTURE',credit:'Luis Fernando Flores LAB · CC BY',page:'https://commons.wikimedia.org/wiki/File:Petri_dish_with_solid-state_fermentation.jpg'},
   catalogue:{src:'./assets/chapter-catalogue.jpg',alt:'Pleurotus ostreatus cultivé sur substrat à base de copeaux de bois',tag:'CULTURES & MATERIALS',credit:'Zinnmann · Wikimedia Commons',page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_025-047.jpg'},
-  about:{src:'./assets/chapter-about.jpg',alt:'Mycélium de Pleurotus ostreatus et microstructure observée au microscope électronique',tag:'MYCELIUM / MICROSTRUCTURE',credit:'Maseko et al. · International Journal of Food Science · CC BY 4.0',page:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/'}
+  about:{src:'./assets/chapter-about.jpg',alt:'Graphiques de contribution des variables à la production de protéines mycéliennes de Pleurotus ostreatus',tag:'MYCELIUM / NUTRIENT MODEL',credit:'Maseko et al. · International Journal of Food Science · CC BY 4.0',page:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  Object.entries(visuals).forEach(([key,data])=>{
