@@ -138,3 +138,16 @@
 @media(prefers-reduced-motion:reduce){
  #app.balabs-ui > main .universe-index-card .universe-visual img{transform:none!important;transition:none!important}
 }
+
+/* A failed chapter photograph must not erase the chapter's visual anchor.
+   Keep its editorial frame and source caption, and reveal a mineral/mycelial field. */
+.experience-page>.chapter-atmosphere.is-unavailable{
+ display:block!important;
+ background:
+  radial-gradient(ellipse at 72% 28%,rgba(185,107,77,.22),transparent 34%),
+  radial-gradient(ellipse at 22% 76%,rgba(126,170,163,.18),transparent 38%),
+  repeating-linear-gradient(132deg,rgba(209,208,197,.035) 0 1px,transparent 1px 13px),
+  linear-gradient(135deg,#263b38,#111b1d 72%);
+}
+.experience-page>.chapter-atmosphere.is-unavailable img{opacity:0}
+.experience-page>.chapter-atmosphere figcaption a{pointer-events:auto;position:relative;z-index:4;color:#f2f1e9;text-decoration:underline;text-underline-offset:2px}
