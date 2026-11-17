@@ -11,7 +11,7 @@
   if (!panel) return;
   const shell = document.createElement("div");
   shell.className = "lineage-graph-shell";
-  shell.innerHTML = '<div class="lineage-graph-heading"><span>CARTE DE FILIATION</span><small>Chaque nœud ouvre la fiche de la culture correspondante</small></div><div class="lineage-graph-legend" aria-label="Légende"><span data-kind="ancestor">Origines</span><span data-kind="current">Sélectionnée</span><span data-kind="descendant">Descendantes</span></div><div class="lineage-graph-stage" role="img" aria-label="Graphe interactif des cultures parentes, de la culture sélectionnée et de ses descendantes"><p class="lineage-graph-status">Préparation de la carte de filiation…</p></div>';
+  shell.innerHTML = '<div class="lineage-graph-heading"><span>CARTE DE FILIATION</span><small>Vue PixiJS · sélectionnez un nœud pour ouvrir sa fiche</small></div><div class="lineage-graph-legend" aria-label="Légende"><span data-kind="ancestor">Origines</span><span data-kind="current">Sélectionnée</span><span data-kind="descendant">Descendantes</span></div><div class="lineage-graph-toolbar" role="group" aria-label="Commandes de la carte"><button type="button" data-graph-zoom="out" aria-label="Réduire le zoom">−</button><button type="button" data-graph-zoom="in" aria-label="Augmenter le zoom">+</button><button type="button" data-graph-zoom="fit">Recentrer</button><span class="lineage-graph-zoom-label" aria-live="polite">100 %</span></div><div class="lineage-graph-stage" tabindex="0" aria-label="Carte de filiation interactive. Utilisez les commandes de zoom ou faites glisser la carte."><p class="lineage-graph-status">Préparation de la carte de filiation…</p></div>'
   const details = document.createElement("details");
   details.className = "lineage-data-details";
   const summary = document.createElement("summary");
@@ -119,13 +119,51 @@
       const { Container, Graphics, Text, Rectangle } = pixi;
       const scene = new Container();
       nextApp.stage.addChild(scene);
+      const zoomLabel = shell.querySelector(".lineage-graph-zoom-label");
+      let zoom = 1;
+      const applyZoom = value => {
+        zoom = Math.max(0.55, Math.min(1.8, value));
+        scene.scale.set(zoom);
+        if (zoomLabel) zoomLabel.textContent = Math.round(zoom * 100) + " %";
+      };
+      shell.querySelector('[data-graph-zoom="in"]').addEventListener("click", () => applyZoom(zoom + 0.15));
+      shell.querySelector('[data-graph-zoom="out"]').addEventListener("click", () => applyZoom(zoom - 0.15));
+      shell.querySelector('[data-graph-zoom="fit"]').addEventListener("click", () => {
+        applyZoom(1);
+        stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+      });
+      let drag = null;
+      stage.addEventListener("pointerdown", event => {
+        if (event.target === nextApp.canvas) {
+          drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
+          stage.setPointerCapture?.(event.pointerId);
+          stage.classList.add("is-panning");
+        }
+      });
+      stage.addEventListener("pointermove", event => {
+        if (!drag) return;
+        stage.scrollLeft = drag.left - (event.clientX - drag.x);
+        stage.scrollTop = drag.top - (event.clientY - drag.y);
+      });
+      const stopDrag = () => { drag = null; stage.classList.remove("is-panning"); };
+      stage.addEventListener("pointerup", stopDrag);
+      stage.addEventListener("pointercancel", stopDrag);
+      stage.addEventListener("lostpointercapture", stopDrag);
+      stage.addEventListener("wheel", event => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        applyZoom(zoom + (event.deltaY < 0 ? 0.08 : -0.08));
+      }, { passive: false });
       const nodeWidth = 184, nodeHeight = 68;
       const byId = graph.positions;
       const drawEdge = (from, to) => {
         if (!from || !to) return;
-        const line = new Graphics().moveTo(from.x + nodeWidth, from.y + nodeHeight / 2)
-          .lineTo(to.x, to.y + nodeHeight / 2)
-          .stroke({ color: colors.line, alpha: 0.72, width: 1.5 });
+        const startX = from.x + nodeWidth, startY = from.y + nodeHeight / 2;
+        const endX = to.x, endY = to.y + nodeHeight / 2;
+        const bend = Math.max(34, (endX - startX) * 0.46);
+        const line = new Graphics().moveTo(startX, startY)
+          .bezierCurveTo(startX + bend, startY, endX - bend, endY, endX, endY)
+          .stroke({ color: colors.line, alpha: 0.78, width: 1.8 });
         scene.addChild(line);
       };
       nodes.forEach(node => {
@@ -146,6 +184,9 @@
         card.eventMode = "static";
         card.cursor = "pointer";
         card.hitArea = new Rectangle(0, 0, nodeWidth, nodeHeight);
+        const halo = new Graphics().roundRect(-3, -3, nodeWidth + 6, nodeHeight + 6, 12)
+          .fill({ color, alpha: node.role === "current" ? 0.11 : 0.035 });
+        card.addChild(halo);
         const plate = new Graphics().roundRect(0, 0, nodeWidth, nodeHeight, 10)
           .fill({ color: 0x202d2b, alpha: 0.98 })
           .stroke({ color, alpha: node.role === "current" ? 0.9 : 0.52, width: node.role === "current" ? 2 : 1 });
