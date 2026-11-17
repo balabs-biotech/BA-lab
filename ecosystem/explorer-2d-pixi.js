@@ -25,7 +25,8 @@ export async function createPixiRenderer(canvas){
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
   for(const e of edges){
-   const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
+   const depth=Math.max(e.a.level,e.b.level);let alpha=alphaFor(depth);if(alpha<.015)continue;
+   if(selected&&!e.verified)alpha*=activeBranch.has(e.a.id)&&activeBranch.has(e.b.id)?1:.16;
    const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
    const bend=Math.min(58,len*.19)*side*(.62+((seed>>>5)&63)/100);
@@ -42,7 +43,8 @@ export async function createPixiRenderer(canvas){
    if(!reduced&&!e.cross&&alpha>.2){const particleCount=depth<=2&&len>150?3:depth<=2&&len>72?2:1;for(let particle=0;particle<particleCount;particle++){const phase=time*.00012+(seed%100)*.013+particle/particleCount,q=(phase*(depth===1?.7:.48))%1,u=1-q,x=u*u*a.x+2*u*q*cx+q*q*b.x,y=u*u*a.y+2*u*q*cy+q*q*b.y;filaments.circle(x,y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:particleCount===1?.82:.68});}}
   }
   for(const n of nodes){
-   const alpha=alphaFor(n.level);if(alpha<.015)continue;
+   let alpha=alphaFor(n.level);if(alpha<.015)continue;
+   if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const r=Math.max(1.25,n.r),color=PALETTE[n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
    if(n.level<=1)junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
    const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
@@ -63,6 +65,12 @@ export async function createPixiRenderer(canvas){
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
   while(ancestor){lineage.add(ancestor.id);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
+  const activeBranch=new Set();
+  if(selected){
+   activeBranch.add(selected.id);
+   let grew=true;
+   while(grew){grew=false;for(const n of nodes){if(n.parent&&activeBranch.has(n.parent)&&!activeBranch.has(n.id)){activeBranch.add(n.id);grew=true;}}}
+  }
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
@@ -80,7 +88,7 @@ export async function createPixiRenderer(canvas){
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
    const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
-   const fontSize=n.level===0?clamp(9+Math.log2(Math.max(.5,scale))*1.1,8,10.5):clamp(7.5+Math.log2(Math.max(.7,scale))*.65,7,9.5);
+   const fontSize=n.level===0?clamp(10.5+Math.log2(Math.max(.5,scale))*1.15,9.5,12.5):clamp(9+Math.log2(Math.max(.7,scale))*.72,8.5,11.5);
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
