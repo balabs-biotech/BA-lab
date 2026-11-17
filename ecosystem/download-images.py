@@ -1,44 +1,73 @@
 #!/usr/bin/env python3
-"""Fetch and validate BA Labs public-site image assets for GitHub Pages."""
-import argparse, json, pathlib, sys, time
+"""Fetch, audit and validate every BA Labs public-site image for GitHub Pages."""
+import argparse
+import json
+import pathlib
+import re
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
 
 SIGNATURES = {
     ".jpg": (b"\xff\xd8\xff",),
     ".png": (b"\x89PNG\r\n\x1a\n",),
     ".webp": (b"RIFF",),
 }
+
+def audit_references(site, entries):
+    ids = [item["id"] for item in entries]
+    files = [item["file"] for item in entries]
+    urls = [item["url"] for item in entries]
+    if len(ids) != len(set(ids)) or len(files) != len(set(files)) or len(urls) != len(set(urls)):
+        raise SystemExit("Image manifest contains duplicate IDs, filenames or source URLs.")
+    pattern = re.compile(r"(?:[.]/assets/|/assets/)([A-Za-z0-9._-]+[.](?:jpg|jpeg|png|webp))", re.I)
+    referenced = set()
+    for source in site.rglob("*"):
+        if source.is_file() and source.suffix.lower() in {".html", ".css", ".js"}:
+            try:
+                referenced.update(pattern.findall(source.read_text(encoding="utf-8")))
+            except UnicodeDecodeError:
+                continue
+    packaged = set(files)
+    missing = sorted(referenced - packaged)
+    unused = sorted(packaged - referenced)
+    if missing or unused:
+        raise SystemExit(f"Image coverage audit failed. Missing from manifest: {missing}; unused manifest files: {unused}")
+    print(f"Image coverage audit passed: {len(referenced)} unique image references across all HTML/CSS/JS files.")
+
 def download(url):
     last = None
     for attempt in range(4):
         try:
-            req = Request(url, headers={"User-Agent":"BALabs-SiteAssetBuilder/1.0 (GitHub Pages image packaging)"})
+            req = Request(url, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.0 (public site image packaging)"})
             with urlopen(req, timeout=22) as response:
                 data = response.read(20 * 1024 * 1024 + 1)
                 if len(data) > 20 * 1024 * 1024:
                     raise RuntimeError("image exceeds 20 MB")
                 final_url = response.geturl()
                 content_type = response.headers.get("Content-Type", "")
-                if response.status != 200:
-                    raise RuntimeError(f"HTTP {response.status}")
-                if not data:
-                    raise RuntimeError("empty response")
+                if response.status != 200 or not data:
+                    raise RuntimeError(f"invalid response: HTTP {response.status}")
                 return data, final_url, content_type
         except Exception as exc:
             last = exc
-            delay = (10, 18, 28, 40)[attempt] if getattr(exc, 'code', None) == 429 else (2, 5, 10, 15)[attempt]
+            delay = (8, 18, 30, 45)[attempt] if getattr(exc, "code", None) == 429 else (2, 5, 10, 15)[attempt]
             time.sleep(delay)
     raise RuntimeError(str(last))
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
+    site = pathlib.Path(__file__).resolve().parent
     entries = json.loads(pathlib.Path(args.manifest).read_text(encoding="utf-8"))
-    out = pathlib.Path(args.output); out.mkdir(parents=True, exist_ok=True)
+    audit_references(site, entries)
+    out = pathlib.Path(args.output)
+    out.mkdir(parents=True, exist_ok=True)
     failures = []
+
     def fetch_one(item):
         data, final_url, mime = download(item["url"])
         ext = pathlib.Path(item["file"]).suffix.lower()
@@ -48,14 +77,16 @@ def main():
         if not valid:
             raise RuntimeError(f"response is not a valid {ext} image (Content-Type: {mime}; final URL: {final_url})")
         (out / item["file"]).write_bytes(data)
+        if "upload.wikimedia.org" in final_url:
+            time.sleep(1.5)
         return f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}"
+
     with ThreadPoolExecutor(max_workers=1) as pool:
         jobs = {pool.submit(fetch_one, item): item for item in entries}
         for future in as_completed(jobs):
             item = jobs[future]
             try:
                 print(future.result())
-                time.sleep(1.25)  # stay below Wikimedia Commons request limits
             except Exception as exc:
                 failures.append((item["id"], str(exc)))
                 print(f"FAIL {item['id']}: {exc}", file=sys.stderr)
@@ -63,5 +94,6 @@ def main():
         print(f"\n{len(failures)} image(s) failed; refusing to publish a partial image set.", file=sys.stderr)
         sys.exit(1)
     print(f"Validated and packaged {len(entries)} unique BA Labs images.")
+
 if __name__ == "__main__":
     main()
