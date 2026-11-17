@@ -37,6 +37,9 @@ jobs:
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           touch _site/.nojekyll
 
+      - name: Download and validate BA Labs website images
+        run: python ecosystem/download-images.py --manifest ecosystem/images-manifest.json --output _site/ecosystem/assets
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
