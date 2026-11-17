@@ -744,3 +744,94 @@ html body[data-domain="agronomy"] #plantCard #plantCultureList .culture-catalog-
 @media(prefers-reduced-motion:reduce) {
   html body[data-domain="agronomy"] #plantCard #savePlantCultureButton { transition:none !important; }
 }
+
+
+/* PASS 150 — Sentinel-2 NDVI time series: distinct analytical surface and observation markers. */
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel {
+  display:grid !important;
+  align-content:start !important;
+  gap:10px !important;
+  min-width:0 !important;
+  padding:clamp(14px,2vw,20px) !important;
+  border-color:rgba(180,244,119,.2) !important;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(180,244,119,.075),transparent 58%),
+    linear-gradient(145deg,#202d27,#17221e) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel > h3 {
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  margin:0 !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel > h3::before {
+  content:"NDVI" !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:23px !important;
+  padding:3px 7px !important;
+  border:1px solid rgba(180,244,119,.28) !important;
+  border-radius:5px !important;
+  background:rgba(180,244,119,.09) !important;
+  color:#c8ef9e !important;
+  font-size:9px !important;
+  font-weight:850 !important;
+  letter-spacing:.08em !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel > .environmental-ndvi-chart {
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  height:auto !important;
+  min-width:0 !important;
+  padding:9px 6px 3px !important;
+  border:1px solid rgba(180,244,119,.13) !important;
+  border-radius:9px !important;
+  background:rgba(9,17,14,.46) !important;
+  overflow:visible !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-grid {
+  stroke:rgba(190,211,190,.17) !important;
+  stroke-dasharray:3 5 !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-chart text {
+  fill:#b8c8b8 !important;
+  font-family:var(--ba-font,Arial,sans-serif) !important;
+  font-size:11px !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-series {
+  stroke:#b4f477 !important;
+  stroke-width:3.25 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:drop-shadow(0 0 4px rgba(180,244,119,.24)) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-point {
+  fill:#c8ef9e !important;
+  stroke:#17251d !important;
+  stroke-width:2.5 !important;
+  transition:r .14s ease,filter .14s ease !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-point:hover {
+  r:7 !important;
+  filter:drop-shadow(0 0 5px rgba(180,244,119,.55)) !important;
+}
+html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel > p.muted {
+  margin:0 !important;
+  padding:9px 11px !important;
+  border-inline-start:2px solid rgba(180,244,119,.58) !important;
+  border-radius:0 7px 7px 0 !important;
+  background:rgba(180,244,119,.045) !important;
+  color:#b9c9b9 !important;
+  font-size:10px !important;
+  line-height:1.6 !important;
+}
+@media(max-width:620px) {
+  html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel { padding:12px !important; }
+  html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-chart { padding:7px 2px 2px !important; }
+  html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-chart text { font-size:10px !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="agronomy"] #environmentalCard #vegetationTrendPanel .environmental-ndvi-point { transition:none !important; }
+}
