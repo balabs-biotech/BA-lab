@@ -1070,3 +1070,11 @@ html body[data-domain="laboratory"] #batchCard #createBatchButton:hover {
 @media(prefers-reduced-motion:reduce) {
   html body[data-domain="laboratory"] #batchCard #createBatchButton { transition:none !important; }
 }
+
+
+/* PASS 148 — explicit surface colour for the active production stage.
+   The gradient alone computes to a transparent background in browser diagnostics. */
+html body[data-domain="laboratory"] #batchCard #batchStageList > .stage.active {
+  background-color:#233943 !important;
+  background-image:linear-gradient(145deg,rgba(120,184,232,.15),rgba(9,18,21,.38)) !important;
+}
