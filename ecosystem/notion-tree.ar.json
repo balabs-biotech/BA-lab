@@ -1083,21 +1083,24 @@
           "title": "الأعمال الموثقة",
           "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "40173152f171811aaac8db82b1c7a9fe"
         },
         {
           "id": "evidence-resource-2",
           "title": "منهجية البحث والتطوير",
           "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "40273152f1718172aabbe09bb712c3d1"
         },
         {
           "id": "evidence-resource-3",
           "title": "الكتالوج العام",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
-          "kind": "reference"
+          "kind": "reference",
+          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
         },
         {
           "id": "evidence-resource-4",
