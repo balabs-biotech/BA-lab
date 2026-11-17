@@ -243,7 +243,72 @@
               "notionId": "40273152f171810d92ffe6dfe8330a17",
               "url": "https://app.notion.com/p/40273152f171810d92ffe6dfe8330a17",
               "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
-              "children": []
+              "children": [
+                {
+                  "id": "en-myco-glomus-aggregatum",
+                  "title": "Glomus aggregatum — organism profile",
+                  "notionId": "40173152f171819bbb4ad4228587c985",
+                  "url": "https://app.notion.com/p/40173152f171819bbb4ad4228587c985",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-glomus-brasilianum",
+                  "title": "Glomus brasilianum — organism profile",
+                  "notionId": "40173152f171816eac93cd00f0450047",
+                  "url": "https://app.notion.com/p/40173152f171816eac93cd00f0450047",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-rhizophagus-clarus",
+                  "title": "Rhizophagus clarus (Glomus clarum) — organism profile",
+                  "notionId": "40173152f1718167bc04d6a36e0c2802",
+                  "url": "https://app.notion.com/p/40173152f1718167bc04d6a36e0c2802",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-glomus-deserticola",
+                  "title": "Glomus deserticola — organism profile",
+                  "notionId": "40173152f17181f9a2fcd3594708e9e9",
+                  "url": "https://app.notion.com/p/40173152f17181f9a2fcd3594708e9e9",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-rhizophagus-irregularis",
+                  "title": "Rhizophagus irregularis (Glomus intraradices) — organism profile",
+                  "notionId": "40173152f17181a7bcd1e4d69f31ea96",
+                  "url": "https://app.notion.com/p/40173152f17181a7bcd1e4d69f31ea96",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-glomus-monosporus",
+                  "title": "Glomus monosporus — organism profile",
+                  "notionId": "40173152f171810296caef43036c77ec",
+                  "url": "https://app.notion.com/p/40173152f171810296caef43036c77ec",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-funneliformis",
+                  "title": "Funneliformis mosseae (Glomus mosseae) — organism profile",
+                  "notionId": "40173152f171819a87acdc9dff6133da",
+                  "url": "https://app.notion.com/p/40173152f171819a87acdc9dff6133da",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-gigaspora",
+                  "title": "Gigaspora margarita — organism profile",
+                  "notionId": "40173152f171811c9d91ca85d7d6f89f",
+                  "url": "https://app.notion.com/p/40173152f171811c9d91ca85d7d6f89f",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                }
+              ]
             },
             {
               "id": "en-myco-ectomycorrhizae",
@@ -251,23 +316,40 @@
               "notionId": "40273152f17181a4aa7ccbe56cf01500",
               "url": "https://app.notion.com/p/40273152f17181a4aa7ccbe56cf01500",
               "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
-              "children": []
-            },
-            {
-              "id": "en-myco-rhizopogon",
-              "title": "Rhizopogon spp. — ectomycorrhizal group profile",
-              "notionId": "40273152f171810e8544ed23af43d1ac",
-              "url": "https://app.notion.com/p/40273152f171810e8544ed23af43d1ac",
-              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
-              "children": []
-            },
-            {
-              "id": "en-myco-scleroderma",
-              "title": "Scleroderma spp. — ectomycorrhizal group profile",
-              "notionId": "40273152f171819a9502cb49b4793a0b",
-              "url": "https://app.notion.com/p/40273152f171819a9502cb49b4793a0b",
-              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
-              "children": []
+              "children": [
+                {
+                  "id": "en-myco-rhizopogon",
+                  "title": "Rhizopogon spp. — ectomycorrhizal group profile",
+                  "notionId": "40273152f171810e8544ed23af43d1ac",
+                  "url": "https://app.notion.com/p/40273152f171810e8544ed23af43d1ac",
+                  "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-scleroderma",
+                  "title": "Scleroderma spp. — ectomycorrhizal group profile",
+                  "notionId": "40273152f171819a9502cb49b4793a0b",
+                  "url": "https://app.notion.com/p/40273152f171819a9502cb49b4793a0b",
+                  "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-laccaria",
+                  "title": "Laccaria laccata — organism profile",
+                  "notionId": "40173152f171811ca07df731eed807fe",
+                  "url": "https://app.notion.com/p/40173152f171811ca07df731eed807fe",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-pisolithus",
+                  "title": "Pisolithus tinctorius — organism profile",
+                  "notionId": "40173152f171815f9edcca973aa6968a",
+                  "url": "https://app.notion.com/p/40173152f171815f9edcca973aa6968a",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                }
+              ]
             }
           ]
         },
