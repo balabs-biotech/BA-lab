@@ -1591,3 +1591,18 @@
  #app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{filter:saturate(.94) contrast(1.03) brightness(.98)!important;opacity:.92!important;object-position:58% 44%!important}
  #app section.hero:after{background-image:linear-gradient(90deg,rgba(7,13,15,.64),rgba(7,13,15,.18)),linear-gradient(0deg,rgba(7,13,15,.36),transparent 62%)!important}
 }
+
+
+/* FINAL CASCADE FIX — override the legacy high-specificity homepage dimmer. */
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
+  opacity:.94!important;
+  filter:saturate(.94) contrast(1.06) brightness(.98)!important;
+  object-position:64% 42%!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="home"]>.hero>.hero-micrograph{
+    opacity:.92!important;
+    filter:saturate(.96) contrast(1.04) brightness(1)!important;
+    object-position:58% 44%!important;
+  }
+}
