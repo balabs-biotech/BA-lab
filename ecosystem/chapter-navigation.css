@@ -272,3 +272,24 @@ body>.chapter-rail .chapter-rail-node{pointer-events:auto!important;touch-action
 body>.chapter-rail .chapter-rail-nodes{pointer-events:auto!important;}
 body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
 @media(max-width:760px){body>.chapter-rail{left:0!important;right:auto!important;}[dir=rtl] body>.chapter-rail{left:auto!important;right:0!important;}}
+
+
+/* Mobile chapter controls: reserve a dedicated bottom lane instead of floating over photography. */
+@media(max-width:760px){
+ .experience-page{padding-bottom:88px!important}
+ .experience-page>.hero{
+  min-height:calc(100% - 82px)!important;
+  padding-bottom:18px!important;
+ }
+ .experience-controls{
+  bottom:7px!important;
+  padding:4px 6px!important;
+  gap:5px!important;
+  border-radius:10px!important;
+  background:rgba(16,24,42,.97)!important;
+  border-color:rgba(132,157,204,.48)!important;
+  box-shadow:0 3px 14px rgba(0,0,0,.28)!important;
+ }
+ .experience-controls button{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;border-radius:7px!important}
+ .experience-count{min-width:38px!important}
+}
