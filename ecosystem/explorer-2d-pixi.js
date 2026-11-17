@@ -21,7 +21,24 @@ export async function createPixiRenderer(canvas){
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
+  const biome=selected?(PALETTE[selected.rootId]||0x78958a):0x78958a;
   for(let i=0;i<110;i++){const x=(i*137.51)%width,y=(i*83.71)%height;field.circle(x,y,i%9===0?1.1:.6).fill({color:i%7===0?0xb96b4d:0xd1d0c5,alpha:i%5===0?.16:.055});}
+  // A restrained microscopy-like hyphal grain sits behind the navigable network.
+  // Its geometry is deterministic; only the spore drift animates.
+  for(let i=0;i<18;i++){
+   const seed=hash("field-hypha-"+i),x=(seed%997)/997*width,y=((seed>>>9)%991)/991*height;
+   const length=24+(seed%86),bend=((seed>>>7)%41)-20,side=(seed&1)?1:-1;
+   field.moveTo(x,y).quadraticCurveTo(x+length*.48,y+bend*side,x+length,y+bend*.28).stroke({color:biome,alpha:selected?.035:.022,width:.65,cap:"round"});
+   if(i%3===0){field.circle(x+length,y+bend*.28,1.15).fill({color:0xb96b4d,alpha:.15});}
+  }
+  if(!reduced){
+   for(let i=0;i<24;i++){
+    const seed=hash("spore-"+i),phase=time*.000018+(seed%1000)/1000;
+    const x=((seed%997)/997*width+Math.sin(phase*6.28+i)*7+width)%width;
+    const y=(((seed>>>8)%991)/991*height-phase*9+height*2)%height;
+    field.circle(x,y,i%5===0?1.45:.8).fill({color:i%6===0?0xb96b4d:biome,alpha:i%4===0?.2:.11});
+   }
+  }
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
   const byId=new Map(nodes.map(n=>[n.id,n]));
