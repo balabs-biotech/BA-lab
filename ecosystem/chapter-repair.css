@@ -231,3 +231,54 @@
    padding:11px 0 13px!important;
  }
 }
+
+
+/* PHASE 46 — mobile type/image proportion: tighten copy, reduce oversized headings and line-height. */
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about{
+   gap:12px!important;padding-block:18px 22px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .about-copy h2{
+   max-width:18ch!important;font-size:clamp(23px,6.1vw,29px)!important;
+   line-height:1.06!important;letter-spacing:-.04em!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .about-copy>p{
+   max-width:44ch!important;margin-top:9px!important;
+   font-size:11px!important;line-height:1.48!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .about-copy .editorial-link{
+   margin-top:12px!important;font-size:10px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art{
+   aspect-ratio:16/9!important;max-height:190px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method{
+   padding:20px 16px 24px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top{
+   margin-block:8px 12px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top h2{
+   max-width:20ch!important;font-size:clamp(22px,5.8vw,28px)!important;
+   line-height:1.06!important;letter-spacing:-.04em!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top>p{
+   max-width:44ch!important;margin-top:8px!important;
+   font-size:10.5px!important;line-height:1.45!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps b{
+   font-size:16px!important;line-height:1.12!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps p{
+   font-size:9.5px!important;line-height:1.38!important;
+ }
+}
+@media(max-width:420px){
+ #app.balabs-ui .experience-page[data-chapter="about"] .about-copy h2,
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top h2{
+   font-size:23px!important;line-height:1.05!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"] .about-copy>p{font-size:10.5px!important;line-height:1.42!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-top>p{font-size:10px!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps p{font-size:9px!important}
+}
