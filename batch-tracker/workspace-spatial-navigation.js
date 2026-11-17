@@ -19,13 +19,35 @@
     }
   };
 
-  const labels = {
-    overviewCard: "Vue générale",
-    trackerCard: "Cultures",
-    plantCard: "Cultures végétales",
-    batchCard: "Lots de production",
-    measurementCard: "Données & observations",
-    statisticsCard: "Analyse"
+  const translations = {
+    fr: {
+      nav: "Navigation spatiale CultureOps", kicker: "ESPACE ACTIF",
+      primary: "Pilotage & opérations", secondary: "Données & analyse",
+      up: "Monter vers le pilotage", down: "Descendre vers les données",
+      left: "Module précédent", right: "Module suivant", active: "Espace actif : ",
+      labels: { overviewCard: "Vue générale", trackerCard: "Cultures", plantCard: "Cultures végétales", batchCard: "Lots de production", measurementCard: "Données & observations", statisticsCard: "Analyse" }
+    },
+    en: {
+      nav: "CultureOps spatial navigation", kicker: "ACTIVE SPACE",
+      primary: "Operations & control", secondary: "Data & analysis",
+      up: "Move up to control", down: "Move down to data",
+      left: "Previous module", right: "Next module", active: "Active space: ",
+      labels: { overviewCard: "Overview", trackerCard: "Cultures", plantCard: "Plant cultures", batchCard: "Production batches", measurementCard: "Data & observations", statisticsCard: "Analysis" }
+    },
+    pt: {
+      nav: "Navegação espacial CultureOps", kicker: "ESPAÇO ATIVO",
+      primary: "Gestão & operações", secondary: "Dados & análise",
+      up: "Subir para gestão", down: "Descer para dados",
+      left: "Módulo anterior", right: "Módulo seguinte", active: "Espaço ativo: ",
+      labels: { overviewCard: "Visão geral", trackerCard: "Culturas", plantCard: "Culturas vegetais", batchCard: "Lotes de produção", measurementCard: "Dados & observações", statisticsCard: "Análise" }
+    },
+    ar: {
+      nav: "التنقل المكاني CultureOps", kicker: "المساحة النشطة",
+      primary: "الإدارة والعمليات", secondary: "البيانات والتحليل",
+      up: "الصعود إلى الإدارة", down: "النزول إلى البيانات",
+      left: "الوحدة السابقة", right: "الوحدة التالية", active: "المساحة النشطة: ",
+      labels: { overviewCard: "نظرة عامة", trackerCard: "المزارع الفطرية", plantCard: "المحاصيل النباتية", batchCard: "دفعات الإنتاج", measurementCard: "البيانات والملاحظات", statisticsCard: "التحليل" }
+    }
   };
 
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -51,7 +73,7 @@
     if (dock || !document.querySelector(".app-toolbar")) return;
     dock = document.createElement("nav");
     dock.className = "ba-spatial-dock";
-    dock.setAttribute("aria-label", "Navigation spatiale CultureOps");
+    dock.setAttribute("aria-label", translations.fr.nav);
     dock.innerHTML = `
       <div class="ba-spatial-context">
         <span class="ba-spatial-kicker">ESPACE ACTIF</span>
@@ -99,6 +121,18 @@
     if (!dock) return;
     const map = mapForDomain();
     const current = currentModule(map);
+    const language = (window.BALabsI18n?.language || document.documentElement.lang || "fr").slice(0, 2).toLowerCase();
+    const t = translations[language] || translations.fr;
+    dock.setAttribute("aria-label", t.nav);
+    dock.querySelector(".ba-spatial-kicker").textContent = t.kicker;
+    controls.up.setAttribute("aria-label", t.up);
+    controls.up.title = t.up;
+    controls.down.setAttribute("aria-label", t.down);
+    controls.down.title = t.down;
+    controls.left.setAttribute("aria-label", t.left);
+    controls.left.title = t.left;
+    controls.right.setAttribute("aria-label", t.right);
+    controls.right.title = t.right;
     const row = activeRow(map, current);
     const rowItems = map[row].filter(available);
     const index = Math.max(0, rowItems.indexOf(current));
@@ -108,11 +142,11 @@
     const plane = dock.querySelector("#baSpatialPlane");
     const count = dock.querySelector("#baSpatialCount");
     const progress = dock.querySelector("#baSpatialProgress");
-    if (title) title.textContent = labels[current] || "Espace";
-    if (plane) plane.textContent = row === "primary" ? "Pilotage & opérations" : "Données & analyse";
+    if (title) title.textContent = t.labels[current] || "Workspace";
+    if (plane) plane.textContent = row === "primary" ? t.primary : t.secondary;
     if (count) count.textContent = String(overallIndex + 1).padStart(2, "0") + " / " + String(allItems.length).padStart(2, "0");
     if (progress) progress.style.width = ((overallIndex + 1) / Math.max(1, allItems.length) * 100) + "%";
-    if (status) status.textContent = "Espace actif : " + (labels[current] || current);
+    if (status) status.textContent = t.active + (t.labels[current] || current);
     Object.entries(controls).forEach(([direction, button]) => {
       const target = destination(direction, map, current);
       button.disabled = !target;
@@ -207,4 +241,6 @@
     syncDock();
   });
   authObserver.observe(document.body, { attributes: true, attributeFilter: ["class", "data-domain"] });
+  const languageObserver = new MutationObserver(syncDock);
+  languageObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 })();
