@@ -493,3 +493,57 @@
     max-width:100%!important;
   }
 }
+
+
+/* Usability repair: editorial content must remain visible even if an observer
+   does not fire (slow devices, fast chapter jumps, reduced motion or touch). */
+#app.balabs-ui .experience-page .rb-heading-armed,
+#app.balabs-ui .experience-page .rb-heading-armed.rb-heading-visible{
+ opacity:1!important;filter:none!important;transform:none!important;transition:none!important;
+}
+#app.balabs-ui .experience-page .rb-image-armed,
+#app.balabs-ui .experience-page .rb-image-armed.rb-image-revealed{
+ clip-path:none!important;transform:none!important;opacity:1!important;visibility:visible!important;
+ transition:none!important;will-change:auto!important;
+}
+
+/* Home chapter: keep the statement readable and the micrograph subordinate. */
+@media(min-width:761px){
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+  grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr)!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
+  min-height:min(760px,calc(100svh - 145px))!important;
+  padding:clamp(42px,5vw,72px) clamp(20px,4vw,60px) 48px!important;
+  gap:clamp(20px,3vw,42px)!important;overflow:visible!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero h1{
+  max-width:14ch!important;font-size:clamp(50px,5.8vw,88px)!important;
+  line-height:.94!important;letter-spacing:-.055em!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-micrograph{
+  grid-column:2!important;grid-row:1 / span 2!important;
+  width:100%!important;height:100%!important;min-height:360px!important;max-height:600px!important;
+  mix-blend-mode:normal!important;opacity:.72!important;
+  filter:grayscale(.55) contrast(1.06) brightness(.92)!important;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 12%,#000 42%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 12%,#000 42%)!important;
+ }
+}
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  min-height:0!important;padding:24px 16px 34px!important;gap:18px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero>div:first-of-type{order:0!important;padding:0!important}
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero h1{
+  max-width:13ch!important;font-size:clamp(42px,11vw,58px)!important;
+  line-height:.98!important;letter-spacing:-.05em!important;margin:16px 0 18px!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-micrograph{
+  order:1!important;width:100%!important;height:220px!important;min-height:220px!important;
+  max-height:260px!important;opacity:.76!important;mix-blend-mode:normal!important;
+  filter:grayscale(.5) contrast(1.05) brightness(.94)!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero .aside{order:2!important;margin:0!important;max-width:100%!important}
+ #app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-credit{display:none!important}
+}
