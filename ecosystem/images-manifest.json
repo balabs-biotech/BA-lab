@@ -5,11 +5,6 @@
     "url": "https://cdn.ncbi.nlm.nih.gov/pmc/blobs/0dfc/11698607/99ea2e80b22d/IJFS2024-5562732.001.jpg"
   },
   {
-    "id": "home-iot",
-    "file": "home-iot.png",
-    "url": "https://www.mdpi.com/sensors/sensors-22-05646/article_deploy/html/images/sensors-22-05646-g002.png"
-  },
-  {
     "id": "home-hyphae",
     "file": "home-hyphae.jpg",
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungi_seen_with_fluorescence_microscope.jpg"
@@ -80,11 +75,6 @@
     "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Microscopic_Image_of_Penicillium_conidial_fungi.jpg"
   },
   {
-    "id": "universe-iot",
-    "file": "universe-iot.png",
-    "url": "https://www.mdpi.com/sensors/sensors-22-05646/article_deploy/html/images/sensors-22-05646-g003.png"
-  },
-  {
     "id": "universe-soil",
     "file": "universe-soil.jpg",
     "url": "https://www.frontiersin.org/files/Articles/668929/fpls-12-668929-HTML/image_m/fpls-12-668929-g003.jpg"
@@ -118,11 +108,6 @@
     "id": "editorial-penicillium",
     "file": "editorial-penicillium.png",
     "url": "https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png"
-  },
-  {
-    "id": "editorial-iot",
-    "file": "editorial-iot.png",
-    "url": "https://www.mdpi.com/sensors/sensors-22-05646/article_deploy/html/images/sensors-22-05646-g004.png"
   },
   {
     "id": "editorial-soil",
