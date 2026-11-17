@@ -4,6 +4,7 @@ html body[data-domain] .container {
   grid-template-areas:
     "nav"
     "spatial"
+    "back"
     "hero"
     "message"
     "auth"
@@ -11,6 +12,7 @@ html body[data-domain] .container {
     "result" !important;
 }
 html body[data-domain] .ba-spatial-dock { grid-area:spatial !important; }
+html body[data-domain] .universe-home-link { grid-area:back !important; }
 
 
 html body[data-domain] .ba-spatial-dock {
