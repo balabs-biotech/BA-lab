@@ -734,40 +734,45 @@
               "title": "Microorganisms of agricultural interest",
               "notionId": "40173152f171817e918cc9c278aeca0d",
               "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "en-products-pleurotus",
               "title": "Pleurotus — cultivated species and resources",
               "notionId": "40273152f17181eba1bbcaf1b1d491d6",
               "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "en-products-other-fungi",
               "title": "Other fungi studied and cultivated",
               "notionId": "40273152f171812aad80e9a88edf1be6",
               "url": "https://app.notion.com/p/40273152f171812aad80e9a88edf1be6",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "en-products-fungal-resources",
               "title": "Fungal resources",
               "notionId": "40173152f1718111a73ced2825985454",
               "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "en-products-mycorrhizae",
               "title": "Mycorrhizae and biological interactions",
               "notionId": "40173152f1718101965cc766e3d7e27f",
               "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             }
           ]
         },
@@ -1058,8 +1063,9 @@
           "title": "Measurement and reproducibility",
           "notionId": "40273152f17181f896c7c040f4402212",
           "url": "https://app.notion.com/p/40273152f17181f896c7c040f4402212",
-          "description": "Sous-page directement référencée par la page R&D de cette langue.",
-          "children": []
+          "description": "Cross-reference to the same measurement and reproducibility page in the instrumentation universe.",
+          "children": [],
+          "kind": "reference"
         },
         {
           "id": "en-work-iteration",
