@@ -132,7 +132,8 @@ function updateSelection(){
  const n=selected,data=n.data,card=el("div","card"),body=el("div","card-body");
  const badge=el("span","badge badge-outline",n.level===0?t("root"):data.children?.length?t("branch"):t("leaf"));
  const title=el("h2","card-title",n.title),desc=el("p","",data.description||((data.children?.length||0)+" "+t("children")));
- const meta=el("small","",n.level+" / "+t("count")),actions=el("div","card-actions");
+ const descendants=nodes.filter(candidate=>{let parent=candidate;while(parent?.parent){if(parent.parent===n.id)return true;parent=byId.get(parent.parent);}return false;}).length;
+ const meta=el("small","", "N"+n.level+" · "+descendants+" "+t("count")),actions=el("div","card-actions");
  const focus=el("button","btn btn-primary btn-sm",t("focus"));focus.type="button";focus.onclick=()=>focusNode(n);actions.append(focus);
  if(data.url){const a=el("a","btn btn-outline btn-sm",t("open"));a.href=data.url;a.target="_blank";a.rel="noopener noreferrer";actions.append(a);}
  body.append(badge,title,desc,meta,actions);
