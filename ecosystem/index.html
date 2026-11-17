@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="./reactbits-adaptations.css?v=1">
 <link rel="stylesheet" href="./chapter-navigation.css?v=14">
 <link rel="stylesheet" href="./vengeance-adaptation.css?v=3">
+<style>#mainView,#miniView,.cluster-key{display:none!important}.scene{min-height:104px}.scenehead{min-height:88px}.scenehead .btn#open2DExplorer{background:#b96b4d;color:#111b1d;border-color:#b96b4d;font-weight:800}</style>
 </head>
 <body>
 <div class="wrap balabs-ui" id="app" dir="ltr">
@@ -75,7 +76,7 @@
 
 </section>
 
-<section class="scene" id="universe" aria-label="BALabs universe"><div class="scenehead"><div><small data-i18n="sceneKicker">02 / Univers BALabs</small><strong data-i18n="sceneTitle">Choisis un domaine pour explorer son réseau.</strong></div><button class="btn" id="homeBtn" hidden data-i18n="backHome">← Retour aux huit domaines</button><a class="btn" id="open2DExplorer" href="./explorer-2d.html">Explorer 2D / expérimental ↗</a></div>
+<section class="scene" id="universe" aria-label="BALabs universe"><div class="scenehead"><div><small data-i18n="sceneKicker">02 / Univers BALabs</small><strong data-i18n="sceneTitle">Choisis un domaine pour explorer son réseau.</strong></div><button class="btn" id="homeBtn" hidden data-i18n="backHome">← Retour aux huit domaines</button><a class="btn" id="open2DExplorer" href="./explorer-2d.html">Explorer le réseau vivant ↗</a></div>
 <div class="cluster-key" aria-label="Domain clusters"><div class="cluster-item cluster-foundations"><i aria-hidden="true"></i><span><b data-i18n="clusterBio">FONDEMENTS BIOLOGIQUES</b><small data-i18n="clusterBioSub">Biotechnologies · mycologie · TechnoSoil · R&D</small></span></div><div class="cluster-item cluster-applications"><i aria-hidden="true"></i><span><b data-i18n="clusterApply">APPLICATIONS &amp; TRANSMISSION</b><small data-i18n="clusterApplySub">Produits · ingénierie · projets · ressources</small></span></div></div><div class="view universe-closed" id="mainView">
 <svg class="network" id="sphereNetwork" aria-hidden="true" viewBox="0 0 1000 650" preserveAspectRatio="none"><g id="networkEdges"></g></svg><div class="galaxy"></div><div class="galaxy g2"></div><button class="hub" id="openUniverse" type="button" aria-label="Ouvrir les sphères BALabs"><div><strong>BA</strong><small data-i18n="coreLabel">NOYAU BALABS</small><span class="hubhint" data-i18n="hubHint">Cliquer pour explorer ↓</span></div></button>
 <button class="sphere sp-bio active" data-sphere="bio" style="--c:var(--bio)"><span class="idx">01</span><b data-sphere-title="bio">Biotechnologies</b><small data-sphere-sub="bio">Microorganismes · bioprocédés</small></button>
@@ -417,8 +418,7 @@ document.addEventListener('click',event=>{
  const id=link.dataset.domainPage||link.dataset.workPage;
  if(!pages[id])return;
  event.preventDefault();
- if(typeof window.__BALABS_3D_ENTER_DOMAIN__==='function') window.__BALABS_3D_ENTER_DOMAIN__(id);
- else location.href='./index.html?domain='+encodeURIComponent(id)+'&lang='+lang;
+ location.href='./explorer-2d.html?domain='+encodeURIComponent(id)+'&lang='+encodeURIComponent(lang);
 });
 
 /* The clean Three.js engine is the sole owner of #mainView. This legacy script keeps only site-wide language/content behavior; it must not bind sphere, hub, home or pointer navigation. */
@@ -434,10 +434,10 @@ window.addEventListener('resize',()=>{drawMiniConnections()});
  domains.parentNode.insertBefore(scene,domains);
 })();
 
-const experiment2DLink=document.getElementById('open2DExplorer');if(experiment2DLink)experiment2DLink.addEventListener('click',()=>{experiment2DLink.href='./explorer-2d.html?lang='+encodeURIComponent(lang)});
+const experiment2DLink=document.getElementById('open2DExplorer');if(experiment2DLink){experiment2DLink.href='./explorer-2d.html?lang='+encodeURIComponent(lang);experiment2DLink.addEventListener('click',event=>{event.preventDefault();location.href=experiment2DLink.href;});}
 const routeParams=new URLSearchParams(location.search);let initialLanguage=routeParams.get('lang');try{if(!['fr','en','ar','pt'].includes(initialLanguage)){const savedLanguage=localStorage.getItem('balabs-language');if(['fr','en','ar','pt'].includes(savedLanguage))initialLanguage=savedLanguage}}catch(_){}if(!['fr','en','ar','pt'].includes(initialLanguage))initialLanguage='fr';setLanguage(initialLanguage);applyOrbit();
 </script>
-<script type="module" src="./engine-v2.js?v=20261116-domain-hit-targets-4"></script>
+<!-- Vernpixi 2D is the primary explorer. The legacy 3D engine remains in Git history as a rollback reference. -->
 
 <script src="./method-interaction.js?v=1"></script>
 
