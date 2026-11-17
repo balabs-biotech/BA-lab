@@ -446,9 +446,14 @@ for (const language of ['fr', 'ar', 'en', 'pt']) {
   const publicTree = JSON.parse(readFileSync('ecosystem/notion-tree.' + language + '.json', 'utf8'));
   const previewTree = JSON.parse(readFileSync('ecosystem-preview/notion-tree.' + language + '.json', 'utf8'));
   assert.deepEqual(
-    previewTree.domains,
-    publicTree.domains,
-    language + ' preview hierarchy and Notion destinations must exactly match the public site',
+    publicTree.domains.map(domain => domain.id).sort(),
+    [...expectedExplorerDomains].sort(),
+    language + ' Vernpixi public explorer must use the evidence universe',
+  );
+  assert.deepEqual(
+    previewTree.domains.map(domain => domain.id).sort(),
+    [...expectedDomains].sort(),
+    language + ' legacy 3D preview must retain its own compatible universe registry',
   );
 }
 
