@@ -704,40 +704,45 @@
               "title": "Microorganismes d’intérêt agricole",
               "notionId": "3e273152f171814187cbd78d7b0a4a94",
               "url": "https://app.notion.com/p/3e273152f171814187cbd78d7b0a4a94",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "fr-products-pleurotus",
               "title": "Pleurotus — espèces et ressources cultivées",
               "notionId": "40073152f17181d1822cfb0e92d55485",
               "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "fr-products-other-fungi",
               "title": "Autres champignons cultivés et étudiés",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
               "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "fr-products-fungal-resources",
               "title": "Ressources fongiques",
               "notionId": "3e273152f1718172bb0be5342cc16e0e",
               "url": "https://app.notion.com/p/3e273152f1718172bb0be5342cc16e0e",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             },
             {
               "id": "fr-products-mycorrhizae",
               "title": "Mycorhizes & interactions biologiques",
               "notionId": "3e273152f17181c88bbbe98171594535",
               "url": "https://app.notion.com/p/3e273152f17181c88bbbe98171594535",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
+              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
+              "children": [],
+              "kind": "reference"
             }
           ]
         },
