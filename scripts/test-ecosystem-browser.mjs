@@ -78,10 +78,27 @@ try {
           width: image.naturalWidth,
           alt: image.alt || ''
         }));
-        return { chapter: chapterId, images: records, missing: records.filter(image => !image.loaded).map(image => image.src) };
+        const backgroundUrls = [...new Set([...root.querySelectorAll('*')].flatMap(el => {
+          const value = getComputedStyle(el).backgroundImage || '';
+          return [...value.matchAll(/url\\(["']?(.*?)["']?\\)/g)].map(match => match[1]).filter(url => url && !url.startsWith('data:') && !url.startsWith('blob:'));
+        }))];
+        const backgrounds = await Promise.all(backgroundUrls.map(url => new Promise(resolve => {
+          const image = new Image();
+          image.onload = () => resolve({src:url,loaded:true,width:image.naturalWidth});
+          image.onerror = () => resolve({src:url,loaded:false,width:0});
+          image.src = url;
+        })));
+        return {
+          chapter: chapterId,
+          images: records,
+          missing: records.filter(image => !image.loaded).map(image => image.src),
+          backgrounds,
+          missingBackgrounds: backgrounds.filter(image => !image.loaded).map(image => image.src)
+        };
       }, chapter);
       chapterImageAudits.push(audit);
-      assert.deepEqual(audit.missing, [], 'All images in chapter ' + chapter + ' must decode');
+      assert.deepEqual(audit.missing, [], 'All img elements in chapter ' + chapter + ' must decode');
+      assert.deepEqual(audit.missingBackgrounds, [], 'All CSS background images in chapter ' + chapter + ' must decode');
       const presentation = await page.evaluate((chapterId) => {
         const root = document.querySelector('#chapter-' + chapterId);
         const headings = [...root.querySelectorAll('.rb-heading-armed')];
@@ -94,6 +111,17 @@ try {
       assert.equal(presentation.hiddenImages, 0, 'No editorial image may remain clipped or hidden in ' + chapter);
       await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
     }
+    // Scroll the track independently of the rail and verify that the active point follows it.
+    await page.evaluate(() => {
+      const track = document.querySelector('#experienceTrack');
+      track.scrollTo({ left: track.clientWidth * 3, behavior: 'instant' });
+    });
+    await page.waitForFunction(() => {
+      const track = document.querySelector('#experienceTrack');
+      return Math.abs(track.scrollLeft - track.clientWidth * 3) < 3 &&
+        document.querySelectorAll('.chapter-rail-node')[3]?.getAttribute('aria-current') === 'step' &&
+        document.querySelector('#chapter-catalogue')?.getAttribute('aria-current') === 'page';
+    }, undefined, { timeout: 10000 });
     const allChapterImageAudits = chapterImageAudits.flatMap(audit => audit.images);
     assert.ok(allChapterImageAudits.length > 0, 'Editorial chapters must contain real image elements');
     const catalogueVisuals = await page.locator('.product-catalogue-visual-img').evaluateAll(imgs => ({count:imgs.length,unique:new Set(imgs.map(img=>img.currentSrc||img.src)).size,loaded:imgs.every(img=>img.complete&&img.naturalWidth>0)}));
