@@ -66,9 +66,39 @@ function buildNetwork(){
   const usedA=new Set(),usedB=new Set();let linked=0;
   for(const candidate of candidates){if(usedA.has(candidate.a.id)||usedB.has(candidate.b.id))continue;edges.push({a:candidate.a,b:candidate.b,depth:1,cross:true,seed:hash(candidate.a.id+candidate.b.id)});usedA.add(candidate.a.id);usedB.add(candidate.b.id);if(++linked===2)break;}
  }
- // Anastomoses connect nearby branches at each level without turning the map into a grid.
- const levels=new Map();nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
- levels.forEach(group=>{group.forEach((n,i)=>{if(i%3===0&&group.length>3){const other=group[(i+2)%group.length];if(n.parent!==other.id&&other.parent!==n.id)edges.push({a:n,b:other,depth:n.level,cross:true,seed:hash(n.id+other.id)});}})});
+ // Local anastomoses follow spatial proximity, not array order. Each hypha can
+ // form one restrained side-connection at its depth, creating irregular meshes
+ // while avoiding long chords and the visual regularity of a grid.
+ const levels=new Map();
+ nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
+ let localAnastomoses=0;
+ levels.forEach(group=>{
+  if(group.length<4)return;
+  const candidates=[];
+  const nearestDistances=[];
+  group.forEach((a,i)=>{
+   const nearby=group.filter((b,j)=>j!==i&&a.parent!==b.parent)
+    .map(b=>({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)}))
+    .sort((x,y)=>x.d-y.d).slice(0,3);
+   if(nearby.length)nearestDistances.push(nearby[0].d);
+   nearby.forEach(pair=>candidates.push(pair));
+  });
+  nearestDistances.sort((a,b)=>a-b);
+  const median=nearestDistances[Math.floor(nearestDistances.length/2)]||60;
+  const maxDistance=clamp(median*2.8,48,175);
+  candidates.sort((a,b)=>a.d-b.d);
+  const degree=new Map(),existing=new Set();
+  for(const edge of edges){if(!edge.cross)continue;existing.add([edge.a.id,edge.b.id].sort().join("|"));}
+  for(const pair of candidates){
+   if(pair.d>maxDistance)break;
+   if((degree.get(pair.a.id)||0)>=1||(degree.get(pair.b.id)||0)>=1)continue;
+   const key=[pair.a.id,pair.b.id].sort().join("|");
+   if(existing.has(key))continue;
+   edges.push({a:pair.a,b:pair.b,depth:pair.a.level,cross:true,seed:hash(key)});
+   existing.add(key);degree.set(pair.a.id,1);degree.set(pair.b.id,1);localAnastomoses++;
+  }
+ });
+ canvas.dataset.localAnastomoses=String(localAnastomoses);
  canvas.dataset.universeCount=String(roots);
  canvas.dataset.nodeCount=String(nodes.length);
  canvas.dataset.edgeCount=String(edges.length);
