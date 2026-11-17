@@ -33,7 +33,7 @@ assert.match(html, /<link rel="stylesheet" href="\.\/brand-system\.css\?v=\d+">/
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 const chapterNavigationJs = readFileSync('ecosystem/chapter-navigation.js', 'utf8');
 const chapterNavigationCss = readFileSync('ecosystem/chapter-navigation.css', 'utf8');
-assert.ok(html.includes('chapter-navigation.css?v=19') && html.includes('chapter-navigation.js?v=20'), 'Public homepage must load the chapter navigation assets');
+assert.ok(html.includes('chapter-navigation.css?v=19') && html.includes('chapter-navigation.js?v=21'), 'Public homepage must load the chapter navigation assets');
 assert.ok(chapterNavigationJs.includes("rail.className='chapter-rail'") && chapterNavigationJs.includes("document.body.append(rail)") && chapterNavigationJs.includes("b.addEventListener('click',()=>go(i))"), 'Chapter navigation must expose clickable side-point navigation');
 assert.ok(chapterNavigationCss.includes('.chapter-rail{') && chapterNavigationCss.includes('position:fixed!important'), 'Side-point navigation must remain fixed above the horizontal chapter track');
 
