@@ -31,6 +31,8 @@ for (const language of expectedLanguages) {
     if (node.kind === 'section') {
       assert.ok(!node.url && !node.notionId, trail + ': a heading-derived section must not invent a Notion page destination');
       assert.ok((node.children || []).length > 0, trail + ': a heading-derived section must contain verified Notion pages');
+    } else if (node.kind === 'label') {
+      assert.ok(!node.url && !node.notionId && !(node.children || []).length, trail + ': a non-navigable topic label must not invent a Notion page destination');
     } else if (node.kind === 'reference') {
       assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-universe Notion reference URL');
       assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': reference URL and page ID must match');
