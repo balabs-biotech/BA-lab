@@ -2,11 +2,11 @@
 (()=> {
  const track=document.getElementById('experienceTrack');if(!track||track.dataset.atmosphereReady)return;track.dataset.atmosphereReady='true';
  const visuals={
-  home:{src:'./assets/chapter-home.jpg',alt:'Mycélium fongique dans une préparation microscopique LPCB',tag:'LIVING NETWORK',credit:'Ajay Kumar Chaurasiya · CC BY',page:'https://commons.wikimedia.org/wiki/File:Fungal_mycelium.jpg'},
-  research:{src:'./assets/chapter-research.jpg',alt:'Culture fongique en boîte de Petri dans un contexte de recherche biochimique',tag:'EXPERIMENTAL CULTURE',credit:'Yakuzakorat · CC BY',page:'https://commons.wikimedia.org/wiki/File:Fungus_in_glass_dish28.jpg'},
+  home:{src:'./assets/chapter-home.jpg',alt:'Morphologies de croissance de Pleurotus ostreatus sur milieux de culture à différents pH',tag:'PLEUROTUS / CULTURE MORPHOLOGY',credit:'Maseko et al. · International Journal of Food Science · CC BY 4.0',page:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/'},
+  research:{src:'./assets/chapter-research.jpg',alt:'Croissance de Pleurotus ostreatus sur plusieurs formulations de milieux nutritifs',tag:'NUTRIENT MEDIA / CULTURE',credit:'Maseko et al. · International Journal of Food Science · CC BY 4.0',page:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/'},
   network:{src:'./assets/chapter-network.jpg',alt:'Croissance fongique en boîte de Petri lors d’une fermentation à l’état solide',tag:'BIOPROCESS / CULTURE',credit:'Luis Fernando Flores LAB · CC BY',page:'https://commons.wikimedia.org/wiki/File:Petri_dish_with_solid-state_fermentation.jpg'},
   catalogue:{src:'./assets/chapter-catalogue.jpg',alt:'Pleurotus ostreatus cultivé sur substrat à base de copeaux de bois',tag:'CULTURES & MATERIALS',credit:'Zinnmann · Wikimedia Commons',page:'https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_025-047.jpg'},
-  about:{src:'./assets/chapter-about.jpg',alt:'Hyphes fongiques dans une préparation microscopique LPCB',tag:'BIOLOGIE EXPÉRIMENTALE',credit:'Ajay Kumar Chaurasiya · CC BY 4.0',page:'https://commons.wikimedia.org/wiki/File:Fungal_hyphae_in_LPCB_preparation_of_culture_microscopic_examination.jpg'}
+  about:{src:'./assets/chapter-about.jpg',alt:'Mycélium de Pleurotus ostreatus et microstructure observée au microscope électronique',tag:'MYCELIUM / MICROSTRUCTURE',credit:'Maseko et al. · International Journal of Food Science · CC BY 4.0',page:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11698607/'}
  };
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  Object.entries(visuals).forEach(([key,data])=>{
