@@ -59,18 +59,27 @@ export async function createPixiRenderer(canvas){
    pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",learn:"RECURSOS"}
   };
   const candidates=[];
+  const byId=new Map(nodes.map(n=>[n.id,n]));
+  const lineage=new Set();let ancestor=selected;
+  while(ancestor){lineage.add(ancestor.id);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
-   const show=n.level===0||(alpha>.5&&scale>(n.level===1?.72:n.level===2?1.3:n.level===3?2.55:4.3))||selected?.id===n.id;
-   if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:n.level===0?1:2});
+   const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
+   if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
+   const threshold=n.level===0?0:n.level===1?.72:n.level===2?1.3:n.level===3?2.55:4.3;
+   const show=n.level===0||(alpha>.5&&scale>threshold)||lineage.has(n.id);
+   if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
-  candidates.sort((a,b)=>a.priority-b.priority);
-  const occupied=[];
+  candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
+  const rootCount=candidates.filter(c=>c.n.level===0).length;
+  const labelBudget=rootCount+Math.min(34,Math.max(8,Math.round(10+scale*5)));
+  const occupied=[];let drawn=0;
   for(const {n,alpha} of candidates){
+   if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
    const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
-   const fontSize=clamp((n.level===0?11:9)*Math.sqrt(scale),n.level===0?8:7,n.level===0?13:12);
+   const fontSize=n.level===0?clamp(9+Math.log2(Math.max(.5,scale))*1.1,8,10.5):clamp(7.5+Math.log2(Math.max(.7,scale))*.65,7,9.5);
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
@@ -78,9 +87,9 @@ export async function createPixiRenderer(canvas){
    const x=clamp(sx+dx*radius,5,width-5),y=clamp(sy+dy*radius,64,height-18);
    label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=alpha;label.visible=true;
    const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
-   const collides=occupied.some(o=>box.left<o.right+5&&box.right>o.left-5&&box.top<o.bottom+4&&box.bottom>o.top-4);
+   const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
-   occupied.push(box);live.add(n.id);
+   occupied.push(box);live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
   app.render();
