@@ -12,7 +12,7 @@ export async function createPixiRenderer(canvas){
  const field=new Graphics(),filaments=new Graphics(),junctions=new Graphics(),labels=new Container();
  app.stage.addChild(field,filaments,junctions,labels);
  const labelPool=new Map();
- const style=new TextStyle({fontFamily:"Inter, system-ui, sans-serif",fontSize:12,fill:0xe4e7dd,fontWeight:"500",stroke:{color:0x111b1d,width:3},align:"center"});
+ const style=new TextStyle({fontFamily:"Inter, system-ui, sans-serif",fontSize:12,fill:0xf2f1e9,fontWeight:"600",stroke:{color:0x07100f,width:4.5},align:"center"});
  let lastWidth=0,lastHeight=0;
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
  const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
@@ -22,22 +22,12 @@ export async function createPixiRenderer(canvas){
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
   const biome=selected?(PALETTE[selected.rootId]||0x78958a):0x78958a;
-  for(let i=0;i<110;i++){const x=(i*137.51)%width,y=(i*83.71)%height;field.circle(x,y,i%9===0?1.1:.6).fill({color:i%7===0?0xb96b4d:0xd1d0c5,alpha:i%5===0?.16:.055});}
   // A restrained microscopy-like hyphal grain sits behind the navigable network.
   // Its geometry is deterministic; only the spore drift animates.
   for(let i=0;i<18;i++){
    const seed=hash("field-hypha-"+i),x=(seed%997)/997*width,y=((seed>>>9)%991)/991*height;
    const length=24+(seed%86),bend=((seed>>>7)%41)-20,side=(seed&1)?1:-1;
    field.moveTo(x,y).quadraticCurveTo(x+length*.48,y+bend*side,x+length,y+bend*.28).stroke({color:biome,alpha:selected?.035:.022,width:.65,cap:"round"});
-   if(i%3===0){field.circle(x+length,y+bend*.28,1.15).fill({color:0xb96b4d,alpha:.15});}
-  }
-  if(!reduced){
-   for(let i=0;i<24;i++){
-    const seed=hash("spore-"+i),phase=time*.000018+(seed%1000)/1000;
-    const x=((seed%997)/997*width+Math.sin(phase*6.28+i)*7+width)%width;
-    const y=(((seed>>>8)%991)/991*height-phase*9+height*2)%height;
-    field.circle(x,y,i%5===0?1.45:.8).fill({color:i%6===0?0xb96b4d:biome,alpha:i%4===0?.2:.11});
-   }
   }
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
@@ -70,7 +60,7 @@ export async function createPixiRenderer(canvas){
   }
   for(const n of nodes){
    let alpha=alphaFor(n.level);if(alpha<.015)continue;
-   if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
+   if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.34;
    const r=Math.max(1.25,n.r),color=PALETTE[n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
    if(n.level<=1)junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
    const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
@@ -112,7 +102,7 @@ export async function createPixiRenderer(canvas){
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
    const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
    const x=clamp(sx+dx*radius,5,width-5),y=clamp(sy+dy*radius,64,height-18);
-   label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=alpha;label.visible=true;
+   label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=Math.max(alpha,selected?0.76:0.88);label.visible=true;
    const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
