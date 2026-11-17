@@ -173,7 +173,7 @@
   position:relative!important;isolation:isolate!important;
   background:
     linear-gradient(90deg,rgba(17,27,29,.96) 0%,rgba(17,27,29,.88) 54%,rgba(17,27,29,.34) 100%),
-    url("https://upload.wikimedia.org/wikipedia/commons/8/82/Fungus_in_glass_dish3.jpg") right 28%/46% 100% no-repeat,
+    url("./assets/chapter-about-method.jpg") right 28%/46% 100% no-repeat,
     linear-gradient(145deg,#263b38 0%,#1c302d 58%,#172522 100%)!important;
 }
 #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:before{
@@ -193,7 +193,7 @@
    padding:26px 18px 30px!important;
    background:
      linear-gradient(90deg,rgba(17,27,29,.91),rgba(17,27,29,.76)),
-     url("https://upload.wikimedia.org/wikipedia/commons/8/82/Fungus_in_glass_dish3.jpg") center/cover no-repeat,
+     url("./assets/chapter-about-method.jpg") center/cover no-repeat,
      linear-gradient(145deg,#263b38,#172522)!important;
  }
  #app.balabs-ui .experience-page[data-chapter="about"] .method-top{max-width:100%!important}
