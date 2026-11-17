@@ -265,3 +265,10 @@ body{overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){
  .chapter-rail .filament-progress,.chapter-rail .chapter-rail-dot{transition:none!important}
 }
+
+/* Reliable touch target and viewport anchoring for the five chapter markers. */
+body>.chapter-rail{position:fixed!important;z-index:2147483647!important;pointer-events:none!important;}
+body>.chapter-rail .chapter-rail-node{pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent;cursor:pointer;}
+body>.chapter-rail .chapter-rail-nodes{pointer-events:auto!important;}
+body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
+@media(max-width:760px){body>.chapter-rail{left:0!important;right:auto!important;}[dir=rtl] body>.chapter-rail{left:auto!important;right:0!important;}}
