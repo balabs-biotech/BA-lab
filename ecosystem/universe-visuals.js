@@ -17,8 +17,7 @@
  cards.forEach((card,index)=>{
   const data=images[card.dataset.domainPage];if(!data)return;
   const figure=document.createElement('figure');figure.className='universe-visual';
-  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=index<4?'eager':'lazy';img.decoding='async';img.referrerPolicy='no-referrer';
-  img.addEventListener('error',()=>{figure.classList.add('is-unavailable');card.classList.add('visual-fallback')},{once:true});
+  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading=index<4?'eager':'lazy';img.decoding='async';
   const caption=document.createElement('figcaption');
   const subject=document.createElement('span');subject.textContent=data.label;
   const credit=document.createElement('small');credit.textContent='IMAGE / '+data.credit;
