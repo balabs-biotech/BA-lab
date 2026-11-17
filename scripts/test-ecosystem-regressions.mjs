@@ -141,6 +141,8 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
       } else if (node.kind === 'section') {
         assert.ok(!node.notionId, language + ' ' + node.id + ' heading-derived section must not invent a Notion page ID');
         assert.ok((node.children || []).length > 0, language + ' ' + node.id + ' section must contain verified Notion pages');
+      } else if (node.kind === 'label') {
+        assert.ok(!node.notionId && !(node.children || []).length, language + ' ' + node.id + ' label must be a non-navigable heading without a fabricated Notion page');
       } else {
         assert.equal(node, domain, language + ' only a universe root or explicit section may omit its own Notion URL');
         assert.ok((node.children || []).length > 0, language + ' an unlinked universe root must still expose real child pages');
