@@ -12,10 +12,10 @@ SIGNATURES = {
 }
 def download(url):
     last = None
-    for attempt in range(3):
+    for attempt in range(4):
         try:
             req = Request(url, headers={"User-Agent":"BALabs-SiteAssetBuilder/1.0 (GitHub Pages image packaging)"})
-            with urlopen(req, timeout=18) as response:
+            with urlopen(req, timeout=22) as response:
                 data = response.read(20 * 1024 * 1024 + 1)
                 if len(data) > 20 * 1024 * 1024:
                     raise RuntimeError("image exceeds 20 MB")
@@ -28,7 +28,8 @@ def download(url):
                 return data, final_url, content_type
         except Exception as exc:
             last = exc
-            time.sleep(1.5 * (attempt + 1))
+            delay = (10, 18, 28, 40)[attempt] if getattr(exc, 'code', None) == 429 else (2, 5, 10, 15)[attempt]
+            time.sleep(delay)
     raise RuntimeError(str(last))
 def main():
     parser = argparse.ArgumentParser()
@@ -48,12 +49,13 @@ def main():
             raise RuntimeError(f"response is not a valid {ext} image (Content-Type: {mime}; final URL: {final_url})")
         (out / item["file"]).write_bytes(data)
         return f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}"
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=1) as pool:
         jobs = {pool.submit(fetch_one, item): item for item in entries}
         for future in as_completed(jobs):
             item = jobs[future]
             try:
                 print(future.result())
+                time.sleep(1.25)  # stay below Wikimedia Commons request limits
             except Exception as exc:
                 failures.append((item["id"], str(exc)))
                 print(f"FAIL {item['id']}: {exc}", file=sys.stderr)
