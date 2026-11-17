@@ -28,8 +28,14 @@ const brandCss = readFileSync('ecosystem/brand-system.css', 'utf8');
 const baseCss = readFileSync('ecosystem/site-base.css', 'utf8');
 const overridesCss = readFileSync('ecosystem/site-overrides.css', 'utf8');
 const pageCss = [baseCss, brandCss, overridesCss].join('\n');
-assert.ok(html.includes('<link rel="stylesheet" href="./brand-system.css?v=14">'), 'Public homepage must load the BA Labs visual system');
+assert.match(html, /<link rel="stylesheet" href="\.\/brand-system\.css\?v=\d+">/, 'Public homepage must load the BA Labs visual system');
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
+const chapterNavigationJs = readFileSync('ecosystem/chapter-navigation.js', 'utf8');
+const chapterNavigationCss = readFileSync('ecosystem/chapter-navigation.css', 'utf8');
+assert.ok(html.includes('chapter-navigation.css?v=17') && html.includes('chapter-navigation.js?v=16'), 'Public homepage must load the chapter navigation assets');
+assert.ok(chapterNavigationJs.includes("rail.className='chapter-rail'") && chapterNavigationJs.includes("b.addEventListener('click',()=>go(i))"), 'Chapter navigation must expose clickable side-point navigation');
+assert.ok(chapterNavigationCss.includes('.chapter-rail{') && chapterNavigationCss.includes('position:fixed!important'), 'Side-point navigation must remain fixed above the horizontal chapter track');
+
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
   assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
   assert.ok(!brandCss.includes('#app.balabs-ui > .' + section), 'Visual system must not target ' + section + ' as a direct app child');
