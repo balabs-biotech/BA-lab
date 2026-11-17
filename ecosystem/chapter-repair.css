@@ -1,0 +1,123 @@
+/* BA Labs — repair pass: image visibility, method chapter completeness and restrained motion. */
+#app.balabs-ui .experience-page[data-chapter="home"]>.chapter-atmosphere{
+  opacity:.58!important;width:min(42%,610px)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.25) 12%,#000 46%,#000 78%,transparent 100%),linear-gradient(180deg,#000 0%,rgba(0,0,0,.82) 70%,transparent 100%)!important;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.25) 12%,#000 46%,#000 78%,transparent 100%),linear-gradient(180deg,#000 0%,rgba(0,0,0,.82) 70%,transparent 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.chapter-atmosphere img{
+  filter:grayscale(1) saturate(0) contrast(1.16) brightness(.76)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero .hero-micrograph{
+  filter:grayscale(1) saturate(0) contrast(1.12) brightness(.72)!important;
+  opacity:.2!important;
+}
+#app.balabs-ui .experience-page[data-chapter="home"]>.hero canvas{
+  opacity:.16!important;filter:grayscale(1)!important;mix-blend-mode:screen!important;
+}
+/* The final chapter must read as a complete editorial spread, not a cropped background. */
+#app.balabs-ui .experience-page[data-chapter="about"]{
+  overflow-y:auto!important;overflow-x:hidden!important;
+  padding-bottom:clamp(84px,10vh,120px)!important;
+  scroll-padding-bottom:100px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere{
+  position:relative!important;inset:auto!important;z-index:1!important;
+  display:block!important;width:100%!important;max-width:1320px!important;
+  height:clamp(190px,27vw,330px)!important;margin:0 auto clamp(24px,4vw,48px)!important;
+  opacity:1!important;overflow:hidden!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%)!important;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere img{
+  width:100%!important;height:100%!important;object-fit:cover!important;
+  object-position:center 48%!important;
+  filter:grayscale(.82) saturate(.22) contrast(1.18) brightness(.76)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere:after{
+  background:linear-gradient(90deg,rgba(17,27,29,.12),transparent 22%,transparent 76%,rgba(17,27,29,.22)),linear-gradient(0deg,rgba(17,27,29,.72),transparent 60%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about,
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method,
+#app.balabs-ui .experience-page[data-chapter="about"]>.value-principles,
+#app.balabs-ui .experience-page[data-chapter="about"]>.foot{
+  position:relative!important;z-index:2!important;overflow:visible!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method{
+  min-height:0!important;height:auto!important;overflow:visible!important;
+  padding-block:clamp(42px,6vw,78px)!important;
+  background:
+    radial-gradient(ellipse at 88% 12%,rgba(145,169,154,.13),transparent 34%),
+    linear-gradient(145deg,#263b38 0%,#1c302d 58%,#172522 100%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-top,
+#app.balabs-ui .experience-page[data-chapter="about"] .method-steps{
+  position:relative!important;z-index:2!important;max-width:1180px!important;
+  margin-inline:auto!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-steps{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:0!important;overflow:visible!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-steps li{
+  min-width:0!important;min-height:190px!important;height:auto!important;
+  padding:22px 18px 26px!important;overflow:visible!important;
+  border-top:1px solid rgba(209,208,197,.28)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-trigger{
+  display:grid!important;grid-template-columns:34px minmax(0,1fr) 18px!important;
+  align-items:start!important;gap:12px!important;width:100%!important;
+  min-height:130px!important;padding:0!important;text-align:start!important;
+  background:transparent!important;border:0!important;color:#f2f1e9!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-trigger-copy{min-width:0!important}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-steps b{
+  margin:3px 0 12px!important;font-size:clamp(21px,2vw,28px)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-steps p{
+  max-width:34ch!important;color:#d1d0c5!important;font-size:12px!important;line-height:1.75!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-trigger[aria-expanded="true"] .method-arrow{
+  color:#d99a7f!important;transform:rotate(45deg)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-arrow{
+  transition:transform .45s cubic-bezier(.16,1,.3,1),color .3s ease!important;
+}
+/* Animated mycelial signal: a quiet moving filament, never an orange wash. */
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:before{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.62;
+  background:
+    radial-gradient(ellipse at 18% 78%,rgba(145,169,154,.12),transparent 28%),
+    radial-gradient(ellipse at 78% 28%,rgba(185,107,77,.08),transparent 26%);
+  animation:bal-method-atmosphere 18s ease-in-out infinite alternate;
+}
+#app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:after{
+  content:"";position:absolute;z-index:1;inset:12% 4%;pointer-events:none;opacity:.22;
+  background:repeating-linear-gradient(118deg,transparent 0 72px,rgba(209,208,197,.22) 73px,transparent 74px 138px);
+  mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);
+  animation:bal-method-filament 24s linear infinite alternate;
+}
+#app.balabs-ui .experience-page[data-chapter="about"] .method-detail[hidden]{display:none!important}
+#app.balabs-ui .experience-page[data-chapter="about"] #methodDetail{
+  position:relative!important;z-index:3!important;max-width:1180px!important;margin:28px auto 0!important;
+  overflow:visible!important;
+}
+@keyframes bal-method-atmosphere{from{transform:translate3d(-1%,0,0);opacity:.35}to{transform:translate3d(1%,1.5%,0);opacity:.8}}
+@keyframes bal-method-filament{from{background-position:0 0;transform:translateX(-1%)}to{background-position:220px 0;transform:translateX(1%)}}
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="home"]>.chapter-atmosphere{width:58%!important;height:clamp(145px,40vw,190px)!important;opacity:.46!important}
+ #app.balabs-ui .experience-page[data-chapter="about"]{padding-bottom:110px!important}
+ #app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere{height:clamp(150px,43vw,220px)!important;margin-bottom:22px!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps li{min-height:0!important;padding:18px 10px 22px!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-trigger{grid-template-columns:26px minmax(0,1fr) 14px!important;gap:8px!important;min-height:0!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps b{font-size:21px!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps p{font-size:11px!important}
+}
+@media(max-width:420px){
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps{grid-template-columns:1fr!important}
+ #app.balabs-ui .experience-page[data-chapter="about"] .method-steps li{padding:18px 0!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:before,
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method:after{animation:none!important}
+}
