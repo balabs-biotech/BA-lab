@@ -72,6 +72,62 @@
                   "url": "https://app.notion.com/p/40273152f17181a1ac41c6b2e83a8fa1",
                   "description": "Página filha verificada na estrutura pública do Notion.",
                   "children": []
+                },
+                {
+                  "id": "pt-myco-djamor",
+                  "title": "Pleurotus djamor — ficha do organismo",
+                  "notionId": "40173152f171816c9898d836c4e587eb",
+                  "url": "https://app.notion.com/p/40173152f171816c9898d836c4e587eb",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-citrinopileatus",
+                  "title": "Pleurotus citrinopileatus — ficha do organismo",
+                  "notionId": "40173152f1718100862be142bdd4824b",
+                  "url": "https://app.notion.com/p/40173152f1718100862be142bdd4824b",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-ostreatus",
+                  "title": "Pleurotus ostreatus — ficha da espécie",
+                  "notionId": "40173152f1718185b8ffcdb50b2d8d1d",
+                  "url": "https://app.notion.com/p/40173152f1718185b8ffcdb50b2d8d1d",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-eryngii",
+                  "title": "Pleurotus eryngii e híbridos — perfil do grupo",
+                  "notionId": "40173152f171817d8b8acbf34382eb07",
+                  "url": "https://app.notion.com/p/40173152f171817d8b8acbf34382eb07",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-hk35",
+                  "title": "HK35 — perfil de estirpe e recurso",
+                  "notionId": "40173152f17181629641f663cb8abcd3",
+                  "url": "https://app.notion.com/p/40173152f17181629641f663cb8abcd3",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-p80",
+                  "title": "P80 — perfil de estirpe e recurso",
+                  "notionId": "40173152f1718194a960d2011187b860",
+                  "url": "https://app.notion.com/p/40173152f1718194a960d2011187b860",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-pulmonarius",
+                  "title": "Pleurotus pulmonarius — perfil da espécie e cultivo",
+                  "notionId": "40273152f1718185862ec2926a91f721",
+                  "url": "https://app.notion.com/p/40273152f1718185862ec2926a91f721",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
                 }
               ]
             },
@@ -96,6 +152,78 @@
                   "notionId": "40273152f17181669cd8dd135bce91f3",
                   "url": "https://app.notion.com/p/40273152f17181669cd8dd135bce91f3",
                   "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-calocybe",
+                  "title": "Calocybe indica — ficha do organismo",
+                  "notionId": "40173152f17181eeba21c621278f2ae6",
+                  "url": "https://app.notion.com/p/40173152f17181eeba21c621278f2ae6",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-ganoderma",
+                  "title": "Ganoderma lucidum — ficha do organismo",
+                  "notionId": "40173152f17181e79ddbd6950bce763d",
+                  "url": "https://app.notion.com/p/40173152f17181e79ddbd6950bce763d",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-hericium",
+                  "title": "Hericium erinaceus — ficha do organismo",
+                  "notionId": "40173152f171810ab499d4dac7e2fdc3",
+                  "url": "https://app.notion.com/p/40173152f171810ab499d4dac7e2fdc3",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-cordyceps",
+                  "title": "Cordyceps militaris — ficha do organismo",
+                  "notionId": "40173152f171816484f5eb9651855f2a",
+                  "url": "https://app.notion.com/p/40173152f171816484f5eb9651855f2a",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-lentinula",
+                  "title": "Lentinula edodes — ficha do organismo",
+                  "notionId": "40173152f171815fbc82cce01f2980f6",
+                  "url": "https://app.notion.com/p/40173152f171815fbc82cce01f2980f6",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-pholiota",
+                  "title": "Pholiota adiposa — ficha do organismo",
+                  "notionId": "40173152f171816db975e9457fb536ff",
+                  "url": "https://app.notion.com/p/40173152f171816db975e9457fb536ff",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-trametes",
+                  "title": "Trametes versicolor — ficha do organismo",
+                  "notionId": "40173152f1718188a519dc92863cdb0a",
+                  "url": "https://app.notion.com/p/40173152f1718188a519dc92863cdb0a",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-hypsizygus-ulmarius",
+                  "title": "Hypsizygus ulmarius — ficha do organismo",
+                  "notionId": "40173152f17181b9bd46f76fea6de022",
+                  "url": "https://app.notion.com/p/40173152f17181b9bd46f76fea6de022",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "pt-myco-hypsizygus-marmoreus",
+                  "title": "Hypsizygus marmoreus — ficha do organismo",
+                  "notionId": "40173152f17181b5827ce46e1aebce1b",
+                  "url": "https://app.notion.com/p/40173152f17181b5827ce46e1aebce1b",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
                   "children": []
                 }
               ]
