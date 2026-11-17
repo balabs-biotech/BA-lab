@@ -1265,3 +1265,87 @@
  #app.balabs-ui > main .universe-index-card,
  #app.balabs-ui > main .work-card{will-change:auto!important}
 }
+
+
+/* PHASE 37 — catalogue as a visual field dossier.
+   Images are explicitly identified as scientific reference imagery, never product photography. */
+#app.balabs-ui > main .product-catalogue-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  padding-top:118px!important;
+  background:linear-gradient(180deg,rgba(17,27,29,.08) 0 74px,rgba(17,27,29,.96) 118px)!important;
+  border-top-color:rgba(209,208,197,.18)!important;
+  transition:transform .42s cubic-bezier(.2,.7,.2,1),border-color .35s ease,background-color .35s ease;
+}
+#app.balabs-ui > main .product-catalogue-card:after{
+  content:"VISUEL SCIENTIFIQUE · RÉFÉRENCE";
+  position:absolute;z-index:-1;inset:0 0 auto;height:96px;
+  display:flex;align-items:flex-end;padding:0 12px 9px;
+  color:rgba(230,230,216,.8);font:600 8px/1.2 ui-monospace,monospace;letter-spacing:.13em;
+  background-size:cover;background-position:center 44%;
+  border-bottom:1px solid rgba(185,107,77,.42);
+  filter:saturate(.78) contrast(1.08);
+  transition:filter .5s ease,background-position .8s ease;
+}
+#app.balabs-ui > main .product-catalogue-card:nth-child(4n+1):after{
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("https://upload.wikimedia.org/wikipedia/commons/3/31/Oyster_mushroom_%28Pleurotus_ostreatus%29_mycelium_in_petri_dish_on_coffee_grounds.JPG");
+}
+#app.balabs-ui > main .product-catalogue-card:nth-child(4n+2):after{
+ background-image:linear-gradient(180deg,rgba(17,27,29,.06),rgba(17,27,29,.8)),url("https://webstories.fontagro.org/uploads/adjuntos/3-9.jpg");
+}
+#app.balabs-ui > main .product-catalogue-card:nth-child(4n+3):after{
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png");
+}
+#app.balabs-ui > main .product-catalogue-card:nth-child(4n):after{
+ background-image:linear-gradient(180deg,rgba(17,27,29,.08),rgba(17,27,29,.78)),url("https://images.squarespace-cdn.com/content/v1/6094285c54e29a05c2abf169/1630084749140-LWY62FPY6Z0DEI5ZCEJF/IMG_2319.jpeg?format=1000w");
+}
+#app.balabs-ui > main .product-catalogue-card:hover,
+#app.balabs-ui > main .product-catalogue-card:focus-visible{
+ transform:translateY(-4px);
+ border-top-color:var(--balabs-copper)!important;
+}
+#app.balabs-ui > main .product-catalogue-card:hover:after,
+#app.balabs-ui > main .product-catalogue-card:focus-visible:after{
+ filter:saturate(1.05) contrast(1.1);
+ background-position:center 54%;
+}
+#app.balabs-ui > main .product-catalogue-card .product-ref,
+#app.balabs-ui > main .product-catalogue-card .product-kind,
+#app.balabs-ui > main .product-catalogue-card h3,
+#app.balabs-ui > main .product-catalogue-card p,
+#app.balabs-ui > main .product-catalogue-card .product-state,
+#app.balabs-ui > main .product-catalogue-card .product-open{position:relative;z-index:1}
+#app.balabs-ui > main .product-catalogue-head{
+ position:relative;isolation:isolate;
+}
+#app.balabs-ui > main .product-catalogue-head:after{
+ content:"";position:absolute;right:0;top:0;width:min(22vw,210px);height:100%;
+ pointer-events:none;opacity:.42;
+ background:radial-gradient(ellipse at 70% 35%,rgba(185,107,77,.25),transparent 58%),
+ repeating-linear-gradient(135deg,transparent 0 12px,rgba(209,208,197,.09) 13px 14px);
+ mask-image:linear-gradient(90deg,transparent,#000);
+}
+#app.balabs-ui > main .editorial-feature .editorial-art,
+#app.balabs-ui > main .editorial-about .editorial-art{position:relative;isolation:isolate}
+#app.balabs-ui > main .editorial-feature .editorial-art:after,
+#app.balabs-ui > main .editorial-about .editorial-art:after{
+ content:"";position:absolute;inset:10px;border:1px solid rgba(185,107,77,.34);
+ pointer-events:none;transform:translate(7px,7px);transition:transform .7s cubic-bezier(.2,.7,.2,1);
+}
+#app.balabs-ui > main .editorial-feature .editorial-art:hover:after,
+#app.balabs-ui > main .editorial-about .editorial-art:hover:after{transform:translate(0,0)}
+#app.balabs-ui > main .editorial-about .editorial-art svg path{
+ stroke-dasharray:1;stroke-dashoffset:0;animation:mycelial-line 12s ease-in-out infinite alternate;
+}
+@keyframes mycelial-line{from{opacity:.56}to{opacity:1}}
+@media(max-width:620px){
+ #app.balabs-ui > main .product-catalogue-card{padding-top:108px!important}
+ #app.balabs-ui > main .product-catalogue-card:after{height:88px}
+ #app.balabs-ui > main .product-catalogue-head:after{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui > main .product-catalogue-card,
+ #app.balabs-ui > main .product-catalogue-card:after,
+ #app.balabs-ui > main .editorial-feature .editorial-art:after,
+ #app.balabs-ui > main .editorial-about .editorial-art:after,
+ #app.balabs-ui > main .editorial-about .editorial-art svg path{animation:none!important;transition:none!important}
+}
