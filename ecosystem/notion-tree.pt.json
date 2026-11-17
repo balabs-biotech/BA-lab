@@ -684,6 +684,116 @@
           "url": "https://app.notion.com/p/40173152f17181888deee64e2fcc1597",
           "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
           "children": []
+        },
+        {
+          "id": "iot-environment",
+          "title": "Monitorização ambiental",
+          "description": "Acompanhar parâmetros físicos que condicionam os sistemas biológicos.",
+          "children": [
+            {
+              "id": "iot-temperature",
+              "title": "Temperatura",
+              "description": "Acompanhar gradientes, ciclos e estabilidade térmica dos espaços de cultivo."
+            },
+            {
+              "id": "iot-humidity",
+              "title": "Humidade",
+              "description": "Observar a humidade do ar e as condições de disponibilidade de água."
+            },
+            {
+              "id": "iot-gas",
+              "title": "Trocas gasosas e ventilação",
+              "description": "Estudar a ventilação e as trocas gasosas nas câmaras de cultivo."
+            }
+          ]
+        },
+        {
+          "id": "iot-instrumentation",
+          "title": "Arquitetura de instrumentação",
+          "description": "Combinar sensores, interfaces e unidades de controlo adequadas aos ensaios.",
+          "children": [
+            {
+              "id": "iot-sensors-types",
+              "title": "Sensores e sondas",
+              "description": "Comparar tecnologias de medição, gamas, precisão e limitações."
+            },
+            {
+              "id": "iot-microcontrollers",
+              "title": "Microcontroladores",
+              "description": "Explorar interfaces de leitura, entradas, saídas e unidades integradas."
+            },
+            {
+              "id": "iot-power",
+              "title": "Alimentação e segurança",
+              "description": "Documentar alimentação, proteção elétrica e fiabilidade da montagem."
+            }
+          ]
+        },
+        {
+          "id": "iot-control",
+          "title": "Controlo do cultivo",
+          "description": "Estudar o controlo gradual das condições de cultivo, distinguindo protótipos de sistemas operacionais.",
+          "children": [
+            {
+              "id": "iot-airflow",
+              "title": "Ventilação e fluxo de ar",
+              "description": "Desenhar a monitorização e o controlo da renovação do ar."
+            },
+            {
+              "id": "iot-humidification",
+              "title": "Humidificação",
+              "description": "Estudar a regulação da humidade e a distribuição de água."
+            },
+            {
+              "id": "iot-lighting",
+              "title": "Iluminação e ciclos",
+              "description": "Definir cenários de iluminação e temporização para ensaios."
+            }
+          ]
+        },
+        {
+          "id": "iot-data",
+          "title": "Aquisição e tratamento de dados",
+          "description": "Transformar sinais medidos em séries temporais úteis e comparáveis.",
+          "children": [
+            {
+              "id": "iot-logging",
+              "title": "Registo contínuo",
+              "description": "Datilhar medições e conservar dados brutos com o respetivo contexto."
+            },
+            {
+              "id": "iot-dashboard",
+              "title": "Visualização e alertas",
+              "description": "Representar tendências, limites e desvios para facilitar o acompanhamento."
+            },
+            {
+              "id": "iot-quality",
+              "title": "Qualidade das medições",
+              "description": "Identificar deriva, valores em falta, calibração e incerteza."
+            }
+          ]
+        },
+        {
+          "id": "iot-traceability-detail",
+          "title": "Rastreabilidade experimental",
+          "description": "Ligar cada medição a uma cultura, lote, protocolo e período de ensaio.",
+          "children": [
+            {
+              "id": "iot-batch-links",
+              "title": "Lotes e culturas",
+              "description": "Associar leituras aos identificadores dos lotes e às fases de cultivo."
+            },
+            {
+              "id": "iot-protocol-links",
+              "title": "Protocolos e eventos",
+              "description": "Registar alterações de parâmetros, intervenções e incidentes."
+            },
+            {
+              "id": "iot-comparison",
+              "title": "Histórico e comparações",
+              "description": "Comparar ciclos experimentais sem perder as condições iniciais."
+            }
+          ]
         }
       ],
       "notionParentId": "hub",
