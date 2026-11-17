@@ -33,7 +33,7 @@ Les images photographiques du site sont téléchargées, contrôlées et empaque
 Pour les œuvres Wikimedia Commons, la page de chaque fichier est la référence pour l'attribution et les conditions de licence. Les images fournisseurs sont identifiées séparément et ne sont pas présentées comme des œuvres Creative Commons. Les illustrations IoT, Laboratoire et Projets scientifiques en SVG sont des créations originales BA Labs. Les valeurs d'interface et morphologies expérimentales représentées sont schématiques et ne constituent pas des résultats scientifiques. Aucun auteur ni fournisseur n'endosse BA Labs.
 
 
-## Illustrations originales du catalogue
+## Photographies du catalogue
 
-- `assets/catalogue-liquid-culture.svg` — BA Labs, illustration originale d'une seringue de culture liquide (visuel de catégorie, pas une photographie ni une référence de conditionnement).
-- `assets/catalogue-water-agar.svg` — BA Labs, illustration originale d'une boîte de Petri contenant une gélose à l'eau (visuel de catégorie, pas une photographie de produit).
+- `assets/catalogue-liquid-culture.jpg` — « Fungal growth in erlenmeyer », Luis Fernando Flores LAB, photographie originale publiée sous CC BY 4.0. Source : https://commons.wikimedia.org/wiki/File:Fungal_growth_in_erlenmeyer.jpg
+- `assets/catalogue-water-agar.jpg` — « White mycelium growing on agar », Zenyrgarden, photographie originale publiée sous CC BY-SA 4.0. Source : https://commons.wikimedia.org/wiki/File:White_mycelium_growing_on_agar.jpg
