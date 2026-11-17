@@ -38,10 +38,10 @@ def audit_references(site, entries):
 
 def download(url):
     last = None
-    for attempt in range(4):
+    for attempt in range(2):
         try:
             req = Request(url, headers={"User-Agent": "BALabs-SiteAssetBuilder/1.1 (https://balabs-biotech.github.io/BA-lab/)", "Referer": "https://balabs-biotech.github.io/BA-lab/"})
-            with urlopen(req, timeout=22) as response:
+            with urlopen(req, timeout=18) as response:
                 data = response.read(20 * 1024 * 1024 + 1)
                 if len(data) > 20 * 1024 * 1024:
                     raise RuntimeError("image exceeds 20 MB")
@@ -52,7 +52,7 @@ def download(url):
                 return data, final_url, content_type
         except Exception as exc:
             last = exc
-            delay = (8, 18, 30, 45)[attempt] if getattr(exc, "code", None) == 429 else (2, 5, 10, 15)[attempt]
+            delay = (5, 10)[attempt] if getattr(exc, "code", None) == 429 else (1, 3)[attempt]
             time.sleep(delay)
     raise RuntimeError(str(last))
 
@@ -78,10 +78,10 @@ def main():
             raise RuntimeError(f"response is not a valid {ext} image (Content-Type: {mime}; final URL: {final_url})")
         (out / item["file"]).write_bytes(data)
         if "upload.wikimedia.org" in final_url:
-            time.sleep(4.0)
+            time.sleep(1.0)
         return f"OK {item['id']} {len(data)} bytes {mime} -> {final_url}"
 
-    with ThreadPoolExecutor(max_workers=1) as pool:
+    with ThreadPoolExecutor(max_workers=4) as pool:
         jobs = {pool.submit(fetch_one, item): item for item in entries}
         for future in as_completed(jobs):
             item = jobs[future]
