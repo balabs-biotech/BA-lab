@@ -230,9 +230,12 @@
 #app.balabs-ui .experience-page[data-chapter="about"]>.under{
   background:#d1d0c5!important;
 }
-#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-card{
+#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-item{
   padding:24px 18px 28px;border-inline-end:1px solid rgba(17,27,29,.18);
 }
+#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-item h3{margin:18px 0 10px;color:#111b1d;font:400 clamp(20px,2vw,26px)/1.15 Georgia,serif}
+#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-item p{color:#3e4b44;font-size:12px;line-height:1.75}
+#app.balabs-ui .experience-page[data-chapter="about"]>.under .value-no{color:#8a4d38;font:700 8px/1.4 ui-monospace,monospace;letter-spacing:.14em}
 #app.balabs-ui .experience-page[data-chapter="about"]>.foot{
   position:relative;margin-top:0!important;
   border-top:2px solid #b96b4d!important;
@@ -253,7 +256,7 @@
  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-steps li{border-right:0!important;border-bottom:1px solid rgba(209,208,197,.2);padding:18px 0!important}
  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-trigger-copy b{margin-top:4px}
  #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-method .method-arrow{margin-top:4px}
- #app.balabs-ui .experience-page[data-chapter="about"]>.under .value-card{border-inline-end:0;border-bottom:1px solid rgba(17,27,29,.18)}
+ #app.balabs-ui .experience-page[data-chapter="about"]>.under .value-item{border-inline-end:0;border-bottom:1px solid rgba(17,27,29,.18)}
 }
 @media(prefers-reduced-motion:reduce){
  #app.balabs-ui .experience-page[data-chapter="research"] .feature-photo,
