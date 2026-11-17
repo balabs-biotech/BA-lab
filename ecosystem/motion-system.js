@@ -77,7 +77,7 @@
         const title=hero.querySelector('h1');
         const image=hero.querySelector('.hero-micrograph');
         if(title) animate(title,{opacity:[0,1],translateY:[28,0],duration:1150,ease:'out(4)'});
-        if(image) animate(image,{opacity:[.45,1],scale:[1.055,1],duration:1800,ease:'out(3)'});
+        if(image) animate(image,{opacity:[.45,1],duration:1500,ease:'out(3)'});
       }
 
       const headings=[...page.querySelectorAll('.work-heading,.universe-index-heading,.value-heading,.product-catalogue-head,.editorial-about h2,.editorial-method h2,.bridge-copy h2,.field-atlas-head')];
@@ -100,7 +100,7 @@
       cards.forEach(el=>{el.style.opacity='0';});
       if(cards.length) animate(cards,{
         opacity:[0,1],translateY:[24,0],scale:[.975,1],
-        rotate:[el=>el.matches('.work-card,.universe-index-card')?-.35:0,0],
+        rotate:[-.22,0],
         duration:980,delay:stagger(78,{start:130}),ease:'out(4)'
       });
 
