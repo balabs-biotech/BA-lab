@@ -353,6 +353,18 @@ try {
         await page.evaluate(() => {
           const auth = document.querySelector("#authCard");
           if (auth) auth.classList.add("hidden");
+          const sectionNavigation = document.getElementById("sectionNavigation");
+          if (sectionNavigation) {
+            sectionNavigation.hidden = false;
+            for (const link of sectionNavigation.querySelectorAll('a[href^="#"]')) {
+              link.hidden = false;
+              const panel = document.getElementById(link.getAttribute("href").slice(1));
+              if (panel) {
+                panel.hidden = false;
+                panel.classList.remove("hidden", "workspace-inactive");
+              }
+            }
+          }
           const card = document.querySelector("#overviewCard");
           if (card) {
             card.classList.remove("hidden");
