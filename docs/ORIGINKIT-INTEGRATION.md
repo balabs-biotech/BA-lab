@@ -13,28 +13,28 @@ This integration connects CultureOps to the official OriginKit MCP service throu
 
 ## Why this is a bridge, not a browser plugin
 
-OriginKit's official plugin targets Vellum Assistant. It is not a ChatGPT plugin that can be installed into this session, and its component catalogue currently advertises Framer variants. CultureOps is a static HTML/JavaScript application. The bridge requests Vite-compatible source as an intermediate artifact; imported components must be reviewed and adapted to the existing no-framework runtime before being loaded into a workspace.
+OriginKit's official plugin targets Vellum Assistant. It is not a ChatGPT plugin that can be installed into this session. CultureOps is a static HTML/JavaScript application, while the selected OriginKit components are React/Vite source. The bridge retrieves source as an intermediate artifact; each component must be reviewed and adapted to the existing no-framework runtime before production use.
 
 ## Security
 
 1. Rotate any API key previously pasted into a chat or other shared surface.
-2. Add the replacement key in Supabase Dashboard → Project Settings → Edge Functions → Secrets, under the exact name `ORIGINKIT_API_KEY`.
-3. Never add the key to GitHub, a frontend `.js` file, HTML, local storage, or a public environment variable.
+2. Store the replacement only in Supabase Edge Function secrets as `ORIGINKIT_API_KEY`.
+3. Never add the key to GitHub, frontend JavaScript, HTML, local storage, or a public environment variable.
 4. Keep Edge Function JWT verification enabled.
-5. The function accepts only `browse` and `get` actions, validates component names against the official catalogue, and fixes the upstream host to OriginKit. It does not act as a general-purpose URL proxy.
-6. OriginKit documents a limit of 10 source fetches per key per day, shared with website copies. Browse requests use public catalogue metadata and do not consume source-fetch quota.
+5. The function accepts only `browse` and `get`, validates component names against the official catalogue, and fixes the upstream host to OriginKit. It is not a general-purpose URL proxy.
+6. OriginKit's source-fetch quota is limited; fetch only the selected components, not exploratory variations.
 
 ## Request contract
 
-Invoke the function with the current Supabase client:
+Use the authenticated Supabase client already signed in to CultureOps:
 
 ```js
 const { data, error } = await supabase.functions.invoke("originkit-mcp", {
-  body: { action: "browse", query: "particle", category: "interactive-elements" }
+  body: { action: "browse", query: "particle" }
 });
 ```
 
-Fetch a component only after reviewing the catalogue entry:
+After reviewing the catalogue, fetch a component:
 
 ```js
 const { data, error } = await supabase.functions.invoke("originkit-mcp", {
@@ -48,18 +48,29 @@ const { data, error } = await supabase.functions.invoke("originkit-mcp", {
 });
 ```
 
-The returned source is an import artifact, not automatically executable in CultureOps. Review dependencies, accessibility, canvas lifecycle, reduced-motion handling, mobile performance, and licensing attribution before integration.
+The returned source is not automatically executable in CultureOps. Review imports, dependencies, lifecycle, accessibility, reduced-motion behavior, mobile performance, and licensing before mounting it.
 
 ## Current status
 
-- [x] Official OriginKit endpoint and JSON-RPC contract verified from the public repository.
-- [x] Public component index and MIT licence verified.
-- [x] Server-side relay source prepared; API key is not embedded.
-- [ ] Add a newly rotated API key as the Supabase Edge Function secret.
-- [ ] Deploy the Edge Function and verify browse/get against the authenticated app.
-- [ ] Fetch and adapt selected components (do not spend the 10-fetch daily quota on exploratory calls).
-- [ ] Integrate and visually test each chosen animation in its target sector.
+- [x] Official OriginKit endpoint, JSON-RPC contract, public component index, and MIT licence reviewed.
+- [x] Secure Supabase relay committed; no API key in source control.
+- [x] Replacement key configured by the project owner in Supabase.
+- [x] Edge Function `originkit-mcp` deployed and confirmed active (version 1, JWT verification enabled).
+- [ ] Invoke `browse` and `get` from an authenticated CultureOps session to validate the secret and upstream response.
+- [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
+- [ ] Adapt and integrate the components into GreenTech, Mycology, and Laboratory.
+- [ ] Visually verify desktop/mobile layouts, interaction, and reduced-motion behavior.
+
+## Selected component mapping
+
+| Workspace | Component | Intended role |
+|---|---|---|
+| GreenTech | `risinglines` | restrained rising light/particle motion in the environmental hero |
+| Mycology | `particlesphere` | copper/graphite 3D particle field; no green palette |
+| Laboratory | `kineticgrid` | interactive measurement/instrumentation grid in blue |
+
+These are targets, not claims of completed integration.
 
 ## Attribution
 
-OriginKit components are created by Vellum. Preserve the upstream MIT copyright and licence notice with any copied or adapted source. See https://github.com/vellum-ai/originkit/blob/main/LICENSE.
+OriginKit components are created by Vellum. Preserve the upstream MIT copyright and licence notice with copied or adapted source: https://github.com/vellum-ai/originkit/blob/main/LICENSE.
