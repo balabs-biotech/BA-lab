@@ -12,7 +12,7 @@ assert.match(adapter, /mountParticleSphere/);
 assert.match(adapter, /mountParticleSphereFallback/);
 assert.match(adapter, /ba-originkit-rising-lines/);
 assert.match(adapter, /ba-originkit-particle-sphere/);
-assert.match(adapter, /three@0\\.174\\.0/);
+assert.match(adapter, /three@0\.174\.0/);
 assert.match(adapter, /vellum-ai\/motion-design/);
 assert.match(adapter, /prefers-reduced-motion/);
 assert.match(adapter, /ResizeObserver/);
@@ -26,4 +26,4 @@ for (const page of entryPages) {
   assert.match(page, /workspace-origin-components\.js\?v=20261118-kinetic-grid-1/);
   assert.match(page, /visualRuntime\.onload/);
 }
-console.log("OriginKit Kinetic Grid adapter contract passed.");
+console.log("OriginKit visual adapter contract passed.");
