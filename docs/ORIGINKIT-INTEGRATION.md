@@ -20,7 +20,7 @@ OriginKit's official plugin targets Vellum Assistant. It is not a ChatGPT plugin
 1. Rotate any API key previously pasted into a chat or other shared surface.
 2. Store the replacement only in Supabase Edge Function secrets as `ORIGINKIT_API_KEY`.
 3. Never add the key to GitHub, frontend JavaScript, HTML, local storage, or a public environment variable.
-4. Keep Edge Function JWT verification enabled.
+4. Keep Edge Function JWT verification enabled. The handler also requires a real `authenticated` user JWT and rejects publishable/anon keys and anonymous sessions.
 5. The function accepts only `browse` and `get`, validates component names against the official catalogue, and fixes the upstream host to OriginKit. It is not a general-purpose URL proxy.
 6. OriginKit's source-fetch quota is limited; fetch only the selected components, not exploratory variations.
 
@@ -55,7 +55,7 @@ The returned source is not automatically executable in CultureOps. Review import
 - [x] Official OriginKit endpoint, JSON-RPC contract, public component index, and MIT licence reviewed.
 - [x] Secure Supabase relay committed; no API key in source control.
 - [x] Replacement key configured by the project owner in Supabase.
-- [x] Edge Function `originkit-mcp` deployed and confirmed active (version 1, JWT verification enabled).
+- [x] Edge Function `originkit-mcp` deployed and confirmed active (version 3, JWT verification enabled).
 - [ ] Invoke `browse` and `get` from an authenticated CultureOps session to validate the secret and upstream response.
 - [x] Add a spatial module navigation rail with previous/next controls, progress steps, Alt+arrow keyboard navigation, and touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
