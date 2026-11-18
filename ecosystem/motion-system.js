@@ -13,21 +13,134 @@
     s.onload=()=>{s.dataset.loaded='1';resolve();}; s.onerror=reject; document.head.appendChild(s);
   });
 
-  // Vanta is deliberately limited to the hero: no competing full-page WebGL scenes.
+  // Organic mycelium field for the homepage hero.
+  // Curved hyphae replace Vanta's geometric cells/constellation look; pointer movement
+  // gently deforms the filaments instead of moving dots or drawing straight connections.
   const hero=document.querySelector('#accueil');
-  if(hero && canWebGL && !reduce && !saveData && !lowPower){
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js')
-      .then(()=>loadScript('https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.cells.min.js'))
-      .then(()=>{
-        if(!window.VANTA?.CELLS || !hero.isConnected || hero.dataset.vantaReady) return;
-        hero.dataset.vantaReady='1';
-        window.__balabsVanta=window.VANTA.CELLS({
-          el:hero, THREE:window.THREE, mouseControls:true, touchControls:false, gyroControls:false,
-          minHeight:260, minWidth:260, scale:1, scaleMobile:1,
-          color1:0x263b38, color2:0x79a991, backgroundColor:0x111b1d,
-          size:1.2, speed:0.28
+  if(hero){
+    const canvas=document.createElement('canvas');
+    canvas.className='balabs-organic-field';
+    canvas.setAttribute('aria-hidden','true');
+    Object.assign(canvas.style,{
+      position:'absolute',inset:'0',width:'100%',height:'100%',
+      zIndex:'-1',pointerEvents:'none',opacity:'1'
+    });
+    hero.prepend(canvas);
+    const ctx=canvas.getContext('2d',{alpha:true});
+    if(ctx){
+      let width=0,height=0,dpr=1,raf=0,visible=true,lastFrame=0;
+      let pointer={x:0,y:0,tx:0,ty:0,active:false};
+      let paths=[];
+      const rand=(seed)=>{const x=Math.sin(seed*127.1+311.7)*43758.5453;return x-Math.floor(x);};
+      const buildPath=(x,y,angle,steps,length,seed,weight,colour)=>{
+        const nodes=[{x,y,phase:rand(seed)*6.28,amp:1.8}];
+        for(let i=1;i<=steps;i++){
+          angle+=(rand(seed+i*3.1)-.5)*.72;
+          const distance=length*(.68+rand(seed+i*7.7)*.58);
+          x+=Math.cos(angle)*distance;y+=Math.sin(angle)*distance;
+          nodes.push({x,y,phase:rand(seed+i*11.3)*6.28,amp:2.2+rand(seed+i*13.9)*2.2});
+        }
+        return {nodes,weight,colour,seed};
+      };
+      const rebuild=()=>{
+        const rect=hero.getBoundingClientRect();
+        width=Math.max(1,rect.width);height=Math.max(1,rect.height);
+        dpr=Math.min(window.devicePixelRatio||1,1.35);
+        canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        paths=[];
+        const span=Math.min(width,height),step=span*.145;
+        const roots=[
+          [0,.08,0],[0,.42,-.04],[0,.78,.12],[1,.16,Math.PI],
+          [1,.55,Math.PI+.12],[1,.9,Math.PI-.18],[.16,0,Math.PI/2],
+          [.55,0,Math.PI/2+.12],[.88,0,Math.PI/2-.16],
+          [.1,1,-Math.PI/2],[.52,1,-Math.PI/2-.12],[.9,1,-Math.PI/2+.14]
+        ];
+        roots.forEach((a,i)=>{
+          const x=a[0]*width,y=a[1]*height;
+          const inward=Math.atan2(height*.5-y,width*.5-x)+a[2];
+          const root=buildPath(x,y,inward,5,step,31+i*17,1.15+rand(i)*.65,
+            i%4===0?'copper':'green');
+          paths.push(root);
+          [2,3].forEach((at,j)=>{
+            const node=root.nodes[at];
+            const prev=root.nodes[at-1],next=root.nodes[at+1];
+            const tangent=Math.atan2(next.y-prev.y,next.x-prev.x);
+            [-1,1].forEach((side,k)=>{
+              const branch=buildPath(node.x,node.y,tangent+side*(.62+rand(i+j+k)*.55),
+                3,step*(.55+rand(i+j+k+8)*.25),71+i*23+j*5+k,
+                .48+rand(i+j+k+19)*.35,(i+j+k)%5===0?'copper':'green');
+              paths.push(branch);
+            });
+          });
         });
-      }).catch(()=>{ /* CSS/image hero remains the fallback. */ });
+      };
+      const resize=new ResizeObserver(rebuild);
+      resize.observe(hero);rebuild();
+      const onPointer=(event)=>{
+        const rect=hero.getBoundingClientRect();
+        pointer.tx=event.clientX-rect.left;pointer.ty=event.clientY-rect.top;
+        pointer.active=true;
+      };
+      const leave=()=>{pointer.active=false;};
+      hero.addEventListener('pointermove',onPointer,{passive:true});
+      hero.addEventListener('pointerleave',leave,{passive:true});
+      hero.addEventListener('pointerdown',onPointer,{passive:true});
+      const drawPath=(path,time)=>{
+        const pts=path.nodes.map((n,i)=>{
+          let x=n.x+Math.sin(time*.34+n.phase+i*.61)*n.amp;
+          let y=n.y+Math.cos(time*.29+n.phase+i*.47)*n.amp;
+          if(pointer.active){
+            const dx=x-pointer.x,dy=y-pointer.y,dist=Math.hypot(dx,dy);
+            const influence=Math.exp(-(dist*dist)/(2*155*155));
+            const curl=10*influence;
+            x+=(-dx/(dist||1)*22-dy/(dist||1)*curl);
+            y+=(-dy/(dist||1)*22+dx/(dist||1)*curl);
+          }
+          return {x,y};
+        });
+        if(pts.length<2)return;
+        ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+        for(let i=1;i<pts.length-1;i++){
+          const mx=(pts[i].x+pts[i+1].x)*.5,my=(pts[i].y+pts[i+1].y)*.5;
+          ctx.quadraticCurveTo(pts[i].x,pts[i].y,mx,my);
+        }
+        ctx.lineTo(pts[pts.length-1].x,pts[pts.length-1].y);
+        const copper=path.colour==='copper';
+        ctx.strokeStyle=copper?'rgba(185,107,77,.28)':'rgba(121,169,145,.30)';
+        ctx.lineWidth=path.weight;ctx.lineCap='round';ctx.lineJoin='round';
+        ctx.shadowColor=copper?'rgba(185,107,77,.18)':'rgba(121,169,145,.2)';
+        ctx.shadowBlur=path.weight>1?8:4;ctx.stroke();ctx.shadowBlur=0;
+      };
+      const draw=(now)=>{
+        if(!visible)return;
+        if(!reduce && now-lastFrame<32){raf=requestAnimationFrame(draw);return;}
+        lastFrame=now;
+        pointer.x+=(pointer.tx-pointer.x)*.075;pointer.y+=(pointer.ty-pointer.y)*.075;
+        ctx.clearRect(0,0,width,height);
+        const time=reduce?0:now*.001;
+        paths.forEach(path=>drawPath(path,time));
+        if(!reduce){raf=requestAnimationFrame(draw);}
+      };
+      if(!reduce){
+        const observer=new IntersectionObserver(entries=>{
+          visible=entries[0].isIntersecting;
+          if(visible&&!raf)raf=requestAnimationFrame(draw);
+          else if(!visible&&raf){cancelAnimationFrame(raf);raf=0;}
+        },{threshold:.01});
+        observer.observe(hero);
+        raf=requestAnimationFrame(draw);
+        window.addEventListener('pagehide',()=>{
+          cancelAnimationFrame(raf);observer.disconnect();resize.disconnect();
+          hero.removeEventListener('pointermove',onPointer);
+          hero.removeEventListener('pointerleave',leave);
+          hero.removeEventListener('pointerdown',onPointer);
+        },{once:true});
+      }else{
+        draw(0);
+        resize.disconnect();
+      }
+    }else canvas.remove();
   }
 
   // Lightweight fragment-shader gradient for the Field Atlas, independent from Vanta.
