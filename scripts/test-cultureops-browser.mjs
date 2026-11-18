@@ -5,7 +5,7 @@ import path from "node:path";
 
 const cultureOpsLanding = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const cultureOpsLocales = fs.readFileSync(new URL("../batch-tracker/i18n.js", import.meta.url), "utf8");
-if (/CULTURE\s*&(?:amp;)?\\s*BATCH TRACKER/i.test(cultureOpsLanding)) {
+if (/CULTURE\s*&(?:amp;)?\s*BATCH TRACKER/i.test(cultureOpsLanding)) {
   throw new Error("CultureOps landing page still exposes a retired product label.");
 }
 if (/BA Labs BatchTracker|BA Labs Batch Tracker/i.test(cultureOpsLocales)) {
