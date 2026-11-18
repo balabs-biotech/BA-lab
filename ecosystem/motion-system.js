@@ -24,8 +24,8 @@
         window.__balabsVanta=window.VANTA.CELLS({
           el:hero, THREE:window.THREE, mouseControls:true, touchControls:false, gyroControls:false,
           minHeight:260, minWidth:260, scale:1, scaleMobile:1,
-          color:0x4778ff, color2:0xd6ad5b, backgroundColor:0x10182a,
-          size:1.15, speed:0.55
+          color:0x79a991, color2:0xb96b4d, backgroundColor:0x111b1d,
+          size:1.05, speed:0.32
         });
       }).catch(()=>{ /* CSS/image hero remains the fallback. */ });
   }
@@ -44,7 +44,7 @@
         'float a=blob(p,vec2(sin(t*.17)*.34,cos(t*.13)*.22),.20);'+
         'float b=blob(p,vec2(cos(t*.11)*.36,sin(t*.19)*.25),.24);'+
         'float c=blob(p,vec2(sin(t*.09+.8)*.12,cos(t*.15+.6)*.36),.18);'+
-        'vec3 col=vec3(.063,.094,.16)+a*vec3(.055,.12,.28)+b*vec3(.20,.12,.035)+c*vec3(.12,.065,.12);'+
+        'vec3 col=vec3(.067,.106,.114)+a*vec3(.08,.14,.11)+b*vec3(.22,.11,.07)+c*vec3(.10,.11,.09);'+
         'gl_FragColor=vec4(col,.62);}';
       const compile=(type,src)=>{const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;};
       try{
@@ -105,6 +105,6 @@
 
     // Slow breathing is reserved for the documentary hero photograph, never the interface or explorer.
     const heroImage=document.querySelector('#accueil .hero-micrograph');
-    if(heroImage) animate(heroImage,{scale:[1,1.014],duration:11000,ease:'inOutSine',alternate:true,loop:true});
+    if(heroImage) animate(heroImage,{scale:[1.02,1.035],duration:16000,ease:'inOutSine',alternate:true,loop:true});
   }).catch(()=>{ /* Static editorial layout remains fully visible if the animation CDN is unavailable. */ });
 })();
