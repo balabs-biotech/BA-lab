@@ -10,17 +10,17 @@
 <title>BALabs — Réseau vivant</title>
 <link rel="stylesheet" href="./site-base.css?v=2">
 
-  <link rel="stylesheet" href="./brand-system.css?v=18">
+  <link rel="stylesheet" href="./brand-system.css?v=19">
 <link rel="stylesheet" href="./site-overrides.css?v=7">
 <link rel="stylesheet" href="./chapter-navigation.css?v=22">
-<link rel="stylesheet" href="./reactbits-adaptations.css?v=3">
+<link rel="stylesheet" href="./reactbits-adaptations.css?v=4">
 <link rel="stylesheet" href="./vengeance-adaptation.css?v=5">
 <link rel="stylesheet" href="./editorial-refinement.css?v=32">
 <link rel="stylesheet" href="./chapter-atmosphere.css?v=6">
 
 <link rel="stylesheet" href="./visual-continuity.css?v=3">
 <link rel="stylesheet" href="./chapter-repair.css?v=18">
-<link rel="stylesheet" href="./chromatic-direction.css?v=1">
+<link rel="stylesheet" href="./chromatic-direction.css?v=4">
 <style>
 #mainView,#miniView,.cluster-key{display:none!important}
 .scene{min-height:0;padding-bottom:clamp(34px,5vw,72px)}
@@ -71,15 +71,15 @@
 @media(prefers-reduced-motion:reduce){.inline-explorer *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 /* Focus-first explorer: keep the mycelium visible, not covered by stacked UI. */
-#selection{position:absolute!important;left:auto!important;right:clamp(12px,2vw,24px)!important;bottom:clamp(12px,2vw,22px)!important;z-index:5!important;width:min(340px,calc(100% - 24px))!important;height:auto!important;max-height:30%!important;margin:0!important;padding:0!important;overflow:visible!important;clip:auto!important;white-space:normal!important;border:0!important;pointer-events:none!important}
+#selection{position:absolute!important;left:clamp(12px,2vw,24px)!important;right:auto!important;bottom:clamp(12px,2vw,22px)!important;z-index:5!important;width:min(340px,calc(100% - 24px))!important;height:auto!important;max-height:30%!important;margin:0!important;padding:0!important;overflow:visible!important;clip:auto!important;white-space:normal!important;border:0!important;pointer-events:none!important}
 #selection:empty,#selection[hidden]{display:none!important}
-.selection-dock{display:grid;gap:5px;padding:11px 13px;border:1px solid #82998a55;border-left:2px solid #b96b4d;border-radius:9px;background:linear-gradient(120deg,#14211feF,#10191af2);box-shadow:0 10px 30px #0005;backdrop-filter:blur(12px);pointer-events:none}
+.selection-dock{display:grid;gap:5px;padding:11px 13px;border:1px solid #82998a55;border-left:2px solid #b96b4d;border-radius:9px;background:linear-gradient(120deg,#14211feF,#10191af2);box-shadow:0 10px 30px #0005;backdrop-filter:blur(12px);pointer-events:auto}
 .selection-title{margin:0;color:#e5e6dc;font:600 13px/1.25 Inter,system-ui,sans-serif;letter-spacing:-.015em}
 .selection-context{margin:0;color:#91a79a;font:600 8px/1.4 ui-monospace,monospace;letter-spacing:.09em;text-transform:uppercase}
 .selection-description{margin:2px 0 0;color:#bdc8bd;font:400 10px/1.45 Inter,system-ui,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.selection-open-link{pointer-events:auto;justify-self:start;margin-top:3px;color:#e0a184;font:700 9px/1.3 Inter,system-ui,sans-serif;letter-spacing:.04em;text-decoration:none;border-bottom:1px solid #b96b4d88;padding-bottom:2px}
+.selection-open-link{justify-self:start;margin-top:3px;color:#e0a184;font:700 9px/1.3 Inter,system-ui,sans-serif;letter-spacing:.04em;text-decoration:none;border-bottom:1px solid #b96b4d88;padding-bottom:2px}
 .selection-open-link:hover,.selection-open-link:focus-visible{color:#f2d0bf;border-color:#f2d0bf;outline-offset:3px}
-@media(max-width:700px){#selection{left:auto!important;right:10px!important;bottom:10px!important;width:min(275px,calc(100% - 20px))!important;max-height:26%!important}.selection-dock{padding:9px 11px;gap:4px}.selection-title{font-size:12px}.selection-description{font-size:9px}}
+@media(max-width:700px){#selection{left:10px!important;bottom:10px!important;width:min(275px,calc(100% - 20px))!important;max-height:26%!important}.selection-dock{padding:9px 11px;gap:4px}.selection-title{font-size:12px}.selection-description{font-size:9px}}
 #hint,.relation-legend,.inline-explorer-title p{display:none!important}
 .inline-explorer-title{left:16px;top:14px;opacity:.58;max-width:210px}
 .inline-explorer-title h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0}
@@ -156,6 +156,14 @@
 }
 @media(prefers-reduced-motion:reduce){
  #app.balabs-ui .universe-filament-glow,#app.balabs-ui .inline-explorer .universe-rail button,#app.balabs-ui .inline-explorer .universe-rail button i{transition:none!important;animation:none!important}
+}
+
+/* Keep chapter controls and the universe filament independently tappable. */
+body > .chapter-rail{left:auto!important;right:clamp(3px,.65vw,12px)!important}
+#app.balabs-ui #selection{left:clamp(82px,6vw,92px)!important;right:auto!important;width:min(340px,calc(100% - 174px))!important}
+@media(max-width:700px){
+ body > .chapter-rail{left:auto!important;right:0!important}
+ #app.balabs-ui #selection{left:56px!important;right:10px!important;width:auto!important;max-width:none!important}
 }
 </style>
 </head>
@@ -650,7 +658,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script src="./vengeance-adaptation.js?v=3"></script>
 <script type="importmap">{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}</script>
 <script type="module" src="./explorer-2d.js?v=selection-dock-1"></script>
-<script src="./motion-system.js?v=3" defer></script>
+<script src="./motion-system.js?v=4" defer></script>
 
 
 <script>
