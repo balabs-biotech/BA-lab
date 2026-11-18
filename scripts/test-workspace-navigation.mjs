@@ -26,6 +26,6 @@ assert.match(navigation, /workspace-authenticated/);
 assert.doesNotMatch(navigation, /supabase\.from\(|\.insert\(|\.update\(/);
 
 for (const page of entryPages) {
-  assert.match(page, /workspace-navigation\.js\?v=20261118-spatial-rail-2/);
+  assert.match(page, /workspace-navigation\.js\?v=20261118-spatial-rail-3/);
 }
 console.log("CultureOps spatial module navigation contract passed.");
