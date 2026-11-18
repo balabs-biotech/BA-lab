@@ -201,19 +201,35 @@ try {
         const canvasRect = document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.getBoundingClientRect();
         const artHidden = getComputedStyle(art).display === "none";
         const descriptionHidden = getComputedStyle(document.querySelector(".hero-description")).display === "none";
+        const navRail = document.querySelector(".ba-module-rail");
+        const directionSequence = [];
+        if (navRail) {
+          const activeStepIndex = () => [...navRail.querySelectorAll(".ba-module-rail__step")]
+            .findIndex(step => step.getAttribute("aria-current") === "step");
+          navRail.querySelector(".ba-module-rail__step")?.click();
+          directionSequence.push(activeStepIndex());
+          for (const direction of ["down", "right", "up", "left"]) {
+            navRail.querySelector(`[data-direction="${direction}"]`)?.click();
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            directionSequence.push(activeStepIndex());
+          }
+        }
+        const navigationRailVisible = !!navRail && getComputedStyle(navRail).display !== "none";
         document.body.classList.remove("workspace-authenticated");
         if (authWasVisible) auth.classList.remove("hidden");
         return {
           before, after, artHidden, descriptionHidden,
           artWidth: artRect?.width ?? 0, artHeight: artRect?.height ?? 0,
           visualWidth: visualRect?.width ?? 0, visualHeight: visualRect?.height ?? 0,
-          canvasWidth: canvasRect?.width ?? 0, canvasHeight: canvasRect?.height ?? 0
+          canvasWidth: canvasRect?.width ?? 0, canvasHeight: canvasRect?.height ?? 0,
+          navigationRailVisible, directionSequence
         };
       });
       if (compactHero.artHidden || !compactHero.descriptionHidden) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector signature should remain visible while the marketing description collapses`);
       if (compactHero.artWidth <= 0 || compactHero.artHeight <= 0 || compactHero.visualWidth <= 0 || compactHero.visualHeight <= 0 || compactHero.canvasWidth <= 0 || compactHero.canvasHeight <= 0) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector animation has no visible drawing area (${JSON.stringify(compactHero)})`);
       const maxAuthenticatedHeroHeight = viewport.width >= 821 ? 160 : 280;
       if (compactHero.after > maxAuthenticatedHeroHeight) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector header is too tall (${compactHero.after}px > ${maxAuthenticatedHeroHeight}px)`);
+      if (!compactHero.navigationRailVisible || JSON.stringify(compactHero.directionSequence) !== JSON.stringify([0, 2, 3, 1, 0])) failures.push(`${workspace.slug}/${viewport.name}: four-direction navigation did not follow the 2-column module map (${JSON.stringify(compactHero.directionSequence)})`);
       const accessibility = await page.evaluate(() => {
         const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
         const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
