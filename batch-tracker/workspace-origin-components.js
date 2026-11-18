@@ -27,22 +27,35 @@
     const hero = document.querySelector(".app-hero");
     const art = hero?.querySelector(".hero-art");
     const visual = art?.querySelector(".ba-sector-visual");
-    const compact = (window.matchMedia?.("(max-width: 760px)")?.matches ?? false) && document.body.classList.contains("workspace-authenticated");
+    const narrow = window.matchMedia?.("(max-width: 760px)")?.matches ?? false;
+    const authenticated = document.body.classList.contains("workspace-authenticated");
     if (!hero || !art) return;
-    if (compact) {
+    if (narrow) {
       hero.style.setProperty("grid-template-columns", "minmax(0, 1fr)", "important");
       art.style.setProperty("grid-column", "1", "important");
       art.style.setProperty("justify-self", "stretch", "important");
-      art.style.setProperty("width", "100%", "important");
-      art.style.setProperty("min-height", "185px", "important");
-      art.style.setProperty("margin-top", "8px", "important");
-      visual?.style.setProperty("width", "min(100%, 270px)", "important");
-      visual?.style.setProperty("height", "170px", "important");
-      visual?.style.setProperty("min-height", "170px", "important");
+      if (authenticated) {
+        art.style.setProperty("display", "flex", "important");
+        art.style.setProperty("width", "100%", "important");
+        art.style.setProperty("min-height", "185px", "important");
+        art.style.setProperty("margin-top", "8px", "important");
+        visual?.style.setProperty("width", "min(100%, 270px)", "important");
+        visual?.style.setProperty("height", "170px", "important");
+        visual?.style.setProperty("min-height", "170px", "important");
+      } else {
+        art.style.setProperty("display", "none", "important");
+        art.style.removeProperty("width");
+        art.style.removeProperty("min-height");
+        art.style.removeProperty("margin-top");
+        visual?.style.removeProperty("width");
+        visual?.style.removeProperty("height");
+        visual?.style.removeProperty("min-height");
+      }
     } else {
       hero.style.removeProperty("grid-template-columns");
       art.style.removeProperty("grid-column");
       art.style.removeProperty("justify-self");
+      art.style.removeProperty("display");
       art.style.removeProperty("width");
       art.style.removeProperty("min-height");
       art.style.removeProperty("margin-top");
