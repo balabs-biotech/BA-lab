@@ -235,8 +235,9 @@
         build(rect?.width, rect?.height);
       })
     : null;
+  const onResize = () => build();
   resizeObserver?.observe(host);
-  if (!resizeObserver) window.addEventListener("resize", build);
+  if (!resizeObserver) window.addEventListener("resize", onResize);
 
   if (!reducedMotion) {
     host.addEventListener("pointermove", setPointer, { passive: true });
@@ -266,7 +267,7 @@
       host.removeEventListener("pointermove", setPointer);
       host.removeEventListener("pointerleave", clearPointer);
       host.removeEventListener("pointercancel", clearPointer);
-      window.removeEventListener("resize", build);
+      window.removeEventListener("resize", onResize);
     }, { once: true });
   }
 })();
