@@ -190,9 +190,12 @@ try {
         const hero = document.querySelector(".app-hero");
         const auth = document.querySelector("#authCard");
         const authWasVisible = auth && !auth.classList.contains("hidden");
+        const sectionNavigation = document.getElementById("sectionNavigation");
+        const navigationWasHidden = sectionNavigation?.hidden ?? false;
         const before = hero?.getBoundingClientRect().height ?? 0;
         document.body.classList.add("workspace-authenticated");
         auth?.classList.add("hidden");
+        if (sectionNavigation) sectionNavigation.hidden = false;
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const after = hero?.getBoundingClientRect().height ?? 0;
         const art = document.querySelector(".hero-art");
@@ -216,6 +219,7 @@ try {
         }
         const navigationRailVisible = !!navRail && getComputedStyle(navRail).display !== "none";
         document.body.classList.remove("workspace-authenticated");
+        if (navigationWasHidden && sectionNavigation) sectionNavigation.hidden = true;
         if (authWasVisible) auth.classList.remove("hidden");
         return {
           before, after, artHidden, descriptionHidden,
