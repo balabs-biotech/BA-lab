@@ -21,8 +21,9 @@ OriginKit's official plugin targets Vellum Assistant. It is not a ChatGPT plugin
 2. Store the replacement only in Supabase Edge Function secrets as `ORIGINKIT_API_KEY`.
 3. Never add the key to GitHub, frontend JavaScript, HTML, local storage, or a public environment variable.
 4. Keep Edge Function JWT verification enabled. The handler also requires a real `authenticated` user JWT and rejects publishable/anon keys and anonymous sessions.
-5. The function accepts only `browse` and `get`, validates component names against the official catalogue, and fixes the upstream host to OriginKit. It is not a general-purpose URL proxy.
-6. OriginKit's source-fetch quota is limited; fetch only the selected components, not exploratory variations.
+5. Configure `ORIGINKIT_ALLOWED_USER_IDS` as a comma-separated Supabase Edge Function secret containing only the maintainer Auth user UUID(s). Without this allowlist, `get` is denied by default; ordinary authenticated accounts can browse public metadata but cannot spend the source-fetch quota.
+6. The function accepts only `browse` and `get`, validates component names against the official catalogue, and fixes the upstream host to OriginKit. It is not a general-purpose URL proxy.
+7. OriginKit's source-fetch quota is limited; fetch only the selected components, not exploratory variations.
 
 ## Request contract
 
@@ -55,9 +56,10 @@ The returned source is not automatically executable in CultureOps. Review import
 - [x] Official OriginKit endpoint, JSON-RPC contract, public component index, and MIT licence reviewed.
 - [x] Secure Supabase relay committed; no API key in source control.
 - [x] Replacement key configured by the project owner in Supabase.
-- [x] Edge Function `originkit-mcp` deployed and confirmed active (version 3, JWT verification enabled).
+- [ ] Configure `ORIGINKIT_ALLOWED_USER_IDS` with the maintainer Auth UUID before enabling source retrieval.
+- [ ] Deploy the maintainer-only `get` guard from PR #375; the deployed version 3 predates this additional allowlist.
 - [x] Verify that a publishable key alone is rejected by the deployed function (`401 authenticated_session_required`).
-- [ ] Invoke `browse` and `get` from a real authenticated CultureOps session to validate the stored secret and upstream response.
+- [ ] Invoke `browse` from a real authenticated CultureOps session and `get` from an allowlisted maintainer session to validate the stored secret and upstream response.
 - [x] Add a two-column spatial module navigation rail with four-direction controls, progress steps, Alt+arrow keyboard navigation, and horizontal/vertical touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
 - [x] Adapt Rising Lines into the GreenTech hero as a lightweight canvas particle stream with a lime horizon glow.
