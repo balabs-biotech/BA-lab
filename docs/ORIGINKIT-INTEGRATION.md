@@ -59,7 +59,9 @@ The returned source is not automatically executable in CultureOps. Review import
 - [ ] Invoke `browse` and `get` from an authenticated CultureOps session to validate the secret and upstream response.
 - [x] Add a spatial module navigation rail with previous/next controls, progress steps, Alt+arrow keyboard navigation, and touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
-- [ ] Adapt and integrate the components into GreenTech, Mycology, and Laboratory.
+- [x] Adapt and integrate Kinetic Grid into the Laboratory hero as a native canvas component, preserving the original cursor-attraction mesh behavior without React/Framer dependencies.
+- [ ] Adapt and integrate Rising Lines into GreenTech and Particle Sphere into Mycology.
+- [x] Browser-check Kinetic Grid at desktop and mobile widths; canvas renders at the intended size with no page errors.
 - [ ] Visually verify desktop/mobile layouts, interaction, and reduced-motion behavior.
 
 ## Selected component mapping
@@ -68,9 +70,9 @@ The returned source is not automatically executable in CultureOps. Review import
 |---|---|---|
 | GreenTech | `risinglines` | restrained rising light/particle motion in the environmental hero |
 | Mycology | `particlesphere` | copper/graphite 3D particle field; no green palette |
-| Laboratory | `kineticgrid` | interactive measurement/instrumentation grid in blue |
+| Laboratory | `kineticgrid` | integrated native canvas adaptation: interactive blue mesh, pointer attraction, trail and responsive sizing |
 
-These are targets, not claims of completed integration.
+Rising Lines and Particle Sphere remain targets, not completed integrations. The Laboratory adaptation is based on Vellum's published motion-design component source (which includes the OriginKit preview configuration comments); the secure MCP `get` call still needs authenticated end-to-end verification.
 
 ## Attribution
 
