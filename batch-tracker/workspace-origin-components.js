@@ -54,6 +54,111 @@
   applyResponsiveHero();
   window.addEventListener("resize", applyResponsiveHero, { passive: true });
 
+  const mountParticleSphereFallback = (host, reduced, compact) => {
+    const canvas = document.createElement("canvas");
+    canvas.className = "ba-originkit-particle-sphere ba-originkit-particle-sphere--2d";
+    canvas.setAttribute("aria-hidden", "true");
+    Object.assign(canvas.style, {
+      position: "absolute", inset: "0", zIndex: "0",
+      width: "100%", height: "100%", pointerEvents: "none"
+    });
+    host.insertBefore(canvas, host.firstChild);
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+    const count = compact ? 520 : 1050;
+    const points = [];
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < count; i++) {
+      const y = 1 - (i / Math.max(1, count - 1)) * 2;
+      const ring = Math.sqrt(Math.max(0, 1 - y * y));
+      const angle = golden * i;
+      points.push({ x: Math.cos(angle) * ring, y, z: Math.sin(angle) * ring });
+    }
+    let width = 1, height = 1, dpr = 1, rotation = 0, raf = 0, visible = false, disposed = false, last = 0;
+    let pointer = { x: 0, y: 0, active: false };
+    const resize = () => {
+      const rect = host.getBoundingClientRect();
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      dpr = Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.4);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (reduced) draw(0);
+    };
+    const draw = (dt) => {
+      ctx.clearRect(0, 0, width, height);
+      ctx.globalCompositeOperation = "lighter";
+      const scale = Math.min(width, height) * 0.38;
+      const centerX = width / 2, centerY = height / 2;
+      const cosY = Math.cos(rotation), sinY = Math.sin(rotation);
+      const cosX = Math.cos(rotation * 0.36), sinX = Math.sin(rotation * 0.36);
+      for (const point of points) {
+        const rx = point.x * cosY - point.z * sinY;
+        const rz = point.x * sinY + point.z * cosY;
+        const ry = point.y * cosX - rz * sinX;
+        const depth = point.y * sinX + rz * cosX;
+        const perspective = 2.9 / (2.9 - depth * 0.45);
+        let x = centerX + rx * scale * perspective;
+        let y = centerY + ry * scale * perspective;
+        if (pointer.active) {
+          const dx = x - pointer.x, dy = y - pointer.y;
+          const distance = Math.hypot(dx, dy);
+          if (distance < 38 && distance > 0.1) {
+            const force = (1 - distance / 38) * 10;
+            x += (dx / distance) * force;
+            y += (dy / distance) * force;
+          }
+        }
+        const alpha = Math.max(0.12, Math.min(0.82, 0.26 + (depth + 1) * 0.28));
+        const size = (0.65 + (depth + 1) * 0.42) * (compact ? 0.9 : 1);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = "#d69a75";
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+      if (!reduced) rotation += dt * 0.34;
+    };
+    const loop = (time) => {
+      if (disposed || !visible || document.hidden) { raf = 0; return; }
+      if (time - last < 30) { raf = requestAnimationFrame(loop); return; }
+      const dt = last ? Math.min(0.05, (time - last) / 1000) : 1 / 60;
+      last = time;
+      draw(dt);
+      raf = requestAnimationFrame(loop);
+    };
+    const start = () => { if (!disposed && !reduced && visible && !document.hidden && !raf) { last = 0; raf = requestAnimationFrame(loop); } };
+    const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0; };
+    const onMove = (event) => {
+      const rect = host.getBoundingClientRect();
+      pointer = { x: event.clientX - rect.left, y: event.clientY - rect.top, active: true };
+    };
+    const onLeave = () => { pointer.active = false; };
+    resize();
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(resize) : null;
+    resizeObserver?.observe(host);
+    const intersection = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting);
+      if (visible) start(); else stop();
+    }, { rootMargin: "80px" }) : null;
+    if (intersection) intersection.observe(host); else { visible = true; start(); }
+    if (!reduced) {
+      host.addEventListener("pointermove", onMove, { passive: true });
+      host.addEventListener("pointerleave", onLeave, { passive: true });
+    }
+    const onVisibility = () => { if (document.hidden) stop(); else start(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", () => {
+      disposed = true; stop(); resizeObserver?.disconnect(); intersection?.disconnect();
+      host.removeEventListener("pointermove", onMove);
+      host.removeEventListener("pointerleave", onLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
+    }, { once: true });
+  };
+
   const mountParticleSphere = async () => {
     const sphereHost = document.querySelector(".ba-sector-visual--mycology");
     if (!sphereHost || sphereHost.dataset.particleSphereMounted === "true") return;
@@ -240,7 +345,9 @@
       }, { once: true });
     } catch (error) {
       sphereHost.dataset.particleSphereFallback = "true";
-      console.info("BA Labs: Particle Sphere WebGL indisponible; la boîte de Petri SVG reste visible.", error);
+      sphereHost.dataset.particleSphereError = String(error?.message || error).slice(0, 180);
+      mountParticleSphereFallback(sphereHost, reduced, compact);
+      console.info("BA Labs: Particle Sphere utilise le rendu 2D de compatibilité.", error);
     }
   };
 
