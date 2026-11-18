@@ -34,9 +34,11 @@
       art.style.setProperty("grid-column", "1", "important");
       art.style.setProperty("justify-self", "stretch", "important");
       art.style.setProperty("width", "100%", "important");
-      art.style.setProperty("min-height", "150px", "important");
+      art.style.setProperty("min-height", "185px", "important");
       art.style.setProperty("margin-top", "8px", "important");
       visual?.style.setProperty("width", "min(100%, 270px)", "important");
+      visual?.style.setProperty("height", "170px", "important");
+      visual?.style.setProperty("min-height", "170px", "important");
     } else {
       hero.style.removeProperty("grid-template-columns");
       art.style.removeProperty("grid-column");
@@ -45,6 +47,8 @@
       art.style.removeProperty("min-height");
       art.style.removeProperty("margin-top");
       visual?.style.removeProperty("width");
+      visual?.style.removeProperty("height");
+      visual?.style.removeProperty("min-height");
     }
   };
   applyResponsiveHero();
