@@ -347,49 +347,60 @@ try {
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
 
-      // Visual fixture only: render one active module, matching the real
-      // single-workspace interaction model instead of exposing every panel.
+      // Visual fixture only: simulate a signed-in user on the overview module.
       if (viewport.name === "desktop" || viewport.name === "mobile") {
         await page.evaluate((workspaceSlug) => {
           const auth = document.querySelector("#authCard");
           if (auth) {
             auth.hidden = true;
-            auth.style.display = "none";
+            auth.classList.add("hidden");
+            auth.style.setProperty("display", "none", "important");
           }
+
           const allowedByWorkspace = {
             "green-tech": ["overviewCard", "plantCard", "measurementCard", "statisticsCard"],
             mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
             laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard"],
           };
           const allowed = new Set(allowedByWorkspace[workspaceSlug] || []);
-          const sectionNavigation = document.getElementById("sectionNavigation");
-          if (sectionNavigation) {
-            sectionNavigation.hidden = false;
-            for (const link of sectionNavigation.querySelectorAll('a[href^="#"]')) {
+          const navigation = document.getElementById("sectionNavigation");
+          if (navigation) {
+            navigation.hidden = false;
+            navigation.classList.remove("hidden");
+            navigation.style.removeProperty("display");
+            for (const link of navigation.querySelectorAll('a[href^="#"]')) {
               const id = link.getAttribute("href").slice(1);
-              const panel = document.getElementById(id);
               const visible = allowed.has(id);
               link.hidden = !visible;
-              if (panel) {
-                panel.hidden = id !== "overviewCard";
-                panel.classList.toggle("hidden", id !== "overviewCard");
-                panel.classList.remove("workspace-inactive");
-              }
+              link.style.setProperty("display", visible ? "inline-flex" : "none", "important");
             }
           }
-          const card = document.querySelector("#overviewCard");
-          if (card) {
-            card.hidden = false;
-            card.classList.remove("hidden", "workspace-inactive");
+
+          for (const panel of document.querySelectorAll("section.card")) {
+            const active = panel.id === "overviewCard";
+            if (panel.id === "authCard") continue;
+            panel.hidden = !active;
+            panel.classList.toggle("hidden", !active);
+            if (active) {
+              panel.style.removeProperty("display");
+            } else {
+              panel.style.setProperty("display", "none", "important");
+            }
+          }
+
+          const overview = document.getElementById("overviewCard");
+          if (overview) {
+            overview.hidden = false;
+            overview.classList.remove("hidden", "workspace-inactive");
+            overview.style.removeProperty("display");
             document.body.classList.add("workspace-authenticated");
-            const live = card.querySelector(".overview-live");
+            const live = overview.querySelector(".overview-live");
             if (live) live.textContent = "Aperçu visuel — données de test";
-            const values = {
+            for (const [id, value] of Object.entries({
               overviewCultureCount: "12",
               overviewBatchCount: "8",
               overviewObservationCount: "34",
-            };
-            for (const [id, value] of Object.entries(values)) {
+            })) {
               const node = document.getElementById(id);
               if (node) node.textContent = value;
             }
@@ -407,14 +418,22 @@ try {
         await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
         const overviewState = await page.evaluate(() => {
           const card = document.querySelector("#overviewCard");
+          const auth = document.querySelector("#authCard");
+          const visibleSections = [...document.querySelectorAll("section.card")]
+            .filter((section) => getComputedStyle(section).display !== "none")
+            .map((section) => section.id);
           return {
-            visible: !!card && card.getBoundingClientRect().height > 0,
+            visible: !!card && getComputedStyle(card).display !== "none" && card.getBoundingClientRect().height > 0,
+            authHidden: !auth || getComputedStyle(auth).display === "none",
+            visibleSections,
             width: document.documentElement.scrollWidth,
             viewport: innerWidth,
             metricCount: card?.querySelectorAll(".overview-metric").length ?? 0,
           };
         });
-        if (!overviewState.visible || overviewState.metricCount !== 3 || overviewState.width > overviewState.viewport + 1) {
+        if (!overviewState.visible || !overviewState.authHidden ||
+            overviewState.visibleSections.length !== 1 || overviewState.visibleSections[0] !== "overviewCard" ||
+            overviewState.metricCount !== 3 || overviewState.width > overviewState.viewport + 1) {
           failures.push(`${workspace.slug}/${viewport.name}: dashboard overview preview failed ${JSON.stringify(overviewState)}`);
         }
       }
