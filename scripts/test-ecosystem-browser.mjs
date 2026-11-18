@@ -133,6 +133,9 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.trim() === 'MYCOLOGIE', undefined, { timeout: 15000 });
     assert.equal(page.url(), originalUrl, 'Selecting a universe must stay inside the normal BA Labs homepage');
     assert.ok((await page.locator('#selection').innerText()).length > 0, 'Direct domain selection must focus the requested universe in the embedded scene');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), 'MYCOLOGIE', 'The selected universe must be visibly named in the compact dock');
+    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), 'https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063', 'The selected universe must expose its canonical public Notion page');
+    assert.ok(await page.locator('#selection').evaluate((element) => element.getBoundingClientRect().width > 100 && element.getBoundingClientRect().height > 20), 'The selected-node dock must be visible and not clipped');
     assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), 'location', 'The side rail must reflect the focused universe');
     await page.locator('.universe-rail [data-universe="bio"]').click();
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.trim() === 'BIOTECHNOLOGIE', undefined, { timeout: 10000 });
