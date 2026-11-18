@@ -138,7 +138,7 @@ try {
     assert.ok(await page.locator('#selection').evaluate((element) => element.getBoundingClientRect().width > 100 && element.getBoundingClientRect().height > 20), 'The selected-node dock must be visible and not clipped');
     assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), 'location', 'The side rail must reflect the focused universe');
     await page.locator('.universe-rail [data-universe="bio"]').click();
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.trim() === 'BIOTECHNOLOGIE', undefined, { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === 'BIOTECHNOLOGIE', undefined, { timeout: 10000 });
     assert.equal(await page.locator('.universe-rail [data-universe="bio"]').getAttribute('aria-current'), 'location', 'Clicking a side point must focus and activate its matching universe');
     assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), null, 'Only the currently focused universe may be active in the side rail');
     // Every one of the eight public points must stay synchronized with the focused root.
