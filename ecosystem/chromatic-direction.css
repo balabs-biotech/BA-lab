@@ -1,4 +1,4 @@
-/* BA Labs — chromatic direction v1
+/* BA Labs — chromatic direction v3
    Mineral forest + graphite petroleum + oxidised copper. Keep generous mineral-light surfaces.
    This is a controlled overlay: existing editorial structure and content remain intact. */
 :root{
@@ -10,7 +10,6 @@
   --balabs-sage-bright:#9BAEA4;
   --balabs-mineral-pale:#D1D0C5;
   --balabs-copper:#B96B4D;
-  --balabs-copper:#B96B4D;
   --balabs-paper:#F2F1E9;
   --balabs-mineral:#D1D0C5;
   --balabs-muted:#9BAEA4;
@@ -19,15 +18,15 @@
   --balabs-focus-ring:0 0 0 3px var(--balabs-ink),0 0 0 5px var(--balabs-copper);
 }
 #app.balabs-ui>.top{
-  background:linear-gradient(100deg,rgba(13,21,39,.98),rgba(24,36,60,.96))!important;
-  border-bottom:1px solid rgba(104,143,230,.34)!important;
+  background:linear-gradient(100deg,rgba(17,27,29,.98),rgba(38,59,56,.96))!important;
+  border-bottom:1px solid rgba(185,107,77,.34)!important;
   box-shadow:0 8px 28px rgba(17,27,29,.16)!important;
 }
 #app.balabs-ui>.top .brand strong{color:#F2F1E9!important}
 #app.balabs-ui>.top .brand small{color:#9BAEA4!important}
 #app.balabs-ui>.top .brand:after{background:linear-gradient(90deg,#789A8B,#B96B4D)!important}
 #app.balabs-ui>.top .lang{
-  color:#D9E3F6!important;background:#263B38!important;
+  color:#D1D0C5!important;background:#263B38!important;
   border-color:rgba(64,83,77,.32)!important;
 }
 #app.balabs-ui>.top .lang[aria-pressed=true]{
@@ -35,7 +34,7 @@
 }
 #app.balabs-ui>.site-nav{
   border-color:rgba(64,83,77,.2)!important;
-  background:rgba(16,24,42,.94)!important;
+  background:rgba(17,27,29,.94)!important;
 }
 #app.balabs-ui>.site-nav a{color:#D1D0C5!important}
 #app.balabs-ui>.site-nav a:hover{
@@ -54,8 +53,8 @@
   --chapter-accent:#B96B4D!important;
   background:
     radial-gradient(ellipse at 84% 7%,rgba(121,154,139,.19),transparent 35%),
-    radial-gradient(ellipse at 8% 82%,rgba(200,121,82,.09),transparent 34%),
-    linear-gradient(145deg,#1B2B28 0%,#111B1D 54%,#111B2B 100%)!important;
+    radial-gradient(ellipse at 8% 82%,rgba(185,107,77,.09),transparent 34%),
+    linear-gradient(145deg,#1B2B28 0%,#111B1D 54%,#111B1D 100%)!important;
 }
 #app.balabs-ui .experience-page[data-chapter=home]{--chapter-accent:#9BAEA4!important}
 #app.balabs-ui .experience-page[data-chapter=research]{--chapter-accent:#B96B4D!important}
@@ -70,7 +69,7 @@
 }
 #app.balabs-ui .experience-page .experience-page-label{
   border-inline-start-color:var(--chapter-accent)!important;
-  background:rgba(16,24,42,.38)!important;
+  background:rgba(17,27,29,.38)!important;
 }
 #app.balabs-ui .experience-page:before{
   background:linear-gradient(90deg,transparent,#789A8B 30%,#B96B4D 72%,transparent)!important;
@@ -130,7 +129,7 @@
   border-color:rgba(155,174,164,.28)!important;
 }
 #app.balabs-ui .experience-page .universe-bridge .bridge-kicker,
-#app.balabs-ui .experience-page .universe-bridge .bridge-action{color:#E1BD75!important}
+#app.balabs-ui .experience-page .universe-bridge .bridge-action{color:#D58A68!important}
 #app.balabs-ui .experience-page .universe-bridge .bridge-action{border-color:#B96B4D!important}
 @media(prefers-reduced-motion:no-preference){
   #app.balabs-ui .experience-page:after{
@@ -161,21 +160,21 @@ html,body{
   background-attachment:fixed!important;
 }
 #app.balabs-ui .experience-page[data-chapter=home]>.hero{
-  background:linear-gradient(135deg,rgba(22,37,61,.97),rgba(16,24,42,.94))!important;
+  background:linear-gradient(135deg,rgba(38,59,56,.97),rgba(17,27,29,.94))!important;
 }
 #app.balabs-ui .experience-page[data-chapter=research]>.editorial-work{
   background:
-    radial-gradient(ellipse at 88% 5%,rgba(214,173,91,.09),transparent 32%),
+    radial-gradient(ellipse at 88% 5%,rgba(185,107,77,.09),transparent 32%),
     linear-gradient(145deg,#263B38 0%,#172321 68%,#111B1D 100%)!important;
 }
 #app.balabs-ui .experience-page[data-chapter=network]>.universe-index{
   background:
     radial-gradient(ellipse at 12% 20%,rgba(120,146,125,.16),transparent 38%),
-    linear-gradient(145deg,#1E302B 0%,#101A2B 72%)!important;
+    linear-gradient(145deg,#1E302B 0%,#111B1D 72%)!important;
 }
 #app.balabs-ui .experience-page[data-chapter=catalogue]>.product-catalogue{
   background:
-    radial-gradient(ellipse at 90% 0%,rgba(200,121,82,.11),transparent 30%),
+    radial-gradient(ellipse at 90% 0%,rgba(185,107,77,.11),transparent 30%),
     linear-gradient(180deg,#172321 0%,#111B1D 100%)!important;
 }
 #app.balabs-ui .experience-page[data-chapter=catalogue] .product-catalogue-card{
@@ -242,7 +241,7 @@ html,body{
 }
 
 /* Semantic color mapping for the eight universes: biology is green, engineering is mineral green. */
-#app.balabs-ui .universe-index-card{--universe-accent:#A8B8C9}
+#app.balabs-ui .universe-index-card{--universe-accent:#9BAEA4}
 #app.balabs-ui .universe-index-card[data-domain-page="myco"],
 #app.balabs-ui .universe-index-card[data-domain-page="bio"],
 #app.balabs-ui .universe-index-card[data-domain-page="soil"]{--universe-accent:#A7B8A4}
@@ -250,7 +249,7 @@ html,body{
 #app.balabs-ui .universe-index-card[data-domain-page="lab"]{--universe-accent:#B96B4D}
 #app.balabs-ui .universe-index-card[data-domain-page="products"]{--universe-accent:#B96B4D}
 #app.balabs-ui .universe-index-card[data-domain-page="work"]{--universe-accent:#B96B4D}
-#app.balabs-ui .universe-index-card[data-domain-page="learn"]{--universe-accent:#A8B8C9}
+#app.balabs-ui .universe-index-card[data-domain-page="learn"]{--universe-accent:#9BAEA4}
 #app.balabs-ui .universe-index-card>span,
 #app.balabs-ui .universe-index-card>em{color:var(--universe-accent)!important}
 #app.balabs-ui .universe-index-card:hover{
@@ -288,17 +287,17 @@ html,body{
 #app.balabs-ui .experience-page[data-chapter=research]>.editorial-work{
   background-image:
     var(--balabs-noise),
-    repeating-linear-gradient(0deg,rgba(214,173,91,.025) 0 1px,transparent 1px 7px),
-    radial-gradient(ellipse at 88% 5%,rgba(214,173,91,.12),transparent 36%),
+    repeating-linear-gradient(0deg,rgba(185,107,77,.025) 0 1px,transparent 1px 7px),
+    radial-gradient(ellipse at 88% 5%,rgba(185,107,77,.12),transparent 36%),
     linear-gradient(145deg,#263B38 0%,#172321 68%,#111B1D 100%)!important;
   background-blend-mode:soft-light,overlay,normal,normal!important;
 }
 #app.balabs-ui .experience-page[data-chapter=catalogue]>.product-catalogue{
   background-image:
     var(--balabs-noise),
-    repeating-linear-gradient(112deg,rgba(200,121,82,.035) 0 1px,transparent 1px 11px),
-    radial-gradient(ellipse at 90% 0%,rgba(200,121,82,.14),transparent 34%),
-    linear-gradient(180deg,#172235 0%,#111B1D 100%)!important;
+    repeating-linear-gradient(112deg,rgba(185,107,77,.035) 0 1px,transparent 1px 11px),
+    radial-gradient(ellipse at 90% 0%,rgba(185,107,77,.14),transparent 34%),
+    linear-gradient(180deg,#172321 0%,#111B1D 100%)!important;
   background-blend-mode:soft-light,screen,normal,normal!important;
 }
 /* Biological chapter: branching fibre-like contours in mineral green. */
@@ -307,7 +306,7 @@ html,body{
     var(--balabs-noise),
     repeating-radial-gradient(ellipse at 18% 24%,transparent 0 27px,rgba(167,184,164,.045) 28px 29px,transparent 30px 54px),
     radial-gradient(ellipse at 12% 20%,rgba(120,146,125,.2),transparent 42%),
-    linear-gradient(145deg,#1E302B 0%,#101A2B 72%)!important;
+    linear-gradient(145deg,#1E302B 0%,#111B1D 72%)!important;
   background-blend-mode:soft-light,screen,normal,normal!important;
 }
 /* Light panels: tactile mineral paper, enough contrast to keep text crisp. */
@@ -315,22 +314,22 @@ html,body{
 #app.balabs-ui .experience-page .under{
   background-image:
     var(--balabs-noise),
-    repeating-linear-gradient(0deg,rgba(16,24,42,.018) 0 1px,transparent 1px 5px),
-    linear-gradient(135deg,#F2F4F8,#E8EDF5)!important;
+    repeating-linear-gradient(0deg,rgba(17,27,29,.018) 0 1px,transparent 1px 5px),
+    linear-gradient(135deg,#E9E8DF,#D1D0C5)!important;
   background-blend-mode:multiply,normal,normal!important;
 }
 #app.balabs-ui .experience-page .product-catalogue-card{
   background-image:
     var(--balabs-noise),
-    repeating-linear-gradient(112deg,rgba(200,121,82,.035) 0 1px,transparent 1px 9px),
-    linear-gradient(145deg,rgba(35,51,73,.94),rgba(17,27,29,.98))!important;
+    repeating-linear-gradient(112deg,rgba(185,107,77,.035) 0 1px,transparent 1px 9px),
+    linear-gradient(145deg,rgba(38,59,56,.94),rgba(17,27,29,.98))!important;
   background-blend-mode:soft-light,screen,normal!important;
 }
 /* Copper accents get a brushed highlight rather than a flat fill. */
 #app.balabs-ui .experience-page .experience-page-label,
 #app.balabs-ui .experience-page .universe-index-card>em,
 #app.balabs-ui .experience-page .product-ref{
-  text-shadow:0 1px 10px rgba(214,173,91,.12);
+  text-shadow:0 1px 10px rgba(185,107,77,.12);
 }
 #app.balabs-ui .experience-page .work-card,
 #app.balabs-ui .experience-page .method-steps li,
