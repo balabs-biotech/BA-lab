@@ -16,7 +16,9 @@ assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particl
 assert.ok(!html.includes("visual-mycology"), "The obsolete branching mycelium hero SVG must not be shipped in the shared markup");
 assert.ok(!visuals.includes("workspace-particle-field"), "The old generic global particle field must be removed");
 assert.ok(visuals.includes('ba-sector-visual--mycology'), "Mycology must have a dedicated colony-growth scene");
-assert.ok(visuals.includes('ba-sector-visual--greentech'), "GreenTech must have a dedicated leaf-growth scene");
+assert.ok(visuals.includes('ba-sector-visual--greentech'), "GreenTech must have a dedicated botanical scene");
+assert.ok(visuals.includes('data-visual="botanical-plate"') && visuals.includes('ba-botanical-plate'), "GreenTech must render the detailed botanical plate");
+assert.ok(visuals.includes("secondary veins") || visuals.includes("nervures secondaires"), "GreenTech botanical plate must describe its scientific morphology");
 assert.ok(visuals.includes('ba-sector-visual--laboratory'), "Laboratory must have a dedicated bioreactor scene");
 assert.ok(visuals.includes('mode: "repulse"') && visuals.includes('mode: "push"'), "GreenTech particles must react to pointer hover and click");
 assert.ok(visuals.includes('mode: "bubble"'), "Laboratory particles must react with a controlled bubble interaction");
@@ -39,8 +41,8 @@ assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS l
 assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
-assert.ok(greenTechEntry.includes("20261117-sector-interaction-160"), "GreenTech must load the interactive sector particle runtime");
-assert.ok(laboratoryEntry.includes("20261117-sector-interaction-160"), "Laboratory must load the interactive sector particle runtime");
+assert.ok(greenTechEntry.includes("20261119-botanical-plate-1"), "GreenTech must load the current botanical visual runtime");
+assert.ok(laboratoryEntry.includes("20261119-botanical-plate-1"), "Laboratory must load the current shared visual runtime");
 
 const laboratoryProcess = fs.readFileSync("batch-tracker/laboratory-process-visuals.js", "utf8");
 const laboratoryStyles = fs.readFileSync("batch-tracker/styles/laboratory-process-map.css", "utf8");
