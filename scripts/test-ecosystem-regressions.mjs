@@ -12,7 +12,7 @@ const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
 
 assert.ok(publicExplorerJs.includes('selection-dock') && publicExplorerJs.includes('selection-open-link'), 'Selecting a 2D node must render a compact selection dock with its direct resource action');
 assert.ok(publicExplorerJs.includes('selected.data.url') && publicExplorerJs.includes('https:'), 'The selection action must use the verified Notion URL carried by the selected manifest node');
-assert.doesNotMatch(html, /#selection\\{position:absolute!important;width:1px!important/, 'The public explorer must not clip the selected-node dock out of view');
+assert.ok(!html.includes('#selection{position:absolute!important;width:1px!important'), 'The public explorer must not clip the selected-node dock out of view');
 
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
 const previewEngine = readFileSync('ecosystem-preview/engine-v2.js', 'utf8');
