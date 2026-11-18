@@ -60,7 +60,7 @@ The returned source is not automatically executable in CultureOps. Review import
 - [ ] Deploy the maintainer-only `get` guard from PR #375; the deployed version 3 predates this additional allowlist.
 - [x] Verify that a publishable key alone is rejected by the deployed function (`401 authenticated_session_required`).
 - [ ] Invoke `browse` from a real authenticated CultureOps session and `get` from an allowlisted maintainer session to validate the stored secret and upstream response.
-- [x] Add a two-column spatial module navigation rail with four-direction controls, progress steps, Alt+arrow keyboard navigation, and horizontal/vertical touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
+- [x] Add a domain-aware two-column spatial module navigation rail with four-direction controls, progress steps, Alt+arrow keyboard navigation, and horizontal/vertical touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
 - [x] Adapt Rising Lines into the GreenTech hero as a lightweight canvas particle stream with a lime horizon glow.
 - [x] Adapt Particle Sphere into Mycology with a Three.js particle cloud and a 2D canvas fallback when WebGL is unavailable.
