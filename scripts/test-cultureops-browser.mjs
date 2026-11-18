@@ -208,6 +208,9 @@ try {
             }
             link.hidden = false;
           }
+          // Trigger the real workspace activation handler. Merely removing
+          // hidden attributes does not update the navigation's active module.
+          sectionNavigation.querySelector('a[href^="#"]')?.click();
         }
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const after = hero?.getBoundingClientRect().height ?? 0;
