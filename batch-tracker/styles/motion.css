@@ -391,3 +391,18 @@ html body[data-domain="agronomy"] .ba-botanical-plate .ba-leaf-scan {
     opacity:.42 !important;
   }
 }
+
+
+/* Domain-specific hero titles: only the ampersand carries the sector accent. */
+html body[data-domain] .app-hero h1 #heroTitlePrimary {
+  color:var(--paper) !important;
+  text-shadow:none !important;
+}
+html body[data-domain] .app-hero h1 #heroTitleSecondary {
+  color:#bdc9c2 !important;
+  text-shadow:none !important;
+}
+html body[data-domain] .app-hero h1 > span[aria-hidden="true"] {
+  color:var(--workspace-accent) !important;
+  text-shadow:0 0 24px color-mix(in srgb,var(--workspace-accent) 24%,transparent) !important;
+}
