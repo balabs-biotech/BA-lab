@@ -4,12 +4,6 @@ name: Deploy Batch Tracker to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'index.html'
-      - 'batch-tracker/**'
-      - 'ecosystem/**'
-      - 'ecosystem-preview/**'
-      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -55,3 +49,27 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify published BA Labs assets
+        run: |
+          set -eu
+          base="https://balabs-biotech.github.io/BA-lab/ecosystem"
+          verify_asset() {
+            path="$1"
+            expected="$2"
+            for attempt in $(seq 1 18); do
+              result="$(curl -sSL -o /dev/null -w '%{http_code} %{content_type}' "$base/$path" || true)"
+              code="${result%% *}"
+              mime="${result#* }"
+              if [ "$code" = "200" ] && echo "$mime" | grep -qi "$expected"; then
+                echo "✓ $path ($mime)"
+                return 0
+              fi
+              sleep 5
+            done
+            echo "Published asset verification failed: $path ($result)" >&2
+            return 1
+          }
+          verify_asset "assets/chapter-home.jpg" "image/jpeg"
+          verify_asset "assets/editorial-penicillium.png" "image/png"
+          verify_asset "explorer-2d.js?v=selection-dock-1" "javascript"
