@@ -23,7 +23,7 @@
     canvas.setAttribute('aria-hidden','true');
     Object.assign(canvas.style,{
       position:'absolute',inset:'0',width:'100%',height:'100%',
-      zIndex:'-1',pointerEvents:'none',opacity:'1'
+      zIndex:'0',pointerEvents:'none',opacity:'1'
     });
     hero.prepend(canvas);
     const ctx=canvas.getContext('2d',{alpha:true});
