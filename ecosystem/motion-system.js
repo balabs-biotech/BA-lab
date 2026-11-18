@@ -56,12 +56,13 @@
           [.55,0,.08],[.88,0,-.1],
           [.1,1,.12],[.52,1,-.08],[.9,1,.1]
         ];
-        roots.forEach((a,i)=>{
+        const mainRoots=[];
+      roots.forEach((a,i)=>{
           const x=a[0]*width,y=a[1]*height;
           const inward=Math.atan2(height*.5-y,width*.5-x)+a[2];
           const root=buildPath(x,y,inward,5,step,31+i*17,1.15+rand(i)*.65,
             i%4===0?'copper':'green');
-          paths.push(root);
+          paths.push(root);mainRoots.push(root);
           [2,3].forEach((at,j)=>{
             const node=root.nodes[at];
             const prev=root.nodes[at-1],next=root.nodes[at+1];
@@ -74,6 +75,33 @@
             });
           });
         });
+        // Anastomosis: selected hyphae from different colonies fuse at nearby
+        // internal nodes, turning separate branching trees into one reticulated
+        // mycelial network. Junctions reuse the original node objects.
+        const links=[];
+        for(let i=0;i<mainRoots.length;i++) for(let j=i+1;j<mainRoots.length;j++){
+          let best=null;
+          for(let a=1;a<mainRoots[i].nodes.length;a++) for(let b=1;b<mainRoots[j].nodes.length;b++){
+            const p=mainRoots[i].nodes[a],q=mainRoots[j].nodes[b];
+            const d=Math.hypot(p.x-q.x,p.y-q.y);
+            if(!best||d<best.d) best={p,q,d,i,j};
+          }
+          if(best&&best.d<span*.34) links.push(best);
+        }
+        links.sort((a,b)=>a.d-b.d);
+        const degree=Array(mainRoots.length).fill(0);
+        let fused=0;
+        for(const link of links){
+          if(fused>=14||degree[link.i]>=2||degree[link.j]>=2) continue;
+          const dx=link.q.x-link.p.x,dy=link.q.y-link.p.y;
+          const bend=(fused%2?1:-1)*Math.min(24,link.d*.16);
+          const mid={x:(link.p.x+link.q.x)/2-dy/(link.d||1)*bend,
+            y:(link.p.y+link.q.y)/2+dx/(link.d||1)*bend,
+            phase:rand(fused+901)*6.28,amp:1.2};
+          paths.push({nodes:[link.p,mid,link.q],weight:.62,
+            colour:fused%4===0?'copper':'green',seed:900+fused});
+          degree[link.i]++;degree[link.j]++;fused++;
+        }
       };
       const resize=new ResizeObserver(rebuild);
       resize.observe(hero);rebuild();
