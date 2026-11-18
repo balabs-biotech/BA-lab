@@ -344,22 +344,3 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
 @media(prefers-reduced-motion:reduce){
  .chapter-filament .filament-branches{filter:none!important}
 }
-
-/* Physical left/right anchors avoid logical-inset ambiguity on the body-level fixed rail. */
-.chapter-rail .chapter-rail-name{
- position:absolute!important;
- top:50%!important;
- left:calc(100% + 8px)!important;
- right:auto!important;
- box-sizing:border-box!important;
- width:min(220px,calc(100vw - 110px))!important;
- max-width:calc(100vw - 110px)!important;
- white-space:normal!important;
- overflow-wrap:anywhere!important;
- transform:translateY(-50%)!important;
-}
-[dir="rtl"] .chapter-rail .chapter-rail-name{
- left:auto!important;
- right:calc(100% + 8px)!important;
- text-align:end!important;
-}
