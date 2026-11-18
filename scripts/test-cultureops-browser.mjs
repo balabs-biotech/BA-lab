@@ -5,8 +5,11 @@ import path from "node:path";
 
 const cultureOpsLanding = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const cultureOpsLocales = fs.readFileSync(new URL("../batch-tracker/i18n.js", import.meta.url), "utf8");
-if (/CULTURE\s*&(?:amp;)?\s*BATCH TRACKER/i.test(cultureOpsLanding)) {
+if (/CULTURE\s*&(?:amp;)?\s*BATCH TRACKER|CULTURE\s*&\s*RASTREIO DE LOTES|تتبّع الثقافات والدفعات/i.test(cultureOpsLanding)) {
   throw new Error("CultureOps landing page still exposes a retired product label.");
+}
+if ((cultureOpsLanding.match(/BA LABS \/ CULTUREOPS/g) || []).length !== 4) {
+  throw new Error("CultureOps branding is not consistent across all four portal languages.");
 }
 if (/BA Labs BatchTracker|BA Labs Batch Tracker/i.test(cultureOpsLocales)) {
   throw new Error("CultureOps translations still expose a retired product label.");
