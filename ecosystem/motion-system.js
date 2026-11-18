@@ -32,8 +32,8 @@
       let pointer={x:0,y:0,tx:0,ty:0,active:false};
       let paths=[];
       const rand=(seed)=>{const x=Math.sin(seed*127.1+311.7)*43758.5453;return x-Math.floor(x);};
-      const buildPath=(x,y,angle,steps,length,seed,weight,colour)=>{
-        const nodes=[{x,y,phase:rand(seed)*6.28,amp:1.8}];
+      const buildPath=(x,y,angle,steps,length,seed,weight,colour,startNode=null)=>{
+        const nodes=[startNode || {x,y,phase:rand(seed)*6.28,amp:0}];
         for(let i=1;i<=steps;i++){
           angle+=(rand(seed+i*3.1)-.5)*.72;
           const distance=length*(.68+rand(seed+i*7.7)*.58);
@@ -69,7 +69,7 @@
             [-1,1].forEach((side,k)=>{
               const branch=buildPath(node.x,node.y,tangent+side*(.62+rand(i+j+k)*.55),
                 3,step*(.55+rand(i+j+k+8)*.25),71+i*23+j*5+k,
-                .48+rand(i+j+k+19)*.35,(i+j+k)%5===0?'copper':'green');
+                .48+rand(i+j+k+19)*.35,(i+j+k)%5===0?'copper':'green',node);
               paths.push(branch);
             });
           });
@@ -87,25 +87,30 @@
       hero.addEventListener('pointerleave',leave,{passive:true});
       hero.addEventListener('pointerdown',onPointer,{passive:true});
       const drawPath=(path,time)=>{
-        const pts=path.nodes.map((n,i)=>{
-          let x=n.x+Math.sin(time*.34+n.phase+i*.61)*n.amp;
-          let y=n.y+Math.cos(time*.29+n.phase+i*.47)*n.amp;
+        const pts=path.nodes.map(n=>{
+          // Shared node objects mean a daughter hypha starts at the exact moving
+          // junction of its parent: no visual gaps at branch origins.
+          let x=n.x+Math.sin(time*.22+n.phase)*n.amp;
+          let y=n.y+Math.cos(time*.19+n.phase*.83)*n.amp;
           if(pointer.active){
             const dx=x-pointer.x,dy=y-pointer.y,dist=Math.hypot(dx,dy);
-            const influence=Math.exp(-(dist*dist)/(2*155*155));
-            const curl=10*influence;
-            x+=(-dx/(dist||1)*22-dy/(dist||1)*curl);
-            y+=(-dy/(dist||1)*22+dx/(dist||1)*curl);
+            const influence=Math.exp(-(dist*dist)/(2*175*175));
+            const curl=8*influence;
+            x+=(-dx/(dist||1)*18-dy/(dist||1)*curl);
+            y+=(-dy/(dist||1)*18+dx/(dist||1)*curl);
           }
           return {x,y};
         });
         if(pts.length<2)return;
+        // Catmull–Rom converted to cubic Béziers: the curve passes through
+        // every biological junction instead of merely bending near it.
         ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-        for(let i=1;i<pts.length-1;i++){
-          const mx=(pts[i].x+pts[i+1].x)*.5,my=(pts[i].y+pts[i+1].y)*.5;
-          ctx.quadraticCurveTo(pts[i].x,pts[i].y,mx,my);
+        for(let i=0;i<pts.length-1;i++){
+          const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+          const c1={x:p1.x+(p2.x-p0.x)/6,y:p1.y+(p2.y-p0.y)/6};
+          const c2={x:p2.x-(p3.x-p1.x)/6,y:p2.y-(p3.y-p1.y)/6};
+          ctx.bezierCurveTo(c1.x,c1.y,c2.x,c2.y,p2.x,p2.y);
         }
-        ctx.lineTo(pts[pts.length-1].x,pts[pts.length-1].y);
         const copper=path.colour==='copper';
         ctx.strokeStyle=copper?'rgba(185,107,77,.28)':'rgba(121,169,145,.30)';
         ctx.lineWidth=path.weight;ctx.lineCap='round';ctx.lineJoin='round';
