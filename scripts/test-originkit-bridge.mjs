@@ -10,6 +10,7 @@ assert.match(source, /tools\/call/);
 assert.match(source, /get_component/);
 assert.match(source, /Deno\.serve/);
 assert.match(source, /authenticatedUserId/);
+assert.match(source, /if \(parts\.length !== 3 \|\| !parts\[1\]\) return null/);
 assert.match(source, /ORIGINKIT_ALLOWED_USER_IDS/);
 assert.match(source, /isOriginKitMaintainer/);
 assert.match(source, /originkit_maintainer_required/);
