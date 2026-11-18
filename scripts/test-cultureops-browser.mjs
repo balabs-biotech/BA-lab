@@ -91,6 +91,17 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: workspace shell or authentication panel did not render`);
       }
 
+      const expectedAnimationCanvas = {
+        agronomy: ".ba-originkit-rising-lines",
+        mycology: ".ba-originkit-particle-sphere",
+        laboratory: ".ba-originkit-kinetic-grid",
+      }[workspace.domain];
+      try {
+        await page.locator(expectedAnimationCanvas).waitFor({ state: "attached", timeout: 15000 });
+      } catch {
+        failures.push(`${workspace.slug}/${viewport.name}: sector OriginKit canvas did not mount (${expectedAnimationCanvas})`);
+      }
+
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
@@ -132,6 +143,7 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          heroAnimationCanvas: document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.className || null,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
             const rect = element.getBoundingClientRect();
@@ -157,6 +169,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
+      if (!metrics.heroAnimationCanvas) failures.push(`${workspace.slug}/${viewport.name}: sector-specific OriginKit canvas missing`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
@@ -173,21 +186,34 @@ try {
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
-      const compactHero = await page.evaluate(() => {
+      const compactHero = await page.evaluate(async () => {
         const hero = document.querySelector(".app-hero");
         const auth = document.querySelector("#authCard");
         const authWasVisible = auth && !auth.classList.contains("hidden");
         const before = hero?.getBoundingClientRect().height ?? 0;
         document.body.classList.add("workspace-authenticated");
         auth?.classList.add("hidden");
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const after = hero?.getBoundingClientRect().height ?? 0;
-        const artHidden = getComputedStyle(document.querySelector(".hero-art")).display === "none";
+        const art = document.querySelector(".hero-art");
+        const artRect = art?.getBoundingClientRect();
+        const visualRect = document.querySelector(".ba-sector-visual")?.getBoundingClientRect();
+        const canvasRect = document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.getBoundingClientRect();
+        const artHidden = getComputedStyle(art).display === "none";
         const descriptionHidden = getComputedStyle(document.querySelector(".hero-description")).display === "none";
         document.body.classList.remove("workspace-authenticated");
         if (authWasVisible) auth.classList.remove("hidden");
-        return { before, after, artHidden, descriptionHidden };
+        return {
+          before, after, artHidden, descriptionHidden,
+          artWidth: artRect?.width ?? 0, artHeight: artRect?.height ?? 0,
+          visualWidth: visualRect?.width ?? 0, visualHeight: visualRect?.height ?? 0,
+          canvasWidth: canvasRect?.width ?? 0, canvasHeight: canvasRect?.height ?? 0
+        };
       });
-      if (!compactHero.artHidden || !compactHero.descriptionHidden || compactHero.after >= compactHero.before) failures.push(`${workspace.slug}/${viewport.name}: authenticated hero did not collapse (${compactHero.before}px -> ${compactHero.after}px)`);
+      if (compactHero.artHidden || !compactHero.descriptionHidden) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector signature should remain visible while the marketing description collapses`);
+      if (compactHero.artWidth <= 0 || compactHero.artHeight <= 0 || compactHero.visualWidth <= 0 || compactHero.visualHeight <= 0 || compactHero.canvasWidth <= 0 || compactHero.canvasHeight <= 0) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector animation has no visible drawing area (${JSON.stringify(compactHero)})`);
+      const maxAuthenticatedHeroHeight = viewport.width >= 821 ? 160 : 280;
+      if (compactHero.after > maxAuthenticatedHeroHeight) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector header is too tall (${compactHero.after}px > ${maxAuthenticatedHeroHeight}px)`);
       const accessibility = await page.evaluate(() => {
         const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
         const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
