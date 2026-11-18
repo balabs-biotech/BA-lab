@@ -193,14 +193,25 @@ try {
         const before = hero?.getBoundingClientRect().height ?? 0;
         document.body.classList.add("workspace-authenticated");
         auth?.classList.add("hidden");
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const after = hero?.getBoundingClientRect().height ?? 0;
-        const artHidden = getComputedStyle(document.querySelector(".hero-art")).display === "none";
+        const art = document.querySelector(".hero-art");
+        const artRect = art?.getBoundingClientRect();
+        const visualRect = document.querySelector(".ba-sector-visual")?.getBoundingClientRect();
+        const canvasRect = document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.getBoundingClientRect();
+        const artHidden = getComputedStyle(art).display === "none";
         const descriptionHidden = getComputedStyle(document.querySelector(".hero-description")).display === "none";
         document.body.classList.remove("workspace-authenticated");
         if (authWasVisible) auth.classList.remove("hidden");
-        return { before, after, artHidden, descriptionHidden };
+        return {
+          before, after, artHidden, descriptionHidden,
+          artWidth: artRect?.width ?? 0, artHeight: artRect?.height ?? 0,
+          visualWidth: visualRect?.width ?? 0, visualHeight: visualRect?.height ?? 0,
+          canvasWidth: canvasRect?.width ?? 0, canvasHeight: canvasRect?.height ?? 0
+        };
       });
       if (!compactHero.artHidden || !compactHero.descriptionHidden || compactHero.after >= compactHero.before) failures.push(`${workspace.slug}/${viewport.name}: authenticated hero did not collapse (${compactHero.before}px -> ${compactHero.after}px)`);
+      if (compactHero.artWidth <= 0 || compactHero.artHeight <= 0 || compactHero.visualWidth <= 0 || compactHero.visualHeight <= 0 || compactHero.canvasWidth <= 0 || compactHero.canvasHeight <= 0) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector animation has no visible drawing area (${JSON.stringify(compactHero)})`);
       const accessibility = await page.evaluate(() => {
         const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
         const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
