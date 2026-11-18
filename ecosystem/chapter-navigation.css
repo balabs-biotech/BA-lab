@@ -344,3 +344,12 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
 @media(prefers-reduced-motion:reduce){
  .chapter-filament .filament-branches{filter:none!important}
 }
+
+/* RTL rail labels open toward the content, never beyond the viewport edge. */
+[dir="rtl"] .chapter-rail .chapter-rail-name{
+ inset-inline-start:auto!important;
+ inset-inline-end:calc(100% + 8px)!important;
+ max-width:min(220px,calc(100vw - 90px));
+ white-space:normal;
+ text-align:end;
+}
