@@ -98,6 +98,8 @@ jobs:
           node scripts/test-auth-init-tenant-revision-guards.mjs
           node scripts/test-originkit-bridge.mjs
           node scripts/test-workspace-navigation.mjs
+          node --check batch-tracker/workspace-origin-components.js
+          node scripts/test-originkit-adapter.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
