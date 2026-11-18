@@ -56,7 +56,8 @@ The returned source is not automatically executable in CultureOps. Review import
 - [x] Secure Supabase relay committed; no API key in source control.
 - [x] Replacement key configured by the project owner in Supabase.
 - [x] Edge Function `originkit-mcp` deployed and confirmed active (version 3, JWT verification enabled).
-- [ ] Invoke `browse` and `get` from an authenticated CultureOps session to validate the secret and upstream response.
+- [x] Verify that a publishable key alone is rejected by the deployed function (`401 authenticated_session_required`).
+- [ ] Invoke `browse` and `get` from a real authenticated CultureOps session to validate the stored secret and upstream response.
 - [x] Add a spatial module navigation rail with previous/next controls, progress steps, Alt+arrow keyboard navigation, and touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
 - [x] Adapt Rising Lines into the GreenTech hero as a lightweight canvas particle stream with a lime horizon glow.
