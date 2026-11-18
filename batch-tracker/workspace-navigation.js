@@ -10,6 +10,15 @@
   const nav = document.getElementById("sectionNavigation");
   if (!hero || !nav || document.querySelector(".ba-module-rail")) return;
 
+  const modulesByDomain = {
+    agronomy: ["overviewCard", "plantCard", "measurementCard", "statisticsCard"],
+    mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
+    laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard"],
+  };
+  const allowedModuleIds = new Set(
+    modulesByDomain[document.body.dataset.domain] || modulesByDomain.laboratory
+  );
+
   const style = document.createElement("style");
   style.id = "ba-module-rail-style";
   style.textContent = `
@@ -77,8 +86,8 @@
     links = Array.from(nav.querySelectorAll('a[href^="#"]')).filter((link) => {
       const id = link.getAttribute("href").slice(1);
       const panel = document.getElementById(id);
-      return panel && !link.hidden && !panel.hidden && !panel.classList.contains("hidden") &&
-        !link.closest("[hidden]");
+      return allowedModuleIds.has(id) && panel && !link.hidden && !panel.hidden &&
+        !panel.classList.contains("hidden") && !link.closest("[hidden]");
     });
     stepsHost.replaceChildren();
     links.forEach((link, index) => {
