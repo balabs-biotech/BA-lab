@@ -305,3 +305,42 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
 @media(prefers-reduced-motion:reduce){
  .chapter-rail .chapter-rail-dot{transition:none!important}
 }
+
+
+/* Mycelial filaments: fine side hyphae branch from the measured navigation spine. */
+.chapter-filament .filament-branches{
+ fill:none!important;
+ stroke:#b6a58d!important;
+ stroke-width:1.05!important;
+ stroke-linecap:round!important;
+ stroke-linejoin:round!important;
+ stroke-dasharray:1 2.8!important;
+ opacity:.52!important;
+ filter:drop-shadow(0 0 2px #b96b4d33)!important;
+ pointer-events:none!important;
+}
+.chapter-filament .filament-base{
+ stroke:#8fa79a88!important;
+ stroke-width:1.15!important;
+ stroke-dasharray:1.4 4.5!important;
+}
+.chapter-filament .filament-progress{
+ stroke:#c87952!important;
+ stroke-width:2.2!important;
+ filter:drop-shadow(0 0 3px #c8795288)!important;
+}
+.chapter-rail .chapter-rail-dot{
+ box-shadow:0 0 0 3px #111b1dcc,0 0 0 4px #78958a33!important;
+}
+.chapter-rail .chapter-rail-node.is-past .chapter-rail-dot{
+ background:#c87952!important;
+ border-color:#e0b49b!important;
+}
+.chapter-rail .chapter-rail-node.is-active .chapter-rail-dot{
+ background:#f0e4d5!important;
+ border-color:#c87952!important;
+ box-shadow:0 0 0 4px #c8795233,0 0 14px #c87952aa!important;
+}
+@media(prefers-reduced-motion:reduce){
+ .chapter-filament .filament-branches{filter:none!important}
+}
