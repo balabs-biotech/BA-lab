@@ -18,6 +18,14 @@
   const allowedModuleIds = new Set(
     modulesByDomain[document.body.dataset.domain] || modulesByDomain.laboratory
   );
+  const navigationCopy = {
+    fr: { rail: "Navigation rapide entre les modules", eyebrow: "Parcours du workspace", steps: "Étapes du workspace", group: "Déplacement entre les modules", above: "Module au-dessus", left: "Module à gauche", below: "Module en dessous", right: "Module à droite", goTo: "Aller au module", workspace: "Espace de travail" },
+    en: { rail: "Quick navigation between modules", eyebrow: "Workspace path", steps: "Workspace steps", group: "Move between modules", above: "Module above", left: "Module to the left", below: "Module below", right: "Module to the right", goTo: "Go to module", workspace: "Workspace" },
+    pt: { rail: "Navegação rápida entre módulos", eyebrow: "Percurso do workspace", steps: "Etapas do workspace", group: "Mover entre módulos", above: "Módulo acima", left: "Módulo à esquerda", below: "Módulo abaixo", right: "Módulo à direita", goTo: "Ir para o módulo", workspace: "Espaço de trabalho" },
+    ar: { rail: "التنقل السريع بين الوحدات", eyebrow: "مسار مساحة العمل", steps: "خطوات مساحة العمل", group: "التنقل بين الوحدات", above: "الوحدة أعلاه", left: "الوحدة إلى اليسار", below: "الوحدة أدناه", right: "الوحدة إلى اليمين", goTo: "الانتقال إلى الوحدة", workspace: "مساحة العمل" },
+  };
+  const copy = () => navigationCopy[document.documentElement.lang] || navigationCopy.fr;
+
 
   const style = document.createElement("style");
   style.id = "ba-module-rail-style";
@@ -50,21 +58,21 @@
 
   const rail = document.createElement("nav");
   rail.className = "ba-module-rail";
-  rail.setAttribute("aria-label", "Navigation rapide entre les modules");
+  rail.setAttribute("aria-label", copy().rail);
   rail.innerHTML = `
     <div class="ba-module-rail__meta">
-      <span class="ba-module-rail__eyebrow">Parcours du workspace</span>
+      <span class="ba-module-rail__eyebrow"></span>
       <strong class="ba-module-rail__title" aria-live="polite">Vue générale</strong>
       <span class="ba-module-rail__count">01 / 04</span>
     </div>
-    <div class="ba-module-rail__steps" aria-label="Étapes du workspace"></div>
+    <div class="ba-module-rail__steps"></div>
     <div class="ba-module-rail__controls">
       <span class="ba-module-rail__hint">ALT + ↑ ↓ ← →</span>
-      <div class="ba-module-rail__pad" role="group" aria-label="Déplacement entre les modules">
-        <button class="ba-module-rail__button" type="button" data-direction="up" aria-label="Module au-dessus">↑</button>
-        <button class="ba-module-rail__button" type="button" data-direction="left" aria-label="Module à gauche">←</button>
-        <button class="ba-module-rail__button" type="button" data-direction="down" aria-label="Module en dessous">↓</button>
-        <button class="ba-module-rail__button" type="button" data-direction="right" aria-label="Module à droite">→</button>
+      <div class="ba-module-rail__pad" role="group">
+        <button class="ba-module-rail__button" type="button" data-direction="up" aria-label="">↑</button>
+        <button class="ba-module-rail__button" type="button" data-direction="left" aria-label="">←</button>
+        <button class="ba-module-rail__button" type="button" data-direction="down" aria-label="">↓</button>
+        <button class="ba-module-rail__button" type="button" data-direction="right" aria-label="">→</button>
       </div>
     </div>`;
   hero.insertAdjacentElement("afterend", rail);
@@ -75,6 +83,20 @@
   const directionButtons = Array.from(rail.querySelectorAll(".ba-module-rail__button"));
   let links = [];
   let activeIndex = 0;
+
+  const updateLabels = () => {
+    const labels = copy();
+    rail.setAttribute("aria-label", labels.rail);
+    rail.querySelector(".ba-module-rail__eyebrow").textContent = labels.eyebrow;
+    stepsHost.setAttribute("aria-label", labels.steps);
+    rail.querySelector(".ba-module-rail__pad").setAttribute("aria-label", labels.group);
+    const names = { up: labels.above, left: labels.left, down: labels.below, right: labels.right };
+    directionButtons.forEach((button) => button.setAttribute("aria-label", names[button.dataset.direction]));
+    titleNode.textContent = links[activeIndex] ? labelFor(links[activeIndex]) : labels.workspace;
+    Array.from(stepsHost.children).forEach((step, index) => {
+      step.setAttribute("aria-label", labels.goTo + " " + (index + 1) + " : " + labelFor(links[index]));
+    });
+  };
 
   const labelFor = (link) => {
     const number = link.querySelector(".nav-number")?.textContent?.trim() || "";
@@ -94,7 +116,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "ba-module-rail__step";
-      button.setAttribute("aria-label", "Aller au module " + (index + 1) + " : " + labelFor(link));
+      button.setAttribute("aria-label", copy().goTo + " " + (index + 1) + " : " + labelFor(link));
       button.title = labelFor(link);
       button.addEventListener("click", () => link.click());
       stepsHost.appendChild(button);
@@ -107,7 +129,7 @@
     if (current >= 0) activeIndex = current;
     activeIndex = Math.max(0, Math.min(activeIndex, Math.max(0, links.length - 1)));
     const currentLink = links[activeIndex];
-    titleNode.textContent = currentLink ? labelFor(currentLink) : "Workspace";
+    titleNode.textContent = currentLink ? labelFor(currentLink) : copy().workspace;
     countNode.textContent = String(activeIndex + 1).padStart(2, "0") + " / " + String(links.length).padStart(2, "0");
     Array.from(stepsHost.children).forEach((step, index) => {
       if (index === activeIndex) step.setAttribute("aria-current", "step");
@@ -191,5 +213,8 @@
     }
   }, { passive: true });
 
+  updateLabels();
   refreshLinks();
+  const languageObserver = new MutationObserver(updateLabels);
+  languageObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 })();
