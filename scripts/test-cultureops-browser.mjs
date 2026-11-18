@@ -186,7 +186,7 @@ try {
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
-      const compactHero = await page.evaluate(() => {
+      const compactHero = await page.evaluate(async () => {
         const hero = document.querySelector(".app-hero");
         const auth = document.querySelector("#authCard");
         const authWasVisible = auth && !auth.classList.contains("hidden");
