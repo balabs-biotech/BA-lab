@@ -88,9 +88,21 @@
   update();
  };
  const scheduleRailGeometry=()=>{if(railGeometryFrame)return;railGeometryFrame=requestAnimationFrame(()=>{railGeometryFrame=0;syncRailGeometry()})};
- const pageWidth=()=>Math.max(1,track.clientWidth);
+ const pageStart=page=>{
+  const trackRect=track.getBoundingClientRect(),pageRect=page.getBoundingClientRect();
+  return track.scrollLeft+pageRect.left-trackRect.left;
+ };
+ const trackProgress=()=>{
+  const x=track.scrollLeft,starts=pages.map(pageStart);
+  if(x<=starts[0])return 0;
+  for(let i=0;i<starts.length-1;i++){
+   const span=Math.max(1,starts[i+1]-starts[i]);
+   if(x<=starts[i+1])return i+Math.max(0,Math.min(1,(x-starts[i])/span));
+  }
+  return pages.length-1;
+ };
  const update=()=>{
-  const rawProgress=Math.max(0,Math.min(pages.length-1,track.scrollLeft/pageWidth()));
+  const rawProgress=Math.max(0,Math.min(pages.length-1,trackProgress()));
   const idx=Math.max(0,Math.min(pages.length-1,Math.round(rawProgress)));
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
@@ -103,7 +115,7 @@
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
  const scrollBehavior=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
- const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:n*pageWidth(),top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
+ const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:pageStart(pages[n]),top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
  prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
  track.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
  track.addEventListener('scrollend',update,{passive:true});
