@@ -60,10 +60,18 @@ try {
     await page.locator('.chapter-rail-node').first().hover();
     const chapterLabelBounds = await page.locator('.chapter-rail-node').first().locator('.chapter-rail-name').evaluate(element => {
       const rect = element.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, viewportWidth: window.innerWidth, visibility: getComputedStyle(element).visibility };
+      const railRect = document.querySelector('.chapter-rail').getBoundingClientRect();
+      const nodeRect = element.closest('.chapter-rail-node').getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        left: rect.left, right: rect.right, width: rect.width, viewportWidth: window.innerWidth,
+        visibility: style.visibility, display: style.display, direction: getComputedStyle(document.documentElement).direction,
+        rail: { left: railRect.left, right: railRect.right, width: railRect.width },
+        node: { left: nodeRect.left, right: nodeRect.right, width: nodeRect.width }
+      };
     });
     assert.equal(chapterLabelBounds.visibility, 'visible', 'Hovering a chapter point must reveal its label');
-    assert.ok(chapterLabelBounds.left >= 0 && chapterLabelBounds.right <= chapterLabelBounds.viewportWidth, 'The chapter label must remain fully inside the viewport: ' + JSON.stringify({ ...chapterLabelBounds, width: chapterLabelBounds.right - chapterLabelBounds.left, display: getComputedStyle(document.querySelector('.chapter-rail-node .chapter-rail-name')).display, direction: getComputedStyle(document.documentElement).direction, rail: (() => { const r=document.querySelector('.chapter-rail').getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; })(), node: (() => { const r=document.querySelector('.chapter-rail-node').getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; })() }));
+    assert.ok(chapterLabelBounds.left >= 0 && chapterLabelBounds.right <= chapterLabelBounds.viewportWidth, 'The chapter label must remain fully inside the viewport: ' + JSON.stringify(chapterLabelBounds));
 
     // Audit real image decoding on every editorial chapter after navigation.
     const chapterImageAudits = [];
