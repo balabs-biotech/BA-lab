@@ -58,7 +58,7 @@ The returned source is not automatically executable in CultureOps. Review import
 - [x] Edge Function `originkit-mcp` deployed and confirmed active (version 3, JWT verification enabled).
 - [x] Verify that a publishable key alone is rejected by the deployed function (`401 authenticated_session_required`).
 - [ ] Invoke `browse` and `get` from a real authenticated CultureOps session to validate the stored secret and upstream response.
-- [x] Add a spatial module navigation rail with previous/next controls, progress steps, Alt+arrow keyboard navigation, and touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
+- [x] Add a two-column spatial module navigation rail with four-direction controls, progress steps, Alt+arrow keyboard navigation, and horizontal/vertical touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
 - [x] Adapt Rising Lines into the GreenTech hero as a lightweight canvas particle stream with a lime horizon glow.
 - [x] Adapt Particle Sphere into Mycology with a Three.js particle cloud and a 2D canvas fallback when WebGL is unavailable.
