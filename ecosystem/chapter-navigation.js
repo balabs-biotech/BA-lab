@@ -61,6 +61,9 @@
   });
  }
  const filament=rail.querySelector('.filament-progress'),filamentBase=rail.querySelector('.filament-base'),signal=rail.querySelector('.filament-signal'),railSvg=rail.querySelector('.chapter-filament');
+ const svgNS='http://www.w3.org/2000/svg';
+ const branchLayer=document.createElementNS(svgNS,'path');branchLayer.setAttribute('class','filament-branches');branchLayer.setAttribute('aria-hidden','true');railSvg.insertBefore(branchLayer,filament);
+
  let filamentLength=0,current=0,railGeometryFrame=0;
  const syncRailGeometry=()=>{
   const railRect=rail.getBoundingClientRect(),nodes=[...railNodes.querySelectorAll('.chapter-rail-node')];
@@ -70,6 +73,16 @@
   railSvg.setAttribute('preserveAspectRatio','none');
   const d=pts.reduce((path,p,i)=>{if(!i)return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;const prev=pts[i-1],mid=(prev.y+p.y)/2,dir=i%2?1:-1,curve=Math.min(10,railRect.width*.16)*dir;return path+` C ${(prev.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${(p.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${p.x.toFixed(2)} ${p.y.toFixed(2)}`},'');
   filament.setAttribute('d',d);filamentBase.setAttribute('d',d);
+  const tendrils=[];
+  for(let i=0;i<pts.length-1;i++){
+   const a=pts[i],b=pts[i+1],side=i%2?1:-1,dx=Math.min(19,railRect.width*.34)*side;
+   const at=(t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+   [.28,.68].forEach((t,j)=>{
+    const p=at(t),len=Math.min(12,railRect.width*.22)*(j?-.78:1);
+    tendrils.push(`M ${p.x.toFixed(2)} ${p.y.toFixed(2)} C ${(p.x+dx*.38).toFixed(2)} ${(p.y+len*.22).toFixed(2)}, ${(p.x+dx*.88).toFixed(2)} ${(p.y+len*.7).toFixed(2)}, ${(p.x+dx).toFixed(2)} ${(p.y+len).toFixed(2)}`);
+   });
+  }
+  branchLayer.setAttribute('d',tendrils.join(' '));
   try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){filamentLength=0}
   update();
  };
