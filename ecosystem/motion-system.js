@@ -49,66 +49,67 @@
         canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
         ctx.setTransform(dpr,0,0,dpr,0,0);
         paths=[];
-        const span=Math.min(width,height),step=span*.105;
-        // Twenty-four inoculation fronts distributed around the perimeter.
-        // Each front grows inward; lateral hyphae branch from existing nodes.
-        const roots=[
-          [0,.04,.04],[0,.17,-.02],[0,.32,.03],[0,.48,-.04],[0,.65,.03],[0,.82,-.02],[0,.96,.04],
-          [1,.04,-.04],[1,.19,.02],[1,.35,-.03],[1,.52,.04],[1,.69,-.03],[1,.85,.02],[1,.97,-.04],
-          [.08,0,.02],[.28,0,-.03],[.5,0,.03],[.72,0,-.02],[.92,0,.03],
-          [.08,1,-.02],[.3,1,.03],[.52,1,-.03],[.74,1,.02],[.94,1,-.03]
-        ];
+        const span=Math.min(width,height);
+        const step=span*.082;
+        // Thirty-six growth fronts: nine on each edge, with staggered spacing.
+        const roots=[];
+        for(let i=0;i<9;i++){
+          const t=.025+i*.119;
+          roots.push([0,t,(i%2?-.025:.025)],[1,t,(i%2?.025:-.025)]);
+          roots.push([t,0,(i%2?.025:-.025)],[t,1,(i%2?-.025:.025)]);
+        }
         const mainRoots=[];
         roots.forEach((a,i)=>{
           const x=a[0]*width,y=a[1]*height;
           const inward=Math.atan2(height*.5-y,width*.5-x)+a[2];
-          const root=buildPath(x,y,inward,7,step,131+i*29,1.05+rand(i)*.5,
-            i%5===0?'copper':'green');
+          const root=buildPath(x,y,inward,9,step,213+i*37,1.25+rand(i)*.55,
+            i%6===0?'copper':'green');
           paths.push(root);mainRoots.push(root);
-          // Primary laterals: alternate sides and originate on the parent hypha.
+          // Dense first-order branching, always rooted in a real parent node.
           [2,4,6].forEach((at,j)=>{
             const node=root.nodes[at],prev=root.nodes[at-1],next=root.nodes[at+1];
             const tangent=Math.atan2(next.y-prev.y,next.x-prev.x);
             [-1,1].forEach((side,k)=>{
-              const branch=buildPath(node.x,node.y,tangent+side*(.68+rand(i+j+k)*.32),
-                4,step*(.48+rand(i+j+k+8)*.16),271+i*31+j*7+k,
-                .58+rand(i+j+k+19)*.22,(i+j+k)%7===0?'copper':'green',node);
+              const branch=buildPath(node.x,node.y,tangent+side*(.62+rand(i+j+k)*.42),
+                5,step*(.52+rand(i+j+k+8)*.20),371+i*41+j*9+k,
+                .72+rand(i+j+k+19)*.28,(i+j+k)%9===0?'copper':'green',node);
               paths.push(branch);
-              // Secondary twigs also emerge from the lateral itself, never as loose strokes.
-              if(j<2){
-                const bn=branch.nodes[2],bp=branch.nodes[1],bnext=branch.nodes[3];
+              // Second-order branches split from two internal points on each lateral.
+              [2,3].forEach((bat,m)=>{
+                const bn=branch.nodes[bat],bp=branch.nodes[bat-1],bnext=branch.nodes[bat+1];
                 const bt=Math.atan2(bnext.y-bp.y,bnext.x-bp.x);
-                const twig=buildPath(bn.x,bn.y,bt+(k===0?1:-1)*(.82+rand(i+j+k+33)*.25),
-                  2,step*.34,511+i*17+j*3+k,.34,'green',bn);
-                paths.push(twig);
-              }
+                [-1,1].forEach((turn,n)=>{
+                  const twig=buildPath(bn.x,bn.y,bt+turn*(.78+rand(i+j+k+m+n)*.38),
+                    3,step*(.25+rand(i+j+k+m+n+20)*.08),811+i*29+j*11+k*3+m*2+n,
+                    .38+rand(i+j+k+m+n+40)*.15,'green',bn);
+                  paths.push(twig);
+                });
+              });
             });
           });
         });
-        // Anastomoses: join nearby nodes from distinct inoculation fronts.
-        // A shared pair of endpoints makes each bridge a real topological connection.
+        // Anastomotic bridges: dense, short cross-links between distinct growth fronts.
         const candidates=[];
         for(let i=0;i<mainRoots.length;i++) for(let j=i+1;j<mainRoots.length;j++){
           for(let a=2;a<mainRoots[i].nodes.length-1;a++) for(let b=2;b<mainRoots[j].nodes.length-1;b++){
             const p=mainRoots[i].nodes[a],q=mainRoots[j].nodes[b];
             const d=Math.hypot(p.x-q.x,p.y-q.y);
-            if(d>span*.025&&d<span*.30)candidates.push({p,q,d,i,j});
+            if(d>span*.018&&d<span*.24)candidates.push({p,q,d,i,j});
           }
         }
         candidates.sort((a,b)=>a.d-b.d);
-        const degree=Array(mainRoots.length).fill(0),used=new Set();
+        const degree=Array(mainRoots.length).fill(0);
         let fused=0;
         for(const link of candidates){
-          const pair=link.i+':'+link.j;
-          if(fused>=34||degree[link.i]>=3||degree[link.j]>=3||used.has(pair))continue;
+          if(fused>=110||degree[link.i]>=6||degree[link.j]>=6)continue;
           const dx=link.q.x-link.p.x,dy=link.q.y-link.p.y;
-          const bend=(fused%2?1:-1)*Math.min(18,link.d*.12);
+          const bend=(fused%2?1:-1)*Math.min(14,link.d*.10);
           const mid={x:(link.p.x+link.q.x)/2-dy/(link.d||1)*bend,
             y:(link.p.y+link.q.y)/2+dx/(link.d||1)*bend,
-            phase:rand(fused+1901)*6.28,amp:1.0};
-          paths.push({nodes:[link.p,mid,link.q],weight:.58,
-            colour:fused%6===0?'copper':'green',seed:1900+fused});
-          degree[link.i]++;degree[link.j]++;used.add(pair);fused++;
+            phase:rand(fused+2901)*6.28,amp:.8};
+          paths.push({nodes:[link.p,mid,link.q],weight:.68,
+            colour:fused%8===0?'copper':'green',seed:2900+fused});
+          degree[link.i]++;degree[link.j]++;fused++;
         }
       };
       const resize=new ResizeObserver(rebuild);
