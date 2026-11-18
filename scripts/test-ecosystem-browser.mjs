@@ -56,6 +56,14 @@ try {
     }
     await page.locator('[data-lang="fr"]').first().click();
     await page.waitForFunction(() => document.documentElement.lang === 'fr' && document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
+    // Hover labels must remain inside the viewport even when the chapter rail is on the RTL edge.
+    await page.locator('.chapter-rail-node').first().hover();
+    const chapterLabelBounds = await page.locator('.chapter-rail-node').first().locator('.chapter-rail-name').evaluate(element => {
+      const rect = element.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, viewportWidth: window.innerWidth, visibility: getComputedStyle(element).visibility };
+    });
+    assert.equal(chapterLabelBounds.visibility, 'visible', 'Hovering a chapter point must reveal its label');
+    assert.ok(chapterLabelBounds.left >= 0 && chapterLabelBounds.right <= chapterLabelBounds.viewportWidth, 'The chapter label must remain fully inside the viewport');
 
     // Audit real image decoding on every editorial chapter after navigation.
     const chapterImageAudits = [];
