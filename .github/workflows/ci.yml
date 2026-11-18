@@ -301,8 +301,12 @@ jobs:
         run: npm install --no-save --no-package-lock playwright
       - name: Install Chromium with WebGL support
         run: npx playwright install --with-deps chromium
+      - name: Install image optimization dependency
+        run: python -m pip install Pillow
       - name: Download and validate all site images for browser testing
-        run: python ecosystem/download-images.py --manifest ecosystem/images-manifest.json --output ecosystem/assets
+        run: |
+          python ecosystem/download-images.py --manifest ecosystem/images-manifest.json --output ecosystem/assets
+          python scripts/optimize-ecosystem-images.py --directory ecosystem/assets --max-edge 1800 --jpeg-quality 84
       - name: Serve the public ecosystem locally
         run: |
           python3 -m http.server 8765 --directory ecosystem > /tmp/balabs-ecosystem-server.log 2>&1 &
