@@ -6,6 +6,22 @@
  */
 (() => {
   "use strict";
+  const responsiveStyle = document.createElement("style");
+  responsiveStyle.id = "ba-originkit-responsive-hero";
+  responsiveStyle.textContent = `
+    @media (max-width: 760px) {
+      body[data-domain] .app-hero { grid-template-columns: minmax(0, 1fr) !important; }
+      body[data-domain] .hero-art.ba-sector-art {
+        grid-column: 1;
+        width: 100% !important;
+        min-height: 150px !important;
+        margin-top: 8px !important;
+      }
+      body[data-domain] .ba-sector-visual { width: min(100%, 270px) !important; }
+    }
+  `;
+  document.head.appendChild(responsiveStyle);
+
   const host = document.querySelector(".ba-sector-visual--laboratory");
   if (!host || host.dataset.kineticGridMounted === "true") return;
   host.dataset.kineticGridMounted = "true";
