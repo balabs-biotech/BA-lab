@@ -59,9 +59,11 @@ The returned source is not automatically executable in CultureOps. Review import
 - [ ] Invoke `browse` and `get` from an authenticated CultureOps session to validate the secret and upstream response.
 - [x] Add a spatial module navigation rail with previous/next controls, progress steps, Alt+arrow keyboard navigation, and touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
-- [x] Adapt and integrate Kinetic Grid into the Laboratory hero as a native canvas component, preserving the original cursor-attraction mesh behavior without React/Framer dependencies.
-- [ ] Adapt and integrate Rising Lines into GreenTech and Particle Sphere into Mycology.
-- [x] Browser-check Kinetic Grid at desktop and mobile widths; canvas renders at the intended size with no page errors.
+- [x] Adapt Rising Lines into the GreenTech hero as a lightweight canvas particle stream with a lime horizon glow.
+- [x] Adapt Particle Sphere into Mycology with a Three.js particle cloud and a 2D canvas fallback when WebGL is unavailable.
+- [x] Adapt Kinetic Grid into Laboratory as a native canvas mesh with cursor attraction and trail.
+- [x] Preserve reduced-motion handling, resize observation, viewport-based animation pausing, and mobile sizing across the three visual adapters.
+- [x] Browser-check all three sector canvases at desktop/mobile widths. The current browser environment does not expose WebGL, so the Mycology 2D fallback was verified; the Three.js WebGL path remains to be checked on a WebGL-capable client.
 - [ ] Visually verify desktop/mobile layouts, interaction, and reduced-motion behavior.
 
 ## Selected component mapping
@@ -72,7 +74,7 @@ The returned source is not automatically executable in CultureOps. Review import
 | Mycology | `particlesphere` | copper/graphite 3D particle field; no green palette |
 | Laboratory | `kineticgrid` | integrated native canvas adaptation: interactive blue mesh, pointer attraction, trail and responsive sizing |
 
-Rising Lines and Particle Sphere remain targets, not completed integrations. The Laboratory adaptation is based on Vellum's published motion-design component source (which includes the OriginKit preview configuration comments); the secure MCP `get` call still needs authenticated end-to-end verification.
+The three adapters are based on Vellum's published motion-design component references (which include OriginKit preview configuration comments), adapted for CultureOps' static runtime. They are not the original React/Framer wrappers. The secure MCP `get` call still needs authenticated end-to-end verification, so these adaptations do not yet prove that the deployed bridge can retrieve source from the API.
 
 ## Attribution
 
