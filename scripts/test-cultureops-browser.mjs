@@ -430,14 +430,15 @@ try {
             viewport: innerWidth,
             metricCount: card?.querySelectorAll(".overview-metric").length ?? 0,
             contrastSamples: [
-              ".section-kicker",
-              ".overview-metric-label",
-              ".overview-metric-note",
-              ".overview-shortcuts h3",
-              ".overview-shortcut strong",
-            ].map(selector => {
+              [".section-kicker", "rgb(230, 161, 125)"],
+              [".overview-metric-label", "rgb(208, 219, 211)"],
+              [".overview-metric-note", "rgb(174, 189, 180)"],
+              [".overview-shortcuts h3", "rgb(208, 219, 211)"],
+              [".overview-shortcut strong", "rgb(208, 219, 211)"],
+            ].map(([selector, expected]) => {
               const node = card?.querySelector(selector);
-              return { selector, color: node ? getComputedStyle(node).color : null };
+              const color = node ? getComputedStyle(node).color : null;
+              return { selector, color, expected };
             }),
           };
         });
@@ -448,8 +449,8 @@ try {
         }
         if (workspace.slug === "mycology") {
           for (const sample of overviewState.contrastSamples) {
-            if (!sample.color || contrastRatio(sample.color, "#1b2525") < 4.5) {
-              failures.push(`${workspace.slug}/${viewport.name}: overview text contrast below 4.5:1 for ${sample.selector} (${sample.color})`);
+            if (!sample.color || sample.color !== sample.expected || contrastRatio(sample.color, "#1b2525") < 4.5) {
+              failures.push(`${workspace.slug}/${viewport.name}: overview text style/contrast mismatch for ${sample.selector} (actual ${sample.color}, expected ${sample.expected}, ratio ${sample.color ? contrastRatio(sample.color, "#1b2525").toFixed(2) : "n/a"}:1)`);
             }
           }
         }
