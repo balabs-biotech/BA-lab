@@ -1,0 +1,40 @@
+/* BA Labs — desktop hero framing
+   Keep the approved Pleurotus research image intact and give it real screen area.
+   Mobile crop/layout remains owned by brand-system.css. */
+@media (min-width: 1100px) {
+  #app.balabs-ui > main > #accueil.hero {
+    grid-template-columns: minmax(0, .92fr) minmax(440px, 1.08fr) !important;
+    min-height: min(920px, calc(100svh - 74px)) !important;
+    gap: clamp(20px, 3vw, 48px) !important;
+    padding: clamp(48px, 6vh, 82px) clamp(32px, 5vw, 76px) !important;
+  }
+  #app.balabs-ui > main > #accueil.hero > .hero-micrograph {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: min(78svh, 780px) !important;
+    min-height: 540px !important;
+    max-height: 780px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    clip-path: none !important;
+    opacity: .96 !important;
+    filter: grayscale(1) contrast(1.16) brightness(.88) !important;
+    background: radial-gradient(ellipse at 50% 50%, rgba(38,59,56,.32), transparent 72%) !important;
+  }
+}
+@media (min-width: 761px) and (max-width: 1099px) {
+  #app.balabs-ui > main > #accueil.hero {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr) !important;
+    min-height: min(820px, calc(100svh - 74px)) !important;
+    gap: clamp(18px, 3vw, 32px) !important;
+    padding-inline: clamp(24px, 4vw, 48px) !important;
+  }
+  #app.balabs-ui > main > #accueil.hero > .hero-micrograph {
+    height: min(68svh, 620px) !important;
+    min-height: 420px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    clip-path: none !important;
+  }
+}
