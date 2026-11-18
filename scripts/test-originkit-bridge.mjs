@@ -10,7 +10,7 @@ assert.match(source, /tools\/call/);
 assert.match(source, /get_component/);
 assert.match(source, /Deno\.serve/);
 assert.match(source, /hasAuthenticatedUser/);
-assert.ok(source.includes(String.raw`match(/^Bearer\s+(.+)$/i)`), "Bearer JWT extraction must accept whitespace after the scheme");
+assert.ok(source.includes(String.raw\`match(/^Bearer\s+(.+)$/i)\`), "Bearer JWT extraction must accept whitespace after the scheme");
 assert.match(source, /claims\.role === "authenticated"/);
 assert.match(source, /claims\.is_anonymous !== true/);
 assert.match(source, /authenticated_session_required/);
