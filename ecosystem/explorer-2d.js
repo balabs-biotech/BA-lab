@@ -145,7 +145,25 @@ function updateBreadcrumbs(){
 function updateSelection(){
  const box=$("selection");updateBreadcrumbs();
  $("back").disabled=!viewHistory.length;
- box.textContent=selected?selected.title:"";
+ box.replaceChildren();
+ if(!selected){box.hidden=true;renderAccessible();return;}
+ const dock=el("div","selection-dock");
+ const title=el("h3","selection-title",selected.title);
+ const root=byId.get(selected.rootId||selected.id);
+ const levelLabel=selected.level===0?t("root"):selected.level===1?t("branch"):t("leaf");
+ const context=el("p","selection-context",root&&root.id!==selected.id?root.title+" · "+levelLabel:levelLabel);
+ dock.append(title,context);
+ if(selected.data.description){
+  const description=el("p","selection-description",selected.data.description);
+  dock.append(description);
+ }
+ const notionUrl=selected.data.url;
+ if(typeof notionUrl==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(notionUrl)){
+  const link=el("a","selection-open-link",t("open"));
+  link.href=notionUrl;link.target="_blank";link.rel="noopener noreferrer";
+  dock.append(link);
+ }
+ box.append(dock);box.hidden=false;
  renderAccessible();
 }
 function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.forEach(n=>{const b=el("button","",n.title);b.type="button";b.dataset.nodeId=n.id;b.dataset.level=String(n.level);b.setAttribute("aria-label",n.title+" · niveau "+n.level);b.onclick=()=>focusNode(n);nav.append(b);});}
