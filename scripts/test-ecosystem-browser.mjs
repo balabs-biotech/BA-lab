@@ -44,11 +44,11 @@ try {
         const hero = document.querySelector('#accueil');
         return hero?.dataset.vantaReady === '1' && hero.querySelector('canvas');
       }, undefined, { timeout: 15000 });
-      heroMotion = await page.locator('#accueil').evaluate(hero => ({
-        ...motionEligibility,
+      heroMotion = await page.locator('#accueil').evaluate((hero, eligibility) => ({
+        ...eligibility,
         active: hero.dataset.vantaReady === '1',
         canvases: hero.querySelectorAll('canvas').length
-      }));
+      }), motionEligibility);
       assert.ok(heroMotion.active && heroMotion.canvases > 0, 'The eligible desktop hero must initialize the connected Vanta network');
     }
     // Test the actual packaged image files, not merely whether the page JS starts.
