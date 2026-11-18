@@ -7,6 +7,12 @@ const entryPages = ["green-tech", "mycology", "laboratory"].map((sector) =>
 );
 
 assert.match(adapter, /Kinetic Grid by Vellum AI/);
+assert.match(adapter, /mountRisingLines/);
+assert.match(adapter, /mountParticleSphere/);
+assert.match(adapter, /mountParticleSphereFallback/);
+assert.match(adapter, /ba-originkit-rising-lines/);
+assert.match(adapter, /ba-originkit-particle-sphere/);
+assert.match(adapter, /three@0\\.174\\.0/);
 assert.match(adapter, /vellum-ai\/motion-design/);
 assert.match(adapter, /prefers-reduced-motion/);
 assert.match(adapter, /ResizeObserver/);
