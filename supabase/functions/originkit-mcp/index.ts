@@ -9,6 +9,32 @@ const ALLOWED_STYLING = new Set(["css", "tailwind", "cssmodules"]);
 
 type JsonObject = Record<string, unknown>;
 
+// The Supabase gateway validates the JWT signature when verify_jwt is enabled.
+// This additional claim check rejects publishable/anon keys and anonymous sessions.
+function hasAuthenticatedUser(token: string): boolean {
+  const parts = token.split(".");
+  if (parts.length !== 3 || !parts[1]) return false;
+  try {
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/").padEnd(
+      Math.ceil(parts[1].length / 4) * 4,
+      "=",
+    );
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const claims = JSON.parse(new TextDecoder().decode(bytes)) as {
+      role?: unknown;
+      sub?: unknown;
+      is_anonymous?: unknown;
+    };
+    return claims.role === "authenticated" &&
+      claims.is_anonymous !== true &&
+      typeof claims.sub === "string" &&
+      claims.sub.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 function response(
   status: number,
   payload: JsonObject,
@@ -106,6 +132,11 @@ Deno.serve(async (req: Request) => {
   }
   if (req.method !== "POST") {
     return response(405, { error: "method_not_allowed" });
+  }
+
+  const bearer = req.headers.get("authorization")?.match(/^Bearer\\s+(.+)$/i)?.[1];
+  if (!bearer || !hasAuthenticatedUser(bearer)) {
+    return response(401, { error: "authenticated_session_required" });
   }
 
   let input: JsonObject;
