@@ -1,4 +1,3 @@
-assert.match(source, /claims\.is_anonymous !== true/);
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
@@ -12,7 +11,7 @@ assert.match(source, /get_component/);
 assert.match(source, /Deno\.serve/);
 assert.match(source, /hasAuthenticatedUser/);
 assert.match(source, /claims\.role === "authenticated"/);
-assert.match(source, /claims\.role === "authenticated"/);
+assert.match(source, /claims\.is_anonymous !== true/);
 assert.match(source, /authenticated_session_required/);
 assert.match(source, /origin_not_allowed/);
 assert.match(source, /component_not_found/);
