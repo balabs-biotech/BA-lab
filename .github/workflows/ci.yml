@@ -77,11 +77,11 @@ jobs:
         run: |
           [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
 
-  batch-tracker-audit:
+  cultureops-audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check batch-tracker structure
+      - name: Check CultureOps structure
         run: |
           node scripts/check-batch-tracker-js.mjs
           node supabase/tests/copernicus-sentinel-catalogue.test.mjs
@@ -96,10 +96,14 @@ jobs:
           node scripts/test-smart-entry.mjs
           node scripts/test-auth-transition-workspace-lockdown.mjs
           node scripts/test-auth-init-tenant-revision-guards.mjs
+          node scripts/test-originkit-bridge.mjs
+          node scripts/test-workspace-navigation.mjs
+          node --check batch-tracker/workspace-origin-components.js
+          node scripts/test-originkit-adapter.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
           [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
           [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
-      - name: Verify no secrets in batch-tracker (code only, docs excluded)
+      - name: Verify no secrets in CultureOps frontend (code only, docs excluded)
         run: sh scripts/check-secrets.sh
       - name: Check CDN scripts for version pinning
         run: |
@@ -109,7 +113,7 @@ jobs:
             exit 1
           fi
           grep -Eo "@supabase/supabase-js@[0-9]+\.[0-9]+\.[0-9]+" $entry_pages | head -1
-      - name: Verify batch-tracker README covers Notion sync
+      - name: Verify CultureOps documentation covers Notion sync
         run: |
           grep -q "Notion\|sync" batch-tracker/README.md && echo "✓ Notion sync documented" || echo "⚠ Notion sync not documented in README"
 

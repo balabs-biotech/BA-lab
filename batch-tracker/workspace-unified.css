@@ -1,6 +1,6 @@
 @import url("./styles/design-tokens.css?v=20261116-interior-pass-1");
 @import url("./styles/workspace-components.css?v=20261117-global-visual-system-1");
-@import url("./styles/mycology-workspace.css?v=20261117-pixi-graph-controls-159");
+@import url("./styles/mycology-workspace.css?v=20261118-contrast-164");
 @import url("./styles/laboratory-workspace.css?v=20261117-analytics-1");
 @import url("./styles/greentech-workspace.css?v=20261117-ndvi-chart-1");
 @import url("./styles/motion.css?v=20261117-sector-motion-156");
@@ -584,4 +584,39 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
   html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
     transition:none !important;
   }
+}
+
+
+/* CultureOps authentication gate: author display rules must not override the HTML hidden state. */
+html body[data-domain] #sectionNavigation[hidden] {
+  display: none !important;
+}
+
+
+/* PASS 165 — final Mycology overview contrast overrides.
+   Kept at the end of the shared sheet to win against legacy overview rules. */
+html body[data-domain="mycology"] #overviewCard .section-kicker,
+html body[data-domain="mycology"] #overviewCard .overview-observations-details > summary,
+html body[data-domain="mycology"] #overviewCard .shortcut-index {
+  color:#e6a17d !important;
+  opacity:1 !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-metric-label,
+html body[data-domain="mycology"] #overviewCard .overview-activity h3,
+html body[data-domain="mycology"] #overviewCard .overview-shortcuts h3,
+html body[data-domain="mycology"] #overviewCard .overview-shortcut strong,
+html body[data-domain="mycology"] #overviewCard .overview-shortcut small {
+  color:#d0dbd3 !important;
+  opacity:1 !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-metric-note {
+  color:#aebdb4 !important;
+  opacity:1 !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-shortcut {
+  border-color:rgba(201,130,89,.28) !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-shortcut:hover {
+  border-color:rgba(230,161,125,.7) !important;
+  background:rgba(201,130,89,.12) !important;
 }

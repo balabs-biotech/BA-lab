@@ -2,6 +2,19 @@ import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 
+
+const cultureOpsLanding = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const cultureOpsLocales = fs.readFileSync(new URL("../batch-tracker/i18n.js", import.meta.url), "utf8");
+if (/CULTURE\s*&(?:amp;)?\s*BATCH TRACKER|CULTURE\s*&\s*RASTREIO DE LOTES|تتبّع الثقافات والدفعات/i.test(cultureOpsLanding)) {
+  throw new Error("CultureOps landing page still exposes a retired product label.");
+}
+if ((cultureOpsLanding.match(/BA LABS \/ CULTUREOPS/g) || []).length !== 4) {
+  throw new Error("CultureOps branding is not consistent across all four portal languages.");
+}
+if (/BA Labs BatchTracker|BA Labs Batch Tracker/i.test(cultureOpsLocales)) {
+  throw new Error("CultureOps translations still expose a retired product label.");
+}
+
 const baseUrl = (process.env.CULTUREOPS_BASE_URL || "http://127.0.0.1:8787").replace(/\/$/, "");
 const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops-browser-smoke";
 fs.mkdirSync(artifactDir, { recursive: true });
@@ -91,6 +104,17 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: workspace shell or authentication panel did not render`);
       }
 
+      const expectedAnimationCanvas = {
+        agronomy: ".ba-originkit-rising-lines",
+        mycology: ".ba-originkit-particle-sphere",
+        laboratory: ".ba-originkit-kinetic-grid",
+      }[workspace.domain];
+      try {
+        await page.locator(expectedAnimationCanvas).waitFor({ state: "attached", timeout: 15000 });
+      } catch {
+        failures.push(`${workspace.slug}/${viewport.name}: sector OriginKit canvas did not mount (${expectedAnimationCanvas})`);
+      }
+
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
@@ -132,6 +156,7 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          heroAnimationCanvas: document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.className || null,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
             const rect = element.getBoundingClientRect();
@@ -150,6 +175,7 @@ try {
             .sort((a, b) => b.right - a.right).slice(0, 12),
           navLinks: document.querySelectorAll(".section-nav a").length,
           navigationHidden: document.querySelector(".section-nav")?.hidden ?? false,
+          navigationDisplay: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).display : "missing",
         };
       });
 
@@ -157,6 +183,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
+      if (!metrics.heroAnimationCanvas) failures.push(`${workspace.slug}/${viewport.name}: sector-specific OriginKit canvas missing`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
@@ -171,23 +198,72 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (viewport.name !== "desktop" && metrics.signInButtonBottom > viewport.height) failures.push(`${workspace.slug}/${viewport.name}: sign-in action falls below the first viewport (${metrics.signInButtonBottom}px > ${viewport.height}px)`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
-      if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
+      if (!metrics.navigationHidden || metrics.navigationDisplay !== "none") failures.push(`${workspace.slug}/${viewport.name}: module navigation is visible before authentication (hidden=${metrics.navigationHidden}, display=${metrics.navigationDisplay})`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
-      const compactHero = await page.evaluate(() => {
+      const compactHero = await page.evaluate(async () => {
         const hero = document.querySelector(".app-hero");
         const auth = document.querySelector("#authCard");
         const authWasVisible = auth && !auth.classList.contains("hidden");
+        const sectionNavigation = document.getElementById("sectionNavigation");
+        const navigationWasHidden = sectionNavigation?.hidden ?? false;
         const before = hero?.getBoundingClientRect().height ?? 0;
         document.body.classList.add("workspace-authenticated");
         auth?.classList.add("hidden");
+        if (sectionNavigation) {
+          sectionNavigation.hidden = false;
+          // The smoke harness has no real Supabase session. Reproduce the
+          // authenticated workspace state by revealing the same hash targets
+          // that the application reveals after login.
+          for (const link of sectionNavigation.querySelectorAll('a[href^="#"]')) {
+            const panel = document.getElementById(link.getAttribute("href").slice(1));
+            if (panel) {
+              panel.hidden = false;
+              panel.classList.remove("hidden", "workspace-inactive");
+            }
+            link.hidden = false;
+          }
+          // Trigger the real workspace activation handler. Merely removing
+          // hidden attributes does not update the navigation's active module.
+          sectionNavigation.querySelector('a[href^="#"]')?.click();
+        }
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const after = hero?.getBoundingClientRect().height ?? 0;
-        const artHidden = getComputedStyle(document.querySelector(".hero-art")).display === "none";
+        const art = document.querySelector(".hero-art");
+        const artRect = art?.getBoundingClientRect();
+        const visualRect = document.querySelector(".ba-sector-visual")?.getBoundingClientRect();
+        const canvasRect = document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.getBoundingClientRect();
+        const artHidden = getComputedStyle(art).display === "none";
         const descriptionHidden = getComputedStyle(document.querySelector(".hero-description")).display === "none";
+        const navRail = document.querySelector(".ba-module-rail");
+        const directionSequence = [];
+        if (navRail) {
+          const activeStepIndex = () => [...navRail.querySelectorAll(".ba-module-rail__step")]
+            .findIndex(step => step.getAttribute("aria-current") === "step");
+          navRail.querySelector(".ba-module-rail__step")?.click();
+          directionSequence.push(activeStepIndex());
+          for (const direction of ["down", "right", "up", "left"]) {
+            navRail.querySelector(`[data-direction="${direction}"]`)?.click();
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            directionSequence.push(activeStepIndex());
+          }
+        }
+        const navigationRailVisible = !!navRail && getComputedStyle(navRail).display !== "none";
         document.body.classList.remove("workspace-authenticated");
+        if (navigationWasHidden && sectionNavigation) sectionNavigation.hidden = true;
         if (authWasVisible) auth.classList.remove("hidden");
-        return { before, after, artHidden, descriptionHidden };
+        return {
+          before, after, artHidden, descriptionHidden,
+          artWidth: artRect?.width ?? 0, artHeight: artRect?.height ?? 0,
+          visualWidth: visualRect?.width ?? 0, visualHeight: visualRect?.height ?? 0,
+          canvasWidth: canvasRect?.width ?? 0, canvasHeight: canvasRect?.height ?? 0,
+          navigationRailVisible, directionSequence
+        };
       });
-      if (!compactHero.artHidden || !compactHero.descriptionHidden || compactHero.after >= compactHero.before) failures.push(`${workspace.slug}/${viewport.name}: authenticated hero did not collapse (${compactHero.before}px -> ${compactHero.after}px)`);
+      if (compactHero.artHidden || !compactHero.descriptionHidden) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector signature should remain visible while the marketing description collapses`);
+      if (compactHero.artWidth <= 0 || compactHero.artHeight <= 0 || compactHero.visualWidth <= 0 || compactHero.visualHeight <= 0 || compactHero.canvasWidth <= 0 || compactHero.canvasHeight <= 0) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector animation has no visible drawing area (${JSON.stringify(compactHero)})`);
+      const maxAuthenticatedHeroHeight = viewport.width >= 821 ? 160 : 280;
+      if (compactHero.after > maxAuthenticatedHeroHeight) failures.push(`${workspace.slug}/${viewport.name}: authenticated sector header is too tall (${compactHero.after}px > ${maxAuthenticatedHeroHeight}px)`);
+      if (!compactHero.navigationRailVisible || JSON.stringify(compactHero.directionSequence) !== JSON.stringify([0, 2, 3, 1, 0])) failures.push(`${workspace.slug}/${viewport.name}: four-direction navigation did not follow the 2-column module map (${JSON.stringify(compactHero.directionSequence)})`);
       const accessibility = await page.evaluate(() => {
         const ids = [...document.querySelectorAll("[id]")].map(node => node.id);
         const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
@@ -228,6 +304,20 @@ try {
           failures.push(`${workspace.slug}/${viewport.name}: language ${language} produced ${JSON.stringify(languageState)}`);
         }
         if (languageState.width > languageState.viewport + 1) failures.push(`${workspace.slug}/${viewport.name}/${language}: horizontal overflow ${languageState.width}px > ${languageState.viewport}px`);
+        const expectedRailCopy = {
+          fr: { eyebrow: "Parcours du workspace", controls: ["Module au-dessus", "Module à gauche", "Module en dessous", "Module à droite"] },
+          en: { eyebrow: "Workspace path", controls: ["Module above", "Module to the left", "Module below", "Module to the right"] },
+          pt: { eyebrow: "Percurso do workspace", controls: ["Módulo acima", "Módulo à esquerda", "Módulo abaixo", "Módulo à direita"] },
+          ar: { eyebrow: "مسار مساحة العمل", controls: ["الوحدة أعلاه", "الوحدة إلى اليسار", "الوحدة أدناه", "الوحدة إلى اليمين"] },
+        };
+        const railCopy = await page.evaluate(() => ({
+          eyebrow: document.querySelector(".ba-module-rail__eyebrow")?.textContent.trim() || "",
+          controls: [...document.querySelectorAll(".ba-module-rail__button")].map(button => button.getAttribute("aria-label")),
+        }));
+        if (railCopy.eyebrow !== expectedRailCopy[language].eyebrow ||
+            JSON.stringify(railCopy.controls) !== JSON.stringify(expectedRailCopy[language].controls)) {
+          failures.push(`${workspace.slug}/${viewport.name}/${language}: module navigation is not translated ${JSON.stringify(railCopy)}`);
+        }
       }
       await page.locator("#languageSelect").selectOption("fr");
       await page.locator("#authEmail").fill("");
@@ -257,24 +347,60 @@ try {
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
 
-      // Visual fixture only: render the dashboard overview without pretending
-      // that the test Supabase stub has authenticated or loaded tenant data.
+      // Visual fixture only: simulate a signed-in user on the overview module.
       if (viewport.name === "desktop" || viewport.name === "mobile") {
-        await page.evaluate(() => {
+        await page.evaluate((workspaceSlug) => {
           const auth = document.querySelector("#authCard");
-          if (auth) auth.classList.add("hidden");
-          const card = document.querySelector("#overviewCard");
-          if (card) {
-            card.classList.remove("hidden");
+          if (auth) {
+            auth.hidden = true;
+            auth.classList.add("hidden");
+            auth.style.setProperty("display", "none", "important");
+          }
+
+          const allowedByWorkspace = {
+            "green-tech": ["overviewCard", "plantCard", "measurementCard", "statisticsCard"],
+            mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
+            laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard"],
+          };
+          const allowed = new Set(allowedByWorkspace[workspaceSlug] || []);
+          const navigation = document.getElementById("sectionNavigation");
+          if (navigation) {
+            navigation.hidden = false;
+            navigation.classList.remove("hidden");
+            navigation.style.removeProperty("display");
+            for (const link of navigation.querySelectorAll('a[href^="#"]')) {
+              const id = link.getAttribute("href").slice(1);
+              const visible = allowed.has(id);
+              link.hidden = !visible;
+              link.style.setProperty("display", visible ? "inline-flex" : "none", "important");
+            }
+          }
+
+          for (const panel of document.querySelectorAll("section.card")) {
+            const active = panel.id === "overviewCard";
+            if (panel.id === "authCard") continue;
+            panel.hidden = !active;
+            panel.classList.toggle("hidden", !active);
+            if (active) {
+              panel.style.removeProperty("display");
+            } else {
+              panel.style.setProperty("display", "none", "important");
+            }
+          }
+
+          const overview = document.getElementById("overviewCard");
+          if (overview) {
+            overview.hidden = false;
+            overview.classList.remove("hidden", "workspace-inactive");
+            overview.style.removeProperty("display");
             document.body.classList.add("workspace-authenticated");
-            const live = card.querySelector(".overview-live");
+            const live = overview.querySelector(".overview-live");
             if (live) live.textContent = "Aperçu visuel — données de test";
-            const values = {
+            for (const [id, value] of Object.entries({
               overviewCultureCount: "12",
               overviewBatchCount: "8",
               overviewObservationCount: "34",
-            };
-            for (const [id, value] of Object.entries(values)) {
+            })) {
               const node = document.getElementById(id);
               if (node) node.textContent = value;
             }
@@ -287,20 +413,46 @@ try {
               if (node) node.style.width = width;
             }
           }
-        });
+        }, workspace.slug);
         const overviewPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}-overview-preview.png`);
         await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
         const overviewState = await page.evaluate(() => {
           const card = document.querySelector("#overviewCard");
+          const auth = document.querySelector("#authCard");
+          const visibleSections = [...document.querySelectorAll("section.card")]
+            .filter((section) => getComputedStyle(section).display !== "none")
+            .map((section) => section.id);
           return {
-            visible: !!card && card.getBoundingClientRect().height > 0,
+            visible: !!card && getComputedStyle(card).display !== "none" && card.getBoundingClientRect().height > 0,
+            authHidden: !auth || getComputedStyle(auth).display === "none",
+            visibleSections,
             width: document.documentElement.scrollWidth,
             viewport: innerWidth,
             metricCount: card?.querySelectorAll(".overview-metric").length ?? 0,
+            contrastSamples: [
+              [".section-kicker", "rgb(230, 161, 125)"],
+              [".overview-metric-label", "rgb(208, 219, 211)"],
+              [".overview-metric-note", "rgb(174, 189, 180)"],
+              [".overview-shortcuts h3", "rgb(208, 219, 211)"],
+              [".overview-shortcut strong", "rgb(208, 219, 211)"],
+            ].map(([selector, expected]) => {
+              const node = card?.querySelector(selector);
+              const color = node ? getComputedStyle(node).color : null;
+              return { selector, color, expected };
+            }),
           };
         });
-        if (!overviewState.visible || overviewState.metricCount !== 3 || overviewState.width > overviewState.viewport + 1) {
+        if (!overviewState.visible || !overviewState.authHidden ||
+            overviewState.visibleSections.length !== 1 || overviewState.visibleSections[0] !== "overviewCard" ||
+            overviewState.metricCount !== 3 || overviewState.width > overviewState.viewport + 1) {
           failures.push(`${workspace.slug}/${viewport.name}: dashboard overview preview failed ${JSON.stringify(overviewState)}`);
+        }
+        if (workspace.slug === "mycology") {
+          for (const sample of overviewState.contrastSamples) {
+            if (!sample.color || sample.color !== sample.expected || contrastRatio(sample.color, "#1b2525") < 4.5) {
+              failures.push(`${workspace.slug}/${viewport.name}: overview text style/contrast mismatch for ${sample.selector} (actual ${sample.color}, expected ${sample.expected}, ratio ${sample.color ? contrastRatio(sample.color, "#1b2525").toFixed(2) : "n/a"}:1)`);
+            }
+          }
         }
       }
       const interiorState = await page.evaluate(() => {
