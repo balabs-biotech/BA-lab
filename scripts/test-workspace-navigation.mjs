@@ -9,6 +9,8 @@ const entryPages = [
 ].map((sector) => readFileSync(new URL(`../batch-tracker/${sector}/index.html`, import.meta.url), "utf8"));
 
 assert.match(navigation, /ba-module-rail/);
+assert.match(navigation, /modulesByDomain/);
+assert.match(navigation, /allowedModuleIds\.has\(id\)/);
 assert.match(navigation, /data-direction="left"/);
 assert.match(navigation, /data-direction="right"/);
 assert.match(navigation, /data-direction="up"/);
