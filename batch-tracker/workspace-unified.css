@@ -627,3 +627,9 @@ html body[data-domain="mycology"] #overviewCard .overview-metric .overview-metri
   color:#aebdb4 !important;
   opacity:1 !important;
 }
+
+/* PASS 167 — explicit metric-note target wins over workspace span rules. */
+html body[data-domain="mycology"] #overviewCard .overview-metrics article.overview-metric > span.overview-metric-note {
+  color:#aebdb4 !important;
+  opacity:1 !important;
+}
