@@ -57,6 +57,7 @@ The returned source is not automatically executable in CultureOps. Review import
 - [x] Replacement key configured by the project owner in Supabase.
 - [x] Edge Function `originkit-mcp` deployed and confirmed active (version 1, JWT verification enabled).
 - [ ] Invoke `browse` and `get` from an authenticated CultureOps session to validate the secret and upstream response.
+- [x] Add a spatial module navigation rail with previous/next controls, progress steps, Alt+arrow keyboard navigation, and touch-swipe support. Browser-smoke-tested on all three workspaces at desktop and mobile viewport sizes.
 - [ ] Retrieve the three selected components and inspect their actual returned source/dependencies.
 - [ ] Adapt and integrate the components into GreenTech, Mycology, and Laboratory.
 - [ ] Visually verify desktop/mobile layouts, interaction, and reduced-motion behavior.
