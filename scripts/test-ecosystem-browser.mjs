@@ -130,7 +130,7 @@ try {
     await page.locator('.chapter-rail-node').nth(2).click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
     await page.locator('#chapter-network a[data-domain-page="myco"]').click();
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.trim() === 'MYCOLOGIE', undefined, { timeout: 15000 });
+    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === 'MYCOLOGIE', undefined, { timeout: 15000 });
     assert.equal(page.url(), originalUrl, 'Selecting a universe must stay inside the normal BA Labs homepage');
     assert.ok((await page.locator('#selection').innerText()).length > 0, 'Direct domain selection must focus the requested universe in the embedded scene');
     assert.equal(await page.locator('#selection .selection-title').textContent(), 'MYCOLOGIE', 'The selected universe must be visibly named in the compact dock');
