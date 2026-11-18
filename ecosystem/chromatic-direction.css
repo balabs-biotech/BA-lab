@@ -1,22 +1,22 @@
 /* BA Labs — chromatic direction v1
-   Electric blue + deep ink + warm gold/copper. Keep generous mineral-light surfaces.
+   Mineral forest + graphite petroleum + oxidised copper. Keep generous mineral-light surfaces.
    This is a controlled overlay: existing editorial structure and content remain intact. */
 :root{
   --balabs-ink:#111B1D;
   --balabs-bio-green:#78927D;
   --balabs-bio-green-soft:#A7B8A4;
   --balabs-ink-soft:#263B38;
-  --balabs-blue:#789A8B;
-  --balabs-blue-bright:#9BAEA4;
-  --balabs-blue-pale:#E8EEF9;
-  --balabs-gold:#B96B4D;
+  --balabs-sage:#789A8B;
+  --balabs-sage-bright:#9BAEA4;
+  --balabs-mineral-pale:#D1D0C5;
+  --balabs-copper:#B96B4D;
   --balabs-copper:#B96B4D;
   --balabs-paper:#F2F1E9;
   --balabs-mineral:#D1D0C5;
   --balabs-muted:#9BAEA4;
   --balabs-line:rgba(64,83,77,.26);
   --balabs-glow:rgba(121,154,139,.22);
-  --balabs-focus-ring:0 0 0 3px var(--balabs-ink),0 0 0 5px var(--balabs-gold);
+  --balabs-focus-ring:0 0 0 3px var(--balabs-ink),0 0 0 5px var(--balabs-copper);
 }
 #app.balabs-ui>.top{
   background:linear-gradient(100deg,rgba(13,21,39,.98),rgba(24,36,60,.96))!important;
@@ -106,7 +106,7 @@
 #app.balabs-ui>.top button:focus-visible{
   outline:2px solid #B96B4D!important;outline-offset:4px!important;
 }
-/* Keep the light editorial chapters light: blue ink and warm gold details, not dark overlays. */
+/* Keep the light editorial chapters light: graphite ink and copper details, not dark overlays. */
 #app.balabs-ui .experience-page .under,
 #app.balabs-ui .experience-page .universe-index-card{
   background-color:#E9E8DF!important;color:#263B38!important;
@@ -275,7 +275,7 @@ html,body{
   background-blend-mode:soft-light,overlay,normal!important;
   background-image:var(--balabs-noise),var(--balabs-brushed),linear-gradient(145deg,rgba(155,174,164,.055),transparent 52%)!important;
 }
-/* Mineral light: subtle organic grain, not a flat electric-blue slab. */
+/* Mineral light: subtle organic grain, not a flat synthetic colour slab. */
 #app.balabs-ui .experience-page[data-chapter=home]>.hero{
   background-image:
     var(--balabs-noise),
@@ -326,7 +326,7 @@ html,body{
     linear-gradient(145deg,rgba(35,51,73,.94),rgba(17,27,29,.98))!important;
   background-blend-mode:soft-light,screen,normal!important;
 }
-/* Gold and copper accents get a brushed highlight rather than a flat fill. */
+/* Copper accents get a brushed highlight rather than a flat fill. */
 #app.balabs-ui .experience-page .experience-page-label,
 #app.balabs-ui .experience-page .universe-index-card>em,
 #app.balabs-ui .experience-page .product-ref{
