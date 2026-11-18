@@ -11,8 +11,8 @@ const entryPages = [
 assert.match(navigation, /ba-module-rail/);
 assert.match(navigation, /data-direction="-1"/);
 assert.match(navigation, /data-direction="1"/);
-assert.match(navigation, /Alt\+ArrowLeft/);
-assert.match(navigation, /Alt\+ArrowRight/);
+assert.match(navigation, /event\.altKey/);
+assert.match(navigation, /ArrowLeft.*ArrowRight/s);
 assert.match(navigation, /prefers-reduced-motion/);
 assert.match(navigation, /pointerdown/);
 assert.match(navigation, /pointerup/);
