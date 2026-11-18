@@ -1404,3 +1404,33 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-stage:focus-visibl
 @media(max-width:600px) {
   html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar { justify-content:flex-start !important; }
 }
+
+
+/* PASS 164 — copper remains the identity accent; functional text uses a lighter,
+   higher-contrast copper or neutral paper on graphite surfaces. */
+html body[data-domain="mycology"] #overviewCard .section-kicker,
+html body[data-domain="mycology"] #overviewCard .overview-observations-details > summary,
+html body[data-domain="mycology"] #overviewCard .shortcut-index {
+  color:#e6a17d !important;
+}
+html body[data-domain="mycology"] #overviewCard :is(
+  .overview-metric-label,
+  .overview-metric-note,
+  .overview-activity h3,
+  .overview-shortcuts h3,
+  .overview-shortcut strong,
+  .overview-shortcut small,
+  .overview-live
+) {
+  color:#d0dbd3 !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-shortcut {
+  border-color:rgba(201,130,89,.24) !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-shortcut:hover {
+  border-color:rgba(230,161,125,.62) !important;
+  background:rgba(201,130,89,.12) !important;
+}
+html body[data-domain="mycology"] #overviewCard .overview-metric-note {
+  color:#aebdb4 !important;
+}
