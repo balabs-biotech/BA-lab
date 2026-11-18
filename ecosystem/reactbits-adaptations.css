@@ -10,7 +10,7 @@
 #app>.top .lang{transition:transform .22s ease,border-color .22s ease,background .22s ease}
 #app>.top .lang:hover{transform:translateY(-2px)}
 #app>main>.hero{position:relative;isolation:isolate;overflow:hidden}
-#app>main>.hero .hero-micrograph{transform:scale(1.035);transform-origin:center;animation:rb-micrograph-drift 28s ease-in-out infinite alternate;will-change:transform}
+#app>main>.hero .hero-micrograph{transform:scale(1.035);transform-origin:center}
 #app>main>.hero>div:first-of-type{animation:rb-rise-in .85s cubic-bezier(.2,.75,.25,1) both}
 #app>main>.hero .aside{animation:rb-rise-in 1s .12s cubic-bezier(.2,.75,.25,1) both;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}
 #app>main>.hero .aside:hover{transform:translateY(-3px);border-color:var(--rb-paper)!important;box-shadow:0 18px 42px #0005!important}
@@ -66,7 +66,7 @@
 #app>.top .lang{transition:transform .22s ease,border-color .22s ease,background .22s ease}
 #app>.top .lang:hover{transform:translateY(-2px)}
 #app>main .experience-page >.hero{position:relative;isolation:isolate;overflow:hidden}
-#app>main .experience-page >.hero .hero-micrograph{transform:scale(1.035);transform-origin:center;animation:rb-micrograph-drift 28s ease-in-out infinite alternate;will-change:transform}
+#app>main .experience-page >.hero .hero-micrograph{transform:scale(1.035);transform-origin:center}
 #app>main .experience-page >.hero>div:first-of-type{animation:rb-rise-in .85s cubic-bezier(.2,.75,.25,1) both}
 #app>main .experience-page >.hero .aside{animation:rb-rise-in 1s .12s cubic-bezier(.2,.75,.25,1) both;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}
 #app>main .experience-page >.hero .aside:hover{transform:translateY(-3px);border-color:var(--rb-paper)!important;box-shadow:0 18px 42px #0005!important}
