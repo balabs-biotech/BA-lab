@@ -51,13 +51,19 @@
         paths=[];
         const span=Math.min(width,height);
         const step=span*.082;
-        // Thirty-six growth fronts: nine on each edge, with staggered spacing.
+        // Bias growth toward the empty upper/lower-left margins around the entry copy.
+        // Keep the photograph side intentionally quieter instead of filling it with strands.
         const roots=[];
-        for(let i=0;i<9;i++){
-          const t=.025+i*.119;
-          roots.push([0,t,(i%2?-.025:.025)],[1,t,(i%2?.025:-.025)]);
-          roots.push([t,0,(i%2?.025:-.025)],[t,1,(i%2?-.025:.025)]);
+        for(let i=0;i<20;i++){
+          const band=i%2===0 ? .025+((i/2)|0)*.105 : .975-(((i-1)/2)|0)*.105;
+          roots.push([0,Math.max(.025,Math.min(.975,band)),(i%2?-.035:.035)]);
         }
+        for(let i=0;i<8;i++){
+          const t=.025+i*.061;
+          roots.push([t,0,(i%2?.035:-.035)],[t,1,(i%2?-.035:.035)]);
+        }
+        // Only a couple of weak fronts enter from the image edge.
+        roots.push([1,.28,-.04],[1,.72,.04]);
         const mainRoots=[];
         roots.forEach((a,i)=>{
           const x=a[0]*width,y=a[1]*height;
@@ -149,10 +155,20 @@
           ctx.bezierCurveTo(c1.x,c1.y,c2.x,c2.y,p2.x,p2.y);
         }
         const copper=path.colour==='copper';
-        ctx.strokeStyle=copper?'rgba(185,107,77,.28)':'rgba(121,169,145,.30)';
+        // Spatial weighting: luminous hyphae gather in the upper/lower-left negative
+        // space; the CTA breathing zone stays calmer and the hero photograph stays legible.
+        const meanX=path.nodes.reduce((sum,n)=>sum+n.x,0)/path.nodes.length;
+        const meanY=path.nodes.reduce((sum,n)=>sum+n.y,0)/path.nodes.length;
+        const x=meanX/Math.max(1,width),y=meanY/Math.max(1,height);
+        const smooth=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
+        const leftBias=1-smooth(.34,.78,x);
+        const cornerBias=.38+.62*smooth(.18,.48,Math.abs(y-.5)*2);
+        const opacity=.10+.90*leftBias*cornerBias;
+        ctx.globalAlpha=opacity;
+        ctx.strokeStyle=copper?'rgba(185,107,77,.34)':'rgba(121,169,145,.36)';
         ctx.lineWidth=path.weight;ctx.lineCap='round';ctx.lineJoin='round';
-        ctx.shadowColor=copper?'rgba(185,107,77,.18)':'rgba(121,169,145,.2)';
-        ctx.shadowBlur=path.weight>1?8:4;ctx.stroke();ctx.shadowBlur=0;
+        ctx.shadowColor=copper?'rgba(185,107,77,.20)':'rgba(121,169,145,.22)';
+        ctx.shadowBlur=path.weight>1?8:4;ctx.stroke();ctx.shadowBlur=0;ctx.globalAlpha=1;
       };
       const draw=(now)=>{
         if(!visible)return;
