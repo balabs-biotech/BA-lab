@@ -1,6 +1,6 @@
 # BA Labs CultureOps
 
-**CultureOps** is the working product name for the BA Labs culture, batch and experimental-data tracker.
+**CultureOps** is BA Labs’ biological culture and experimental operations platform.
 
 CultureOps uses a shared HTML template, CSS and JavaScript engine with three distinct static entry pages. Supabase remains the operational source of truth.
 
@@ -9,7 +9,7 @@ CultureOps uses a shared HTML template, CSS and JavaScript engine with three dis
 - Mycology: `mycology/` — fungal identity, strains, lineage, generations, morphology, transfers and fruiting.
 - Laboratory: `laboratory/` — tissue cultures, agar, liquid cultures, grain inoculation, containers, protocols, measurements and material genealogy.
 
-Each page fixes its workspace at entry and does not show the universe switcher inside the workspace. The root `../index.html` is the universe chooser. The old `batch-tracker/index.html` path redirects to the chooser.
+Each page fixes its workspace at entry and does not show the universe switcher inside the workspace. The root `../index.html` is the universe chooser. The previous chooser route redirects to this portal.
 
 The pages share `workspace.html`, `tracker.css` and `tracker.js`; they do not duplicate the large legacy interface. Batch production is scoped to Laboratory. Mycology uses a restrained terracotta palette, not fluorescent lime.
 
