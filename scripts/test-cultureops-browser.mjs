@@ -2,6 +2,16 @@ import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 
+
+const cultureOpsLanding = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const cultureOpsLocales = fs.readFileSync(new URL("../batch-tracker/i18n.js", import.meta.url), "utf8");
+if (/CULTURE\\s*&(?:amp;)?\\s*BATCH TRACKER/i.test(cultureOpsLanding)) {
+  throw new Error("CultureOps landing page still exposes the retired Batch Tracker product name.");
+}
+if (/BA Labs BatchTracker|BA Labs Batch Tracker/i.test(cultureOpsLocales)) {
+  throw new Error("CultureOps translations still expose the retired Batch Tracker product name.");
+}
+
 const baseUrl = (process.env.CULTUREOPS_BASE_URL || "http://127.0.0.1:8787").replace(/\/$/, "");
 const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops-browser-smoke";
 fs.mkdirSync(artifactDir, { recursive: true });
