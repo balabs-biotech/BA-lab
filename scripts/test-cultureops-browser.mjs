@@ -290,6 +290,20 @@ try {
           failures.push(`${workspace.slug}/${viewport.name}: language ${language} produced ${JSON.stringify(languageState)}`);
         }
         if (languageState.width > languageState.viewport + 1) failures.push(`${workspace.slug}/${viewport.name}/${language}: horizontal overflow ${languageState.width}px > ${languageState.viewport}px`);
+        const expectedRailCopy = {
+          fr: { eyebrow: "Parcours du workspace", controls: ["Module au-dessus", "Module à gauche", "Module en dessous", "Module à droite"] },
+          en: { eyebrow: "Workspace path", controls: ["Module above", "Module to the left", "Module below", "Module to the right"] },
+          pt: { eyebrow: "Percurso do workspace", controls: ["Módulo acima", "Módulo à esquerda", "Módulo abaixo", "Módulo à direita"] },
+          ar: { eyebrow: "مسار مساحة العمل", controls: ["الوحدة أعلاه", "الوحدة إلى اليسار", "الوحدة أدناه", "الوحدة إلى اليمين"] },
+        };
+        const railCopy = await page.evaluate(() => ({
+          eyebrow: document.querySelector(".ba-module-rail__eyebrow")?.textContent.trim() || "",
+          controls: [...document.querySelectorAll(".ba-module-rail__button")].map(button => button.getAttribute("aria-label")),
+        }));
+        if (railCopy.eyebrow !== expectedRailCopy[language].eyebrow ||
+            JSON.stringify(railCopy.controls) !== JSON.stringify(expectedRailCopy[language].controls)) {
+          failures.push(`${workspace.slug}/${viewport.name}/${language}: module navigation is not translated ${JSON.stringify(railCopy)}`);
+        }
       }
       await page.locator("#languageSelect").selectOption("fr");
       await page.locator("#authEmail").fill("");
