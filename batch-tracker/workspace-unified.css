@@ -620,3 +620,10 @@ html body[data-domain="mycology"] #overviewCard .overview-shortcut:hover {
   border-color:rgba(230,161,125,.7) !important;
   background:rgba(201,130,89,.12) !important;
 }
+
+
+/* PASS 166 — metric note must remain visually secondary to its label. */
+html body[data-domain="mycology"] #overviewCard .overview-metric .overview-metric-note {
+  color:#aebdb4 !important;
+  opacity:1 !important;
+}
