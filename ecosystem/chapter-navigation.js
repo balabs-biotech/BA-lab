@@ -60,32 +60,41 @@
    images.forEach(img=>{img.classList.add('rb-image-armed');revealObserver.observe(img)});
   });
  }
- const filament=rail.querySelector('.filament-progress');let filamentLength=0;
- try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){}
- let current=0;
- const lang=()=>document.documentElement.lang||'fr';
+ const filament=rail.querySelector('.filament-progress'),filamentBase=rail.querySelector('.filament-base'),signal=rail.querySelector('.filament-signal'),railSvg=rail.querySelector('.chapter-filament');
+ let filamentLength=0,current=0,railGeometryFrame=0;
+ const syncRailGeometry=()=>{
+  const railRect=rail.getBoundingClientRect(),nodes=[...railNodes.querySelectorAll('.chapter-rail-node')];
+  if(!nodes.length||!railRect.width||!railRect.height)return;
+  const pts=nodes.map(node=>{const r=node.getBoundingClientRect();return{x:r.left+r.width/2-railRect.left,y:r.top+r.height/2-railRect.top}});
+  railSvg.setAttribute('viewBox',`0 0 ${railRect.width} ${railRect.height}`);
+  railSvg.setAttribute('preserveAspectRatio','none');
+  const d=pts.reduce((path,p,i)=>{if(!i)return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;const prev=pts[i-1],mid=(prev.y+p.y)/2,dir=i%2?1:-1,curve=Math.min(10,railRect.width*.16)*dir;return path+` C ${(prev.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${(p.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${p.x.toFixed(2)} ${p.y.toFixed(2)}`},'');
+  filament.setAttribute('d',d);filamentBase.setAttribute('d',d);
+  try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){filamentLength=0}
+  update();
+ };
+ const scheduleRailGeometry=()=>{if(railGeometryFrame)return;railGeometryFrame=requestAnimationFrame(()=>{railGeometryFrame=0;syncRailGeometry()})};
+ const pageWidth=()=>Math.max(1,track.clientWidth);
  const update=()=>{
-  const offsets=pages.map(page=>page.getBoundingClientRect().left-track.getBoundingClientRect().left+track.scrollLeft);
-  const idx=offsets.reduce((best,value,i)=>Math.abs(value-track.scrollLeft)<Math.abs(offsets[best]-track.scrollLeft)?i:best,0);
-  const pageWidth=Math.max(1,track.clientWidth);
-  const rawProgress=Math.max(0,Math.min(pages.length-1,idx+(track.scrollLeft-offsets[idx])/pageWidth));
+  const rawProgress=Math.max(0,Math.min(pages.length-1,track.scrollLeft/pageWidth()));
+  const idx=Math.max(0,Math.min(pages.length-1,Math.round(rawProgress)));
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
   progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[lang()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
-  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false');});
+  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false')});
   rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
-  if(filamentLength){const filamentProgress=rawProgress/Math.max(1,pages.length-1);filament.style.strokeDashoffset=String(filamentLength*(1-filamentProgress));const signal=rail.querySelector('.filament-signal');if(signal){const point=filament.getPointAtLength(filamentLength*filamentProgress);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2));}}
+  if(filamentLength){const p=rawProgress/Math.max(1,pages.length-1);filament.style.strokeDashoffset=String(filamentLength*(1-p));if(signal){const point=filament.getPointAtLength(filamentLength*p);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2))}}
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
  };
  const scrollBehavior=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
- const pageOffset=n=>{const page=pages[n];return page.getBoundingClientRect().left-track.getBoundingClientRect().left+track.scrollLeft;};
- const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:pageOffset(n),top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
+ const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:n*pageWidth(),top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
  prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
  track.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
  track.addEventListener('scrollend',update,{passive:true});
- window.addEventListener('resize',()=>requestAnimationFrame(update),{passive:true});
+ window.addEventListener('resize',()=>{scheduleRailGeometry();requestAnimationFrame(update)},{passive:true});
+ if('ResizeObserver' in window){const railResizeObserver=new ResizeObserver(scheduleRailGeometry);railResizeObserver.observe(rail);railResizeObserver.observe(railNodes)}
  // Each chapter-rail button owns its own click handler above; do not dispatch go() twice.
  track.addEventListener('keydown',e=>{const panel=e.target.closest&&e.target.closest('.experience-page');if(e.target!==track&&e.target!==panel)return;if(e.key==='ArrowRight'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(pages.length-1)}});
  document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;const page=pages[current];if(!page)return;const atTop=page.scrollTop<=4;const atBottom=page.scrollTop+page.clientHeight>=page.scrollHeight-4;if(e.key==='PageDown'&&atBottom&&current<pages.length-1){e.preventDefault();go(current+1)}if(e.key==='PageUp'&&atTop&&current>0){e.preventDefault();go(current-1)}});
@@ -121,7 +130,7 @@
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{const label=groups[i].label[l]||groups[i].label.fr;b.setAttribute('aria-label',label);const name=b.querySelector('.chapter-rail-name');if(name)name.textContent=label;});
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
- localize();update();
+ localize();scheduleRailGeometry();update();
  const hash=location.hash&&document.getElementById(decodeURIComponent(location.hash.slice(1)));
  if(hash){const page=hash.closest('.experience-page');if(page){go(pages.indexOf(page));requestAnimationFrame(()=>hash.scrollIntoView({block:'start',behavior:scrollBehavior()}));}}
 })();
