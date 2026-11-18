@@ -91,6 +91,17 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: workspace shell or authentication panel did not render`);
       }
 
+      const expectedAnimationCanvas = {
+        agronomy: ".ba-originkit-rising-lines",
+        mycology: ".ba-originkit-particle-sphere",
+        laboratory: ".ba-originkit-kinetic-grid",
+      }[workspace.domain];
+      try {
+        await page.locator(expectedAnimationCanvas).waitFor({ state: "attached", timeout: 15000 });
+      } catch {
+        failures.push(`${workspace.slug}/${viewport.name}: sector OriginKit canvas did not mount (${expectedAnimationCanvas})`);
+      }
+
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
@@ -132,6 +143,7 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          heroAnimationCanvas: document.querySelector(".ba-originkit-rising-lines, .ba-originkit-particle-sphere, .ba-originkit-kinetic-grid")?.className || null,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
             const rect = element.getBoundingClientRect();
@@ -157,6 +169,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
+      if (!metrics.heroAnimationCanvas) failures.push(`${workspace.slug}/${viewport.name}: sector-specific OriginKit canvas missing`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
