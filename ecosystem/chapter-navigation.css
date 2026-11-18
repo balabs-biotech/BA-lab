@@ -293,3 +293,15 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
  .experience-controls button{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;border-radius:7px!important}
  .experience-count{min-width:38px!important}
 }
+
+
+/* Chapter rail precision pass: the filament is drawn through the real button centres by JS. */
+.chapter-filament .filament-branch{display:none!important}
+.chapter-filament{overflow:visible!important}
+.chapter-rail .filament-progress{transition:none!important}
+.chapter-rail .filament-signal{transition:none!important}
+.chapter-rail .chapter-rail-node{scroll-margin:0!important}
+.chapter-rail .chapter-rail-dot{transition:width .16s ease,height .16s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease!important}
+@media(prefers-reduced-motion:reduce){
+ .chapter-rail .chapter-rail-dot{transition:none!important}
+}
