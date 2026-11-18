@@ -1,4 +1,4 @@
-name: Deploy Batch Tracker to GitHub Pages
+name: Deploy BA Labs website and Batch Tracker to GitHub Pages
 
 # GitHub Pages is the sole public deployment target for this repository.
 on:
@@ -31,8 +31,14 @@ jobs:
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           touch _site/.nojekyll
 
+      - name: Install image optimization dependency
+        run: python -m pip install Pillow
+
       - name: Download and validate BA Labs website images
         run: python ecosystem/download-images.py --manifest ecosystem/images-manifest.json --output _site/ecosystem/assets
+
+      - name: Optimize BA Labs website images
+        run: python scripts/optimize-ecosystem-images.py --directory _site/ecosystem/assets --max-edge 1800 --jpeg-quality 84
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
