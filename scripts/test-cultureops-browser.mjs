@@ -195,7 +195,20 @@ try {
         const before = hero?.getBoundingClientRect().height ?? 0;
         document.body.classList.add("workspace-authenticated");
         auth?.classList.add("hidden");
-        if (sectionNavigation) sectionNavigation.hidden = false;
+        if (sectionNavigation) {
+          sectionNavigation.hidden = false;
+          // The smoke harness has no real Supabase session. Reproduce the
+          // authenticated workspace state by revealing the same hash targets
+          // that the application reveals after login.
+          for (const link of sectionNavigation.querySelectorAll('a[href^="#"]')) {
+            const panel = document.getElementById(link.getAttribute("href").slice(1));
+            if (panel) {
+              panel.hidden = false;
+              panel.classList.remove("hidden", "workspace-inactive");
+            }
+            link.hidden = false;
+          }
+        }
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const after = hero?.getBoundingClientRect().height ?? 0;
         const art = document.querySelector(".hero-art");
