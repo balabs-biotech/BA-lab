@@ -96,6 +96,10 @@ try {
       const url = `${baseUrl}/batch-tracker/${workspace.slug}/`;
       const response = await page.goto(url, { waitUntil: "networkidle", timeout: 45000 });
       if (!response || !response.ok()) failures.push(`${workspace.slug}/${viewport.name}: HTTP ${response?.status() ?? "no response"}`);
+      const unifiedStylesheetHref = await page.locator('link[rel="stylesheet"][href*="workspace-unified.css"]').getAttribute("href").catch(() => null);
+      if (!unifiedStylesheetHref?.includes("v=20261119-mycology-contrast-167")) {
+        failures.push(workspace.slug + "/" + viewport.name + ": stale or missing workspace stylesheet cache key (" + (unifiedStylesheetHref || "missing") + ")");
+      }
 
       try {
         await page.locator(".app-toolbar").waitFor({ state: "visible", timeout: 15000 });
