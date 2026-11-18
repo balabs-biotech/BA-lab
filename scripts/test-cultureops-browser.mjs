@@ -175,6 +175,7 @@ try {
             .sort((a, b) => b.right - a.right).slice(0, 12),
           navLinks: document.querySelectorAll(".section-nav a").length,
           navigationHidden: document.querySelector(".section-nav")?.hidden ?? false,
+          navigationDisplay: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).display : "missing",
         };
       });
 
@@ -197,7 +198,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (viewport.name !== "desktop" && metrics.signInButtonBottom > viewport.height) failures.push(`${workspace.slug}/${viewport.name}: sign-in action falls below the first viewport (${metrics.signInButtonBottom}px > ${viewport.height}px)`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
-      if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
+      if (!metrics.navigationHidden || metrics.navigationDisplay !== "none") failures.push(`${workspace.slug}/${viewport.name}: module navigation is visible before authentication (hidden=${metrics.navigationHidden}, display=${metrics.navigationDisplay})`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
       const compactHero = await page.evaluate(async () => {
         const hero = document.querySelector(".app-hero");
