@@ -64,6 +64,7 @@
  const svgNS='http://www.w3.org/2000/svg';
  const branchLayer=document.createElementNS(svgNS,'path');branchLayer.setAttribute('class','filament-branches');branchLayer.setAttribute('aria-hidden','true');railSvg.insertBefore(branchLayer,filament);
 
+ const getLanguage=()=>{const value=(document.documentElement.lang||'fr').toLowerCase().split('-')[0];return ['fr','en','ar','pt'].includes(value)?value:'fr'};
  let filamentLength=0,current=0,railGeometryFrame=0;
  const syncRailGeometry=()=>{
   const railRect=rail.getBoundingClientRect(),nodes=[...railNodes.querySelectorAll('.chapter-rail-node')];
@@ -94,9 +95,9 @@
   current=idx;count.textContent=String(idx+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
-  progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[lang()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
+  progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false')});
-  rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[lang()]||groups[i].label.fr});
+  rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[getLanguage()]||groups[i].label.fr});
   if(filamentLength){const p=rawProgress/Math.max(1,pages.length-1);filament.style.strokeDashoffset=String(filamentLength*(1-p));if(signal){const point=filament.getPointAtLength(filamentLength*p);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2))}}
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
@@ -121,7 +122,7 @@
   requestAnimationFrame(()=>{const top=target===page?0:target.offsetTop-page.offsetTop;page.scrollTo({top:Math.max(0,top-12),behavior:scrollBehavior()});history.replaceState(null,'','#'+id)});
  },true);
  const localize=()=>{
-  const l=lang(),labels={
+  const l=getLanguage(),labels={
    track:{fr:'BALabs — navigation horizontale',en:'BALabs — horizontal navigation',ar:'بالابس — التنقل الأفقي',pt:'BALabs — navegação horizontal'},
    progress:{fr:'Progression dans les chapitres',en:'Chapter progress',ar:'التقدم بين الفصول',pt:'Progresso dos capítulos'},
    page:{fr:'Chapitre',en:'Chapter',ar:'الفصل',pt:'Capítulo'}
@@ -141,6 +142,7 @@
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
   rail.setAttribute('aria-label',({fr:'Parcours des chapitres',en:'Chapter navigation',ar:'التنقل بين الفصول',pt:'Navegação por capítulos'})[l]);
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{const label=groups[i].label[l]||groups[i].label.fr;b.setAttribute('aria-label',label);const name=b.querySelector('.chapter-rail-name');if(name)name.textContent=label;});
+  update();
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
  localize();scheduleRailGeometry();update();
