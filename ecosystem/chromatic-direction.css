@@ -400,3 +400,114 @@ html,body{
 #app.balabs-ui .experience-page[data-chapter="research"]>.editorial-work .work-heading>p{
   color:#C5CDDA!important;
 }
+
+
+/* BA Labs palette lock — same dark mineral/copper identity on desktop and mobile.
+   Neutralise legacy blue-slate and light-theme overrides without flattening
+   the biological green accents or the copper navigation signals. */
+:root{
+  color-scheme:dark!important;
+  --bg:#111B1D!important;
+  --panel:#172321!important;
+  --ink:#F2F1E9!important;
+  --muted:#9BAEA4!important;
+  --line:#40534D!important;
+  --lime:#9BAEA4!important;
+  --bio:#78927D!important;
+  --myco:#A7B8A4!important;
+  --soil:#8F9F96!important;
+  --lab:#9BAEA4!important;
+  --iot:#9BAEA4!important;
+  --products:#B96B4D!important;
+  --work:#B96B4D!important;
+  --learn:#D1D0C5!important;
+}
+html,body,#app.balabs-ui{
+  color-scheme:dark!important;
+  background-color:#111B1D!important;
+  color:#D1D0C5!important;
+}
+html,body{
+  background-image:
+    radial-gradient(ellipse at 14% 0%,rgba(38,59,56,.38),transparent 38%),
+    radial-gradient(ellipse at 88% 78%,rgba(185,107,77,.075),transparent 30%),
+    linear-gradient(145deg,#111B1D 0%,#172321 58%,#111B1D 100%)!important;
+}
+#app.balabs-ui>.top,
+#app.balabs-ui>.site-nav{
+  background:#111B1D!important;
+  color:#D1D0C5!important;
+  border-color:#40534D!important;
+}
+#app.balabs-ui>.top .brand strong,
+#app.balabs-ui .experience-page :is(h1,h2,h3,strong){
+  color:#F2F1E9!important;
+}
+#app.balabs-ui>.top .brand small,
+#app.balabs-ui .experience-page :is(p,small,.work-topics,.feature-status){
+  color:#AEBBB2!important;
+}
+#app.balabs-ui .experience-page :is(.eyebrow,.experience-page-label,.work-index,.work-tag,.product-kind,.product-ref){
+  color:#9BAEA4!important;
+}
+#app.balabs-ui .experience-page :is(a,.editorial-link,.work-card-link,.product-catalogue-all){
+  color:#D99A7F!important;
+}
+#app.balabs-ui .experience-page :is(.hero-action-primary,.btn.primary){
+  background:#B96B4D!important;
+  border-color:#B96B4D!important;
+  color:#111B1D!important;
+}
+#app.balabs-ui .experience-page :is(.hero-action-secondary,.btn,.product-filter){
+  background:#263B38!important;
+  border-color:#40534D!important;
+  color:#D1D0C5!important;
+}
+#app.balabs-ui .experience-page :is(.editorial-work,.editorial-feature,.editorial-about,.editorial-method,.field-atlas,.product-catalogue,.universe-index){
+  background-color:#111B1D!important;
+  color:#D1D0C5!important;
+}
+#app.balabs-ui .experience-page :is(.work-card,.product-catalogue-card,.universe-index-card,.selection-dock){
+  background:linear-gradient(145deg,#263B38 0%,#172321 72%,#111B1D 100%)!important;
+  border-color:#40534D!important;
+  color:#D1D0C5!important;
+}
+#app.balabs-ui .experience-page :is(.work-card h3,.product-catalogue-card h3,.universe-index-card>b){
+  color:#F2F1E9!important;
+}
+#app.balabs-ui .experience-page :is(.work-card p,.product-catalogue-card p,.universe-index-card>p,.universe-index-card>small){
+  color:#AEBBB2!important;
+}
+#app.balabs-ui .experience-page :is(.work-card a,.product-catalogue-card a,.universe-index-card>em){
+  color:#D99A7F!important;
+}
+#app.balabs-ui .inline-explorer{
+  background:radial-gradient(ellipse at 50% 45%,#263B38 0%,#172321 48%,#111B1D 100%)!important;
+  border-color:#40534D!important;
+}
+#app.balabs-ui .inline-explorer-title :is(h2,.eyebrow){color:#D1D0C5!important}
+#app.balabs-ui .inline-explorer-controls .btn{
+  background:#172321!important;border-color:#40534D!important;color:#D1D0C5!important;
+}
+@media(max-width:760px){
+  html,body,#app.balabs-ui{
+    background-color:#111B1D!important;
+    color:#D1D0C5!important;
+  }
+  html,body{
+    background-image:
+      radial-gradient(ellipse at 14% 0%,rgba(38,59,56,.38),transparent 38%),
+      radial-gradient(ellipse at 88% 78%,rgba(185,107,77,.075),transparent 30%),
+      linear-gradient(145deg,#111B1D 0%,#172321 58%,#111B1D 100%)!important;
+    background-attachment:scroll!important;
+  }
+  #app.balabs-ui>.top,
+  #app.balabs-ui>.site-nav{
+    background:#111B1D!important;
+    color:#D1D0C5!important;
+    border-color:#40534D!important;
+  }
+  #app.balabs-ui .experience-page :is(.hero-action-primary,.btn.primary){
+    background:#B96B4D!important;color:#111B1D!important;
+  }
+}
