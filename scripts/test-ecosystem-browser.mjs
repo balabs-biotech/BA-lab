@@ -63,7 +63,7 @@ try {
       return { left: rect.left, right: rect.right, viewportWidth: window.innerWidth, visibility: getComputedStyle(element).visibility };
     });
     assert.equal(chapterLabelBounds.visibility, 'visible', 'Hovering a chapter point must reveal its label');
-    assert.ok(chapterLabelBounds.left >= 0 && chapterLabelBounds.right <= chapterLabelBounds.viewportWidth, 'The chapter label must remain fully inside the viewport');
+    assert.ok(chapterLabelBounds.left >= 0 && chapterLabelBounds.right <= chapterLabelBounds.viewportWidth, 'The chapter label must remain fully inside the viewport: ' + JSON.stringify({ ...chapterLabelBounds, width: chapterLabelBounds.right - chapterLabelBounds.left, display: getComputedStyle(document.querySelector('.chapter-rail-node .chapter-rail-name')).display, direction: getComputedStyle(document.documentElement).direction, rail: (() => { const r=document.querySelector('.chapter-rail').getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; })(), node: (() => { const r=document.querySelector('.chapter-rail-node').getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; })() }));
 
     // Audit real image decoding on every editorial chapter after navigation.
     const chapterImageAudits = [];
