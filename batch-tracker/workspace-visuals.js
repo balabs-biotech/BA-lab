@@ -40,7 +40,17 @@
     },
     agronomy: {
       label: "Planche botanique scientifique montrant une feuille, sa nervation principale et son réseau de nervures secondaires",
-      particles: null,
+      particles: {
+        count: compact ? 4 : 7,
+        color: "#b4f477",
+        direction: "none",
+        speed: 0.045,
+        shape: "circle",
+        interactivity: {
+          hover: { enable: true, mode: "repulse" },
+          click: { enable: true, mode: "push" }
+        }
+      },
       markup: `
         <div class="ba-sector-visual ba-sector-visual--greentech" data-sector="agronomy" data-visual="botanical-plate">
           <svg class="ba-sector-svg ba-botanical-plate" viewBox="0 0 320 240" role="img" aria-label="Planche botanique : limbe foliaire, nervure médiane, nervures secondaires et réseau de nervilles">
