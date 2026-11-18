@@ -132,6 +132,8 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          heroPrimary: document.querySelector("#heroTitlePrimary")?.textContent.trim() || "",
+          heroDescription: document.querySelector("#heroDescription")?.textContent.trim() || "",
           heroVisualKind: document.querySelector(".ba-sector-visual")?.dataset.visual || null,
           botanicalPathCount: document.querySelectorAll(".ba-botanical-plate path").length,
           botanicalScanPresent: !!document.querySelector(".ba-botanical-plate .ba-leaf-scan"),
@@ -159,6 +161,8 @@ try {
       if (viewport.width >= 821 && (metrics.toolbarPosition !== "sticky" || metrics.toolbarTop < 0 || metrics.heroTop < metrics.toolbarBottom + 8 || metrics.toolbarWidth > metrics.viewportWidth)) failures.push(`${workspace.slug}/${viewport.name}: horizontal sticky toolbar layout is invalid (${JSON.stringify({ position: metrics.toolbarPosition, top: metrics.toolbarTop, bottom: metrics.toolbarBottom, heroTop: metrics.heroTop, width: metrics.toolbarWidth, viewport: metrics.viewportWidth })})`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
+      const expectedHeroPrimary = { agronomy: "Cultures végétales", mycology: "Cultures fongiques", laboratory: "Production biologique" }[workspace.domain];
+      if (metrics.heroPrimary !== expectedHeroPrimary) failures.push(`${workspace.slug}/${viewport.name}: domain-specific hero title mismatch (${metrics.heroPrimary})`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
       if (workspace.domain === "agronomy" && (metrics.heroVisualKind !== "botanical-plate" || metrics.botanicalPathCount < 5 || !metrics.botanicalScanPresent)) failures.push(`${workspace.slug}/${viewport.name}: GreenTech botanical plate is incomplete (${JSON.stringify({ kind: metrics.heroVisualKind, paths: metrics.botanicalPathCount, scan: metrics.botanicalScanPresent })})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
@@ -226,10 +230,19 @@ try {
           dir: document.documentElement.dir,
           width: document.documentElement.scrollWidth,
           viewport: innerWidth,
+          heroPrimary: document.querySelector("#heroTitlePrimary")?.textContent.trim() || "",
         }));
         const expectedDirection = language === "ar" ? "rtl" : "ltr";
         if (languageState.lang !== language || languageState.dir !== expectedDirection) {
           failures.push(`${workspace.slug}/${viewport.name}: language ${language} produced ${JSON.stringify(languageState)}`);
+        }
+        const expectedHeroTranslations = {
+          agronomy: { fr: "Cultures végétales", en: "Plant cultures", pt: "Culturas vegetais", ar: "المحاصيل النباتية" },
+          mycology: { fr: "Cultures fongiques", en: "Fungal cultures", pt: "Culturas fúngicas", ar: "المزارع الفطرية" },
+          laboratory: { fr: "Production biologique", en: "Biological production", pt: "Produção biológica", ar: "الإنتاج الحيوي" },
+        };
+        if (languageState.heroPrimary !== expectedHeroTranslations[workspace.domain][language]) {
+          failures.push(`${workspace.slug}/${viewport.name}: hero title was not localized for ${language} (${languageState.heroPrimary})`);
         }
         if (languageState.width > languageState.viewport + 1) failures.push(`${workspace.slug}/${viewport.name}/${language}: horizontal overflow ${languageState.width}px > ${languageState.viewport}px`);
       }
