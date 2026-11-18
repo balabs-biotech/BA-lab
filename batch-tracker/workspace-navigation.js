@@ -19,13 +19,18 @@
     .ba-module-rail__eyebrow{color:var(--workspace-accent,var(--domain-accent));font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
     .ba-module-rail__title{overflow:hidden;color:var(--paper,#eef2ed);font-size:14px;font-weight:760;text-overflow:ellipsis;white-space:nowrap}
     .ba-module-rail__count{color:var(--muted);font-size:10px;font-variant-numeric:tabular-nums;letter-spacing:.08em}
-    .ba-module-rail__steps{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}
-    .ba-module-rail__step{position:relative;flex:1 1 0;max-width:62px;height:4px;padding:0;border:0;border-radius:99px;background:rgba(160,180,170,.2);cursor:pointer;transition:background .18s ease,transform .18s ease}
+    .ba-module-rail__steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:7px;min-width:0}
+    .ba-module-rail__step{position:relative;width:100%;height:5px;padding:0;border:0;border-radius:99px;background:rgba(160,180,170,.2);cursor:pointer;transition:background .18s ease,transform .18s ease}
     .ba-module-rail__step[aria-current="step"]{background:var(--workspace-accent,var(--domain-accent));box-shadow:0 0 14px color-mix(in srgb,var(--workspace-accent,var(--domain-accent)) 32%,transparent)}
     .ba-module-rail__step:hover{transform:scaleY(1.8)}
-    .ba-module-rail__controls{display:flex;align-items:center;gap:7px}
-    .ba-module-rail__hint{margin-right:5px;color:var(--muted);font-size:9px;white-space:nowrap}
-    .ba-module-rail__button{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--workspace-accent-border,rgba(160,190,170,.22));border-radius:10px;background:rgba(255,255,255,.035);color:var(--paper,#eef2ed);font-size:18px;line-height:1;cursor:pointer}
+    .ba-module-rail__controls{display:grid;justify-items:center;gap:4px}
+    .ba-module-rail__hint{color:var(--muted);font-size:8px;white-space:nowrap}
+    .ba-module-rail__pad{display:grid;grid-template-columns:repeat(3,30px);grid-template-rows:repeat(2,28px);gap:3px}
+    .ba-module-rail__button{display:grid;place-items:center;width:30px;height:28px;padding:0;border:1px solid var(--workspace-accent-border,rgba(160,190,170,.22));border-radius:8px;background:rgba(255,255,255,.035);color:var(--paper,#eef2ed);font-size:15px;line-height:1;cursor:pointer}
+    .ba-module-rail__button[data-direction="up"]{grid-column:2;grid-row:1}
+    .ba-module-rail__button[data-direction="left"]{grid-column:1;grid-row:2}
+    .ba-module-rail__button[data-direction="down"]{grid-column:2;grid-row:2}
+    .ba-module-rail__button[data-direction="right"]{grid-column:3;grid-row:2}
     .ba-module-rail__button:hover:not(:disabled){border-color:var(--workspace-accent,var(--domain-accent));background:var(--workspace-accent-soft,rgba(255,255,255,.06))}
     .ba-module-rail__button:disabled{opacity:.3;cursor:not-allowed}
     .ba-module-rail__button:focus-visible,.ba-module-rail__step:focus-visible{outline:2px solid var(--workspace-accent,var(--domain-accent));outline-offset:3px}
@@ -45,17 +50,20 @@
     </div>
     <div class="ba-module-rail__steps" aria-label="Étapes du workspace"></div>
     <div class="ba-module-rail__controls">
-      <span class="ba-module-rail__hint">ALT + ← / →</span>
-      <button class="ba-module-rail__button" type="button" data-direction="-1" aria-label="Module précédent">‹</button>
-      <button class="ba-module-rail__button" type="button" data-direction="1" aria-label="Module suivant">›</button>
+      <span class="ba-module-rail__hint">ALT + ↑ ↓ ← →</span>
+      <div class="ba-module-rail__pad" role="group" aria-label="Déplacement entre les modules">
+        <button class="ba-module-rail__button" type="button" data-direction="up" aria-label="Module au-dessus">↑</button>
+        <button class="ba-module-rail__button" type="button" data-direction="left" aria-label="Module à gauche">←</button>
+        <button class="ba-module-rail__button" type="button" data-direction="down" aria-label="Module en dessous">↓</button>
+        <button class="ba-module-rail__button" type="button" data-direction="right" aria-label="Module à droite">→</button>
+      </div>
     </div>`;
   hero.insertAdjacentElement("afterend", rail);
 
   const stepsHost = rail.querySelector(".ba-module-rail__steps");
   const titleNode = rail.querySelector(".ba-module-rail__title");
   const countNode = rail.querySelector(".ba-module-rail__count");
-  const previousButton = rail.querySelector('[data-direction="-1"]');
-  const nextButton = rail.querySelector('[data-direction="1"]');
+  const directionButtons = Array.from(rail.querySelectorAll(".ba-module-rail__button"));
   let links = [];
   let activeIndex = 0;
 
@@ -96,21 +104,34 @@
       if (index === activeIndex) step.setAttribute("aria-current", "step");
       else step.removeAttribute("aria-current");
     });
-    previousButton.disabled = activeIndex <= 0;
-    nextButton.disabled = activeIndex >= links.length - 1;
+    const column = activeIndex % 2;
+    directionButtons.forEach((button) => {
+      const direction = button.dataset.direction;
+      button.disabled =
+        (direction === "left" && column === 0) ||
+        (direction === "right" && (column === 1 || activeIndex + 1 >= links.length)) ||
+        (direction === "up" && activeIndex < 2) ||
+        (direction === "down" && activeIndex + 2 >= links.length);
+    });
   };
 
   const move = (direction) => {
     if (!links.length) return;
-    const nextIndex = Math.max(0, Math.min(links.length - 1, activeIndex + direction));
-    if (nextIndex === activeIndex) return;
+    const column = activeIndex % 2;
+    let nextIndex = activeIndex;
+    if (direction === "left" && column === 1) nextIndex -= 1;
+    if (direction === "right" && column === 0) nextIndex += 1;
+    if (direction === "up") nextIndex -= 2;
+    if (direction === "down") nextIndex += 2;
+    if (nextIndex < 0 || nextIndex >= links.length || nextIndex === activeIndex) return;
     links[nextIndex].click();
     activeIndex = nextIndex;
     sync();
   };
 
-  previousButton.addEventListener("click", () => move(-1));
-  nextButton.addEventListener("click", () => move(1));
+  directionButtons.forEach((button) => {
+    button.addEventListener("click", () => move(button.dataset.direction));
+  });
 
   nav.addEventListener("click", (event) => {
     if (event.target.closest("a")) {
@@ -131,10 +152,17 @@
 
   document.addEventListener("keydown", (event) => {
     if (!document.body.classList.contains("workspace-authenticated") || !event.altKey) return;
-    if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    const directions = {
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      ArrowUp: "up",
+      ArrowDown: "down",
+    };
+    const direction = directions[event.key];
+    if (!direction) return;
     if (event.target instanceof Element && event.target.closest("input,textarea,select,[contenteditable='true']")) return;
     event.preventDefault();
-    move(event.key === "ArrowRight" ? 1 : -1);
+    move(direction);
   });
 
   let touchStart = null;
@@ -147,7 +175,11 @@
     const dx = event.clientX - touchStart.x;
     const dy = event.clientY - touchStart.y;
     touchStart = null;
-    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) move(dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      move(dx < 0 ? "right" : "left");
+    } else if (Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx) * 1.4) {
+      move(dy < 0 ? "down" : "up");
+    }
   }, { passive: true });
 
   refreshLinks();
