@@ -585,3 +585,9 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
     transition:none !important;
   }
 }
+
+
+/* CultureOps authentication gate: author display rules must not override the HTML hidden state. */
+html body[data-domain] #sectionNavigation[hidden] {
+  display: none !important;
+}
