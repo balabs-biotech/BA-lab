@@ -17,15 +17,15 @@
   const hero=document.querySelector('#accueil');
   if(hero && canWebGL && !reduce && !saveData && !lowPower){
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js')
-      .then(()=>loadScript('https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js'))
+      .then(()=>loadScript('https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.cells.min.js'))
       .then(()=>{
-        if(!window.VANTA?.NET || !hero.isConnected || hero.dataset.vantaReady) return;
+        if(!window.VANTA?.CELLS || !hero.isConnected || hero.dataset.vantaReady) return;
         hero.dataset.vantaReady='1';
-        window.__balabsVanta=window.VANTA.NET({
+        window.__balabsVanta=window.VANTA.CELLS({
           el:hero, THREE:window.THREE, mouseControls:true, touchControls:false, gyroControls:false,
           minHeight:260, minWidth:260, scale:1, scaleMobile:1,
-          color:0x79a991, backgroundColor:0x111b1d,
-          points:8, maxDistance:22, spacing:18, showDots:false
+          color1:0x263b38, color2:0x79a991, backgroundColor:0x111b1d,
+          size:1.2, speed:0.28
         });
       }).catch(()=>{ /* CSS/image hero remains the fallback. */ });
   }
