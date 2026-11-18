@@ -132,6 +132,9 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          heroVisualKind: document.querySelector(".ba-sector-visual")?.dataset.visual || null,
+          botanicalPathCount: document.querySelectorAll(".ba-botanical-plate path").length,
+          botanicalScanPresent: !!document.querySelector(".ba-botanical-plate .ba-leaf-scan"),
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
             const rect = element.getBoundingClientRect();
@@ -157,6 +160,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
+      if (workspace.domain === "agronomy" && (metrics.heroVisualKind !== "botanical-plate" || metrics.botanicalPathCount < 5 || !metrics.botanicalScanPresent)) failures.push(`${workspace.slug}/${viewport.name}: GreenTech botanical plate is incomplete (${JSON.stringify({ kind: metrics.heroVisualKind, paths: metrics.botanicalPathCount, scan: metrics.botanicalScanPresent })})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
