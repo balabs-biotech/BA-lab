@@ -157,6 +157,14 @@
 @media(prefers-reduced-motion:reduce){
  #app.balabs-ui .universe-filament-glow,#app.balabs-ui .inline-explorer .universe-rail button,#app.balabs-ui .inline-explorer .universe-rail button i{transition:none!important;animation:none!important}
 }
+
+/* Keep chapter controls and the universe filament independently tappable. */
+body > .chapter-rail{left:auto!important;right:clamp(3px,.65vw,12px)!important}
+#app.balabs-ui #selection{left:clamp(82px,6vw,92px)!important;right:auto!important;width:min(340px,calc(100% - 174px))!important}
+@media(max-width:700px){
+ body > .chapter-rail{left:auto!important;right:0!important}
+ #app.balabs-ui #selection{left:56px!important;right:10px!important;width:auto!important;max-width:none!important}
+}
 </style>
 </head>
 <body>
