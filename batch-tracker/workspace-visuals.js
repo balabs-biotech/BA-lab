@@ -41,7 +41,7 @@
     agronomy: {
       label: "Planche botanique scientifique montrant une feuille, sa nervation principale et son réseau de nervures secondaires",
       particles: {
-        count: compact ? 4 : 7,
+        count: compact ? 5 : 10,
         color: "#b4f477",
         direction: "none",
         speed: 0.045,
