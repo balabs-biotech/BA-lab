@@ -41,6 +41,14 @@
                   "children": []
                 },
                 {
+                  "id": "ar-black-pearl",
+                  "title": "Black Pearl — بطاقة مورد من Pleurotus",
+                  "notionId": "40273152f171810d88b2cd58d26b5374",
+                  "url": "https://app.notion.com/p/40273152f171810d88b2cd58d26b5374",
+                  "description": "بطاقة مورد من مجموعة Pleurotus؛ يُحفظ اسم Black Pearl كما ورد في صفحة Notion دون افتراض تصنيف إضافي.",
+                  "children": []
+                },
+                {
                   "id": "ar-pearl-strain",
                   "title": "Pearl — بطاقة مورد من Pleurotus",
                   "notionId": "40273152f171811a8404f8443efc81d8",
@@ -129,6 +137,22 @@
               "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
               "description": "مجموعة بطاقات لفطريات أخرى تدرسها BA Labs أو توثق مواردها، دون افتراض أن كل نوع متوفر كمزرعة موصوفة.",
               "children": [
+                {
+                  "id": "ar-cyclocybe-aegerita",
+                  "title": "Cyclocybe aegerita — البيوبينو",
+                  "notionId": "40273152f17181679ee3c313d3e1e1bf",
+                  "url": "https://app.notion.com/p/40273152f17181679ee3c313d3e1e1bf",
+                  "description": "فطر البيوبينو، نوع خشبي يرتبط غالبًا بأشجار الحور؛ تعرض البطاقة تعريفه وخصائصه البيولوجية.",
+                  "children": []
+                },
+                {
+                  "id": "ar-calocybe-indica",
+                  "title": "Calocybe indica — بطاقة الكائن",
+                  "notionId": "40173152f17181ecb154ec8a8bf3b894",
+                  "url": "https://app.notion.com/p/40173152f17181ecb154ec8a8bf3b894",
+                  "description": "نوع فطري استوائي يُعرف باسم فطر الحليب؛ تعرض البطاقة هويته وخصائصه المعروفة دون افتراض توفره كمنتج.",
+                  "children": []
+                },
                 {
                   "id": "ar-cordyceps-militaris",
                   "title": "Cordyceps militaris — بطاقة الكائن",
