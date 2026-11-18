@@ -1,3 +1,4 @@
+assert.match(source, /claims\.is_anonymous !== true/);
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
