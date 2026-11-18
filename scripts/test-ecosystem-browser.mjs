@@ -29,6 +29,28 @@ try {
     });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('#app .editorial-method').waitFor({ state: 'visible', timeout: 15000 });
+    // Verify the optional mycelial hero motion when this browser supports it.
+    const motionEligibility = await page.evaluate(() => {
+      const canvas = document.createElement('canvas');
+      const webgl = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const saveData = navigator.connection?.saveData === true;
+      const lowPower = /Android|iPhone|iPad/i.test(navigator.userAgent) && (navigator.hardwareConcurrency || 4) <= 4;
+      return { eligible: webgl && !reduced && !saveData && !lowPower, webgl, reduced, saveData, lowPower };
+    });
+    let heroMotion = { ...motionEligibility, active: false, canvases: 0 };
+    if (viewport.name === 'desktop' && motionEligibility.eligible) {
+      await page.waitForFunction(() => {
+        const hero = document.querySelector('#accueil');
+        return hero?.dataset.vantaReady === '1' && hero.querySelector('canvas');
+      }, undefined, { timeout: 15000 });
+      heroMotion = await page.locator('#accueil').evaluate(hero => ({
+        ...motionEligibility,
+        active: hero.dataset.vantaReady === '1',
+        canvases: hero.querySelectorAll('canvas').length
+      }));
+      assert.ok(heroMotion.active && heroMotion.canvases > 0, 'The eligible desktop hero must initialize the connected Vanta network');
+    }
     // Test the actual packaged image files, not merely whether the page JS starts.
     const imageAudit = await page.evaluate(async () => {
       const images = [...document.images];
