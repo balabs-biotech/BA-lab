@@ -347,27 +347,40 @@ try {
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
 
-      // Visual fixture only: render the dashboard overview without pretending
-      // that the test Supabase stub has authenticated or loaded tenant data.
+      // Visual fixture only: render one active module, matching the real
+      // single-workspace interaction model instead of exposing every panel.
       if (viewport.name === "desktop" || viewport.name === "mobile") {
-        await page.evaluate(() => {
+        await page.evaluate((workspaceSlug) => {
           const auth = document.querySelector("#authCard");
-          if (auth) auth.classList.add("hidden");
+          if (auth) {
+            auth.hidden = true;
+            auth.style.display = "none";
+          }
+          const allowedByWorkspace = {
+            "green-tech": ["overviewCard", "plantCard", "measurementCard", "statisticsCard"],
+            mycology: ["overviewCard", "trackerCard", "measurementCard", "statisticsCard"],
+            laboratory: ["overviewCard", "trackerCard", "batchCard", "measurementCard", "statisticsCard"],
+          };
+          const allowed = new Set(allowedByWorkspace[workspaceSlug] || []);
           const sectionNavigation = document.getElementById("sectionNavigation");
           if (sectionNavigation) {
             sectionNavigation.hidden = false;
             for (const link of sectionNavigation.querySelectorAll('a[href^="#"]')) {
-              link.hidden = false;
-              const panel = document.getElementById(link.getAttribute("href").slice(1));
+              const id = link.getAttribute("href").slice(1);
+              const panel = document.getElementById(id);
+              const visible = allowed.has(id);
+              link.hidden = !visible;
               if (panel) {
-                panel.hidden = false;
-                panel.classList.remove("hidden", "workspace-inactive");
+                panel.hidden = id !== "overviewCard";
+                panel.classList.toggle("hidden", id !== "overviewCard");
+                panel.classList.remove("workspace-inactive");
               }
             }
           }
           const card = document.querySelector("#overviewCard");
           if (card) {
-            card.classList.remove("hidden");
+            card.hidden = false;
+            card.classList.remove("hidden", "workspace-inactive");
             document.body.classList.add("workspace-authenticated");
             const live = card.querySelector(".overview-live");
             if (live) live.textContent = "Aperçu visuel — données de test";
@@ -389,7 +402,7 @@ try {
               if (node) node.style.width = width;
             }
           }
-        });
+        }, workspace.slug);
         const overviewPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}-overview-preview.png`);
         await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
         const overviewState = await page.evaluate(() => {
