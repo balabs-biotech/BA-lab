@@ -345,14 +345,16 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
  .chapter-filament .filament-branches{filter:none!important}
 }
 
-/* Keep rail labels readable and inside the viewport in both writing directions. */
+/* Anchor labels just outside each node and cap their width against the viewport. */
 .chapter-rail .chapter-rail-name{
- max-width:min(220px,calc(100vw - 90px));
+ inset-inline-start:calc(100% + 8px)!important;
+ inset-inline-end:auto!important;
+ box-sizing:border-box;
+ width:max-content;
+ max-width:min(220px,calc(100vw - 110px));
  white-space:normal;
  overflow-wrap:anywhere;
 }
 [dir="rtl"] .chapter-rail .chapter-rail-name{
- inset-inline-start:calc(100% + 8px)!important;
- inset-inline-end:auto!important;
  text-align:end;
 }
