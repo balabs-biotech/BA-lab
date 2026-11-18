@@ -429,12 +429,29 @@ try {
             width: document.documentElement.scrollWidth,
             viewport: innerWidth,
             metricCount: card?.querySelectorAll(".overview-metric").length ?? 0,
+            contrastSamples: [
+              ".section-kicker",
+              ".overview-metric-label",
+              ".overview-metric-note",
+              ".overview-shortcuts h3",
+              ".overview-shortcut strong",
+            ].map(selector => {
+              const node = card?.querySelector(selector);
+              return { selector, color: node ? getComputedStyle(node).color : null };
+            }),
           };
         });
         if (!overviewState.visible || !overviewState.authHidden ||
             overviewState.visibleSections.length !== 1 || overviewState.visibleSections[0] !== "overviewCard" ||
             overviewState.metricCount !== 3 || overviewState.width > overviewState.viewport + 1) {
           failures.push(`${workspace.slug}/${viewport.name}: dashboard overview preview failed ${JSON.stringify(overviewState)}`);
+        }
+        if (workspace.slug === "mycology") {
+          for (const sample of overviewState.contrastSamples) {
+            if (!sample.color || contrastRatio(sample.color, "#1b2525") < 4.5) {
+              failures.push(`${workspace.slug}/${viewport.name}: overview text contrast below 4.5:1 for ${sample.selector} (${sample.color})`);
+            }
+          }
         }
       }
       const interiorState = await page.evaluate(() => {
