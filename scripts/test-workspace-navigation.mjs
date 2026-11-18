@@ -9,13 +9,16 @@ const entryPages = [
 ].map((sector) => readFileSync(new URL(`../batch-tracker/${sector}/index.html`, import.meta.url), "utf8"));
 
 assert.match(navigation, /ba-module-rail/);
-assert.match(navigation, /data-direction="-1"/);
-assert.match(navigation, /data-direction="1"/);
+assert.match(navigation, /data-direction="left"/);
+assert.match(navigation, /data-direction="right"/);
+assert.match(navigation, /data-direction="up"/);
+assert.match(navigation, /data-direction="down"/);
 assert.match(navigation, /event\.altKey/);
-assert.match(navigation, /ArrowLeft.*ArrowRight/s);
+assert.match(navigation, /ArrowLeft.*ArrowRight.*ArrowUp.*ArrowDown/s);
 assert.match(navigation, /prefers-reduced-motion/);
 assert.match(navigation, /pointerdown/);
 assert.match(navigation, /pointerup/);
+assert.match(navigation, /Math\.abs\(dy\)/);
 assert.match(navigation, /aria-current/);
 assert.match(navigation, /workspace-authenticated/);
 assert.doesNotMatch(navigation, /supabase\.from\(|\.insert\(|\.update\(/);
