@@ -54,6 +54,198 @@
   applyResponsiveHero();
   window.addEventListener("resize", applyResponsiveHero, { passive: true });
 
+  const mountParticleSphere = async () => {
+    const sphereHost = document.querySelector(".ba-sector-visual--mycology");
+    if (!sphereHost || sphereHost.dataset.particleSphereMounted === "true") return;
+    sphereHost.dataset.particleSphereMounted = "true";
+
+    // Particle Sphere is the Vellum component's 3D particle-cloud behavior.
+    // Its React wrapper is replaced with a small Three.js runtime for CultureOps.
+    const oldParticles = sphereHost.querySelector("#ba-sector-particles");
+    oldParticles?.remove();
+    try { window.tsParticles?.dom?.().forEach((container) => container.destroy()); } catch (_) {}
+
+    const sphereSvg = sphereHost.querySelector(".ba-sector-svg");
+    const sphereCaption = sphereHost.querySelector(".ba-visual-caption");
+    sphereHost.style.position = "relative";
+    sphereHost.style.isolation = "isolate";
+    if (sphereSvg) { sphereSvg.style.position = "relative"; sphereSvg.style.zIndex = "1"; }
+    if (sphereCaption) sphereCaption.style.zIndex = "2";
+
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    const compact = window.matchMedia?.("(max-width: 640px)")?.matches ?? false;
+    try {
+      const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js");
+      if (!sphereHost.isConnected) return;
+      const renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: false,
+        powerPreference: "low-power",
+        premultipliedAlpha: true
+      });
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.35));
+      Object.assign(renderer.domElement.style, {
+        position: "absolute", inset: "0", zIndex: "0",
+        width: "100%", height: "100%", pointerEvents: "none"
+      });
+      renderer.domElement.className = "ba-originkit-particle-sphere";
+      renderer.domElement.setAttribute("aria-hidden", "true");
+      sphereHost.insertBefore(renderer.domElement, sphereHost.firstChild);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+      camera.position.set(0, 0, 3.55);
+      const group = new THREE.Group();
+      scene.add(group);
+
+      const count = compact ? 2200 : 4600;
+      const radius = 1.16;
+      const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+      const base = new Float32Array(count * 3);
+      const positions = new Float32Array(count * 3);
+      const velocities = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        const y = 1 - (i / Math.max(1, count - 1)) * 2;
+        const ring = Math.sqrt(Math.max(0, 1 - y * y));
+        const theta = goldenAngle * i;
+        const x = Math.cos(theta) * ring;
+        const z = Math.sin(theta) * ring;
+        const offset = i * 3;
+        base[offset] = positions[offset] = x * radius;
+        base[offset + 1] = positions[offset + 1] = y * radius;
+        base[offset + 2] = positions[offset + 2] = z * radius;
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      const material = new THREE.PointsMaterial({
+        color: new THREE.Color("#d69a75"),
+        size: compact ? 0.018 : 0.021,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.82,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const points = new THREE.Points(geometry, material);
+      group.add(points);
+
+      let pointer = { x: 9, y: 9, active: false };
+      let clickImpulse = 0;
+      let frameId = 0;
+      let lastFrame = 0;
+      let visible = false;
+      let disposed = false;
+      let width = 1;
+      let height = 1;
+
+      const resize = () => {
+        const rect = sphereHost.getBoundingClientRect();
+        width = Math.max(1, rect.width);
+        height = Math.max(1, rect.height);
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        if (reduced) renderer.render(scene, camera);
+      };
+      const onPointerMove = (event) => {
+        const rect = sphereHost.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
+        pointer.y = -(((event.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1);
+        pointer.active = true;
+      };
+      const onPointerLeave = () => { pointer.active = false; };
+      const onPointerDown = () => { clickImpulse = 1; };
+
+      const renderFrame = (time) => {
+        if (disposed || !visible || document.hidden) { frameId = 0; return; }
+        if (time - lastFrame < 30) { frameId = requestAnimationFrame(renderFrame); return; }
+        lastFrame = time;
+        const positionAttribute = geometry.attributes.position;
+        const array = positionAttribute.array;
+        const pointerX = pointer.x * 1.35;
+        const pointerY = pointer.y * 1.05;
+        for (let i = 0; i < count; i++) {
+          const k = i * 3;
+          const dxHome = base[k] - array[k];
+          const dyHome = base[k + 1] - array[k + 1];
+          const dzHome = base[k + 2] - array[k + 2];
+          let ax = dxHome * 0.018;
+          let ay = dyHome * 0.018;
+          let az = dzHome * 0.018;
+          if (pointer.active) {
+            const dx = array[k] - pointerX;
+            const dy = array[k + 1] - pointerY;
+            const distance = Math.hypot(dx, dy);
+            if (distance < 0.62 && distance > 0.001) {
+              const force = (1 - distance / 0.62) * 0.012;
+              ax += (dx / distance) * force;
+              ay += (dy / distance) * force;
+              az += clickImpulse * (0.62 - distance) * 0.012;
+            }
+          }
+          velocities[k] = (velocities[k] + ax) * 0.91;
+          velocities[k + 1] = (velocities[k + 1] + ay) * 0.91;
+          velocities[k + 2] = (velocities[k + 2] + az) * 0.91;
+          array[k] += velocities[k];
+          array[k + 1] += velocities[k + 1];
+          array[k + 2] += velocities[k + 2];
+        }
+        clickImpulse *= 0.9;
+        positionAttribute.needsUpdate = true;
+        group.rotation.y += 0.0014;
+        group.rotation.x += 0.00045;
+        renderer.render(scene, camera);
+        frameId = requestAnimationFrame(renderFrame);
+      };
+      const start = () => {
+        if (disposed || reduced || !visible || document.hidden || frameId) return;
+        lastFrame = 0;
+        frameId = requestAnimationFrame(renderFrame);
+      };
+      const stop = () => { if (frameId) cancelAnimationFrame(frameId); frameId = 0; };
+
+      resize();
+      const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(resize) : null;
+      resizeObserver?.observe(sphereHost);
+      const intersection = "IntersectionObserver" in window
+        ? new IntersectionObserver((entries) => {
+            visible = entries.some((entry) => entry.isIntersecting);
+            if (visible) start(); else stop();
+          }, { rootMargin: "80px" })
+        : null;
+      if (intersection) intersection.observe(sphereHost);
+      else { visible = true; start(); }
+      if (!reduced) {
+        sphereHost.addEventListener("pointermove", onPointerMove, { passive: true });
+        sphereHost.addEventListener("pointerleave", onPointerLeave, { passive: true });
+        sphereHost.addEventListener("pointercancel", onPointerLeave, { passive: true });
+        sphereHost.addEventListener("pointerdown", onPointerDown, { passive: true });
+      }
+      const onVisibility = () => { if (document.hidden) stop(); else start(); };
+      document.addEventListener("visibilitychange", onVisibility);
+      window.addEventListener("pagehide", () => {
+        disposed = true;
+        stop();
+        resizeObserver?.disconnect();
+        intersection?.disconnect();
+        document.removeEventListener("visibilitychange", onVisibility);
+        sphereHost.removeEventListener("pointermove", onPointerMove);
+        sphereHost.removeEventListener("pointerleave", onPointerLeave);
+        sphereHost.removeEventListener("pointercancel", onPointerLeave);
+        sphereHost.removeEventListener("pointerdown", onPointerDown);
+        geometry.dispose();
+        material.dispose();
+        renderer.dispose();
+      }, { once: true });
+    } catch (error) {
+      sphereHost.dataset.particleSphereFallback = "true";
+      console.info("BA Labs: Particle Sphere WebGL indisponible; la boîte de Petri SVG reste visible.", error);
+    }
+  };
+
+  void mountParticleSphere();
+
   const mountRisingLines = () => {
     const riseHost = document.querySelector(".ba-sector-visual--greentech");
     if (!riseHost || riseHost.dataset.risingLinesMounted === "true") return;
