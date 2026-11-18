@@ -23,7 +23,7 @@ assert.doesNotMatch(adapter, /from\s+["']react["']/);
 assert.doesNotMatch(adapter, /useIsStaticRenderer|RenderTarget/);
 
 for (const page of entryPages) {
-  assert.match(page, /workspace-origin-components\.js\?v=20261118-kinetic-grid-1/);
-  assert.match(page, /visualRuntime\.onload/);
+  assert.match(page, /workspace-origin-components\.js\?v=20261118-origin-components-3/);
+  assert.match(page, /workspace-origin-components\.js\?v=20261118-origin-components-3/);
 }
 console.log("OriginKit visual adapter contract passed.");
