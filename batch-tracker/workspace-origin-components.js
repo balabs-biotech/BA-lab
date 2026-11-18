@@ -27,7 +27,7 @@
     const hero = document.querySelector(".app-hero");
     const art = hero?.querySelector(".hero-art");
     const visual = art?.querySelector(".ba-sector-visual");
-    const compact = window.matchMedia?.("(max-width: 760px)")?.matches ?? false;
+    const compact = (window.matchMedia?.("(max-width: 760px)")?.matches ?? false) && document.body.classList.contains("workspace-authenticated");
     if (!hero || !art) return;
     if (compact) {
       hero.style.setProperty("grid-template-columns", "minmax(0, 1fr)", "important");
@@ -53,6 +53,8 @@
   };
   applyResponsiveHero();
   window.addEventListener("resize", applyResponsiveHero, { passive: true });
+  const heroAuthObserver = new MutationObserver(applyResponsiveHero);
+  heroAuthObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   const mountParticleSphereFallback = (host, reduced, compact) => {
     const canvas = document.createElement("canvas");
@@ -517,6 +519,8 @@
   };
 
   mountRisingLines();
+
+  window.addEventListener("pagehide", () => heroAuthObserver.disconnect(), { once: true });
 
   const host = document.querySelector(".ba-sector-visual--laboratory");
   if (host && host.dataset.kineticGridMounted !== "true") {
