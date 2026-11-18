@@ -134,7 +134,7 @@ Deno.serve(async (req: Request) => {
     return response(405, { error: "method_not_allowed" });
   }
 
-  const bearer = req.headers.get("authorization")?.match(/^Bearer\\s+(.+)$/i)?.[1];
+  const bearer = req.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
   if (!bearer || !hasAuthenticatedUser(bearer)) {
     return response(401, { error: "authenticated_session_required" });
   }
