@@ -11,7 +11,7 @@ type JsonObject = Record<string, unknown>;
 
 // The Supabase gateway validates the JWT signature when verify_jwt is enabled.
 // This additional claim check rejects publishable/anon keys and anonymous sessions.
-function hasAuthenticatedUser(token: string): boolean {
+function authenticatedUserId(token: string): string | null {
   const parts = token.split(".");
   if (parts.length !== 3 || !parts[1]) return false;
   try {
@@ -26,13 +26,24 @@ function hasAuthenticatedUser(token: string): boolean {
       sub?: unknown;
       is_anonymous?: unknown;
     };
-    return claims.role === "authenticated" &&
-      claims.is_anonymous !== true &&
-      typeof claims.sub === "string" &&
-      claims.sub.length > 0;
+    if (
+      claims.role !== "authenticated" ||
+      claims.is_anonymous === true ||
+      typeof claims.sub !== "string" ||
+      claims.sub.length === 0
+    ) return null;
+    return claims.sub;
   } catch {
-    return false;
+    return null;
   }
+}
+
+function isOriginKitMaintainer(userId: string): boolean {
+  const allowedIds = (Deno.env.get("ORIGINKIT_ALLOWED_USER_IDS") ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return allowedIds.includes(userId);
 }
 
 function response(
@@ -135,7 +146,8 @@ Deno.serve(async (req: Request) => {
   }
 
   const bearer = req.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
-  if (!bearer || !hasAuthenticatedUser(bearer)) {
+  const userId = bearer ? authenticatedUserId(bearer) : null;
+  if (!userId) {
     return response(401, { error: "authenticated_session_required" });
   }
 
@@ -171,6 +183,11 @@ Deno.serve(async (req: Request) => {
 
   if (action !== "get") {
     return response(400, { error: "unsupported_action" });
+  }
+  // Source retrieval consumes a limited upstream quota. Restrict it to explicit
+  // maintainer IDs; a normal authenticated workspace account may only browse.
+  if (!isOriginKitMaintainer(userId)) {
+    return response(403, { error: "originkit_maintainer_required" });
   }
 
   const name = typeof input.name === "string" ? input.name.trim().toLowerCase() : "";
