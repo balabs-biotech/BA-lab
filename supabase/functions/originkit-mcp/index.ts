@@ -13,7 +13,7 @@ type JsonObject = Record<string, unknown>;
 // This additional claim check rejects publishable/anon keys and anonymous sessions.
 function authenticatedUserId(token: string): string | null {
   const parts = token.split(".");
-  if (parts.length !== 3 || !parts[1]) return false;
+  if (parts.length !== 3 || !parts[1]) return null;
   try {
     const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/").padEnd(
       Math.ceil(parts[1].length / 4) * 4,
