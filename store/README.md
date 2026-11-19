@@ -31,13 +31,16 @@ Notion: 🛒 DEMANDES COMMERCIALES
 
 ## Supabase schema
 
-Migration: `supabase/migrations/20261119223731_store_orders_v1.sql`
+Migrations:
+- `supabase/migrations/20261119223731_store_orders_v1.sql`
+- `supabase/migrations/20261119224223_store_checkout_rate_limits_v1.sql`
 
 It creates:
 
 - `store_orders`: customer enquiry, request reference, workflow status, estimated total and Notion sync state.
 - `store_order_items`: immutable product-title, code, family, quantity and price snapshots.
 - `create_store_order(...)`: atomic insert RPC with request-id idempotency.
+- `store_checkout_rate_limits` and `consume_store_rate_limit(...)`: persistent per-client request throttling using HMAC fingerprints, without storing raw IP addresses.
 
 Both tables have RLS enabled. Direct table access is revoked from `anon` and `authenticated`; the service role is the only intended database writer. The RPC is executable only by `service_role`. CultureOps `orders` and `order_items` are untouched.
 
