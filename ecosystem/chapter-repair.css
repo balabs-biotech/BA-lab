@@ -846,3 +846,98 @@
   gap:18px!important;
  }
 }
+
+/* PASS 56 — unify the eight universe cards as a coherent specimen index.
+   Keep original photography, vector assets, ordering and Notion navigation intact. */
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card{
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+  height:100%!important;
+  min-height:0!important;
+  padding:18px!important;
+  gap:0!important;
+  border:1px solid rgba(141,164,148,.22)!important;
+  border-inline-start:2px solid rgba(185,107,77,.72)!important;
+  border-radius:10px!important;
+  background:linear-gradient(145deg,rgba(38,59,56,.48),rgba(17,27,29,.76))!important;
+  box-shadow:inset 0 1px 0 rgba(209,208,197,.035),0 12px 28px rgba(0,0,0,.12)!important;
+  color:#d1d0c5!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > .universe-card-image{
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:clamp(154px,12vw,168px)!important;
+  flex:0 0 auto!important;
+  margin:0 0 15px!important;
+  border-radius:6px!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  background:#172522!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > .universe-card-image[src$=".svg"]{
+  object-fit:contain!important;
+  padding:12px!important;
+  background:radial-gradient(ellipse at 50% 48%,rgba(126,170,163,.12),rgba(17,27,29,.55) 72%)!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > span:first-of-type{
+  margin:0 0 9px!important;
+  color:#d28c6e!important;
+  font:600 9px/1.2 ui-monospace,SFMono-Regular,monospace!important;
+  letter-spacing:.16em!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > b{
+  display:block!important;
+  margin:0 0 7px!important;
+  color:#f0eee3!important;
+  font:500 clamp(19px,1.55vw,21px)/1.16 Georgia,serif!important;
+  letter-spacing:-.025em!important;
+  text-wrap:balance!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > small{
+  margin:0 0 11px!important;
+  color:#91a79a!important;
+  font:600 8px/1.5 Inter,system-ui,sans-serif!important;
+  letter-spacing:.105em!important;
+  text-transform:uppercase!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > p{
+  margin:0 0 12px!important;
+  color:#c5d0c7!important;
+  font:400 12px/1.65 Inter,system-ui,sans-serif!important;
+  max-width:38ch!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > em{
+  margin-top:auto!important;
+  padding:10px 0 1px!important;
+  border-top:1px solid rgba(141,164,148,.18)!important;
+  color:#e0a184!important;
+  font:600 9px/1.4 Inter,system-ui,sans-serif!important;
+  letter-spacing:.055em!important;
+  font-style:normal!important;
+  text-transform:uppercase!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card:hover,
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card:focus-visible{
+  border-color:rgba(185,107,77,.58)!important;
+  border-inline-start-color:#c47b5c!important;
+  background:linear-gradient(145deg,rgba(38,59,56,.72),rgba(17,27,29,.88))!important;
+  outline:1px solid rgba(185,107,77,.22)!important;
+  outline-offset:2px!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card{
+    padding:15px!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > .universe-card-image{
+    height:clamp(148px,43vw,174px)!important;
+    margin-bottom:13px!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > b{
+    font-size:20px!important;
+  }
+  #app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > p{
+    font-size:12px!important;line-height:1.58!important;
+  }
+}
