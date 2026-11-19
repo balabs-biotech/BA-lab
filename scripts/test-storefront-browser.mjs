@@ -30,7 +30,9 @@ try {
 
   assert.equal(await page.locator("#submitOrder").isDisabled(), true, "Public submission must remain disabled");
   await page.locator("#languageSelect").selectOption("en");
-  assert.match(await page.locator('[data-i18n="selectionHeading"]').innerText(), /YOUR SELECTION/);
+  const selectionHeading = page.locator('[data-i18n="selectionHeading"]');
+  assert.equal(await selectionHeading.isVisible(), true, "Selection heading must remain visible after language change");
+  assert.match(await selectionHeading.textContent(), /YOUR SELECTION/);
 
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileColumns = await page.locator(".request-layout").evaluate(el =>
