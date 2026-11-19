@@ -25,7 +25,7 @@ assert.ok(rateMigration.includes("create table if not exists public.store_checko
 assert.ok(rateMigration.includes("create or replace function public.consume_store_rate_limit"), "Persistent rate-limit RPC must exist");
 assert.ok(rateMigration.includes("grant execute on function public.consume_store_rate_limit(text,integer,integer) to service_role"), "Only the backend service role may call the rate-limit RPC");
 
-assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must validate all 15 published catalogue references");
+assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must validate the 15 currently requestable references");
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
 assert.ok(edge.includes("Deno.env.get(\"NOTION_STORE_API_KEY\")"), "Notion credential must remain server-side");
 assert.ok(edge.includes("notion_sync_status") && edge.includes('"pending"'), "Notion failures must leave a recoverable pending state");
@@ -38,4 +38,4 @@ assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consu
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 
 assert.ok(readme.includes("Supabase is the transactional source of truth"), "Architecture documentation must match the implementation");
-console.log("Store order contract checks passed: Supabase-first persistence, Notion mirror, isolated RLS tables, idempotency, 15-product allowlist and disabled public intake.");
+console.log("Store order contract checks passed: Supabase-first persistence, Notion mirror, isolated RLS tables, idempotency, 15-reference request allowlist, unavailable-reference exclusion and disabled public intake.");
