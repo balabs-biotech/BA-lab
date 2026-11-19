@@ -42,6 +42,12 @@ assert.ok(publicResponse.includes("orderRef") && publicResponse.includes("notion
 assert.ok(edge.includes('"Cache-Control": "no-store"'), "Customer enquiry responses must not be cached");
 
 assert.ok(edge.includes("isRateLimited(req, secretKey)") && edge.includes("MAX_BODY_BYTES"), "Public endpoint must apply persistent request throttling and body-size limits");
+assert.ok(edge.includes('new Set(["https://balabs-biotech.github.io"])') && !edge.includes("Access-Control-Allow-Origin: *"), "Order endpoint must use an exact storefront origin allowlist");
+assert.ok(edge.indexOf("if (clean(body.website, 200))") < edge.indexOf("const secretKey = getSecretKey()") && edge.includes("return json(200, { success: true }, origin)"), "Honeypot submissions must be silently discarded before database access");
+assert.ok(edge.indexOf("isRateLimited(req, secretKey)") < edge.indexOf('rpc/create_store_order'), "Rate limiting must run before any customer record is written");
+assert.ok(edge.includes("rate_limit_service_unavailable") && edge.includes("return json(503, { success: false, error: \"store_temporarily_unavailable\" }, origin)"), "Rate-limit failures must fail closed rather than bypass abuse controls");
+assert.ok(edge.includes('Deno.env.get("NOTION_STORE_API_KEY") ?? ""') && !edge.includes('Deno.env.get("NOTION_API_KEY")'), "Storefront Notion sync must use its dedicated credential and never fall back to the shared CultureOps key");
+assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|customer_phone|customer_message)/.test(edge), "Customer contact fields must never be written to application logs");
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 
