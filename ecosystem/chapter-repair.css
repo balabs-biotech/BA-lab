@@ -768,3 +768,16 @@
 #app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(6){order:5!important}
 #app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(7){order:7!important}
 #app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(8){order:8!important}
+
+
+/* Index cards: content-sized rows, not equal-height fractional tracks.
+   The legacy 1fr auto-row rule made two rows of specimens expand to ~500px each. */
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-grid{
+  grid-auto-rows:auto!important;
+  align-content:start!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card{
+  height:auto!important;
+  min-height:0!important;
+  align-self:start!important;
+}
