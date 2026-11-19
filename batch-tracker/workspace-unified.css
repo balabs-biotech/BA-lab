@@ -639,3 +639,11 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
     font-size:9px !important;
   }
 }
+
+
+/* The HTML hidden state must win over the shared flex navigation rule.
+   Otherwise the unauthenticated toolbar renders all module tabs and pushes
+   the sign-in action below the first mobile viewport. */
+html body[data-domain] .section-nav[hidden] {
+  display:none !important;
+}
