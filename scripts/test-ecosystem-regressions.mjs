@@ -584,3 +584,13 @@ for (const selector of [
   '.value-item h3',
 ]) assert.ok(editorialRefinementCss.includes(selector), 'Phase 15 must refine the public editorial experience: ' + selector);
 assert.ok(editorialRefinementCss.includes('prefers-reduced-motion:reduce'), 'Phase 15 must respect reduced-motion preferences');
+
+
+// PASS75: chapter photography must be ready when horizontal navigation reveals it.
+const chapterAtmosphereJs = readFileSync('ecosystem/chapter-atmosphere.js', 'utf8');
+const chapterAtmosphereCss = readFileSync('ecosystem/chapter-atmosphere.css', 'utf8');
+assert.ok(chapterAtmosphereJs.includes("img.loading='eager'"), 'All five horizontal chapter atmosphere images must preload before their chapter is revealed');
+assert.ok(!chapterAtmosphereJs.includes("img.loading=key==='home'?'eager':'lazy'"), 'Chapter covers must not defer off-screen horizontal panels');
+assert.ok(chapterAtmosphereCss.includes('.experience-page>.chapter-atmosphere.is-unavailable{') && chapterAtmosphereCss.includes('background:'), 'A failed chapter image must retain its mineral fallback visual');
+assert.ok(chapterAtmosphereCss.includes('data-chapter="about"') && chapterAtmosphereCss.includes('grayscale(.58)'), 'The scientific chart cover must remain visually subordinate to editorial content');
+assert.match(html, /chapter-atmosphere\.js\?v=15/, 'Public homepage must request the preloading chapter atmosphere script');
