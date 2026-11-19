@@ -31,7 +31,7 @@ Notion: 🛒 DEMANDES COMMERCIALES
 
 ## Supabase schema
 
-Migration: `supabase/migrations/20261119230000_store_orders_v1.sql`
+Migration: `supabase/migrations/20261119223731_store_orders_v1.sql`
 
 It creates:
 
