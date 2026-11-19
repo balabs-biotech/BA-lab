@@ -6,6 +6,8 @@ const css = readFileSync('store/store.css', 'utf8');
 const js = readFileSync('store/store.js', 'utf8');
 const workflow = readFileSync('.github/workflows/deploy-pages.yml', 'utf8');
 const ecosystem = readFileSync('ecosystem/index.html', 'utf8');
+const privacy = readFileSync('store/privacy.html', 'utf8');
+const cookies = readFileSync('store/cookies.html', 'utf8');
 
 for (const page of ['index.html', 'legal.html', 'privacy.html', 'terms.html', 'shipping.html', 'cookies.html']) {
   assert.ok(existsSync('store/' + page), 'Missing storefront page: ' + page);
@@ -25,6 +27,8 @@ assert.ok(js.includes('STORE_REMOTE_CATALOGUE_ENABLED=false') && js.includes('if
 assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Public catalogue requests must use only the publishable key');
 assert.ok(!js.includes("method:'POST'") && !js.includes('customer_phone') && !js.includes('customer_email'), 'Guest personal data must not be submitted before the order endpoint is deployed');
 assert.ok(html.includes('./cookies.html') && html.includes('./privacy.html') && html.includes('./terms.html') && html.includes('./shipping.html') && html.includes('./legal.html'), 'Footer must expose legal and privacy pages');
+assert.ok(privacy.includes('point d\'accès Supabase du catalogue est désactivé') && privacy.includes('transfert international'), 'Privacy policy must disclose the disabled remote catalogue and cross-border review gate');
+assert.ok(cookies.includes('point d\'accès Supabase du catalogue est actuellement désactivé'), 'Cookie policy must disclose that no remote catalogue request is active');
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
