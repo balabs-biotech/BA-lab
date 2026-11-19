@@ -313,7 +313,7 @@ Deno.serve(async (req: Request) => {
         !itemsResult.response.ok || !Array.isArray(itemsResult.data)) {
       throw new Error("stored_order_read_failed");
     }
-    const notionToken = Deno.env.get("NOTION_API_KEY") ?? "";
+    const notionToken = Deno.env.get("NOTION_STORE_API_KEY") ?? "";
     if (!notionToken) throw new Error("notion_token_missing");
     notionPageId = await syncToNotion(orderResult.data[0], itemsResult.data, notionToken);
   } catch (error) {
