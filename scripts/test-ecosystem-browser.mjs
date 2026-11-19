@@ -132,6 +132,15 @@ try {
       assert.equal(presentation.hiddenHeadings, 0, 'No editorial heading may remain blurred or faded in ' + chapter);
       assert.equal(presentation.hiddenImages, 0, 'No editorial image may remain clipped or hidden in ' + chapter);
       if (viewport.name === 'mobile' && chapter === 'about') {
+        await page.screenshot({ path: outputDir + '/mobile-about-top-diagnostic.png', fullPage: false });
+        await page.locator('#demarche').scrollIntoViewIfNeeded();
+        await page.waitForTimeout(500);
+        await page.screenshot({ path: outputDir + '/mobile-method-heading-diagnostic.png', fullPage: false });
+        const methodLayout = await page.locator('#demarche .method-top h2').evaluate(el => {
+          const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+          return {text:el.innerText,width:r.width,height:r.height,fontSize:s.fontSize,lineHeight:s.lineHeight,letterSpacing:s.letterSpacing,display:s.display,writingMode:s.writingMode,wordBreak:s.wordBreak,html:el.innerHTML};
+        });
+        console.log('MOBILE_METHOD_HEADING_DIAGNOSTIC '+JSON.stringify(methodLayout));
         const aboutLayout = await page.locator('#chapter-about .editorial-about').evaluate(root => {
           const copy=root.querySelector('.about-copy'), art=root.querySelector('.editorial-art'), atmosphere=root.querySelector('.chapter-atmosphere');
           const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
