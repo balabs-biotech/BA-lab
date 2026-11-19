@@ -834,9 +834,15 @@
   gap:22px!important;
  }
 }
-@media (min-width:761px) and (max-width:1099px){
+@media (min-width:851px) and (max-width:1099px){
  #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-grid{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;
+ }
+}
+@media (min-width:761px) and (max-width:850px){
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-grid{
+  grid-template-columns:minmax(0,1fr)!important;
   gap:18px!important;
  }
 }
