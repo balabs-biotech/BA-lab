@@ -781,3 +781,38 @@
   min-height:0!important;
   align-self:start!important;
 }
+
+
+/* Specimen cards — tighten the editorial rhythm and preserve vector diagrams. */
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card{
+  padding:18px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > .universe-visual{
+  height:clamp(142px,12vw,170px)!important;
+  margin:0 0 10px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > .universe-visual img[src$=".svg"]{
+  object-fit:contain!important;
+  padding:14px!important;
+  box-sizing:border-box!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > span:first-of-type{
+  height:auto!important;min-height:0!important;margin:0 0 8px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > b{
+  margin:0 0 6px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > small{
+  margin:0 0 8px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > p{
+  margin:0 0 10px!important;
+}
+#app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > em{
+  margin-top:auto!important;padding:7px 0 2px!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .experience-page[data-chapter="network"] > .universe-index .universe-index-card > .universe-visual{
+    height:clamp(138px,43vw,172px)!important;
+  }
+}
