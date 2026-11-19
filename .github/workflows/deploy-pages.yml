@@ -30,6 +30,8 @@ jobs:
           cp -R ecosystem/. _site/ecosystem/
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           cp -R store/. _site/store/
+          node --check store/store.js
+          node --check store/checkout.js
           node scripts/test-storefront.mjs
           node scripts/test-store-order-notion.mjs
           touch _site/.nojekyll
