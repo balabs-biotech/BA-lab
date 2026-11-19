@@ -57,6 +57,7 @@ Source: `supabase/functions/create-store-order/index.ts`
 - Does not log customer payloads or contact fields.
 - The browser persists only the product selection and language preference; customer form values are not written to local storage.
 - Catalogue strings are HTML-escaped before DOM rendering to reduce stored/reflected XSS risk.
+- The storefront applies a restrictive Content Security Policy: scripts and styles load only from the site origin, network calls are limited to the site and its Supabase project, and object embedding is disabled.
 - Writes the request and all items atomically to Supabase before attempting Notion.
 - Uses a server-side Supabase secret/service-role key and the dedicated `NOTION_STORE_API_KEY`; neither credential is present in browser code.
 - Uses a request UUID to make retries idempotent.
