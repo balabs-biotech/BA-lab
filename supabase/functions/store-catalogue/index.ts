@@ -67,7 +67,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const productUrl = new URL(supabaseUrl.replace(/\\/$/, "") + "/rest/v1/store_products");
+    const productUrl = new URL(supabaseUrl.replace(/\/$/, "") + "/rest/v1/store_products");
     productUrl.searchParams.set(
       "select",
       "id,product_code,slug,family,organism_label,title_i18n,description_i18n,source_notion_url,passport_enabled,display_order",
@@ -89,7 +89,7 @@ Deno.serve(async (req: Request) => {
 
     let variants: Record<string, unknown>[] = [];
     if (productIds.length > 0) {
-      const variantUrl = new URL(supabaseUrl.replace(/\\/$/, "") + "/rest/v1/store_variants");
+      const variantUrl = new URL(supabaseUrl.replace(/\/$/, "") + "/rest/v1/store_variants");
       variantUrl.searchParams.set(
         "select",
         "product_id,variant_code,label_i18n,unit_code,pack_quantity,price_mode,price_dzd,availability,lead_time_days",
