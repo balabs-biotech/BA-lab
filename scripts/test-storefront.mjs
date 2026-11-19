@@ -23,6 +23,8 @@ assert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The ino
 assert.ok(js.includes('priceDzd:100') && js.includes('Water Agar — boîte non inoculée'), 'Uninoculated Water Agar must show its 100 DZD unit price');
 assert.ok(js.includes('priceDzd:1000') && js.includes('grain spawn · 2,5 kg'), 'Wheat grain spawn must show its 2.5 kg / 1,000 DZD format');
 assert.ok(js.includes('priceDzd:5000') && js.includes('Prix envisagé · à confirmer') && js.includes('price-qualifier'), 'Liquid culture syringe price must be clearly marked indicative');
+assert.ok(js.includes("family:'spawn'") && js.includes("filterSpawn:'Grain spawn'"), 'Grain spawn must have a distinct localized catalogue filter');
+assert.ok(html.includes('id="copyRequest"') && js.includes('navigator.clipboard.writeText(requestText)'), 'The guest selection must be copyable as a request without submitting personal data');
 assert.ok(js.includes('balabs-store-cart') && js.includes('safeGet') && js.includes('safeSet'), 'Cart and preferences must use guarded local storage');
 assert.ok(js.includes('prefers-reduced-motion') && js.includes('IntersectionObserver'), 'Motion must respect reduced-motion preference and progressive reveal');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'Storefront must not request remote Google Fonts');
