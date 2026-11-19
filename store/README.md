@@ -27,7 +27,7 @@ Notion: 🛒 DEMANDES COMMERCIALES
 - **Notion is the commercial follow-up workspace** populated after the Supabase write succeeds.
 - A Notion API outage does not discard the enquiry: the Supabase record remains stored with `notion_sync_status='pending'`.
 - The Notion sync uses the existing server-side `NOTION_API_KEY` and the existing commercial data source. It does not alter the CultureOps `sync-culture-to-notion` function.
-- The older direct-to-Notion endpoints `store-notion-order` and `notion-store-order` remain deployed for now, but the storefront source has been redirected to the new `create-store-order` endpoint. The new endpoint is staged in GitHub and must be deployed before any activation.
+- The older direct-to-Notion endpoints `store-notion-order` and `notion-store-order` remain deployed for now, but the storefront source has been redirected to the new `create-store-order` endpoint. The new endpoint is deployed in Supabase. The public form remains disabled, so the endpoint is not used by normal storefront visitors.
 
 ## Supabase schema
 
@@ -58,7 +58,7 @@ Source: `supabase/functions/create-store-order/index.ts`
 - Applies a persistent limit of five requests per ten minutes using an HMAC-SHA-256 fingerprint of the gateway-provided client IP. The raw IP is not stored.
 - Does not process payment or confirm stock, delivery fees, or lead times.
 
-The function is not yet deployed. Before deployment, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_API_KEY`.
+The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_API_KEY`.
 
 ## Catalogue
 
@@ -69,12 +69,10 @@ The function is not yet deployed. Before deployment, confirm that the Edge Funct
 
 ## Before enabling customer submissions
 
-1. Deploy `create-store-order` and test the full Supabase → Notion path using an explicitly marked test request.
-2. Verify Notion property mapping and confirm a new page appears in the commercial data source.
-3. Verify that failed Notion synchronization leaves the Supabase request intact and visibly pending for internal recovery.
-4. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
-5. Add a reliable retry mechanism for pending Notion syncs and verify that it can recover after a Notion outage.
-6. Only then set `STORE_ORDER_ENABLED=true` and publish the storefront.
+1. Test the failure path by making Notion temporarily unavailable and confirming the Supabase request remains intact with `notion_sync_status='pending'`.
+2. Implement and test a reliable retry mechanism for pending Notion syncs.
+3. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
+4. Only then set `STORE_ORDER_ENABLED=true` and publish the storefront.
 
 ## CultureOps boundary
 
