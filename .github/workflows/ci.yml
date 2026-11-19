@@ -334,3 +334,30 @@ jobs:
           path: artifacts/vernpixi-primary/
           if-no-files-found: ignore
           retention-days: 14
+
+  storefront-browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve the public storefront locally
+        run: |
+          python3 -m http.server 8767 --directory . > /tmp/balabs-storefront-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8767/store/index.html > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/balabs-storefront-server.log
+          exit 1
+      - name: Test cart, enquiry layout, languages and responsive behavior
+        run: node scripts/test-storefront-browser.mjs
+        env:
+          BALABS_STORE_URL: http://127.0.0.1:8767/store/index.html
