@@ -4,7 +4,7 @@ The store is a separate, static customer-facing application published under `/st
 
 ## Current release boundary
 
-The storefront is a catalogue and request-preparation interface. **Guest order submission remains disabled** in `store/store.js` through `STORE_ORDER_ENABLED=false`. No public customer orders are being accepted through the site.
+The storefront is a catalogue and request-preparation interface. **Guest order submission remains disabled at both the browser and server layers**: `store/store.js` uses `STORE_ORDER_ENABLED=false`, and the Edge Function rejects every request unless its server-side `STORE_ORDER_ENABLED` environment variable is exactly `true`. The server flag is absent by default and must not be enabled until the launch gates below are complete. No public customer orders are being accepted through the site.
 
 The request form has been redesigned as a two-column enquiry workspace: selected references on one side, customer details on the other. It is localized in FR / EN / AR / PT. The form remains disabled until the end-to-end intake and privacy checks are complete.
 
@@ -92,7 +92,7 @@ The function is deployed as `create-store-order` with JWT verification disabled 
 2. Test the failure path by making Notion temporarily unavailable and confirming the Supabase request remains intact with `notion_sync_status='pending'`.
 3. Implement and test a reliable retry mechanism for pending Notion syncs.
 4. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
-5. Only then set `STORE_ORDER_ENABLED=true` and publish the storefront.
+5. Only after all prior gates are complete, set the Edge Function's server-side `STORE_ORDER_ENABLED=true`, then enable the browser flag and publish the storefront.
 
 ## CultureOps boundary
 

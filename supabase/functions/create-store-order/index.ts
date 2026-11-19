@@ -197,6 +197,11 @@ Deno.serve(async (req: Request) => {
     return new Response("Forbidden", { status: 403 });
   }
 
+  // The browser flag is UX only; the server must remain closed by default.
+  if (Deno.env.get("STORE_ORDER_ENABLED") !== "true") {
+    return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
+  }
+
   const declaredLength = Number(req.headers.get("content-length") ?? "0");
   if (declaredLength > MAX_BODY_BYTES) return json(413, { success: false, error: "payload_too_large" }, origin);
 

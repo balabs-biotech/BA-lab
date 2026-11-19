@@ -14,6 +14,7 @@ assert.ok(css.includes(".request-layout") && css.includes("@media(max-width:760p
 assert.ok(js.includes("create-store-order") && !js.includes("functions/v1/store-notion-order"), "Browser must use the Supabase-first endpoint");
 assert.ok(js.includes("request_id:activeRequestId"), "Browser must send a stable idempotency reference");
 assert.ok(js.includes("const STORE_ORDER_ENABLED=false"), "Guest submission must remain disabled until end-to-end verification");
+assert.ok(edge.includes('Deno.env.get("STORE_ORDER_ENABLED") !== "true"') && edge.indexOf('Deno.env.get("STORE_ORDER_ENABLED") !== "true"') < edge.indexOf('const declaredLength = Number(req.headers.get("content-length")'), "The Edge Function must fail closed server-side unless STORE_ORDER_ENABLED is explicitly true");
 assert.ok(!js.includes("NOTION_STORE_API_KEY") && !js.includes("SUPABASE_SERVICE_ROLE_KEY") && !js.includes("sb_secret_"), "No server credential may appear in browser code");
 
 assert.ok(migration.includes("create table if not exists public.store_orders"), "Dedicated storefront order table must exist");
