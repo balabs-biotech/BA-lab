@@ -1,0 +1,24 @@
+name: BA Labs storefront checks
+on:
+  pull_request:
+    paths:
+      - 'store/**'
+      - 'ecosystem/index.html'
+      - 'scripts/test-storefront.mjs'
+      - '.github/workflows/storefront-checks.yml'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  storefront-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run storefront regression checks
+        run: node scripts/test-storefront.mjs
