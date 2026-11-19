@@ -4,13 +4,13 @@ The store is a separate, static customer-facing application published under `/st
 
 ## Current release boundary
 
-This branch contains the storefront, legal-page drafts, versioned commerce schema, and Edge Function source. **The production migration and Edge Functions have not been applied or deployed.** The public page therefore remains a catalogue/request preview; do not represent it as an active checkout.
+This branch contains the storefront, legal-page drafts, versioned commerce schema, and Edge Function source. **The production migration and Edge Functions have not been applied or deployed.** The public page is a catalogue and request-preparation MVP, not an active checkout. Customers can assemble a selection and copy a structured request; it is not transmitted to BA Labs automatically.
 
 ## Data ownership
 
 - **Notion:** editorial source for product descriptions, scientific copy, and language content.
 - **Supabase:** transactional source of truth for published store catalogue records, variants, guest orders, price snapshots, and order events.
-- **GitHub Pages:** static storefront delivery only. The browser integration for the read-only `store-catalogue` GET is staged behind `STORE_REMOTE_CATALOGUE_ENABLED=false`. Keep it disabled until cross-border processing, provider disclosures, and the privacy notice are approved; the reviewed static catalogue remains the only active source.
+- **GitHub Pages:** static storefront delivery only. The browser integration for the read-only `store-catalogue` GET is staged behind `STORE_REMOTE_CATALOGUE_ENABLED=false`. The active static catalogue contains 15 references. The Supabase migration currently seeds 13 records; align the database seed before enabling remote catalogue reads.
 - **CultureOps:** remains separate; its tenant-scoped `orders` and `order_items` are not reused.
 - **Product Passport:** separate post-purchase traceability surface, linked to a product/lot only when a real lot exists.
 
@@ -18,7 +18,7 @@ This branch contains the storefront, legal-page drafts, versioned commerce schem
 
 The migration `supabase/migrations/20261119010000_ba_labs_store_commerce_v1.sql` creates:
 
-- `store_products`: 12 existing published catalogue references, localized in FR / EN / AR / PT.
+- `store_products`: 13 currently seeded published catalogue records, localized in FR / EN / AR / PT. This is not yet synchronized with the 15-reference static storefront.
 - `store_variants`: pack formats, availability, confirmed DZD price or quote-only mode. No speculative prices, stock, pack sizes, or lead times are seeded.
 - `store_orders`: guest contact and delivery data, legal-document version acknowledgements, manual-payment state, hashed tracking and idempotency tokens.
 - `store_order_items`: immutable snapshots of product, variant, quantity and confirmed price.
@@ -49,13 +49,13 @@ If any required secret is missing, guest-order intake fails closed. The current 
 
 ## Release sequence
 
-1. Resolve the Algerian e-commerce hosting/domain requirements and the final legal identity fields.
+1. Publish the static catalogue MVP on GitHub Pages; this does not enable checkout or transmit customer data.
 2. Confirm product variants, packaging, DZD prices, stock rules, and shipping fees.
-3. Review and merge the migration and Edge Function source.
-4. Apply the additive schema migration to Supabase.
-5. Configure server secrets and deploy `store-catalogue` and `create-store-order` with JWT verification disabled only because each function enforces its own public-access contract.
-6. Connect the storefront to the public catalogue endpoint and guest-order endpoint; keep the static catalogue as a controlled fallback.
-7. Run end-to-end tests before enabling customer order submission.
+3. Align the Supabase seed with the 15-reference static catalogue, then review the migration and Edge Function source.
+4. Before collecting customer contact or delivery data, complete the applicable hosting, legal-identity, privacy and cross-border data review.
+5. Apply the additive schema migration to Supabase and configure the documented server secrets.
+6. Deploy `store-catalogue`, `create-store-order` and `track-store-order` only after their endpoint and data protections have been verified.
+7. Connect the storefront to the catalogue and guest-order endpoints; run end-to-end tests before enabling customer order submission.
 
 ## Verification
 
