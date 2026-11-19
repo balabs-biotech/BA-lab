@@ -38,7 +38,8 @@ assert.ok(cookies.includes('point d\'accès Supabase du catalogue est actuelleme
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
-console.log('Storefront regression checks passed: 15 references, including Water Agar 100 DZD, grain spawn 1,000 DZD, indicative liquid culture 5,000 DZD and confirmed 2,000 DZD Petri dish, 4 languages, ecosystem entry point, cart, reduced motion, legal pages, no remote fonts or premature data submission.');
+console.log('Storefront regression checks passed: 15 references, four languages, cart, customer order form, guarded Notion submission, legal pages and reduced-motion support.');
+assert.equal((html.match(/id="copyRequest"/g)||[]).length,1,'Request copy action must have one unique DOM id');
 assert.ok(js.includes('STORE_ORDER_URL') && js.includes('STORE_ORDER_ENABLED=false'), 'Order endpoint must remain gated until deployment');
 assert.ok(html.includes('id="orderForm"') && html.includes('name="phone"') && html.includes('name="name"'), 'Guest order form must collect customer identity');
 assert.ok(js.includes('orderForm.addEventListener') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Browser submits through the public Supabase key only');
