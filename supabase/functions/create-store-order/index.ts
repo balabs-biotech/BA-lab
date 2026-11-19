@@ -331,6 +331,9 @@ Deno.serve(async (req: Request) => {
     notion_page_id: notionPageId || null,
     notion_sync_attempts: 1,
     notion_sync_error: notionPageId ? null : syncError,
+    notion_sync_next_attempt_at: notionPageId ? null : new Date(Date.now() + 60_000).toISOString(),
+    notion_sync_locked_until: null,
+    notion_sync_lock_token: null,
     notion_synced_at: notionPageId ? new Date().toISOString() : null,
     updated_at: new Date().toISOString()
   };

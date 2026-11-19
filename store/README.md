@@ -25,7 +25,7 @@ Notion: 🛒 DEMANDES COMMERCIALES
 
 - **Supabase is the transactional source of truth** for guest enquiries and their item snapshots.
 - **Notion is the commercial follow-up workspace** populated after the Supabase write succeeds.
-- A Notion API outage does not discard the enquiry: the Supabase record remains stored with `notion_sync_status='pending'`.
+- A Notion API outage does not discard the enquiry: the Supabase record remains stored with `notion_sync_status='pending'`. The private `store-order-sync` worker retries pending records with an atomic claim, an eight-attempt ceiling and bounded exponential backoff.
 - The storefront sync uses a dedicated server-side `NOTION_STORE_API_KEY`, separate from CultureOps. Its Notion integration must be shared only with the commercial orders data source, never with CultureOps databases.
 - The legacy direct-to-Notion endpoints `store-notion-order` and `notion-store-order` have been retired. Both now return HTTP 410 and require an authenticated JWT at the gateway. Only `create-store-order` remains the supported intake endpoint.
 - The new endpoint is deployed in Supabase. The public form remains disabled, so normal storefront visitors cannot submit customer data.
@@ -42,6 +42,7 @@ It creates:
 - `store_order_items`: immutable product-title, code, family, quantity and price snapshots.
 - `create_store_order(...)`: atomic insert RPC with request-id idempotency.
 - `store_checkout_rate_limits` and `consume_store_rate_limit(...)`: persistent per-client request throttling using HMAC fingerprints, without storing raw IP addresses.
+- `claim_store_order_sync(...)`, `complete_store_order_sync(...)` and `fail_store_order_sync(...)`: service-role-only RPCs for atomic worker claims, lock ownership and retry state.
 
 Both tables have RLS enabled. Direct table access is revoked from `anon` and `authenticated`; the service role is the only intended database writer. The RPC is executable only by `service_role`. CultureOps `orders` and `order_items` are untouched.
 
@@ -86,11 +87,22 @@ The function is deployed as `create-store-order` with JWT verification disabled 
 - Product presence in the catalogue does not mean current availability. BA Labs confirms availability, format, final price and delivery conditions after receiving an enquiry.
 - Prices that are still indicative are not treated as confirmed totals.
 
+## Notion retry worker
+
+Source: `supabase/functions/store-order-sync/index.ts`.
+
+- Requires a valid Supabase JWT at the gateway and independently checks that its role claim is `service_role`.
+- Claims at most ten requests per run using `FOR UPDATE SKIP LOCKED`; a five-minute lease prevents concurrent workers from processing the same row.
+- Checks the exact commercial request title in Notion before creating a page, so a timeout after page creation can be safely retried without intentionally creating a duplicate.
+- Uses bounded retries (maximum eight attempts) with increasing delays from one minute to 24 hours. Exhausted records move to `failed` for manual review.
+- Sends only aggregate counts in its HTTP response. Customer contact fields are used only server-side and are never logged or returned.
+- The function is deployed with JWT verification enabled. Scheduling is deliberately not activated until a service-role JWT is stored in Supabase Vault and the dedicated Notion commercial credential is configured.
+
 ## Before enabling customer submissions
 
 1. Add a server-verified anti-bot challenge (for example, Turnstile) with a server-side secret; the current controls are a honeypot and persistent rate limiting, not a CAPTCHA.
 2. Test the failure path by making Notion temporarily unavailable and confirming the Supabase request remains intact with `notion_sync_status='pending'`.
-3. Implement and test a reliable retry mechanism for pending Notion syncs.
+3. Configure and test the scheduled `store-order-sync` worker using a service-role JWT stored in Supabase Vault; confirm retries and duplicate prevention.
 4. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
 5. Only after all prior gates are complete, set the Edge Function's server-side `STORE_ORDER_ENABLED=true`, then enable the browser flag and publish the storefront.
 
