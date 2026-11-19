@@ -18,7 +18,8 @@ for (const id of ['productGrid', 'cartDrawer', 'cartItems', 'requestModal', 'con
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   assert.ok(js.includes(language + ':{'), 'Missing language dictionary: ' + language);
 }
-assert.equal((js.match(/code:'BAL-/g) || []).length, 12, 'Storefront must render the 12 verified catalogue references');
+assert.equal((js.match(/code:'BAL-/g) || []).length, 13, 'Storefront must render 12 existing references plus the confirmed inoculated Petri product');
+assert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The inoculated Petri dish must show its confirmed 2,000 DZD unit price');
 assert.ok(js.includes('balabs-store-cart') && js.includes('safeGet') && js.includes('safeSet'), 'Cart and preferences must use guarded local storage');
 assert.ok(js.includes('prefers-reduced-motion') && js.includes('IntersectionObserver'), 'Motion must respect reduced-motion preference and progressive reveal');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'Storefront must not request remote Google Fonts');
@@ -32,4 +33,4 @@ assert.ok(cookies.includes('point d\'accès Supabase du catalogue est actuelleme
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
-console.log('Storefront regression checks passed: 12 references, 4 languages, ecosystem entry point, cart, reduced motion, legal pages, no remote fonts or premature data submission.');
+console.log('Storefront regression checks passed: 13 references, including confirmed 2,000 DZD Petri dish, 4 languages, ecosystem entry point, cart, reduced motion, legal pages, no remote fonts or premature data submission.');
