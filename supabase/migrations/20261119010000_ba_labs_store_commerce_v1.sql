@@ -545,3 +545,47 @@ REVOKE ALL ON FUNCTION public.consume_store_checkout_rate_limit(bytea, integer, 
   FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.consume_store_checkout_rate_limit(bytea, integer, integer)
   TO service_role;
+
+
+-- Guest tracking lookup. Returns order state only; never returns contact or delivery PII.
+CREATE OR REPLACE FUNCTION public.lookup_store_guest_order(
+  p_order_code text,
+  p_tracking_token_hash bytea
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+DECLARE
+  v_result jsonb;
+BEGIN
+  IF nullif(btrim(p_order_code), '') IS NULL
+    OR p_tracking_token_hash IS NULL
+    OR octet_length(p_tracking_token_hash) <> 32 THEN
+    RETURN NULL;
+  END IF;
+
+  SELECT jsonb_build_object(
+    'order_code', order_code,
+    'status', status,
+    'payment_status', payment_status,
+    'delivery_mode', delivery_mode,
+    'submitted_at', submitted_at,
+    'confirmed_at', confirmed_at,
+    'shipped_at', shipped_at,
+    'completed_at', completed_at
+  )
+  INTO v_result
+  FROM public.store_orders
+  WHERE order_code = btrim(p_order_code)
+    AND tracking_token_hash = p_tracking_token_hash;
+
+  RETURN v_result;
+END
+$function$;
+
+REVOKE ALL ON FUNCTION public.lookup_store_guest_order(text, bytea)
+  FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.lookup_store_guest_order(text, bytea)
+  TO service_role;
