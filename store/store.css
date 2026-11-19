@@ -52,3 +52,6 @@
 [dir="rtl"] .cart-line{direction:rtl}
 [dir="rtl"] .consent-notice{direction:rtl}
 @media(max-width:700px){[dir="rtl"] .hero-aside{right:auto;left:-42px}[dir="rtl"] .hero-aside>p{left:-7%}}
+
+.order-form input:disabled,.order-form select:disabled,.order-form textarea:disabled{opacity:.48;cursor:not-allowed;background:#111b1d;color:#9aa99f}
+.order-form label:has(:disabled){opacity:.82}
