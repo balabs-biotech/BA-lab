@@ -1752,3 +1752,31 @@ html[lang="pt"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="pt"
   height:clamp(190px,58vw,250px)!important;object-fit:cover!important;
  }
 }
+
+
+/* MOBILE PASS 66 — final BA Labs chapter: prioritize readable copy over duplicate atmosphere art. */
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="about"]>.chapter-atmosphere{display:none!important}
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  gap:18px!important;padding-block:18px 28px!important;box-sizing:border-box!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about>.about-copy{
+  order:0!important;display:block!important;width:100%!important;
+  max-width:58ch!important;min-width:0!important;justify-self:stretch!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about>.about-copy p{
+  display:block!important;width:100%!important;max-width:58ch!important;
+  font-size:14px!important;line-height:1.72!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about>.editorial-art{
+  order:1!important;display:block!important;width:100%!important;
+  max-width:100%!important;min-width:0!important;height:auto!important;
+  min-height:0!important;max-height:220px!important;aspect-ratio:16/9!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about>.editorial-art img{
+  display:block!important;width:100%!important;height:100%!important;
+  min-height:0!important;max-height:220px!important;object-fit:cover!important;
+ }
+}
