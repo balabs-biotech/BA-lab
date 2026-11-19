@@ -110,6 +110,8 @@
 
 
   const supplementalCoverage = [
+    ["Connexion sécurisée à l’espace BA Labs.","Secure sign-in to the BA Labs workspace.","Acesso seguro ao espaço BA Labs.","تسجيل دخول آمن إلى مساحة BA Labs."],
+
     ["Intelligence environnementale","Environmental intelligence","Inteligência ambiental","الذكاء البيئي"],
     ["Suivi des lignées","Lineage tracking","Acompanhamento das linhagens","تتبّع السلالات"],
     ["Traçabilité expérimentale","Experimental traceability","Rastreabilidade experimental","التتبّع التجريبي"],
