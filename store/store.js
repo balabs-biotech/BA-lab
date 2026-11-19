@@ -189,29 +189,42 @@ function saveCart(){activeRequestId='';safeSet('balabs-store-cart',JSON.stringif
 function t(k){return words[language][k]||words.fr[k]||k}
 function applyLanguage(){document.documentElement.lang=language;document.documentElement.dir=language==='ar'?'rtl':'ltr';document.title=t('pageTitle');const metaDescription=document.querySelector('meta[name="description"]');if(metaDescription)metaDescription.content=t('metaDescription');$('#languageSelect').value=language;document.querySelectorAll('[data-i18n]').forEach(el=>{const val=t(el.dataset.i18n);if(val.includes('<'))el.innerHTML=val;else el.textContent=val});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));document.querySelectorAll('[data-i18n-aria]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.i18nAria)));renderProducts();renderCart()}
 function renderProducts(){const grid=$('#productGrid');const filtered=products.filter(p=>(filter==='all'||p.family===filter)&&[p.code,p.kind,p.titles[language],p.descriptions[language]].join(' ').toLowerCase().includes(query));$('#resultCount').textContent=filtered.length+' '+t('referenceCount');grid.innerHTML=filtered.length?filtered.map((p,i)=>{const status=p.status==='unavailable'?'statusUnavailable':p.status==='to_confirm'?'statusToConfirm':'statusOnRequest';const statusLabel=t(status);const canSelect=p.status!=='unavailable';const price=p.priceDzd?'<div class="product-price-wrap"><strong class="product-price">'+new Intl.NumberFormat(language,{maximumFractionDigits:0}).format(p.priceDzd)+' '+t('pricePerUnit')+'</strong>'+(p.priceQualifier?'<small class="price-qualifier">'+escapeHtml(p.priceQualifier[language])+'</small>':'')+'</div>':'';return '<article class="product-card reveal is-visible"><div class="product-visual"><span class="product-index">REF / '+String(i+1).padStart(2,'0')+'</span><span class="product-family">'+escapeHtml(p.family==='liquid'?t('familyLiquid'):p.family==='spawn'?t('familySpawn'):t('familyAgar'))+'</span><span class="product-symbol">'+escapeHtml(p.symbol)+'</span></div><div class="product-content"><p class="product-code">'+escapeHtml(p.code)+'</p><h3>'+escapeHtml(p.titles[language])+'</h3><p>'+escapeHtml(p.descriptions[language])+'</p><div class="product-card-bottom"><div class="product-meta">'+price+'<span class="availability status-'+p.status+'">'+escapeHtml(statusLabel)+'</span></div>'+(canSelect?'<button class="add-product" data-add="'+escapeHtml(p.code)+'" aria-label="'+t('add')+' '+escapeHtml(p.titles[language])+'">+</button>':'<span class="unavailable-mark" aria-label="'+escapeHtml(statusLabel)+'">—</span>')+'</div></div></article>'}).join(''):'<div class="no-results">'+t('emptySearch')+'</div>';grid.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.add;const product=products.find(p=>p.code===id);if(!product||product.status==='unavailable')return;cart[id]=(cart[id]||0)+1;saveCart();b.textContent='✓';setTimeout(()=>b.textContent='+',700)}))}
+const REMOTE_STATUS_MAP=Object.freeze({
+  "sur demande":"on_request",
+  "on request":"on_request",
+  "à confirmer":"to_confirm",
+  "a confirmer":"to_confirm",
+  "to confirm":"to_confirm",
+  "indisponible":"unavailable",
+  "unavailable":"unavailable"
+});
+function normalizeRemoteAvailability(value){
+  return REMOTE_STATUS_MAP[String(value??"").trim().toLocaleLowerCase("fr")]??null;
+}
 async function loadRemoteCatalogue(){
   if(!STORE_REMOTE_CATALOGUE_ENABLED)return;
   try{
-    const response=await fetch(STORE_CATALOGUE_URL,{method:'GET',headers:{apikey:STORE_PUBLISHABLE_KEY},credentials:'omit',cache:'default'});
+    const response=await fetch(STORE_CATALOGUE_URL,{method:"GET",headers:{apikey:STORE_PUBLISHABLE_KEY},credentials:"omit",cache:"default"});
     if(!response.ok)return;
     const payload=await response.json();
     if(!Array.isArray(payload.products)||payload.products.length===0)return;
-    const remote=payload.products.map(p=>({
-      code:p.product_code,
-      family:p.family,
-      kind:p.organism_label,
-      symbol:p.family==='agar'?'WA':'LC',
-      titles:p.title_i18n,
-      descriptions:p.description_i18n,
-      url:p.source_notion_url,
-      variants:Array.isArray(p.variants)?p.variants:[]
-    }));
-    if(remote.some(p=>!p.code||!p.titles||!p.descriptions))return;
-    products=remote;
+    const updates=new Map(payload.products
+      .filter(item=>item&&typeof item.product_code==="string")
+      .map(item=>[item.product_code,normalizeRemoteAvailability(item.availability)])
+      .filter(([,status])=>status!==null));
+    if(!updates.size)return;
+    products=products.map(product=>{
+      const remoteStatus=updates.get(product.code);
+      return remoteStatus?{...product,status:remoteStatus}:product;
+    });
+    cart=Object.fromEntries(Object.entries(cart).filter(([code,quantity])=>
+      quantity>0&&products.some(product=>product.code===code&&product.status!=="unavailable")
+    ));
+    safeSet("balabs-store-cart",JSON.stringify(cart));
     renderProducts();
     renderCart();
   }catch(_){
-    // The reviewed static catalogue remains available when the API is offline or not deployed.
+    // Static multilingual product data remains authoritative if the public API is unavailable.
   }
 }
 function renderCart(){const entries=Object.entries(cart).filter(([code,n])=>n>0&&products.some(p=>p.code===code&&p.status!=='unavailable'));$('#cartCount').textContent=entries.reduce((s,[,n])=>s+n,0);$('#cartEmpty').hidden=entries.length>0;$('#drawerBottom').hidden=!entries.length;$('#cartItems').innerHTML=entries.map(([id,n])=>{const p=products.find(x=>x.code===id);if(!p)return '';return '<div class="cart-line"><div><h3>'+escapeHtml(p.titles[language])+'</h3><small>'+escapeHtml(p.code)+'</small>'+(p.priceDzd?'<div class="cart-price">'+new Intl.NumberFormat(language,{maximumFractionDigits:0}).format(p.priceDzd)+' '+t('pricePerUnit')+'</div>'+(p.priceQualifier?'<small class="price-qualifier">'+escapeHtml(p.priceQualifier[language])+'</small>':''):'')+'<div class="quantity-control"><button data-qty="'+escapeHtml(id)+'" data-delta="-1" aria-label="'+t('decreaseQty')+'">−</button><span>'+n+'</span><button data-qty="'+escapeHtml(id)+'" data-delta="1" aria-label="'+t('increaseQty')+'">+</button></div></div><button class="remove-line" data-remove="'+escapeHtml(id)+'">'+t('removeItem')+'</button></div>'}).join('');$('#cartItems').querySelectorAll('[data-qty]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.qty;const product=products.find(p=>p.code===id);if(!product||product.status==='unavailable')return;cart[id]=Math.max(0,(cart[id]||0)+Number(b.dataset.delta));if(!cart[id])delete cart[id];saveCart()}));$('#cartItems').querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{delete cart[b.dataset.remove];saveCart()}))}
