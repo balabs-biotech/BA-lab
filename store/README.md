@@ -52,7 +52,7 @@ Source: `supabase/functions/create-store-order/index.ts`
 - Writes the request and all items atomically to Supabase before attempting Notion.
 - Uses a server-side Supabase secret/service-role key and `NOTION_API_KEY`; neither credential is present in browser code.
 - Uses a request UUID to make retries idempotent.
-- Applies a best-effort per-isolate request throttle. Persistent HMAC rate limiting remains a pre-launch hardening item.
+- Applies a persistent limit of five requests per ten minutes using an HMAC-SHA-256 fingerprint of the gateway-provided client IP. The raw IP is not stored.
 - Does not process payment or confirm stock, delivery fees, or lead times.
 
 The function is not yet deployed. Before deployment, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_API_KEY`.
@@ -70,7 +70,7 @@ The function is not yet deployed. Before deployment, confirm that the Edge Funct
 2. Verify Notion property mapping and confirm a new page appears in the commercial data source.
 3. Verify that failed Notion synchronization leaves the Supabase request intact and visibly pending for internal recovery.
 4. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
-5. Add persistent rate limiting and a retry mechanism for pending Notion syncs.
+5. Add a reliable retry mechanism for pending Notion syncs and verify that it can recover after a Notion outage.
 6. Only then set `STORE_ORDER_ENABLED=true` and publish the storefront.
 
 ## CultureOps boundary
