@@ -29,6 +29,10 @@ assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must valida
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
 assert.ok(edge.includes("Deno.env.get(\"NOTION_API_KEY\")"), "Notion credential must remain server-side");
 assert.ok(edge.includes("notion_sync_status") && edge.includes('"pending"'), "Notion failures must leave a recoverable pending state");
+const publicResponse = edge.slice(edge.lastIndexOf("return json("));
+assert.ok(publicResponse.includes("orderRef") && publicResponse.includes("notionSync") && !/customer_(?:name|phone|email|message)/.test(publicResponse), "Public response must never return customer contact details");
+assert.ok(edge.includes('"Cache-Control": "no-store"'), "Customer enquiry responses must not be cached");
+
 assert.ok(edge.includes("isRateLimited(req, secretKey)") && edge.includes("MAX_BODY_BYTES"), "Public endpoint must apply persistent request throttling and body-size limits");
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
