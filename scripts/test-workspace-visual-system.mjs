@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync("batch-tracker/workspace.html", "utf8");
 const visuals = fs.readFileSync("batch-tracker/workspace-visuals.js", "utf8");
+const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
 const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
@@ -12,6 +13,9 @@ const greenTechEntry = fs.readFileSync("batch-tracker/green-tech/index.html", "u
 const laboratoryEntry = fs.readFileSync("batch-tracker/laboratory/index.html", "utf8");
 
 assert.ok(html.includes('class="app-hero"'), "Each sector must retain the shared workspace header");
+assert.ok(tracker.includes('id="heroTitlePrimary"') && tracker.includes('id="heroTitleSecondary"'), "Workspace switching must preserve the domain-specific hero title slots");
+assert.ok(tracker.includes('eyebrow: "AGRONOMIE & ENVIRONNEMENT"') && tracker.includes('eyebrow: "MYCOLOGIE & GÉNÉALOGIE"') && tracker.includes('eyebrow: "LABORATOIRE & BIOPROCÉDÉS"'), "Each domain must have its own scientific hero eyebrow");
+assert.ok(tracker.includes("title: '<span id=\"heroTitlePrimary\">Cultures végétales</span>") && tracker.includes("title: '<span id=\"heroTitlePrimary\">Cultures fongiques</span>") && tracker.includes("title: '<span id=\"heroTitlePrimary\">Production biologique</span>"), "The domain switcher must render the correct title for all three workspaces");
 assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particle layer must be removed from the shared workspace markup");
 assert.ok(!html.includes("visual-mycology"), "The obsolete branching mycelium hero SVG must not be shipped in the shared markup");
 assert.ok(!visuals.includes("workspace-particle-field"), "The old generic global particle field must be removed");
