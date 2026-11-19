@@ -278,10 +278,12 @@ DECLARE
   v_item_count integer;
 BEGIN
   IF jsonb_typeof(p_order) IS DISTINCT FROM 'object'
-    OR jsonb_typeof(p_items) IS DISTINCT FROM 'array'
-    OR jsonb_array_length(p_items) < 1
-    OR jsonb_array_length(p_items) > 30 THEN
+    OR jsonb_typeof(p_items) IS DISTINCT FROM 'array' THEN
     RAISE EXCEPTION 'invalid_order_payload' USING ERRCODE = '22023';
+  END IF;
+
+  IF jsonb_array_length(p_items) < 1 OR jsonb_array_length(p_items) > 30 THEN
+    RAISE EXCEPTION 'invalid_order_item_count' USING ERRCODE = '22023';
   END IF;
 
   IF p_tracking_token_hash IS NULL OR octet_length(p_tracking_token_hash) <> 32
