@@ -52,4 +52,5 @@ assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consu
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 
 assert.ok(readme.includes("Supabase is the transactional source of truth"), "Architecture documentation must match the implementation");
+assert.ok(readme.includes("server-verified anti-bot challenge") && readme.includes("not a CAPTCHA"), "Public intake launch gate must disclose that server-verified bot protection is still required");
 console.log("Store order contract checks passed: Supabase-first persistence, Notion mirror, isolated RLS tables, idempotency, 15-reference request allowlist, unavailable-reference exclusion and disabled public intake.");
