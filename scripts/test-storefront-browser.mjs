@@ -16,6 +16,10 @@ try {
   await page.locator("#cartItems .cart-line").first().waitFor();
   await page.locator("#requestQuote").click();
   await page.locator("#requestModal.is-open").waitFor();
+  await page.waitForFunction(() => {
+    const panel = document.querySelector("#requestModal .request-panel");
+    return panel && Number.parseFloat(getComputedStyle(panel).opacity) >= 0.99;
+  });
   await page.waitForFunction(() => Boolean(document.querySelector("#requestSummary")?.textContent?.trim()));
   const summaryState = await page.locator("#requestSummary").evaluate(el => ({ text: el.textContent.trim(), display: getComputedStyle(el).display, visibility: getComputedStyle(el).visibility, rect: el.getBoundingClientRect().toJSON() }));
   assert.ok(summaryState.text, "Selected product must appear in the request summary");
