@@ -4,8 +4,8 @@ import { readFileSync } from "node:fs";
 const html = readFileSync("store/index.html", "utf8");
 const css = readFileSync("store/store.css", "utf8");
 const js = readFileSync("store/store.js", "utf8");
-const migration = readFileSync("supabase/migrations/20261119230000_store_orders_v1.sql", "utf8");
-const rateMigration = readFileSync("supabase/migrations/20261119235000_store_checkout_rate_limits_v1.sql", "utf8");
+const migration = readFileSync("supabase/migrations/20261119223731_store_orders_v1.sql", "utf8");
+const rateMigration = readFileSync("supabase/migrations/20261119224223_store_checkout_rate_limits_v1.sql", "utf8");
 const edge = readFileSync("supabase/functions/create-store-order/index.ts", "utf8");
 const readme = readFileSync("store/README.md", "utf8");
 
