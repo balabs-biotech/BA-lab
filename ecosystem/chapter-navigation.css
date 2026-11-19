@@ -397,24 +397,27 @@ html[dir="rtl"] body>.chapter-rail{
 }
 
 
-/* PASS 76 — compact mobile nav labels and expose the horizontal scroll affordance. */
+/* PASS 77 — show the complete mobile chapter navigation without a clipped last item.
+   Two compact rows replace the ambiguous horizontal overflow on touch screens. */
 @media(max-width:760px){
  #app.balabs-ui>.site-nav{
-  gap:clamp(6px,1.8vw,9px)!important;
-  scrollbar-width:thin!important;
-  scrollbar-color:#b96b4d #263b38!important;
-  scroll-padding-inline:10px!important;
+  display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;
+  align-content:center!important;align-items:center!important;
+  gap:2px clamp(9px,2.8vw,14px)!important;
+  height:auto!important;min-height:54px!important;max-height:none!important;
+  overflow:visible!important;white-space:normal!important;
+  padding:4px 8px!important;margin:0!important;
  }
- #app.balabs-ui>.site-nav::-webkit-scrollbar{display:block!important;height:3px!important}
- #app.balabs-ui>.site-nav::-webkit-scrollbar-track{background:#263b38!important}
- #app.balabs-ui>.site-nav::-webkit-scrollbar-thumb{background:#b96b4d!important;border-radius:3px!important}
  #app.balabs-ui>.site-nav>a{
-  font-size:8px!important;
-  letter-spacing:.045em!important;
-  padding-inline:1px!important;
+  display:inline-flex!important;flex:0 0 auto!important;
+  min-height:24px!important;height:24px!important;
+  align-items:center!important;padding:2px 1px!important;
+  font-size:8px!important;letter-spacing:.045em!important;
+  white-space:nowrap!important;scroll-snap-align:none!important;
  }
+ #app.balabs-ui>.site-nav::-webkit-scrollbar{display:none!important}
 }
 @media(max-width:390px){
- #app.balabs-ui>.site-nav{gap:6px!important;padding-inline:8px!important}
- #app.balabs-ui>.site-nav>a{font-size:8px!important;letter-spacing:.035em!important}
+ #app.balabs-ui>.site-nav{column-gap:8px!important;row-gap:1px!important;padding-inline:6px!important}
+ #app.balabs-ui>.site-nav>a{font-size:8px!important;letter-spacing:.025em!important}
 }
