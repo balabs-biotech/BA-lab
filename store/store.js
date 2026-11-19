@@ -23,7 +23,7 @@ let products=[
 ];
 const words={
 fr:{
-navCatalog:'Catalogue',navApproach:'Notre démarche',navEcosystem:'Écosystème',cart:'Sélection',
+pageTitle:'Catalogue de ressources — BA Labs',metaDescription:'Cultures, milieux et ressources biologiques BA Labs. Consultez les références et contactez notre équipe pour confirmer disponibilité et conditions.',pageTitle:'Biological resources catalogue — BA Labs',metaDescription:'BA Labs cultures, media and biological resources. Browse references and contact our team to confirm availability and terms.',navCatalog:'Catalogue',navApproach:'Notre démarche',navEcosystem:'Écosystème',cart:'Sélection',
 heroEyebrow:'BA LABS / RESSOURCES BIOLOGIQUES & APPLICATIONS',heroTitle:'La biotechnologie<br><em>en pratique.</em>',
 heroText:'Des cultures, des milieux et des ressources biologiques issus de notre travail en laboratoire. Chaque référence est présentée avec ses informations utiles, dans une démarche de documentation et de traçabilité.',
 explore:'Découvrir les références',heroAside:'RECHERCHE<br>→ CULTURE<br>→ APPLICATION',
@@ -91,7 +91,7 @@ customerMessage:'Message / useful details (optional)',submitOrder:'Submit enquir
 familyLiquid:'LIQUID CULTURE',familySpawn:'GRAIN SPAWN',familyAgar:'MEDIA & AGAR',pricePerUnit:'DA / unit',decreaseQty:'Decrease quantity',increaseQty:'Increase quantity',removeItem:'Remove from selection',skipCatalog:'Skip to catalogue',languageLabel:'Language',openCart:'Open selection',closeCart:'Close selection',closeDialog:'Close dialog',filterLabel:'Filter references',searchLabel:'Search the catalogue',legalNav:'Legal information',honeypotLabel:'Leave this field empty'
 },
 ar:{
-navCatalog:'الكتالوج',navApproach:'منهجيتنا',navEcosystem:'النظام البيئي',cart:'اختياراتي',
+pageTitle:'كتالوج الموارد البيولوجية — BA Labs',metaDescription:'مزارع وأوساط وموارد بيولوجية من BA Labs. تصفح المراجع وتواصل معنا لتأكيد التوفر والشروط.',navCatalog:'الكتالوج',navApproach:'منهجيتنا',navEcosystem:'النظام البيئي',cart:'اختياراتي',
 heroEyebrow:'BA LABS / موارد بيولوجية وتطبيقات',heroTitle:'التكنولوجيا الحيوية<br><em>في التطبيق.</em>',
 heroText:'مزارع وأوساط زراعية وموارد بيولوجية نطوّرها من خلال عملنا المخبري. نقدم كل مرجع بمعلومات عملية مع التركيز على التوثيق وإمكانية التتبع.',
 explore:'استكشف المراجع',heroAside:'البحث<br>← الزراعة<br>← التطبيق',
@@ -125,7 +125,7 @@ customerMessage:'رسالة / تفاصيل إضافية (اختياري)',submit
 familyLiquid:'مزرعة سائلة',familySpawn:'حبوب ملقحة',familyAgar:'أوساط وآغار',pricePerUnit:'دج / الوحدة',decreaseQty:'تقليل الكمية',increaseQty:'زيادة الكمية',removeItem:'إزالة من الاختيارات',skipCatalog:'انتقل إلى الكتالوج',languageLabel:'اللغة',openCart:'فتح الاختيارات',closeCart:'إغلاق الاختيارات',closeDialog:'إغلاق النافذة',filterLabel:'تصفية المراجع',searchLabel:'البحث في الكتالوج',legalNav:'معلومات قانونية',honeypotLabel:'اترك هذا الحقل فارغاً'
 },
 pt:{
-navCatalog:'Catálogo',navApproach:'A nossa abordagem',navEcosystem:'Ecossistema',cart:'A minha seleção',
+pageTitle:'Catálogo de recursos biológicos — BA Labs',metaDescription:'Culturas, meios e recursos biológicos da BA Labs. Consulte as referências e contacte a equipa para confirmar disponibilidade e condições.',navCatalog:'Catálogo',navApproach:'A nossa abordagem',navEcosystem:'Ecossistema',cart:'A minha seleção',
 heroEyebrow:'BA LABS / RECURSOS BIOLÓGICOS E APLICAÇÕES',heroTitle:'Biotecnologia<br><em>na prática.</em>',
 heroText:'Culturas, meios e recursos biológicos desenvolvidos através do nosso trabalho laboratorial. Cada referência é apresentada com informação útil e uma abordagem centrada na documentação e rastreabilidade.',
 explore:'Explorar referências',heroAside:'INVESTIGAÇÃO<br>→ CULTURA<br>→ APLICAÇÃO',
@@ -163,7 +163,7 @@ const $=s=>document.querySelector(s);const safeGet=(key,fallback)=>{try{return l
 function loadCart(){try{return JSON.parse(localStorage.getItem('balabs-store-cart')||'{}')}catch(_){return {}}}
 function saveCart(){safeSet('balabs-store-cart',JSON.stringify(cart));renderCart()}
 function t(k){return words[language][k]||words.fr[k]||k}
-function applyLanguage(){document.documentElement.lang=language;document.documentElement.dir=language==='ar'?'rtl':'ltr';$('#languageSelect').value=language;document.querySelectorAll('[data-i18n]').forEach(el=>{const val=t(el.dataset.i18n);if(val.includes('<'))el.innerHTML=val;else el.textContent=val});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));document.querySelectorAll('[data-i18n-aria]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.i18nAria)));renderProducts();renderCart()}
+function applyLanguage(){document.documentElement.lang=language;document.documentElement.dir=language==='ar'?'rtl':'ltr';document.title=t('pageTitle');const metaDescription=document.querySelector('meta[name="description"]');if(metaDescription)metaDescription.content=t('metaDescription');$('#languageSelect').value=language;document.querySelectorAll('[data-i18n]').forEach(el=>{const val=t(el.dataset.i18n);if(val.includes('<'))el.innerHTML=val;else el.textContent=val});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));document.querySelectorAll('[data-i18n-aria]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.i18nAria)));renderProducts();renderCart()}
 function renderProducts(){const grid=$('#productGrid');const filtered=products.filter(p=>(filter==='all'||p.family===filter)&&[p.code,p.kind,p.titles[language],p.descriptions[language]].join(' ').toLowerCase().includes(query));$('#resultCount').textContent=filtered.length+' '+t('referenceCount');grid.innerHTML=filtered.length?filtered.map((p,i)=>'<article class="product-card reveal is-visible"><div class="product-visual"><span class="product-index">REF / '+String(i+1).padStart(2,'0')+'</span><span class="product-family">'+(p.family==='liquid'?t('familyLiquid'):p.family==='spawn'?t('familySpawn'):t('familyAgar'))+'</span><span class="product-symbol">'+p.symbol+'</span></div><div class="product-content"><p class="product-code">'+p.code+'</p><h3>'+p.titles[language]+'</h3><p>'+p.descriptions[language]+'</p><div class="product-card-bottom">'+(p.priceDzd?'<div class="product-price-wrap"><strong class="product-price">'+new Intl.NumberFormat(language,{maximumFractionDigits:0}).format(p.priceDzd)+' DA / '+t('pricePerUnit')+'</strong>'+(p.priceQualifier?'<small class="price-qualifier">'+p.priceQualifier[language]+'</small>':'')+'</div>':'<span class="availability">'+t('available')+'</span>')+'<button class="add-product" data-add="'+p.code+'" aria-label="'+t('add')+' '+p.titles[language]+'">+</button></div></div></article>').join(''):'<div class="no-results">'+t('emptySearch')+'</div>';grid.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.add;cart[id]=(cart[id]||0)+1;saveCart();b.textContent='✓';setTimeout(()=>b.textContent='+',700)}))}
 async function loadRemoteCatalogue(){
   if(!STORE_REMOTE_CATALOGUE_ENABLED)return;
