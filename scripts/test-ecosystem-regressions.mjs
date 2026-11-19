@@ -587,7 +587,7 @@ assert.ok(editorialRefinementCss.includes('prefers-reduced-motion:reduce'), 'Pha
 
 
 // PASS76: mobile navigation must fit more primary labels and reveal horizontal overflow.
-const chapterNavigationCss = readFileSync('ecosystem/chapter-navigation.css', 'utf8');
+// Reuse chapterNavigationCss loaded by the navigation regression checks above.
 assert.ok(chapterNavigationCss.includes('PASS 76 — compact mobile nav labels and expose the horizontal scroll affordance'), 'Mobile navigation must have a dedicated compact-scroll refinement');
 assert.ok(chapterNavigationCss.includes('scrollbar-width:thin!important') && chapterNavigationCss.includes('scrollbar-color:#b96b4d #263b38!important'), 'Mobile navigation overflow must be visibly discoverable');
 assert.ok(chapterNavigationCss.includes('font-size:8px!important') && chapterNavigationCss.includes('letter-spacing:.045em!important'), 'Mobile navigation labels must be compact enough to expose more primary destinations');
