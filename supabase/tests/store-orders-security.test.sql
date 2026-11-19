@@ -12,12 +12,33 @@ declare
   v_rls_orders boolean;
   v_rls_items boolean;
   v_definer boolean;
+  v_rate_one boolean;
+  v_rate_two boolean;
+  v_rate_three boolean;
+  v_rls_rate_limits boolean;
 begin
   if has_table_privilege('anon','public.store_orders','select')
      or has_table_privilege('authenticated','public.store_orders','select')
      or has_table_privilege('anon','public.store_order_items','select')
      or has_table_privilege('authenticated','public.store_order_items','select') then
     raise exception 'Public roles must not read storefront orders';
+  end if;
+
+  if has_table_privilege('anon','public.store_checkout_rate_limits','select')
+     or has_table_privilege('authenticated','public.store_checkout_rate_limits','select')
+     or not has_table_privilege('service_role','public.store_checkout_rate_limits','select')
+     or not has_table_privilege('service_role','public.store_checkout_rate_limits','insert')
+     or has_function_privilege('anon','public.consume_store_rate_limit(text,integer,integer)','execute')
+     or has_function_privilege('authenticated','public.consume_store_rate_limit(text,integer,integer)','execute')
+     or not has_function_privilege('service_role','public.consume_store_rate_limit(text,integer,integer)','execute') then
+    raise exception 'Persistent rate limiter grants are not least-privilege';
+  end if;
+
+  select c.relrowsecurity into v_rls_rate_limits
+  from pg_class c join pg_namespace n on n.oid=c.relnamespace
+  where n.nspname='public' and c.relname='store_checkout_rate_limits';
+  if not coalesce(v_rls_rate_limits,false) then
+    raise exception 'RLS must be enabled on rate-limit fingerprints';
   end if;
 
   if not has_table_privilege('service_role','public.store_orders','select')
@@ -50,6 +71,13 @@ begin
   where n.nspname='public' and p.proname='create_store_order';
   if not coalesce(v_definer,false) then
     raise exception 'Atomic insert RPC must run with its restricted owner privileges';
+  end if;
+
+  v_rate_one := public.consume_store_rate_limit(repeat('a',64),2,600);
+  v_rate_two := public.consume_store_rate_limit(repeat('a',64),2,600);
+  v_rate_three := public.consume_store_rate_limit(repeat('a',64),2,600);
+  if not v_rate_one or not v_rate_two or v_rate_three then
+    raise exception 'Persistent rate limit must allow two requests and reject the third';
   end if;
 
   v_first := public.create_store_order(
