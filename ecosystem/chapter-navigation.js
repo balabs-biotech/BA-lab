@@ -112,7 +112,26 @@
   rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[getLanguage()]||groups[i].label.fr});
   if(filamentLength){const p=rawProgress/Math.max(1,pages.length-1);filament.style.strokeDashoffset=String(filamentLength*(1-p));if(signal){const point=filament.getPointAtLength(filamentLength*p);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2))}}
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
-  app.querySelectorAll('.site-nav a[href^="#"]').forEach(a=>{const t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));const active=!!(t&&t.closest('.experience-page')===pages[idx]);if(active){a.setAttribute('aria-current','page');a.classList.add('chapter-active')}else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}});
+  // A horizontal chapter can contain several editorial sections. Highlight only
+  // the section nearest the reading line, never every link in the same chapter.
+  const navLinks=[...app.querySelectorAll('.site-nav a[href^="#"]')];
+  const page=pages[idx],pageRect=page.getBoundingClientRect();
+  const readingLine=pageRect.top+Math.min(180,page.clientHeight*.28);
+  let activeLink=null,activeDistance=Infinity;
+  navLinks.forEach(a=>{
+   const id=decodeURIComponent(a.getAttribute('href').slice(1));
+   const target=id&&document.getElementById(id);
+   if(!target||target.closest('.experience-page')!==page)return;
+   const rect=target.getBoundingClientRect();
+   if(rect.bottom<pageRect.top||rect.top>pageRect.bottom)return;
+   const distance=rect.top<=readingLine&&rect.bottom>=readingLine?0:Math.abs(rect.top-readingLine);
+   if(distance<activeDistance){activeDistance=distance;activeLink=a}
+  });
+  navLinks.forEach(a=>{
+   const active=a===activeLink;
+   if(active){a.setAttribute('aria-current','location');a.classList.add('chapter-active')}
+   else{a.removeAttribute('aria-current');a.classList.remove('chapter-active')}
+  });
  };
  const scrollBehavior=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
  const go=i=>{const n=Math.max(0,Math.min(pages.length-1,i));track.scrollTo({left:pageStart(pages[n]),top:0,behavior:scrollBehavior()});pages[n].setAttribute('tabindex','0');};
