@@ -533,3 +533,36 @@ html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-cha
     max-width:100%!important;font-size:clamp(26px,7.2vw,34px)!important;line-height:1.08!important;
   }
 }
+
+
+/* PASS 69 — the method section was inheriting a narrow grid/flex track.
+   Restore a full-width editorial flow before sizing the headline. */
+#app.balabs-ui #demarche.editorial-method{
+  display:block!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+}
+#app.balabs-ui #demarche.editorial-method>.method-top{
+  display:block!important;position:relative!important;
+  width:100%!important;max-width:920px!important;min-width:0!important;
+  margin:0 auto clamp(22px,3vw,34px)!important;
+}
+#app.balabs-ui #demarche.editorial-method>.method-top h2{
+  display:block!important;box-sizing:border-box!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  font-size:clamp(28px,3.2vw,42px)!important;
+  line-height:1.08!important;letter-spacing:-.035em!important;
+  writing-mode:horizontal-tb!important;word-break:normal!important;overflow-wrap:normal!important;
+}
+#app.balabs-ui #demarche.editorial-method>.method-top h2 em{
+  display:inline!important;position:static!important;width:auto!important;
+  transform:none!important;white-space:normal!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui #demarche.editorial-method{padding:26px 18px 30px!important}
+  #app.balabs-ui #demarche.editorial-method>.method-top{width:100%!important;max-width:none!important;margin:0 auto 18px!important}
+  #app.balabs-ui #demarche.editorial-method>.method-top h2{
+    width:100%!important;max-width:none!important;
+    font-size:clamp(23px,6vw,27px)!important;line-height:1.08!important;
+    letter-spacing:-.04em!important;text-wrap:pretty!important;
+  }
+}
