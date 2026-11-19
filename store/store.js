@@ -1,5 +1,7 @@
 (()=>{'use strict';
-const products=[
+const STORE_CATALOGUE_URL='https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/store-catalogue';
+const STORE_PUBLISHABLE_KEY='sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992';
+let products=[
 {code:'BAL-LC-PPU-ETE-001',family:'liquid',kind:'PLEUROTUS PULMONARIUS',symbol:'P.',titles:{fr:'LC — Pleurotus pulmonarius · été',en:'LC — Pleurotus pulmonarius · summer',ar:'مزرعة سائلة — Pleurotus pulmonarius · الصيف',pt:'LC — Pleurotus pulmonarius · verão'},descriptions:{fr:'Culture liquide de Pleurotus pulmonarius — désignation « été ».',en:'Pleurotus pulmonarius liquid culture — “summer” designation.',ar:'مزرعة سائلة من Pleurotus pulmonarius — تسمية «الصيف».',pt:'Cultura líquida de Pleurotus pulmonarius — designação «verão».'},url:'https://app.notion.com/p/40173152f1718165a79ace1bc6189c24'},
 {code:'BAL-LC-PPU-HIV-001',family:'liquid',kind:'PLEUROTUS PULMONARIUS',symbol:'P.',titles:{fr:'LC — Pleurotus pulmonarius · hiver',en:'LC — Pleurotus pulmonarius · winter',ar:'مزرعة سائلة — Pleurotus pulmonarius · الشتاء',pt:'LC — Pleurotus pulmonarius · inverno'},descriptions:{fr:'Culture liquide de Pleurotus pulmonarius — désignation « hiver ».',en:'Pleurotus pulmonarius liquid culture — “winter” designation.',ar:'مزرعة سائلة من Pleurotus pulmonarius — تسمية «الشتاء».',pt:'Cultura líquida de Pleurotus pulmonarius — designação «inverno».'},url:'https://app.notion.com/p/40173152f17181cab9f3e85af551ebde'},
 {code:'BAL-LC-PER-HYB-001',family:'liquid',kind:'PLEUROTUS ERYNGII',symbol:'E.',titles:{fr:'LC — Pleurotus eryngii · hybrides',en:'LC — Pleurotus eryngii · hybrids',ar:'مزرعة سائلة — Pleurotus eryngii · هجائن',pt:'LC — Pleurotus eryngii · híbridos'},descriptions:{fr:'Culture liquide de Pleurotus eryngii — sélection hybride.',en:'Pleurotus eryngii liquid culture — hybrid selection.',ar:'مزرعة سائلة من Pleurotus eryngii — مجموعة هجينة.',pt:'Cultura líquida de Pleurotus eryngii — seleção híbrida.'},url:'https://app.notion.com/p/40173152f1718121bb57fd5eb152e64d'},
@@ -25,6 +27,30 @@ function saveCart(){safeSet('balabs-store-cart',JSON.stringify(cart));renderCart
 function t(k){return words[language][k]||words.fr[k]||k}
 function applyLanguage(){document.documentElement.lang=language;document.documentElement.dir=language==='ar'?'rtl':'ltr';$('#languageSelect').value=language;document.querySelectorAll('[data-i18n]').forEach(el=>{const val=t(el.dataset.i18n);if(val.includes('<'))el.innerHTML=val;else el.textContent=val});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));renderProducts();renderCart()}
 function renderProducts(){const grid=$('#productGrid');const filtered=products.filter(p=>(filter==='all'||p.family===filter)&&[p.code,p.kind,p.titles[language],p.descriptions[language]].join(' ').toLowerCase().includes(query));$('#resultCount').textContent=filtered.length+' '+t('referenceCount');grid.innerHTML=filtered.length?filtered.map((p,i)=>'<article class="product-card reveal is-visible"><div class="product-visual"><span class="product-index">REF / '+String(i+1).padStart(2,'0')+'</span><span class="product-family">'+(p.family==='liquid'?'LIQUID CULTURE':'AGAR / MEDIA')+'</span><span class="product-symbol">'+p.symbol+'</span></div><div class="product-content"><p class="product-code">'+p.code+'</p><h3>'+p.titles[language]+'</h3><p>'+p.descriptions[language]+'</p><div class="product-card-bottom"><span class="availability">'+t('available')+'</span><button class="add-product" data-add="'+p.code+'" aria-label="'+t('add')+' '+p.titles[language]+'">+</button></div></div></article>').join(''):'<div class="no-results">'+t('emptySearch')+'</div>';grid.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.add;cart[id]=(cart[id]||0)+1;saveCart();b.textContent='✓';setTimeout(()=>b.textContent='+',700)}))}
+async function loadRemoteCatalogue(){
+  try{
+    const response=await fetch(STORE_CATALOGUE_URL,{method:'GET',headers:{apikey:STORE_PUBLISHABLE_KEY},credentials:'omit',cache:'default'});
+    if(!response.ok)return;
+    const payload=await response.json();
+    if(!Array.isArray(payload.products)||payload.products.length===0)return;
+    const remote=payload.products.map(p=>({
+      code:p.product_code,
+      family:p.family,
+      kind:p.organism_label,
+      symbol:p.family==='agar'?'WA':'LC',
+      titles:p.title_i18n,
+      descriptions:p.description_i18n,
+      url:p.source_notion_url,
+      variants:Array.isArray(p.variants)?p.variants:[]
+    }));
+    if(remote.some(p=>!p.code||!p.titles||!p.descriptions))return;
+    products=remote;
+    renderProducts();
+    renderCart();
+  }catch(_){
+    // The reviewed static catalogue remains available when the API is offline or not deployed.
+  }
+}
 function renderCart(){const entries=Object.entries(cart).filter(([,n])=>n>0);$('#cartCount').textContent=entries.reduce((s,[,n])=>s+n,0);$('#cartEmpty').hidden=entries.length>0;$('#drawerBottom').hidden=!entries.length;$('#cartItems').innerHTML=entries.map(([id,n])=>{const p=products.find(x=>x.code===id);if(!p)return '';return '<div class="cart-line"><div><h3>'+p.titles[language]+'</h3><small>'+p.code+'</small><div class="quantity-control"><button data-qty="'+id+'" data-delta="-1" aria-label="Diminuer">−</button><span>'+n+'</span><button data-qty="'+id+'" data-delta="1" aria-label="Augmenter">+</button></div></div><button class="remove-line" data-remove="'+id+'">Retirer</button></div>'}).join('');$('#cartItems').querySelectorAll('[data-qty]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.qty;cart[id]=Math.max(0,(cart[id]||0)+Number(b.dataset.delta));if(!cart[id])delete cart[id];saveCart()}));$('#cartItems').querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{delete cart[b.dataset.remove];saveCart()}))}
 function openCart(){const d=$('#cartDrawer');d.classList.add('is-open');d.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('#cartClose').focus()}
 function closeCart(){const d=$('#cartDrawer');d.classList.remove('is-open');d.setAttribute('aria-hidden','true');document.body.style.overflow=''}
@@ -40,5 +66,5 @@ $('#consentAcknowledge').addEventListener('click',()=>{safeSet('balabs-privacy-n
 $('#privacySettings').addEventListener('click',()=>{notice.hidden=false;notice.scrollIntoView({behavior:'smooth',block:'end'})});
 const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');observer.unobserve(e.target)}}),{threshold:.12}):null;document.querySelectorAll('.reveal').forEach(el=>observer?observer.observe(el):el.classList.add('is-visible'));
 function startField(){const canvas=$('#storeField'),ctx=canvas.getContext('2d');if(!ctx)return;let w=0,h=0,dpr=1,raf=0,paths=[],pointer={x:-1000,y:-1000};const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;function resize(){const r=canvas.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);paths=[];for(let i=0;i<32;i++){const edge=i%4;let x=edge===0?0:edge===1?w:Math.random()*w;let y=edge===2?0:edge===3?h:Math.random()*h;let angle=Math.atan2(h*.5-y,w*.5-x)+(Math.random()-.5)*1.2;const pts=[{x,y}];for(let j=0;j<7;j++){angle+=(Math.random()-.5)*.45;x+=Math.cos(angle)*24;y+=Math.sin(angle)*24;pts.push({x,y})}paths.push({pts,phase:Math.random()*6.28,copper:i%7===0})}}function draw(time){ctx.clearRect(0,0,w,h);paths.forEach((path,k)=>{ctx.beginPath();path.pts.forEach((p,i)=>{const drift=reduce?0:Math.sin(time*.00035+path.phase+i*.8)*3;const x=p.x+drift+(pointer.x-p.x)*.0009;const y=p.y+Math.cos(time*.0003+path.phase+i)*drift+(pointer.y-p.y)*.0009;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.strokeStyle=path.copper?'rgba(185,107,77,.25)':'rgba(151,180,160,.19)';ctx.lineWidth=path.copper?1.2:.75;ctx.stroke()});if(!reduce)raf=requestAnimationFrame(draw)}resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(0);addEventListener('resize',()=>{cancelAnimationFrame(raf);resize();if(!reduce)raf=requestAnimationFrame(draw);else draw(0)},{passive:true});canvas.parentElement.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointer={x:e.clientX-r.left,y:e.clientY-r.top}},{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(raf);else if(!reduce)raf=requestAnimationFrame(draw)})}
-startField();applyLanguage();
+startField();applyLanguage();loadRemoteCatalogue();
 })();
