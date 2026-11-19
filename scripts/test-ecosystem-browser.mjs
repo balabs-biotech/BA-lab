@@ -131,6 +131,17 @@ try {
       }, chapter);
       assert.equal(presentation.hiddenHeadings, 0, 'No editorial heading may remain blurred or faded in ' + chapter);
       assert.equal(presentation.hiddenImages, 0, 'No editorial image may remain clipped or hidden in ' + chapter);
+      if (viewport.name === 'mobile' && chapter === 'about') {
+        const aboutLayout = await page.locator('#chapter-about .editorial-about').evaluate(root => {
+          const copy=root.querySelector('.about-copy'), art=root.querySelector('.editorial-art'), atmosphere=root.querySelector('.chapter-atmosphere');
+          const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
+          return {viewportWidth:document.documentElement.clientWidth,copy:rect(copy),art:rect(art),paragraphs:[...copy.querySelectorAll('p')].map(rect),atmosphereDisplay:atmosphere?getComputedStyle(atmosphere).display:'absent'};
+        });
+        assert.ok(aboutLayout.copy.width > aboutLayout.viewportWidth*.72, 'Mobile BA Labs final chapter copy must use the available reading width');
+        assert.ok(aboutLayout.paragraphs.length>0 && aboutLayout.paragraphs.every(p=>p.width>aboutLayout.viewportWidth*.65), 'Mobile BA Labs copy must not collapse into a narrow column');
+        assert.ok(aboutLayout.art.top >= aboutLayout.copy.bottom-2, 'BA Labs documentary image must follow the text on mobile');
+        assert.equal(aboutLayout.atmosphereDisplay,'none','Remove duplicate decorative chapter artwork from the mobile BA Labs reading flow');
+      }
       await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
     }
     // Scroll the track independently of the rail and verify that the active point follows it.
