@@ -755,3 +755,16 @@
   max-width:calc(100% - 28px)!important;overflow-wrap:anywhere!important;
  }
 }
+
+
+/* Keep the eight specimen entries in the same semantic sequence as the explorer:
+   biotechnology, mycology, TechnoSoil, R&D, products, IoT, projects, documentation.
+   CSS grid order changes only presentation; each Notion destination stays untouched. */
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(1){order:2!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(2){order:1!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(3){order:6!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(4){order:3!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(5){order:4!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(6){order:5!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(7){order:7!important}
+#app.balabs-ui .experience-page[data-chapter="network"] .universe-index-grid>.universe-index-card:nth-child(8){order:8!important}
