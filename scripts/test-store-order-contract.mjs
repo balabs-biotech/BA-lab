@@ -14,7 +14,7 @@ assert.ok(css.includes(".request-layout") && css.includes("@media(max-width:760p
 assert.ok(js.includes("create-store-order") && !js.includes("functions/v1/store-notion-order"), "Browser must use the Supabase-first endpoint");
 assert.ok(js.includes("request_id:activeRequestId"), "Browser must send a stable idempotency reference");
 assert.ok(js.includes("const STORE_ORDER_ENABLED=false"), "Guest submission must remain disabled until end-to-end verification");
-assert.ok(!js.includes("NOTION_API_KEY") && !js.includes("SUPABASE_SERVICE_ROLE_KEY") && !js.includes("sb_secret_"), "No server credential may appear in browser code");
+assert.ok(!js.includes("NOTION_STORE_API_KEY") && !js.includes("SUPABASE_SERVICE_ROLE_KEY") && !js.includes("sb_secret_"), "No server credential may appear in browser code");
 
 assert.ok(migration.includes("create table if not exists public.store_orders"), "Dedicated storefront order table must exist");
 assert.ok(migration.includes("create table if not exists public.store_order_items"), "Dedicated storefront item table must exist");
@@ -27,7 +27,7 @@ assert.ok(rateMigration.includes("grant execute on function public.consume_store
 
 assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must validate all 15 published catalogue references");
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
-assert.ok(edge.includes("Deno.env.get(\"NOTION_API_KEY\")"), "Notion credential must remain server-side");
+assert.ok(edge.includes("Deno.env.get(\"NOTION_STORE_API_KEY\")"), "Notion credential must remain server-side");
 assert.ok(edge.includes("notion_sync_status") && edge.includes('"pending"'), "Notion failures must leave a recoverable pending state");
 const publicResponse = edge.slice(edge.lastIndexOf("return json("));
 assert.ok(publicResponse.includes("orderRef") && publicResponse.includes("notionSync") && !/customer_(?:name|phone|email|message)/.test(publicResponse), "Public response must never return customer contact details");
