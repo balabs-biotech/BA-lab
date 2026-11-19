@@ -67,6 +67,7 @@
     <div class="filter-list" role="group" aria-label="Filtrer le catalogue">
       <button class="filter-button is-active" data-filter="all" aria-pressed="true" data-i18n="filterAll">Tout</button>
       <button class="filter-button" data-filter="liquid" aria-pressed="false" data-i18n="filterLiquid">Cultures liquides</button>
+      <button class="filter-button" data-filter="spawn" aria-pressed="false" data-i18n="filterSpawn">Grain spawn</button>
       <button class="filter-button" data-filter="agar" aria-pressed="false" data-i18n="filterAgar">Milieux & gélose</button>
     </div>
     <label class="search-box"><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="Rechercher une référence…" data-i18n-placeholder="searchPlaceholder"><kbd>↵</kbd></label>
@@ -130,6 +131,7 @@
     <h2 id="requestTitle" data-i18n="requestTitle">Votre demande<br><em>de disponibilité.</em></h2>
     <p data-i18n="requestDescription">Le formulaire de commande sera activé après raccordement sécurisé à Supabase et validation des informations commerciales et légales de BA Labs.</p>
     <div class="request-summary" id="requestSummary"></div>
+    <button class="primary-button" id="copyRequest" type="button"><span data-i18n="copyRequest">Copier ma demande</span><b>↗</b></button>
     <div class="integration-note"><span class="status-dot"></span><span data-i18n="integrationNote">Catalogue de démonstration — aucune donnée personnelle n'est envoyée ou enregistrée.</span></div>
   </div>
 </div>
