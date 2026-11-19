@@ -33,6 +33,7 @@ jobs:
           cp -R store/. _site/store/
           node scripts/test-storefront.mjs
           node scripts/test-store-order-contract.mjs
+          node scripts/test-store-catalogue-contract.mjs
           touch _site/.nojekyll
 
       - name: Install image optimization dependency
