@@ -1030,3 +1030,12 @@
   height:clamp(148px,43vw,168px)!important;
  }
 }
+
+/* PASS 59 — preserve the full composition of scientific SVG illustrations. */
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual > img[src$=".svg"]{
+  box-sizing:border-box!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  padding:12px!important;
+  background:radial-gradient(ellipse at 50% 48%,rgba(126,170,163,.13),rgba(17,27,29,.08) 72%)!important;
+}
