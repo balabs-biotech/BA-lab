@@ -732,3 +732,26 @@
  object-fit:cover!important;
  object-position:center!important;
 }
+
+
+/* Mobile final chapter: constrain the editorial specimen figure to its grid cell.
+   Its legacy padding and image min-height were wider than the available column. */
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about{
+  grid-template-columns:minmax(0,1fr)!important;
+  min-width:0!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art{
+  box-sizing:border-box!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  min-height:0!important;aspect-ratio:16/9!important;
+  padding:0!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .editorial-art img{
+  box-sizing:border-box!important;width:100%!important;height:100%!important;
+  min-height:0!important;max-height:none!important;object-fit:cover!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="about"]>.editorial-about .art-caption{
+  max-width:calc(100% - 28px)!important;overflow-wrap:anywhere!important;
+ }
+}
