@@ -7,7 +7,7 @@
 <meta id="storeMetaDescription" name="description" content="Cultures, milieux et ressources biologiques BA Labs. Consultez les références et contactez notre équipe pour confirmer disponibilité et conditions.">
 <title>Boutique — BA Labs</title>
 <link rel="stylesheet" href="../ecosystem/brand-system.css?v=19">
-<link rel="stylesheet" href="./store.css?v=1">
+<link rel="stylesheet" href="./store.css?v=2">
 </head>
 <body class="store-page">
 <a class="skip-link" href="#catalogue" data-i18n="skipCatalog">Aller au catalogue</a>
@@ -129,10 +129,17 @@
     <button class="icon-button modal-close" id="requestClose" aria-label="Fermer la fenêtre" data-i18n-aria="closeDialog">×</button>
     <p class="eyebrow">BA / STORE — 03</p>
     <h2 id="requestTitle" data-i18n="requestTitle">Votre demande<br><em>de disponibilité.</em></h2>
-    <p data-i18n="requestDescription">L’envoi en ligne n’est pas encore activé. À ce stade, les informations saisies dans ce formulaire ne sont pas transmises. Copiez votre sélection, puis contactez BA Labs pour vérifier les disponibilités et les conditions.</p>
-    <div class="request-summary" id="requestSummary"></div>
-    <form id="orderForm" class="order-form">
-      <div class="form-grid">
+    <p class="request-description" data-i18n="requestDescription">L’envoi en ligne n’est pas encore activé. À ce stade, les informations saisies dans ce formulaire ne sont pas transmises. Copiez votre sélection, puis contactez BA Labs pour vérifier les disponibilités et les conditions.</p>
+    <div class="request-layout">
+      <aside class="request-selection">
+        <p class="request-column-label" data-i18n="selectionHeading">01 / VOTRE SÉLECTION</p>
+        <div class="request-summary" id="requestSummary"></div>
+        <p class="request-selection-note" data-i18n="selectionNote">Les prix, formats et disponibilités seront confirmés par BA Labs avant toute validation.</p>
+      </aside>
+      <section class="request-details">
+        <p class="request-column-label" data-i18n="customerHeading">02 / VOS COORDONNÉES</p>
+        <form id="orderForm" class="order-form">
+          <div class="form-grid">
         <label><span data-i18n="customerName">Nom complet *</span><input name="name" autocomplete="name" required maxlength="120"></label>
         <label><span data-i18n="customerPhone">Téléphone *</span><input name="phone" type="tel" autocomplete="tel" required maxlength="32"></label>
         <label><span data-i18n="customerEmail">E-mail</span><input name="email" type="email" autocomplete="email" maxlength="160"></label>
@@ -140,13 +147,15 @@
         <label><span data-i18n="customerWilaya">Wilaya</span><input name="wilaya" maxlength="80"></label>
         <label><span data-i18n="deliveryMode">Mode de livraison</span><select name="deliveryMode"><option value="À définir" data-i18n="deliveryUnset">À définir ensemble</option><option value="Retrait sur place" data-i18n="deliveryPickup">Retrait à Sétif</option><option value="Livraison" data-i18n="deliveryDelivery">Livraison locale</option><option value="Expédition" data-i18n="deliveryShipping">Expédition (à confirmer)</option></select></label>
       </div>
-      <label class="message-field"><span data-i18n="customerMessage">Précisions / utilisation prévue</span><textarea name="message" rows="3" maxlength="1200"></textarea></label>
-      <label class="honeypot" aria-hidden="true"><span data-i18n="honeypotLabel">Ne pas remplir</span><input name="website" tabindex="-1" autocomplete="off"></label>
-      <button class="primary-button" id="submitOrder" type="submit" disabled><span data-i18n="submitOrder">Envoyer ma demande</span><b>↗</b></button>
-      <p class="form-status" id="orderStatus" role="status" aria-live="polite" data-i18n="orderNotActive">Envoi en ligne non activé. Copiez votre sélection et contactez BA Labs.</p>
-    </form>
-    <button class="text-button" id="copyRequest" type="button"><span data-i18n="copyRequest">Copier ma demande</span></button>
-    <div class="integration-note"><span class="status-dot"></span><span data-i18n="integrationNote">Formulaire en cours de raccordement : aucune coordonnée saisie ici n’est envoyée ni enregistrée. Seule la sélection de références peut être copiée.</span></div>
+          <label class="message-field"><span data-i18n="customerMessage">Précisions / utilisation prévue</span><textarea name="message" rows="3" maxlength="1200"></textarea></label>
+          <label class="honeypot" aria-hidden="true"><span data-i18n="honeypotLabel">Ne pas remplir</span><input name="website" tabindex="-1" autocomplete="off"></label>
+          <button class="primary-button" id="submitOrder" type="submit" disabled><span data-i18n="submitOrder">Envoyer ma demande</span><b>↗</b></button>
+          <p class="form-status" id="orderStatus" role="status" aria-live="polite" data-i18n="orderNotActive">Envoi en ligne non activé. Copiez votre sélection et contactez BA Labs.</p>
+        </form>
+        <button class="text-button" id="copyRequest" type="button"><span data-i18n="copyRequest">Copier ma demande</span></button>
+        <div class="integration-note"><span class="status-dot"></span><span data-i18n="integrationNote">Formulaire en cours de raccordement : aucune coordonnée saisie ici n’est envoyée ni enregistrée. Seule la sélection de références peut être copiée.</span></div>
+      </section>
+    </div>
   </div>
 </div>
 
@@ -155,6 +164,6 @@
   <button id="consentAcknowledge" type="button" data-i18n="understood">Compris</button>
   <a href="./privacy.html" data-i18n="learnMore">En savoir plus</a>
 </div>
-<script src="./store.js?v=4" defer></script>
+<script src="./store.js?v=5" defer></script>
 </body>
 </html>
