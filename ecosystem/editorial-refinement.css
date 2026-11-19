@@ -1711,3 +1711,44 @@ html[lang="pt"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="pt"
   height:clamp(190px,58vw,250px)!important;object-fit:cover!important;
  }
 }
+
+
+/* MOBILE PASS 65 — target the live catalogue section in its actual main layout.
+   The catalogue is a direct main child, not a chapter-page child. */
+@media(max-width:760px){
+ #app.balabs-ui > main .product-catalogue{
+  display:block!important;width:100%!important;max-width:100%!important;
+  min-width:0!important;box-sizing:border-box!important;
+  padding-inline:clamp(14px,4vw,22px)!important;
+ }
+ #app.balabs-ui > main .product-catalogue-head{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-auto-flow:row!important;align-items:start!important;gap:14px!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+ }
+ #app.balabs-ui > main .product-catalogue-head>div,
+ #app.balabs-ui > main .product-catalogue-intro{
+  display:block!important;float:none!important;position:static!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  grid-column:1/-1!important;box-sizing:border-box!important;
+ }
+ #app.balabs-ui > main .product-catalogue-intro p{
+  display:block!important;width:100%!important;max-width:44ch!important;
+  margin:0 0 14px!important;font-size:14px!important;line-height:1.72!important;
+  white-space:normal!important;overflow-wrap:break-word!important;word-break:normal!important;
+  hyphens:auto!important;
+ }
+ #app.balabs-ui > main .product-catalogue-visuals{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:22px 0!important;gap:14px!important;
+ }
+ #app.balabs-ui > main .product-catalogue-visual{
+  display:block!important;position:relative!important;float:none!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;
+ }
+ #app.balabs-ui > main .product-catalogue-visual-img{
+  display:block!important;width:100%!important;max-width:100%!important;
+  height:clamp(190px,58vw,250px)!important;object-fit:cover!important;
+ }
+}
