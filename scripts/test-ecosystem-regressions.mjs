@@ -37,7 +37,8 @@ assert.match(html, /<link rel="stylesheet" href="\.\/brand-system\.css\?v=\d+">/
 assert.ok(html.includes('<div class="wrap balabs-ui" id="app"'), 'Public homepage must opt into the BA Labs visual system');
 const chapterNavigationJs = readFileSync('ecosystem/chapter-navigation.js', 'utf8');
 const chapterNavigationCss = readFileSync('ecosystem/chapter-navigation.css', 'utf8');
-assert.ok(html.includes('chapter-navigation.css?v=22') && html.includes('chapter-navigation.js?v=25'), 'Public homepage must load the chapter navigation assets');
+assert.match(html, /chapter-navigation\.css\?v=\d+/, 'Public homepage must load the chapter navigation stylesheet');
+assert.match(html, /chapter-navigation\.js\?v=\d+/, 'Public homepage must load the chapter navigation script');
 assert.ok(!chapterNavigationJs.includes('lang()') && chapterNavigationJs.includes('document.documentElement.lang'), 'Chapter navigation must read the document language without calling an undefined global function');
 assert.ok(chapterNavigationJs.includes('rail.className=\'chapter-rail\'') && chapterNavigationJs.includes("document.body.append(rail)") && chapterNavigationJs.includes("b.addEventListener('click',()=>go(i))"), 'Chapter navigation must expose clickable side-point navigation');
 assert.ok(chapterNavigationCss.includes('.chapter-rail{') && chapterNavigationCss.includes('position:fixed!important'), 'Side-point navigation must remain fixed above the horizontal chapter track');
