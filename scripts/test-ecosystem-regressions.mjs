@@ -590,6 +590,7 @@ assert.ok(editorialRefinementCss.includes('prefers-reduced-motion:reduce'), 'Pha
 const chapterAtmosphereJs = readFileSync('ecosystem/chapter-atmosphere.js', 'utf8');
 const chapterAtmosphereCss = readFileSync('ecosystem/chapter-atmosphere.css', 'utf8');
 assert.ok(chapterAtmosphereJs.includes("img.loading='eager'"), 'All five horizontal chapter atmosphere images must preload before their chapter is revealed');
+assert.ok(chapterAtmosphereJs.includes("img.fetchPriority=key==='home'?'high':'auto'"), 'The opening chapter image must receive priority without starving the other chapter covers');
 assert.ok(!chapterAtmosphereJs.includes("img.loading=key==='home'?'eager':'lazy'"), 'Chapter covers must not defer off-screen horizontal panels');
 assert.ok(chapterAtmosphereCss.includes('.experience-page>.chapter-atmosphere.is-unavailable{') && chapterAtmosphereCss.includes('background:'), 'A failed chapter image must retain its mineral fallback visual');
 assert.ok(chapterAtmosphereCss.includes('data-chapter="about"') && chapterAtmosphereCss.includes('grayscale(.58)'), 'The scientific chart cover must remain visually subordinate to editorial content');
