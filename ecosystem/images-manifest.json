@@ -1,0 +1,112 @@
+[
+  {
+    "id": "home-hero",
+    "file": "home-hero.jpg",
+    "url": "https://cdn.ncbi.nlm.nih.gov/pmc/blobs/0dfc/11698607/99ea2e80b22d/IJFS2024-5562732.001.jpg"
+  },
+  {
+    "id": "home-hyphae",
+    "file": "home-hyphae.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungi_seen_with_fluorescence_microscope.jpg"
+  },
+  {
+    "id": "home-penicillium",
+    "file": "home-penicillium.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Asco1013.jpg"
+  },
+  {
+    "id": "home-colony",
+    "file": "home-colony.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Penicillia_on_Petri_dish.jpg"
+  },
+  {
+    "id": "home-substrate",
+    "file": "home-substrate.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/20210719_Pleurotus_ostreatus_098-127.jpg"
+  },
+  {
+    "id": "home-coffee",
+    "file": "home-coffee.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Microscope_view_of_fungus.jpg"
+  },
+  {
+    "id": "chapter-home",
+    "file": "chapter-home.jpg",
+    "url": "https://cdn.ncbi.nlm.nih.gov/pmc/blobs/0dfc/11698607/6ad8ea817594/IJFS2024-5562732.002.jpg"
+  },
+  {
+    "id": "chapter-research",
+    "file": "chapter-research.jpg",
+    "url": "https://cdn.ncbi.nlm.nih.gov/pmc/blobs/0dfc/11698607/2b1f2a288ebe/IJFS2024-5562732.003.jpg"
+  },
+  {
+    "id": "chapter-network",
+    "file": "chapter-network.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Petri_dish_with_solid-state_fermentation.jpg"
+  },
+  {
+    "id": "chapter-catalogue",
+    "file": "chapter-catalogue.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/20210719_Pleurotus_ostreatus_025-047.jpg"
+  },
+  {
+    "id": "chapter-about",
+    "file": "chapter-about.jpg",
+    "url": "https://cdn.ncbi.nlm.nih.gov/pmc/blobs/0dfc/11698607/070ed60a50a0/IJFS2024-5562732.006.jpg"
+  },
+  {
+    "id": "universe-myco",
+    "file": "universe-myco.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Pleurotus_ostreatus_on_agar.jpg"
+  },
+  {
+    "id": "universe-bio",
+    "file": "universe-bio.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Microscopic_Image_of_Penicillium_conidial_fungi.jpg"
+  },
+  {
+    "id": "universe-soil",
+    "file": "universe-soil.jpg",
+    "url": "https://www.frontiersin.org/files/Articles/668929/fpls-12-668929-HTML/image_m/fpls-12-668929-g003.jpg"
+  },
+  {
+    "id": "universe-products",
+    "file": "universe-products.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/20210719_Pleurotus_ostreatus_017-024.jpg"
+  },
+  {
+    "id": "chapter-about-method",
+    "file": "chapter-about-method.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungus_in_glass_dish3.jpg"
+  },
+  {
+    "id": "editorial-penicillium",
+    "file": "editorial-penicillium.png",
+    "url": "https://www.ifam.fraunhofer.de/en/magazine/DeDrug-Bio/jcr%3Acontent/contentPar/sectioncomponent/sectionParsys/textwithinlinedimage/imageComponent2/image.img.4col.large.png/1742310480431/Mycel-von-Penicillium-angefaerbt-mit-Acridinorange-200x-1.png"
+  },
+  {
+    "id": "editorial-soil",
+    "file": "editorial-soil.jpg",
+    "url": "https://www.frontiersin.org/files/Articles/668929/fpls-12-668929-HTML/image_m/fpls-12-668929-g002.jpg"
+  },
+  {
+    "id": "editorial-preview",
+    "file": "editorial-preview.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Mycelium.jpg"
+  },
+  {
+    "id": "catalogue-liquid-culture",
+    "file": "catalogue-liquid-culture.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Fungal_growth_in_erlenmeyer.jpg"
+  },
+  {
+    "id": "catalogue-liquid-batch",
+    "file": "catalogue-liquid-batch.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Flask_batch_fermentation.jpg"
+  },
+  {
+    "id": "catalogue-water-agar",
+    "file": "catalogue-water-agar.jpg",
+    "url": "https://commons.wikimedia.org/wiki/Special:FilePath/White_mycelium_growing_on_agar.jpg"
+  }
+]

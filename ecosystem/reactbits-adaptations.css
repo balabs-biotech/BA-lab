@@ -1,0 +1,109 @@
+/* BA Labs — React Bits-inspired motion layer (vanilla CSS; no React runtime).
+   Editorial and interaction polish only. Three.js, Notion data and routing remain untouched. */
+:root{
+  --rb-ink:#111B1D;--rb-forest:#263B38;--rb-copper:#B96B4D;
+  --rb-mineral:#D1D0C5;--rb-paper:#F2F1E9;
+}
+#app>.top{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#app>.top .brand strong{transition:letter-spacing .35s ease,color .35s ease}
+#app>.top .brand:hover strong{letter-spacing:.25em!important;color:var(--rb-copper)!important}
+#app>.top .lang{transition:transform .22s ease,border-color .22s ease,background .22s ease}
+#app>.top .lang:hover{transform:translateY(-2px)}
+#app>main>.hero{position:relative;isolation:isolate;overflow:hidden}
+#app>main>.hero .hero-micrograph{transform:scale(1.035);transform-origin:center}
+#app>main>.hero>div:first-of-type{animation:rb-rise-in .85s cubic-bezier(.2,.75,.25,1) both}
+#app>main>.hero .aside{animation:rb-rise-in 1s .12s cubic-bezier(.2,.75,.25,1) both;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}
+#app>main>.hero .aside:hover{transform:translateY(-3px);border-color:var(--rb-paper)!important;box-shadow:0 18px 42px #0005!important}
+#app>main>.hero h1{animation:rb-title-focus 1.05s .06s both}
+#app>main>.hero .hero-action-primary,#app>main>.hero .hero-action-secondary{transition:transform .24s ease,box-shadow .24s ease,background .24s ease}
+#app>main>.hero .hero-action-primary:hover,#app>main>.hero .hero-action-secondary:hover{transform:translateY(-3px);box-shadow:0 12px 28px #0005}
+#app>main>.editorial-work .work-card,#app>main>.universe-index .universe-index-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  transition:transform .32s cubic-bezier(.2,.75,.25,1),border-color .32s ease,box-shadow .32s ease,background-color .32s ease!important;
+}
+#app>main>.editorial-work .work-card:hover,#app>main>.universe-index .universe-index-card:hover{
+  transform:translateY(-5px)!important;border-color:#b96b4d99!important;
+  box-shadow:0 18px 38px #0004,0 0 0 1px #b96b4d22!important;
+  background-image:radial-gradient(320px circle at 50% 0%,#d1d0c510,transparent 68%)!important;
+}
+#app>main>.editorial-work .work-card .work-media img{transition:transform .7s cubic-bezier(.2,.75,.25,1),filter .5s ease}
+#app>main>.editorial-work .work-card:hover .work-media img{transform:scale(1.045);filter:saturate(1.12) contrast(1.04)}
+#app>main>.universe-index .universe-index-card>span{transition:color .25s ease,transform .25s ease}
+#app>main>.universe-index .universe-index-card:hover>span{transform:translateX(3px);color:var(--rb-paper)!important}
+#app>main>.universe-index .universe-index-card>em{transition:letter-spacing .25s ease}
+#app>main>.universe-index .universe-index-card:hover>em{letter-spacing:.04em}
+#app .hero-action-primary:focus-visible,#app .hero-action-secondary:focus-visible,
+#app .work-card-link:focus-visible,#app .product-catalogue-card:focus-visible{
+  outline:2px solid var(--rb-paper)!important;outline-offset:4px!important;
+  box-shadow:0 0 0 6px #b96b4d88!important;
+}
+@keyframes rb-rise-in{from{opacity:0;transform:translateY(18px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes rb-title-focus{from{opacity:0;filter:blur(9px);transform:translateY(10px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes rb-micrograph-drift{from{transform:scale(1.035) translate3d(-.5%,0,0)}to{transform:scale(1.09) translate3d(.7%,-.4%,0)}}
+@media(max-width:760px){
+  #app>main>.hero .hero-micrograph{animation:none;transform:scale(1.02)}
+  #app>main>.editorial-work .work-card:hover,#app>main>.universe-index .universe-index-card:hover{transform:translateY(-2px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #app>.top .brand strong,#app>.top .lang,
+  #app>main>.hero .hero-micrograph,#app>main>.hero>div:first-of-type,
+  #app>main>.hero .aside,#app>main>.hero h1,
+  #app>main>.editorial-work .work-card,#app>main>.universe-index .universe-index-card,
+  #app>main>.editorial-work .work-card .work-media img{animation:none!important;transition:none!important;transform:none!important;filter:none!important}
+}
+
+
+/* Chapter navigation compatibility: preserve original section styling and mirror it inside generated chapter panels. */
+/* BA Labs — React Bits-inspired motion layer (vanilla CSS; no React runtime).
+   Editorial and interaction polish only. Three.js, Notion data and routing remain untouched. */
+:root{
+  --rb-ink:#111B1D;--rb-forest:#263B38;--rb-copper:#B96B4D;
+  --rb-mineral:#D1D0C5;--rb-paper:#F2F1E9;
+}
+#app>.top{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#app>.top .brand strong{transition:letter-spacing .35s ease,color .35s ease}
+#app>.top .brand:hover strong{letter-spacing:.25em!important;color:var(--rb-copper)!important}
+#app>.top .lang{transition:transform .22s ease,border-color .22s ease,background .22s ease}
+#app>.top .lang:hover{transform:translateY(-2px)}
+#app>main .experience-page >.hero{position:relative;isolation:isolate;overflow:hidden}
+#app>main .experience-page >.hero .hero-micrograph{transform:scale(1.035);transform-origin:center}
+#app>main .experience-page >.hero>div:first-of-type{animation:rb-rise-in .85s cubic-bezier(.2,.75,.25,1) both}
+#app>main .experience-page >.hero .aside{animation:rb-rise-in 1s .12s cubic-bezier(.2,.75,.25,1) both;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}
+#app>main .experience-page >.hero .aside:hover{transform:translateY(-3px);border-color:var(--rb-paper)!important;box-shadow:0 18px 42px #0005!important}
+#app>main .experience-page >.hero h1{animation:rb-title-focus 1.05s .06s both}
+#app>main .experience-page >.hero .hero-action-primary,#app>main .experience-page >.hero .hero-action-secondary{transition:transform .24s ease,box-shadow .24s ease,background .24s ease}
+#app>main .experience-page >.hero .hero-action-primary:hover,#app>main .experience-page >.hero .hero-action-secondary:hover{transform:translateY(-3px);box-shadow:0 12px 28px #0005}
+#app>main .experience-page >.editorial-work .work-card,#app>main .experience-page >.universe-index .universe-index-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  transition:transform .32s cubic-bezier(.2,.75,.25,1),border-color .32s ease,box-shadow .32s ease,background-color .32s ease!important;
+}
+#app>main .experience-page >.editorial-work .work-card:hover,#app>main .experience-page >.universe-index .universe-index-card:hover{
+  transform:translateY(-5px)!important;border-color:#b96b4d99!important;
+  box-shadow:0 18px 38px #0004,0 0 0 1px #b96b4d22!important;
+  background-image:radial-gradient(320px circle at 50% 0%,#d1d0c510,transparent 68%)!important;
+}
+#app>main .experience-page >.editorial-work .work-card .work-media img{transition:transform .7s cubic-bezier(.2,.75,.25,1),filter .5s ease}
+#app>main .experience-page >.editorial-work .work-card:hover .work-media img{transform:scale(1.045);filter:saturate(1.12) contrast(1.04)}
+#app>main .experience-page >.universe-index .universe-index-card>span{transition:color .25s ease,transform .25s ease}
+#app>main .experience-page >.universe-index .universe-index-card:hover>span{transform:translateX(3px);color:var(--rb-paper)!important}
+#app>main .experience-page >.universe-index .universe-index-card>em{transition:letter-spacing .25s ease}
+#app>main .experience-page >.universe-index .universe-index-card:hover>em{letter-spacing:.04em}
+#app .hero-action-primary:focus-visible,#app .hero-action-secondary:focus-visible,
+#app .work-card-link:focus-visible,#app .product-catalogue-card:focus-visible{
+  outline:2px solid var(--rb-paper)!important;outline-offset:4px!important;
+  box-shadow:0 0 0 6px #b96b4d88!important;
+}
+@keyframes rb-rise-in{from{opacity:0;transform:translateY(18px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes rb-title-focus{from{opacity:0;filter:blur(9px);transform:translateY(10px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes rb-micrograph-drift{from{transform:scale(1.035) translate3d(-.5%,0,0)}to{transform:scale(1.09) translate3d(.7%,-.4%,0)}}
+@media(max-width:760px){
+  #app>main .experience-page >.hero .hero-micrograph{animation:none;transform:scale(1.02)}
+  #app>main .experience-page >.editorial-work .work-card:hover,#app>main .experience-page >.universe-index .universe-index-card:hover{transform:translateY(-2px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #app>.top .brand strong,#app>.top .lang,
+  #app>main .experience-page >.hero .hero-micrograph,#app>main .experience-page >.hero>div:first-of-type,
+  #app>main .experience-page >.hero .aside,#app>main .experience-page >.hero h1,
+  #app>main .experience-page >.editorial-work .work-card,#app>main .experience-page >.universe-index .universe-index-card,
+  #app>main .experience-page >.editorial-work .work-card .work-media img{animation:none!important;transition:none!important;transform:none!important;filter:none!important}
+}

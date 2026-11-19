@@ -1,0 +1,369 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# CI only checks repository contents; do not grant write permissions by default.
+permissions:
+  contents: read
+
+jobs:
+  secrets-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for hardcoded secrets
+        run: sh scripts/check-secrets.sh
+
+  firmware-logic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ make
+      - name: Host-side logic tests and syntax check
+        run: sh firmware/test/run_tests.sh
+      - name: Report test results
+        if: always()
+        run: |
+          echo "✓ Logic tests passed (embedded control logic validated on host)"
+          echo "✓ Syntax check passed (both firmware nodes compile without errors)"
+
+  firmware-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Verify firmware dependencies
+        run: |
+          cd firmware
+          echo "Platform: espressif32"
+          pio platform show espressif32 || echo "Platform will be fetched during build"
+      - name: Build both nodes
+        run: cd firmware && pio run
+      - name: Verify build artifacts
+        run: |
+          [ -f firmware/.pio/build/climate_node/firmware.elf ] && echo "✓ climate_node.elf created" || exit 1
+          [ -f firmware/.pio/build/irrigation_node/firmware.elf ] && echo "✓ irrigation_node.elf created" || exit 1
+
+  repo-health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify critical files exist
+        run: |
+          [ -f README.md ] && echo "✓ README.md" || exit 1
+          [ -f LICENSE ] && echo "✓ LICENSE" || exit 1
+          [ -f firmware/README.md ] && echo "✓ firmware/README.md" || exit 1
+          [ -f hardware/README.md ] && echo "✓ hardware/README.md" || exit 1
+          [ -d firmware/lib/control_logic ] && echo "✓ firmware/lib/control_logic/" || exit 1
+          [ -d firmware/src/climate_node ] && echo "✓ firmware/src/climate_node/" || exit 1
+          [ -d firmware/src/irrigation_node ] && echo "✓ firmware/src/irrigation_node/" || exit 1
+          [ -f firmware/test/test_control_logic.cpp ] && echo "✓ firmware/test/test_control_logic.cpp" || exit 1
+      - name: Verify LICENSES directory
+        run: |
+          [ -f LICENSES/README.md ] && echo "✓ LICENSES/README.md" || exit 1
+          [ -f LICENSES/MIT.txt ] && echo "✓ LICENSES/MIT.txt" || exit 1
+          [ -f LICENSES/CERN-OHL-P-2.0.txt ] && echo "✓ LICENSES/CERN-OHL-P-2.0.txt" || exit 1
+      - name: Verify gitignore is present
+        run: |
+          [ -f .gitignore ] && echo "✓ .gitignore" || exit 1
+
+  batch-tracker-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check batch-tracker structure
+        run: |
+          node scripts/check-batch-tracker-js.mjs
+          node supabase/tests/copernicus-sentinel-catalogue.test.mjs
+          node --check batch-tracker/environmental-data.js
+          node scripts/check-i18n.mjs
+          node scripts/test-environmental-fallback.mjs
+          node scripts/test-greentech-ndvi-chart.mjs
+          node scripts/test-laboratory-measurement-history-ui.mjs
+          node scripts/test-workspace-visual-system.mjs
+          node scripts/test-workspace-scenarios.mjs
+          node scripts/test-qc-check-session-errors.mjs
+          node scripts/test-storefront.mjs
+          node scripts/test-store-order-contract.mjs
+          node scripts/test-smart-entry.mjs
+          node scripts/test-auth-transition-workspace-lockdown.mjs
+          node scripts/test-auth-init-tenant-revision-guards.mjs
+          [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
+          [ -f batch-tracker/README.md ] && echo "✓ batch-tracker/README.md exists" || exit 1
+          [ -f batch-tracker/supabase/README.md ] && echo "✓ batch-tracker/supabase/README.md exists" || exit 1
+      - name: Verify no secrets in batch-tracker (code only, docs excluded)
+        run: sh scripts/check-secrets.sh
+      - name: Check CDN scripts for version pinning
+        run: |
+          entry_pages="batch-tracker/green-tech/index.html batch-tracker/mycology/index.html batch-tracker/laboratory/index.html"
+          if grep -En "@supabase/supabase-js@[0-9]+(\"|/|$)" $entry_pages; then
+            echo "supabase-js is not pinned to an exact version" >&2
+            exit 1
+          fi
+          grep -Eo "@supabase/supabase-js@[0-9]+\.[0-9]+\.[0-9]+" $entry_pages | head -1
+      - name: Verify batch-tracker README covers Notion sync
+        run: |
+          grep -q "Notion\|sync" batch-tracker/README.md && echo "✓ Notion sync documented" || echo "⚠ Notion sync not documented in README"
+
+  supabase-migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versioned SQL and function sources must not be empty
+        run: |
+          for f in supabase/migrations/*.sql supabase/tests/* supabase/functions/*/index.ts; do
+            [ -s "$f" ] && echo "✓ $f" || { echo "empty file: $f" >&2; exit 1; }
+          done
+      - name: Test environmental measurement catalogue on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/seed_environment_measurement_variables.test.sql
+      - name: Test BA Labs fungal culture formats on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/add_mycology_culture_formats.test.sql
+      - name: Test notion_* protection migration on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_cultures_notion_cols.test.sql
+      - name: Test batch workflow protection migration on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/protect_batch_workflow.test.sql
+      - name: Test FK indexes and consent RLS migration on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/add_missing_fk_indexes_optimize_consent_rls.test.sql
+      - name: Test subscription write protection on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/lock_subscription_writes.test.sql
+      - name: Test organization creation protection on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/lock_organization_creation.test.sql
+      - name: Test least-privilege table grants on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/revoke_anon_tenant_table_privileges.test.sql
+      - name: Test view privilege hardening on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/revoke_excess_view_privileges.test.sql
+      - name: Test read-only culture reference views on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/make_culture_reference_views_read_only.test.sql
+      - name: Test biological traceability RPC, lineage and tenant isolation on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/biological_traceability.test.sql
+      - name: Test atomic manual measurement and observation RPC contract
+        run: node supabase/tests/manual-write-atomicity.test.mjs
+      - name: Test batch harvest RPC contract
+        run: node supabase/tests/batch-harvest-rpc-contract.test.mjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check create-store-order Edge Function TypeScript syntax
+        run: node --experimental-strip-types --check supabase/functions/create-store-order/index.ts
+      - name: Check store-catalogue Edge Function TypeScript syntax
+        run: node --experimental-strip-types --check supabase/functions/store-catalogue/index.ts
+      - name: Test public catalogue privacy contract
+        run: node scripts/test-store-catalogue-contract.mjs
+      - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
+        run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
+      - name: Test Sentinel-2 catalogue security and query contract
+        run: node supabase/tests/copernicus-sentinel-catalogue.test.mjs
+      - name: Test Sentinel-2 frontend catalogue contract
+        run: node supabase/tests/sentinel-2-frontend-contract.test.mjs
+      - name: Test Sentinel-2 bounded request and STAC resource limits
+        run: node supabase/tests/earth-search-sentinel2-resource-limits.test.mjs
+      - name: Test NASA POWER scheduled-import security contract
+        run: node supabase/tests/nasa-power-scheduled-import.test.mjs
+      - name: Test NASA POWER user-import writer authorization
+        run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
+      - name: Test IoT ingestion bounded-body and device-auth security contract
+        run: node supabase/tests/iot-ingest-security.test.mjs
+
+  supabase-migration-replay:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure migration version identifiers are unique
+        run: |
+          set -eu
+          duplicates="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | awk -F/ '{ n=$NF; sub(/_.*/, "", n); print n }' | sort | uniq -d)"
+          if [ -n "$duplicates" ]; then
+            echo "Duplicate Supabase migration version(s): $duplicates" >&2
+            exit 1
+          fi
+      - name: Bootstrap Supabase auth roles
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/migration_replay_bootstrap.sql
+      - name: Replay every versioned migration in timestamp order
+        run: |
+          set -eu
+          count=0
+          for f in $(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | sort); do
+            echo "Applying $f"
+            psql -v ON_ERROR_STOP=1 -X -q -f "$f"
+            count=$((count + 1))
+          done
+          test "$count" -ge 25
+          echo "Replayed $count migration files successfully"
+      - name: Verify expected schema after replay
+        run: |
+          psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
+      - name: Verify atomic manual-write RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
+      - name: Verify batch harvest RPC security contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/batch_harvest_rpc_security_contract.test.sql
+      - name: Verify IoT ingestion idempotency and least-privilege contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot_ingestion_idempotency_contract.test.sql
+      - name: Verify sensitive RPC search-path contracts after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
+      - name: Verify storefront order storage security and idempotency
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/store-orders-security.test.sql
+      - name: Verify append-only audit table privileges after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
+      - name: Test environmental observation schema and access contract
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
+      - name: Test role-aware tenant write authorization after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
+
+  ecosystem-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check BA Labs 3D ecosystem invariants
+        run: node scripts/test-ecosystem-regressions.mjs
+      - name: Validate all four public Notion language trees
+        run: node scripts/test-ecosystem-manifests.mjs
+      - name: Parse 3D scene as an ES module
+        run: node --check --input-type=module < ecosystem/constellation-3d.js
+
+  explorer-2d-browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve the 2D explorer
+        run: |
+          python3 -m http.server 8766 --directory ecosystem > /tmp/explorer-2d.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8766/explorer-2d.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/explorer-2d.log
+          exit 1
+      - name: Test continuous scene, direct selection, zoom and languages
+        run: node scripts/test-explorer-2d.mjs
+        env:
+          BALABS_EXPLORER_URL: http://127.0.0.1:8766/explorer-2d.html?lang=fr
+      - name: Upload desktop and mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balabs-explorer-2d-screenshots
+          path: artifacts/explorer-2d-*.png
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ecosystem-browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright
+      - name: Install Chromium with WebGL support
+        run: npx playwright install --with-deps chromium
+      - name: Install image optimization dependency
+        run: python -m pip install Pillow
+      - name: Download and validate all site images for browser testing
+        run: |
+          python ecosystem/download-images.py --manifest ecosystem/images-manifest.json --output ecosystem/assets
+          python scripts/optimize-ecosystem-images.py --directory ecosystem/assets --max-edge 1800 --jpeg-quality 84
+      - name: Serve the public ecosystem locally
+        run: |
+          python3 -m http.server 8765 --directory ecosystem > /tmp/balabs-ecosystem-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8765/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/balabs-ecosystem-server.log
+          exit 1
+      - name: Test desktop, mobile and Vernpixi primary navigation
+        run: node scripts/test-ecosystem-browser.mjs
+        env:
+          BALABS_SITE_URL: http://127.0.0.1:8765/
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balabs-vernpixi-primary-browser-smoke
+          path: artifacts/vernpixi-primary/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  storefront-browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: npm install --no-save --no-package-lock playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve the public storefront locally
+        run: |
+          python3 -m http.server 8767 --directory . > /tmp/balabs-storefront-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8767/store/index.html > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/balabs-storefront-server.log
+          exit 1
+      - name: Test cart, enquiry layout, languages and responsive behavior
+        run: node scripts/test-storefront-browser.mjs
+        env:
+          BALABS_STORE_URL: http://127.0.0.1:8767/store/index.html

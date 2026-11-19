@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>BA Labs — Explorateur Vernpixi</title>
+<script>
+(function(){
+ const params=new URLSearchParams(location.search);
+ const allowed=['bio','myco','soil','lab','products','iot','work','learn'];
+ const domain=params.get('domain'),lang=params.get('lang')||'fr';
+ const target=new URL('./explorer-2d.html',location.href);
+ if(allowed.includes(domain))target.searchParams.set('domain',domain);
+ if(['fr','en','ar','pt'].includes(lang))target.searchParams.set('lang',lang);
+ location.replace(target.pathname+target.search);
+})();
+</script>
+</head>
+<body><p><a href="./explorer-2d.html">Ouvrir l’explorateur BA Labs</a></p></body>
+</html>

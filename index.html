@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d1110">
+<meta name="description" content="BA Labs CultureOps : suivi des cultures, traçabilité des lots et données expérimentales en agronomie, mycologie et laboratoire.">
+<title>BA Labs CultureOps — Choisir un univers</title>
+<style>
+:root{color-scheme:dark;--ink:#D1D0C5;--paper:#111B1D;--forest:#263B38;--copper:#B96B4D;--muted:#9AA7A0;--line:rgba(209,208,197,.22);font-family:Arial,Helvetica,sans-serif}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:var(--paper)}
+body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.55}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.16;background-image:radial-gradient(rgba(209,208,197,.4) .55px,transparent .7px);background-size:5px 5px}
+.skip-link{position:absolute;left:14px;top:10px;z-index:10;transform:translateY(-160%);padding:10px 14px;background:var(--ink);color:var(--paper);font-size:13px;font-weight:700}.skip-link:focus{transform:translateY(0);outline:2px solid var(--copper);outline-offset:3px}
+main{width:min(1440px,100% - 72px);margin:0 auto;padding:25px 0 24px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:0 0 17px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:13px;font-size:15px;font-weight:900;letter-spacing:.19em}.brand-mark{display:none}.brand-slash{color:var(--copper);font-weight:400}.brand-product{color:var(--muted);font-size:9px;font-weight:600;letter-spacing:.2em}
+.language-picker{display:flex;align-items:center;gap:12px;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}.language-picker select{min-width:70px;padding:8px 26px 8px 10px;border:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);font:11px ui-monospace,monospace}
+.language-picker select:focus-visible,.universe:focus-visible,.skip-link:focus-visible{outline:2px solid var(--copper);outline-offset:4px}
+.intro{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);align-items:center;gap:6vw;min-height:490px;padding:65px 0 58px;border-bottom:1px solid var(--line);overflow:hidden}
+.intro:after{content:"FIELD NOTE / 001";position:absolute;right:0;bottom:17px;color:#78857F;font:9px ui-monospace,monospace;letter-spacing:.2em}
+.kicker{margin:0 0 27px;color:var(--copper);font:700 10px ui-monospace,monospace;letter-spacing:.19em;text-transform:uppercase}
+h1{max-width:850px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(58px,8.2vw,124px);font-weight:400;line-height:.91;letter-spacing:-.065em}h1 span{display:block;margin-top:8px;color:var(--copper);font-style:italic}
+.lead{max-width:520px;margin:31px 0 0;color:#B8C0B9;font-size:clamp(15px,1.35vw,18px);line-height:1.8}
+.intro-note{position:relative;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:20px 0 38px 34px;border-left:1px solid var(--copper);color:var(--muted);font-size:12px;line-height:1.8}
+.intro-note strong{display:block;margin:25px 0 8px;color:var(--ink);font:400 24px/1.15 Georgia,serif}
+.hero-caption{margin-top:8px;color:#77867F;font:9px ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:23px 0 11px;border-bottom:1px solid var(--line)}.section-head h2{margin:0;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase}.section-head p{margin:0;color:#78857F;font:9px ui-monospace,monospace;letter-spacing:.12em}
+.universes{display:block}.universe{--accent:var(--copper);position:relative;display:grid;grid-template-columns:80px minmax(190px,.8fr) minmax(240px,1.2fr) 150px;align-items:center;gap:24px;min-height:142px;padding:22px 10px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;transition:background .2s ease,padding .2s ease}
+.universe:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform:scaleY(0);transform-origin:bottom;transition:transform .2s ease}.universe:hover{padding-left:23px;background:rgba(38,59,56,.38)}.universe:hover:before,.universe:focus-visible:before{transform:scaleY(1)}
+.universe.agronomy{--accent:#A8B69B}.universe.myco{--accent:#B96B4D}.universe.lab{--accent:#A7B7BD}.universe-top{display:contents}
+.universe-label{grid-column:2;color:var(--accent);font:9px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}.universe-index{grid-column:1;grid-row:1/3;color:var(--accent);font:italic 30px Georgia,serif}.symbol{display:none}
+.universe h3{grid-column:2;grid-row:2;margin:8px 0 0;font:400 clamp(29px,3.1vw,43px)/1 Georgia,serif;letter-spacing:-.035em}.universe p{grid-column:3;grid-row:1/3;max-width:470px;margin:0;color:#AAB4AE;font-size:13px;line-height:1.75}
+.enter{grid-column:4;grid-row:1/3;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink);font:10px ui-monospace,monospace;letter-spacing:.07em;text-transform:uppercase}.enter .arrow{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;color:var(--copper);font-size:17px;transition:transform .2s ease,border-color .2s ease}.universe:hover .arrow{transform:translate(3px,-3px);border-color:var(--copper)}
+.footer{display:flex;justify-content:space-between;gap:18px;padding:22px 0 0;color:#78857F;font:9px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase}.footer strong{color:var(--ink);font-weight:800}
+@media(max-width:850px){main{width:calc(100% - 40px)}.intro{grid-template-columns:1fr;gap:28px;min-height:0;padding:56px 0 50px}.intro-note{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.7fr);column-gap:22px;align-items:center;padding:10px 0 35px 20px}.hero-caption{grid-column:1}.intro-note strong{margin:0 0 8px}.universe{grid-template-columns:55px minmax(0,1fr) 110px;gap:14px;min-height:120px}.universe-label{grid-column:2}.universe-index{grid-column:1;grid-row:1/3}.universe h3{grid-column:2;grid-row:2;font-size:32px}.universe p{grid-column:2;grid-row:3}.enter{grid-column:3;grid-row:1/4;flex-direction:column;align-items:flex-end}}
+@media(max-width:520px){main{width:calc(100% - 30px);padding-top:17px}.topbar{padding-bottom:13px}.brand{font-size:13px;gap:9px}.brand-product{font-size:8px}.language-picker{gap:6px;font-size:9px}.language-picker select{min-width:58px;padding:7px 8px}.intro{padding:48px 0 42px;gap:25px}.kicker{font-size:9px;margin-bottom:21px}h1{font-size:clamp(55px,15vw,78px)}.lead{margin-top:23px;font-size:14px}.intro-note{grid-template-columns:1fr;gap:10px;padding-left:15px}.intro-note strong{grid-column:1;font-size:21px}.intro-note{font-size:11px}.hero-caption{grid-column:1}.section-head{align-items:flex-start;flex-direction:column;gap:6px;padding-top:18px}.section-head p{font-size:8px}.universe{grid-template-columns:38px minmax(0,1fr);gap:7px 12px;min-height:0;padding:19px 3px}.universe-index{grid-column:1;grid-row:1/4;font-size:24px;align-self:start}.universe-label{grid-column:2;font-size:8px}.universe h3{grid-column:2;grid-row:2;margin-top:4px;font-size:31px}.universe p{grid-column:2;grid-row:3;font-size:12px}.enter{grid-column:2;grid-row:4;flex-direction:row;align-items:center;justify-content:flex-start;padding-top:8px;font-size:9px}.enter .arrow{width:29px;height:29px}.footer{flex-direction:column;gap:7px;font-size:8px}}
+html[dir="rtl"] .intro-note{border-left:0;border-right:1px solid var(--copper);padding-left:0;padding-right:34px}html[dir="rtl"] .universe:before{left:auto;right:0}html[dir="rtl"] .universe:hover{padding-left:10px;padding-right:23px}html[dir="rtl"] .enter{flex-direction:row-reverse}html[dir="rtl"] .enter .arrow{transform:scaleX(-1)}
+@media(max-width:850px){html[dir="rtl"] .intro-note{padding-right:20px}}@media(max-width:520px){html[dir="rtl"] .intro-note{padding-right:15px}html[dir="rtl"] .universe:hover{padding-right:13px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+#cultureops-particles{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.6}.intro>div,.intro>aside{position:relative;z-index:1}.intro{grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:5vw}.intro-note{display:block;padding:12px 0 35px 28px}.hero-image-stack{display:grid;grid-template-columns:1.2fr .8fr;grid-template-rows:128px 128px;gap:9px;margin:0 0 22px}.hero-image-stack figure{position:relative;margin:0;overflow:hidden;background:#182326}.hero-image-stack figure:first-child{grid-row:1/3}.hero-image-stack img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) contrast(1.08);transition:transform .7s}.hero-image-stack figure:hover img{transform:scale(1.06)}.hero-image-stack figure:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(5,10,11,.82))}.hero-image-stack figcaption{position:absolute;z-index:1;left:9px;bottom:8px;color:#f0eee4;font:8px ui-monospace,monospace;letter-spacing:.12em}.universe{grid-template-columns:64px 168px minmax(190px,.8fr) minmax(220px,1.2fr) 145px;min-height:160px}.universe-index{grid-column:1;grid-row:1/4}.universe-photo{position:relative;grid-column:2;grid-row:1/4;width:100%;height:112px;overflow:hidden}.universe-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.75);transition:transform .7s}.universe:hover .universe-photo img{transform:scale(1.06)}.universe-label{grid-column:3;grid-row:1}.universe h3{grid-column:3;grid-row:2}.universe p{grid-column:4;grid-row:1/4}.enter{grid-column:5;grid-row:1/4}.sector-motion{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.72}@media(max-width:850px){.intro{grid-template-columns:1fr}.intro-note{padding:12px 0 35px 20px}.hero-image-stack{grid-template-rows:105px 105px}.universe{grid-template-columns:48px 130px minmax(0,1fr) 105px;gap:12px;min-height:130px}.universe-index{grid-column:1;grid-row:1/4}.universe-photo{grid-column:2;grid-row:1/4;height:96px}.universe-label{grid-column:3;grid-row:1}.universe h3{grid-column:3;grid-row:2}.universe p{grid-column:3;grid-row:3}.enter{grid-column:4;grid-row:1/4}}@media(max-width:520px){.hero-image-stack{grid-template-rows:92px 92px;gap:6px}.universe{grid-template-columns:34px minmax(0,1fr);gap:8px 12px}.universe-index{grid-column:1;grid-row:1/4}.universe-photo{grid-column:2;grid-row:1;height:125px}.universe-label{grid-column:2;grid-row:2}.universe h3{grid-column:2;grid-row:3}.universe p{grid-column:2;grid-row:4}.enter{grid-column:2;grid-row:5;flex-direction:row;align-items:center}}</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu principal</a>
+<main id="main" tabindex="-1">
+  <header class="topbar">
+    <div class="brand">
+      <span>BA LABS</span><span class="brand-slash">/</span><span class="brand-product">CULTUREOPS</span>
+    </div>
+    <label class="language-picker"><span id="langLabel">Langue</span><select id="pageLanguage" aria-label="Langue"><option value="fr">FR</option><option value="en">EN</option><option value="pt">PT</option><option value="ar">AR</option></select></label>
+  </header>
+  <section class="intro" aria-labelledby="page-title">
+    <div id="cultureops-particles" aria-hidden="true"></div>
+    <div>
+      <p class="kicker">PLATEFORME DE SUIVI BIOLOGIQUE · 01—03</p>
+      <h1 id="page-title">Chaque culture<br>a son <span>univers.</span></h1>
+      <p class="lead">Un espace de travail conçu pour suivre le vivant avec méthode : des cultures aux lots, des observations aux résultats.</p>
+    </div>
+    <aside class="intro-note"><div class="hero-image-stack"><figure><img src="https://static.wixstatic.com/media/04b055_8b2dd14344af40dc8b5b544802486493~mv2.png/v1/fill/w_900,h_900,al_c,q_90/04b055_8b2dd14344af40dc8b5b544802486493~mv2.png" alt="Mycélium dans une boîte de Petri"><figcaption>MYCOLOGY / CULTURE</figcaption></figure><figure><img src="https://assets-global.website-files.com/62d6cc9518e8c4274060a16b/631444f7f4c52f62af001b55_plants.jpg" alt="Tomates sous serre et irrigation"><figcaption>GREENTECH / ENVIRONMENT</figcaption></figure><figure><img src="https://bio-fermen.bocsci.com/upload/image/fermentation-services-1.jpg" alt="Bioréacteurs de laboratoire"><figcaption>LAB / BIOPROCESS</figcaption></figure></div><strong>Trois disciplines. Une traçabilité commune.</strong><span class="intro-note-copy">Des espaces distincts, chacun avec ses propres outils et son identité scientifique.</span><span class="hero-caption">BA LABS / BIOLOGICAL OPERATIONS</span></aside>
+  </section>
+  <section aria-labelledby="workspace-title">
+    <div class="section-head"><h2 id="workspace-title">Choisir votre espace de travail</h2><p>BA LABS / CULTURE &amp; BATCH TRACKER</p></div>
+    <nav class="universes" aria-label="Choisir un univers de travail">
+      <a class="universe agronomy" href="batch-tracker/green-tech/"><span class="universe-photo"><img src="https://assets-global.website-files.com/62d6cc9518e8c4274060a16b/631444f7f4c52f62af001b55_plants.jpg" alt="Tomates sous serre et irrigation" loading="lazy"></span>
+        <div class="universe-top"><span class="universe-label">Agritech &amp; environnement</span><span class="universe-index">01</span></div>
+        <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M8 30c0-12 8-20 24-21-1 15-9 23-21 23"/><path d="M9 32c4-8 10-13 18-17"/></svg></span>
+        <h3>Green Tech</h3><p>Plantes, substrats, serre, irrigation et suivi des paramètres environnementaux.</p>
+        <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
+      </a>
+      <a class="universe myco" href="batch-tracker/mycology/"><span class="universe-photo"><img src="https://static.wixstatic.com/media/04b055_8b2dd14344af40dc8b5b544802486493~mv2.png/v1/fill/w_900,h_900,al_c,q_90/04b055_8b2dd14344af40dc8b5b544802486493~mv2.png" alt="Mycélium de Pleurotus en boîte de Petri" loading="lazy"></span>
+        <div class="universe-top"><span class="universe-label">Mycologie &amp; cultures fongiques</span><span class="universe-index">02</span></div>
+        <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 20c1-9 7-14 14-14s13 5 14 14H6Z"/><path d="M15 20v7c0 5 10 5 10 0v-7M20 27v7M10 34h20"/></svg></span>
+        <h3>Mycologie</h3><p>Souches, lignées, générations, transferts, morphologie et fructification.</p>
+        <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
+      </a>
+      <a class="universe lab" href="batch-tracker/laboratory/"><span class="universe-photo"><img src="https://bio-fermen.bocsci.com/upload/image/fermentation-services-1.jpg" alt="Bioréacteurs et instrumentation" loading="lazy"></span>
+        <div class="universe-top"><span class="universe-label">Recherche &amp; laboratoire</span><span class="universe-index">03</span></div>
+        <span class="symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M15 6h10M18 6v12L9 32c-1 2 1 3 3 3h16c2 0 4-1 3-3L22 18V6"/><path d="M13 28h14M16 23h8"/></svg></span>
+        <h3>Laboratoire</h3><p>Milieux, protocoles, mesures, paramètres expérimentaux et résultats.</p>
+        <span class="enter"><span>Entrer dans l’espace</span><span class="arrow" aria-hidden="true">↗</span></span>
+      </a>
+    </nav>
+  </section>
+  <footer class="footer"><span><strong>BA LABS</strong> · CULTUREOPS</span><span>Biological culture &amp; batch traceability</span></footer>
+</main>
+
+<script>
+(() => {
+  const copy = {
+    fr: ["PLATEFORME DE SUIVI BIOLOGIQUE · 01—03","Chaque culture biologique","a son univers.","Un espace de travail conçu pour suivre le vivant avec méthode : des cultures aux lots, des observations aux résultats.","Choisir un univers de travail","Plantes, substrats, serre, irrigation et suivi des paramètres environnementaux.","Entrer dans l’espace","Souches, lignées, générations, transferts, morphologie et fructification.","Milieux de culture, protocoles, paramètres expérimentaux, mesures et résultats.","Une plateforme commune · Trois espaces spécialisés","Choisir votre espace de travail","Une plateforme. Trois espaces spécialisés.","Une même exigence de traçabilité biologique, avec des outils adaptés à chaque activité.","BA LABS / CULTURE & BATCH TRACKER","Agritech & environnement","Mycologie & cultures fongiques","Recherche & laboratoire","Green Tech","Mycologie","Laboratoire"],
+    en: ["BIOLOGICAL TRACKING PLATFORM · 01—03","Every biological culture","has its own universe.","Choose your workspace. Each universe has its own page and specialist tools, with shared biological traceability.","Choose a workspace","Plants, substrates, greenhouse, irrigation, fungal digesters and environmental monitoring.","Enter workspace","Strains, generations, transfers, morphology and contamination tracking.","Culture media, protocols, experimental parameters, measurements and results.","One shared platform · Three specialised workspaces","Choose your workspace","One platform. Three specialised workspaces.","One shared standard of biological traceability, with tools adapted to each activity.","BA LABS / CULTURE & BATCH TRACKER","Agritech & environment","Mycology & fungal cultures","Research & laboratory","Green Tech","Mycology","Laboratory"],
+    pt: ["PLATAFORMA DE ACOMPANHAMENTO BIOLÓGICO · 01—03","Cada cultura biológica","tem o seu universo.","Escolha o seu espaço de trabalho. Cada espaço tem a sua própria página e ferramentas específicas, com rastreabilidade biológica comum.","Escolher um espaço de trabalho","Plantas, substratos, estufa, irrigação, digestores fúngicos e monitorização ambiental.","Entrar no espaço","Estirpes, gerações, transferências, morfologia e acompanhamento de contaminações.","Meios de cultura, protocolos, parâmetros experimentais, medições e resultados.","Uma plataforma comum · Três interfaces especializadas","Escolha o seu espaço de trabalho","Uma plataforma. Três espaços especializados.","O mesmo rigor de rastreabilidade biológica, com ferramentas adaptadas a cada atividade.","BA LABS / CULTURA & RASTREIO DE LOTES","Agrotecnologia & ambiente","Micologia & culturas fúngicas","Investigação & laboratório","Tecnologia verde","Micologia","Laboratório"],
+    ar: ["منصة تتبّع بيولوجي · 01—03","لكل زراعة","عالمها الخاص.","اختر مساحة العمل. لكل مساحة صفحة وأدوات متخصصة، مع تتبّع بيولوجي مشترك.","اختر مساحة العمل","النباتات والركائز والبيت المحمي والري والهاضمات الفطرية ومراقبة البيئة.","الدخول إلى المساحة","السلالات والأجيال وعمليات النقل والمورفولوجيا ومتابعة التلوث.","أوساط الزراعة والبروتوكولات والمعايير التجريبية والقياسات والنتائج.","منصة مشتركة · ثلاث واجهات متخصصة","اختر مساحة العمل","منصة واحدة. ثلاث مساحات متخصصة.","منهج موحّد للتتبّع البيولوجي، مع أدوات ملائمة لكل نشاط.","BA LABS / تتبّع الثقافات والدفعات","التقنيات الزراعية والبيئة","علم الفطريات وزراعاته","البحث والمختبر","التقنيات الخضراء","علم الفطريات","المختبر"]
+  };
+  const select = document.getElementById("pageLanguage");
+  function apply(lang) {
+    const vals = copy[lang] || copy.fr;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.getElementById("langLabel").textContent = lang === "ar" ? "اللغة" : lang === "pt" ? "Idioma" : lang === "en" ? "Language" : "Langue";
+    {
+      document.querySelector(".kicker").textContent = vals[0];
+      document.querySelector("h1").childNodes[0].textContent = vals[1];
+      document.querySelector("h1").childNodes[2].textContent = lang === "fr" ? "a son " : lang === "en" ? "has its own " : lang === "pt" ? "tem o seu " : "";
+      document.querySelector("h1 span").textContent = lang === "fr" ? "univers." : lang === "en" ? "universe." : lang === "pt" ? "universo." : vals[2];
+      document.querySelector(".lead").textContent = vals[3];
+      document.querySelector(".universes").setAttribute("aria-label", vals[4]);
+      document.querySelector(".section-head h2").textContent = vals[10];
+      document.querySelector(".intro-note strong").textContent = vals[11];
+      document.querySelector(".intro-note-copy").textContent = vals[12];
+      document.querySelector(".section-head p").textContent = vals[13];
+      document.querySelector(".agronomy .universe-label").textContent = vals[14];
+      document.querySelector(".myco .universe-label").textContent = vals[15];
+      document.querySelector(".lab .universe-label").textContent = vals[16];
+      document.querySelector(".agronomy h3").textContent = vals[17];
+      document.querySelector(".myco h3").textContent = vals[18];
+      document.querySelector(".lab h3").textContent = vals[19];
+      [".agronomy p", ".myco p", ".lab p"].forEach((selector, i) => { document.querySelector(selector).textContent = vals[[5, 7, 8][i]]; });
+    }
+    document.querySelectorAll(".enter span:first-child").forEach(el => { el.textContent = vals[6]; });
+    document.querySelector(".footer span:last-child").textContent = vals[9];
+    try { localStorage.setItem("ba-labs-language", lang); } catch (_) {}
+  }
+  let lang = "fr"; try { lang = localStorage.getItem("ba-labs-language") || "fr"; } catch (_) {}
+  select.value = ["fr","en","pt","ar"].includes(lang) ? lang : "fr";
+  apply(select.value); select.addEventListener("change", () => apply(select.value));
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js" defer></script>
+<script type="module">
+import { Application, Graphics } from "https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.mjs";
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const palette = { agronomy: 0xa8b69b, myco: 0xb96b4d, lab: 0xa7b7bd };
+
+function addLine(g, points, color, alpha = 0.42, width = 1) {
+  if (!points.length) return;
+  g.moveTo(points[0][0], points[0][1]);
+  for (const [x, y] of points.slice(1)) g.lineTo(x, y);
+  g.stroke({ color, alpha, width });
+}
+
+async function mountSectorMotion(el) {
+  const classes = el.parentElement.classList;
+  const kind = classes.contains("agronomy") ? "agronomy" : classes.contains("myco") ? "myco" : "lab";
+  const color = palette[kind];
+  const app = new Application();
+  await app.init({
+    resizeTo: el, backgroundAlpha: 0, antialias: true,
+    autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 1.5)
+  });
+  app.canvas.className = "sector-motion";
+  app.canvas.setAttribute("aria-hidden", "true");
+  el.appendChild(app.canvas);
+
+  const w = () => Math.max(1, el.clientWidth);
+  const h = () => Math.max(1, el.clientHeight);
+  const overlay = new Graphics();
+  app.stage.addChild(overlay);
+  const movers = [];
+
+  if (kind === "agronomy") {
+    // Irrigation channels with droplets moving along each row.
+    for (let row = 0; row < 5; row++) {
+      const y = 14 + row * Math.max(12, (h() - 28) / 4);
+      addLine(overlay, [[0,y],[w()*.28,y-3],[w()*.62,y+2],[w(),y-1]], color, .34, 1);
+      for (let j = 0; j < 2; j++) {
+        const bead = new Graphics().circle(0,0,2.1).fill({color,alpha:.9});
+        bead.y = y + (j ? 3 : -2);
+        bead.x = Math.random() * w();
+        bead.speed = .35 + Math.random() * .45;
+        app.stage.addChild(bead); movers.push(bead);
+      }
+    }
+  } else if (kind === "myco") {
+    // Branching hyphal network, rooted at the lower edge.
+    const branch = (x, y, angle, length, depth) => {
+      if (depth <= 0 || length < 5) return;
+      const nx = x + Math.cos(angle) * length;
+      const ny = y + Math.sin(angle) * length;
+      addLine(overlay, [[x,y],[nx,ny]], color, .22 + depth * .09, Math.max(.65, depth * .22));
+      if (depth <= 3) {
+        const node = new Graphics().circle(nx,ny,depth === 3 ? 2.3 : 1.5).fill({color,alpha:.8});
+        app.stage.addChild(node);
+        node.pulse = Math.random() * Math.PI * 2;
+        movers.push(node);
+      }
+      const spread = .34 + Math.random() * .22;
+      branch(nx,ny,angle-spread,length*.76,depth-1);
+      branch(nx,ny,angle+spread,length*.72,depth-1);
+    };
+    for (let root = 0; root < 4; root++) {
+      const x = w() * (.12 + root * .25);
+      branch(x,h()+3,-Math.PI/2 + (root-1.5)*.12,Math.min(w(),h())*.32,5);
+    }
+  } else {
+    // Laboratory: orbital measurement paths and moving sensor points.
+    const cx = w() * .5, cy = h() * .5;
+    for (let ring = 0; ring < 3; ring++) {
+      const rx = Math.max(12, w() * (.15 + ring * .12));
+      const ry = Math.max(10, h() * (.18 + ring * .14));
+      overlay.ellipse(cx,cy,rx,ry).stroke({color,alpha:.27,width:1});
+      const dot = new Graphics().circle(0,0,2 + ring*.35).fill({color,alpha:.9});
+      dot.phase = ring * 2.1;
+      dot.rx = rx; dot.ry = ry; dot.cx = cx; dot.cy = cy;
+      app.stage.addChild(dot); movers.push(dot);
+    }
+    const center = new Graphics().circle(cx,cy,2.4).fill({color,alpha:.65});
+    app.stage.addChild(center);
+  }
+
+  app.ticker.add((ticker) => {
+    const dt = ticker.deltaTime;
+    if (kind === "agronomy") {
+      for (const bead of movers) {
+        bead.x += bead.speed * dt;
+        if (bead.x > w()+3) bead.x = -3;
+      }
+    } else if (kind === "myco") {
+      for (const node of movers) {
+        node.pulse += .018 * dt;
+        node.alpha = .52 + (Math.sin(node.pulse)+1)*.2;
+      }
+    } else {
+      for (const dot of movers) {
+        dot.phase += .006 * dt;
+        dot.x = dot.cx + Math.cos(dot.phase) * dot.rx;
+        dot.y = dot.cy + Math.sin(dot.phase) * dot.ry;
+      }
+    }
+  });
+}
+
+if (!reduceMotion) {
+  for (const el of document.querySelectorAll(".universe-photo")) {
+    mountSectorMotion(el).catch(() => {});
+  }
+  window.addEventListener("load", () => {
+    if (!window.tsParticles) return;
+    window.tsParticles.load({
+      id: "cultureops-particles",
+      options: {
+        fullScreen: { enable: false },
+        particles: {
+          number: { value: 15 },
+          color: { value: ["#a8b69b", "#b96b4d", "#a7b7bd"] },
+          opacity: { value: { min: .08, max: .22 } },
+          size: { value: { min: 1, max: 1.8 } },
+          move: { enable: true, speed: .16, outModes: { default: "out" } },
+          links: { enable: false }
+        },
+        detectRetina: true
+      }
+    }).catch(() => {});
+  });
+}
+</script></body>
+</html>

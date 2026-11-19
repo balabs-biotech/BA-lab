@@ -1,0 +1,47 @@
+/* Mycology culture activity timeline — copper data rail. */
+html body[data-domain="mycology"] #trackerCard .mycology-activity-map {
+  display:grid; gap:12px; margin:0 0 14px; padding:16px;
+  border:1px solid rgba(201,130,89,.25); border-radius:13px;
+  background:linear-gradient(145deg,rgba(43,38,34,.98),rgba(29,31,29,.98));
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-heading {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-kicker {
+  color:#d9a17d; font-size:9px; font-weight:800; letter-spacing:.15em;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-heading h3 {
+  margin:5px 0 3px; color:#eee5dc; font-size:16px;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-heading p {
+  margin:0; color:#b6aaa0; font-size:11px; line-height:1.5;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-tools {
+  display:flex; align-items:center; gap:5px;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-tools button {
+  min-width:30px; min-height:30px; padding:5px 9px; border:1px solid rgba(201,130,89,.28);
+  border-radius:7px; color:#eee5dc; background:#38332f; font-size:11px; cursor:pointer;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-tools button:hover { border-color:#d9a17d; background:#484039; }
+html body[data-domain="mycology"] #trackerCard .mycology-activity-tools span {
+  min-width:42px; color:#c7b8ab; font-size:10px; text-align:right; font-variant-numeric:tabular-nums;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-stage {
+  min-height:190px; overflow:auto; overscroll-behavior:contain; border:1px solid rgba(201,130,89,.14);
+  border-radius:9px; background:radial-gradient(ellipse at 45% 0%,rgba(201,130,89,.10),transparent 72%),#211f1d;
+  scrollbar-color:#705849 #292725; scrollbar-width:thin;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-stage:focus-visible { outline:2px solid #d9a17d; outline-offset:2px; }
+html body[data-domain="mycology"] #trackerCard .mycology-activity-canvas { display:block; max-width:none; }
+html body[data-domain="mycology"] #trackerCard .mycology-activity-status {
+  display:grid; place-items:center; min-height:160px; margin:0; padding:18px; color:#b6aaa0; font-size:11px; text-align:center;
+}
+html body[data-domain="mycology"] #trackerCard .mycology-activity-note { margin:0; color:#9d9187; font-size:10px; line-height:1.5; }
+@media(max-width:620px) {
+  html body[data-domain="mycology"] #trackerCard .mycology-activity-map { padding:12px; }
+  html body[data-domain="mycology"] #trackerCard .mycology-activity-tools { width:100%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="mycology"] #trackerCard .mycology-activity-stage { scroll-behavior:auto; }
+}

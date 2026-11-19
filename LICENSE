@@ -1,0 +1,34 @@
+B.A. LAB project — Licence map
+
+B.A. LAB is used here as a project name; this file does not assert that a legal entity has been registered under that name. This repository mixes several licences. The table below states which one applies
+to which directory. Where a directory is not listed, ALL RIGHTS RESERVED applies.
+
+| Path                                                        | Licence (SPDX)                | Text                              |
+|-------------------------------------------------------------|-------------------------------|-----------------------------------|
+| firmware/                                                   | MIT                           | LICENSES/MIT.txt                  |
+| hardware/                                                   | CERN-OHL-P-2.0                | LICENSES/CERN-OHL-P-2.0.txt (*)   |
+| bio-inputs/, biotech-sops/, 01_R-and-D_Lab/, docs/          | Proprietary, all rights reserved (see below) | this file          |
+| batch-tracker/ (web interface)                              | Proprietary, all rights reserved (see below) | this file          |
+| README.md, LICENSE, LICENSES/, index.html, assets/          | Proprietary, all rights reserved (see below) | this file          |
+
+(*) The official CERN-OHL-P-2.0 text must be present in LICENSES/ for the hardware
+licence to be complete. See LICENSES/README.md.
+
+----------------------------------------------------------------------------------
+Proprietary material
+----------------------------------------------------------------------------------
+Copyright (c) 2026 B.A. LAB project. All Rights Reserved.
+
+The Standard Operating Procedures (SOPs), biological formulation profiles, R&D notes,
+facility layouts and the Batch Tracker web interface are published for evaluation,
+educational and validation purposes. Commercial use, replication of proprietary
+biological strain complexes, or industrial exploitation without prior written consent
+of the relevant copyright holder(s) is strictly prohibited.
+
+----------------------------------------------------------------------------------
+Hardware sheets and safety
+----------------------------------------------------------------------------------
+Hardware sheets in hardware/ are design concepts and carry no warranty. They are NOT
+qualified or certified designs; see the status banner of each sheet before building.
+
+Contact & licensing inquiries: B.A. LAB project — Sétif, Algeria.
