@@ -24,7 +24,7 @@ const PRODUCTS: Record<string, Product> = {
   "BAL-LC-POS-P80-001": { title: "LC — Pleurotus ostreatus · P80", family: "liquid" },
   "BAL-LC-POS-G8-001": { title: "LC — Pleurotus ostreatus · G8", family: "liquid" },
   "BAL-LC-POS-BLUE-001": { title: "LC — Pleurotus ostreatus · Blue Oyster", family: "liquid" },
-  "BAL-CUL-AGAR-001": { title: "Water Agar — boîte non inoculée", family: "agar", price: 100 },
+  "BAL-CUL-AGAR-001": { title: "Water Agar — boîte non inoculée", family: "agar" },
   "BAL-PETRI-INOC-001": { title: "Boîte de Pétri inoculée · 1 souche", family: "agar", price: 2000 },
   "BAL-GRAIN-SPAWN-WHEAT-25-001": { title: "Blé inoculé — grain spawn · 2,5 kg", family: "spawn", price: 1000 },
   "BAL-LC-SYR-10ML-001": { title: "Seringue de culture liquide · 10 ml", family: "liquid", price: 5000, indicative: true }
