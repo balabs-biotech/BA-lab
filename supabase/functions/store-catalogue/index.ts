@@ -41,10 +41,6 @@ function selectValue(property: any): string | null {
   return typeof property?.select?.name === "string" ? property.select.name : null;
 }
 
-function urlValue(property: any): string | null {
-  return typeof property?.url === "string" ? property.url : null;
-}
-
 function publicProduct(page: any) {
   const properties = page?.properties ?? {};
   if (properties["Actif au catalogue"]?.checkbox !== true) return null;
@@ -57,11 +53,7 @@ function publicProduct(page: any) {
     availability: selectValue(properties["Disponibilité"]),
     formats: richText(properties["Formats disponibles"]),
     applications: richText(properties["Applications"]),
-    public_reference: richText(properties["Référence publique"]),
-    summary: richText(properties["Résumé public"]),
-    target_use: richText(properties["Usage cible"]),
-    evidence_level: selectValue(properties["Niveau de preuve"]),
-    request_url: urlValue(properties["Lien demande"])
+    evidence_level: selectValue(properties["Niveau de preuve"])
   };
 
   if (!product.product_code || !product.title) return null;
