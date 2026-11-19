@@ -6366,6 +6366,11 @@ function activateWorkspaceModule(moduleId) {
     const target = link.getAttribute("href");
     if (target === "#" + moduleId) {
       link.setAttribute("aria-current", "page");
+      link.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+      });
     } else {
       link.removeAttribute("aria-current");
     }
