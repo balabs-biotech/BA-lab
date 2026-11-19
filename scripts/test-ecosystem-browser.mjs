@@ -29,27 +29,25 @@ try {
     });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('#app .editorial-method').waitFor({ state: 'visible', timeout: 15000 });
-    // Verify the optional mycelial hero motion when this browser supports it.
-    const motionEligibility = await page.evaluate(() => {
-      const canvas = document.createElement('canvas');
-      const webgl = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const saveData = navigator.connection?.saveData === true;
-      const lowPower = /Android|iPhone|iPad/i.test(navigator.userAgent) && (navigator.hardwareConcurrency || 4) <= 4;
-      return { eligible: webgl && !reduced && !saveData && !lowPower, webgl, reduced, saveData, lowPower };
-    });
-    let heroMotion = { ...motionEligibility, active: false, canvases: 0 };
-    if (viewport.name === 'desktop' && motionEligibility.eligible) {
+    // Verify the current organic mycelial hero field (the legacy Vanta renderer was removed).
+    const motionEligibility = await page.evaluate(() => ({
+      reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      saveData: navigator.connection?.saveData === true,
+      lowPower: /Android|iPhone|iPad/i.test(navigator.userAgent) && (navigator.hardwareConcurrency || 4) <= 4
+    }));
+    let heroMotion = { ...motionEligibility, active: false, width: 0, height: 0 };
+    if (viewport.name === 'desktop') {
       await page.waitForFunction(() => {
-        const hero = document.querySelector('#accueil');
-        return hero?.dataset.vantaReady === '1' && hero.querySelector('canvas');
+        const canvas = document.querySelector('#accueil canvas.balabs-organic-field');
+        return !!canvas && canvas.width > 0 && canvas.height > 0;
       }, undefined, { timeout: 15000 });
-      heroMotion = await page.locator('#accueil').evaluate((hero, eligibility) => ({
+      heroMotion = await page.locator('#accueil canvas.balabs-organic-field').evaluate((canvas, eligibility) => ({
         ...eligibility,
-        active: hero.dataset.vantaReady === '1',
-        canvases: hero.querySelectorAll('canvas').length
+        active: canvas.width > 0 && canvas.height > 0,
+        width: canvas.width,
+        height: canvas.height
       }), motionEligibility);
-      assert.ok(heroMotion.active && heroMotion.canvases > 0, 'The eligible desktop hero must initialize the connected Vanta network');
+      assert.ok(heroMotion.active, 'The desktop hero must initialize its organic mycelial canvas');
     }
     // Test the actual packaged image files, not merely whether the page JS starts.
     const imageAudit = await page.evaluate(async () => {
