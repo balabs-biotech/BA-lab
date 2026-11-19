@@ -63,3 +63,31 @@ If any required secret is missing, guest-order intake fails closed. The current 
 - `supabase/tests/store-catalogue-contract.test.mjs` checks the public catalogue data boundary.
 - `supabase/tests/store-guest-order-contract.test.mjs` checks guest request validation, rate limiting, token hashing, and PII minimization.
 - `scripts/test-storefront.mjs` checks the static storefront and GitHub Pages publication structure.
+
+
+## Guest checkout → Notion commercial register
+
+The storefront checkout now submits guest requests to the Supabase Edge Function
+`notion-store-order`. The function writes directly to the existing Notion data
+source `🛒 DEMANDES COMMERCIALES` (data source
+`7a40b95b-e353-4eb9-a471-99c97c5904f5`). It does not create a second CRM.
+
+Each request creates one `🆕 Nouvelle` record with the customer contact details,
+wilaya, selected products and quantities, fulfilment mode, instructions, a
+unique request reference, and an internal source note. Price, stock, delivery
+cost and final confirmation remain subject to BA Labs review. No online payment
+is taken. The browser never receives the Notion API token.
+
+### Required activation
+
+1. Create a Notion internal integration with read-content and insert-content
+   access, then share the existing `🛒 DEMANDES COMMERCIALES` database with it.
+2. Add its token to Supabase Edge Function secrets as `NOTION_API_KEY`.
+3. Deploy `notion-store-order` with `verify_jwt=false` after setting the secret.
+4. Submit a test request and verify that one row appears in
+   `🛒 DEMANDES COMMERCIALES`. The function uses a request ID to avoid duplicate
+   rows on a retry.
+
+Until `NOTION_API_KEY` is configured, the function fails closed and the
+checkout reports that the request could not be saved. No customer information
+is stored locally as a substitute.
