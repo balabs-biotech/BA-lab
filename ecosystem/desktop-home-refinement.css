@@ -272,7 +272,7 @@
 /* SECOND VISUAL PASS — correct the actual mobile card composition.
    The explorer injects a figure into each universe link; the legacy direct
    image beside it duplicated the specimen and inflated every card. */
-#app.balabs-ui > main > .editorial-work .work-card{
+#app.balabs-ui .experience-page > .editorial-work .work-card{
   display:flex!important;flex-direction:column!important;align-items:stretch!important;
   justify-content:flex-start!important;gap:0!important;min-height:0!important;
   padding:20px!important;margin:0!important;
@@ -281,72 +281,72 @@
   background:linear-gradient(155deg,rgba(38,59,56,.66),rgba(17,27,29,.94))!important;
   box-shadow:0 12px 34px rgba(0,0,0,.13)!important;text-align:left!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card .work-index{
+#app.balabs-ui .experience-page > .editorial-work .work-card .work-index{
   display:block!important;height:auto!important;margin:0 0 12px!important;padding:0!important;
   font:700 9px/1.4 ui-monospace,monospace!important;letter-spacing:.14em!important;color:#d18a6b!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card .work-media{
+#app.balabs-ui .experience-page > .editorial-work .work-card .work-media{
   width:100%!important;height:clamp(160px,17vw,220px)!important;min-height:0!important;
   aspect-ratio:16/10!important;margin:0 0 16px!important;flex:0 0 auto!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card .work-media img{
+#app.balabs-ui .experience-page > .editorial-work .work-card .work-media img{
   display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card h3{
+#app.balabs-ui .experience-page > .editorial-work .work-card h3{
   margin:0 0 10px!important;font-size:clamp(19px,1.6vw,24px)!important;line-height:1.16!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card>p:not(.work-topics){
+#app.balabs-ui .experience-page > .editorial-work .work-card>p:not(.work-topics){
   margin:0 0 10px!important;font-size:13px!important;line-height:1.68!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card .work-topics{
+#app.balabs-ui .experience-page > .editorial-work .work-card .work-topics{
   margin:auto 0 0!important;padding:12px 0 0!important;font-size:9px!important;line-height:1.55!important;
 }
-#app.balabs-ui > main > .editorial-work .work-card .work-card-link{
+#app.balabs-ui .experience-page > .editorial-work .work-card .work-card-link{
   width:max-content!important;max-width:100%!important;margin:12px 0 0!important;
   padding:7px 0 4px!important;font-size:10px!important;line-height:1.4!important;
 }
-#app.balabs-ui > main > .universe-index .universe-index-card>img.universe-card-image{display:none!important}
-#app.balabs-ui > main > .universe-index .universe-index-card{min-height:0!important;padding:16px!important}
-#app.balabs-ui > main > .universe-index .universe-index-card>.universe-visual{
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>img.universe-card-image{display:none!important}
+#app.balabs-ui .experience-page > .universe-index .universe-index-card{min-height:0!important;padding:16px!important}
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>.universe-visual{
   width:100%!important;height:clamp(150px,16vw,190px)!important;margin:0 0 12px!important;flex:0 0 auto!important;
 }
-#app.balabs-ui > main > .universe-index .universe-index-card>span:first-of-type{
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>span:first-of-type{
   min-height:0!important;height:auto!important;margin:0 0 9px!important;padding:0!important;
   font-size:10px!important;line-height:1.3!important;
 }
-#app.balabs-ui > main > .universe-index .universe-index-card>b{
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>b{
   margin:0 0 6px!important;font-size:clamp(17px,1.35vw,21px)!important;line-height:1.18!important;
 }
-#app.balabs-ui > main > .universe-index .universe-index-card>small{
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>small{
   margin:0 0 8px!important;font-size:9px!important;line-height:1.45!important;
 }
-#app.balabs-ui > main > .universe-index .universe-index-card>p{
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>p{
   margin:0 0 10px!important;font-size:11px!important;line-height:1.55!important;
 }
-#app.balabs-ui > main > .universe-index .universe-index-card>em{
+#app.balabs-ui .experience-page > .universe-index .universe-index-card>em{
   margin-top:auto!important;padding:7px 0 2px!important;font-size:9px!important;
 }
 @media(max-width:760px){
-  #app.balabs-ui > main > .editorial-work .work-grid{
+  #app.balabs-ui .experience-page > .editorial-work .work-grid{
     display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;border:0!important;
   }
-  #app.balabs-ui > main > .editorial-work .work-card{
+  #app.balabs-ui .experience-page > .editorial-work .work-card{
     padding:16px!important;border:1px solid rgba(167,184,164,.18)!important;
     border-left:2px solid rgba(185,107,77,.7)!important;
   }
-  #app.balabs-ui > main > .editorial-work .work-card .work-media{
+  #app.balabs-ui .experience-page > .editorial-work .work-card .work-media{
     height:clamp(150px,48vw,190px)!important;min-height:0!important;
   }
-  #app.balabs-ui > main > .universe-index .universe-index-card>.universe-visual{
+  #app.balabs-ui .experience-page > .universe-index .universe-index-card>.universe-visual{
     height:clamp(138px,43vw,172px)!important;margin-bottom:10px!important;
   }
-  #app.balabs-ui > main > .universe-index .universe-index-card{padding:14px!important}
+  #app.balabs-ui .experience-page > .universe-index .universe-index-card{padding:14px!important}
 }
 @media(max-width:420px){
-  #app.balabs-ui > main > .editorial-work .work-card .work-media{height:154px!important}
+  #app.balabs-ui .experience-page > .editorial-work .work-card .work-media{height:154px!important}
 }
 @media(hover:hover) and (pointer:fine){
-  #app.balabs-ui > main > .editorial-work .work-card:hover{
+  #app.balabs-ui .experience-page > .editorial-work .work-card:hover{
     transform:translateY(-4px)!important;border-color:rgba(185,107,77,.48)!important;
     box-shadow:0 20px 48px rgba(0,0,0,.22)!important;
   }
