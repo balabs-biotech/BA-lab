@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'store/**'
+      - 'ecosystem/index.html'
       - 'scripts/test-storefront.mjs'
       - '.github/workflows/storefront-checks.yml'
       - '.github/workflows/deploy-pages.yml'
