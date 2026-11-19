@@ -134,7 +134,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const rate = await postRpc(supabaseUrl, credentials, "consume_store_checkout_rate_limit", {
-      p_fingerprint_hash: await hmacFingerprint(rateLimitSecret, ip),
+      p_fingerprint_hash: await hmacFingerprint(rateLimitSecret, 'track-store-order:' + ip),
       p_limit: 10,
       p_window_seconds: 600,
     });
