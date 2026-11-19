@@ -379,3 +379,19 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
   inset-inline-end:10px!important;
  }
 }
+
+
+/* PASS 73 — keep the mycelial chapter rail on the reserved reading gutter.
+   Physical edge anchoring avoids logical-inset cascade conflicts in LTR pages. */
+html[dir="ltr"] body>.chapter-rail{
+ left:max(0px,env(safe-area-inset-left))!important;
+ right:auto!important;
+ inset-inline-start:max(0px,env(safe-area-inset-left))!important;
+ inset-inline-end:auto!important;
+}
+html[dir="rtl"] body>.chapter-rail{
+ left:auto!important;
+ right:max(0px,env(safe-area-inset-right))!important;
+ inset-inline-start:auto!important;
+ inset-inline-end:max(0px,env(safe-area-inset-right))!important;
+}
