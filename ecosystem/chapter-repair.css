@@ -717,3 +717,18 @@
 .chapter-filament .filament-base{stroke:#9aafa2!important;stroke-width:2!important;stroke-dasharray:2 5!important}
 .chapter-filament .filament-progress{stroke:#c47b5c!important;stroke-width:3!important}
 .chapter-filament .filament-signal{r:5!important}
+
+
+/* Universe index: keep specimen photographs inside their own cards.
+   The source images have different intrinsic widths; never let those widths
+   determine the chapter's horizontal scroll area. */
+#app.balabs-ui .experience-page .universe-index-card>.universe-card-image{
+ display:block!important;
+ flex:0 0 auto!important;
+ width:100%!important;
+ max-width:100%!important;
+ height:clamp(132px,14vw,176px)!important;
+ margin:0 0 14px!important;
+ object-fit:cover!important;
+ object-position:center!important;
+}
