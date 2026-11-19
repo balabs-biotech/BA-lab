@@ -17,7 +17,11 @@ try {
   await page.locator("#requestQuote").click();
   await page.locator("#requestModal.is-open").waitFor();
   await page.waitForFunction(() => Boolean(document.querySelector("#requestSummary")?.textContent?.trim()));
-  assert.ok(await page.locator("#requestSummary").innerText(), "Selected product must appear in the request summary");
+  const summaryState = await page.locator("#requestSummary").evaluate(el => ({ text: el.textContent.trim(), display: getComputedStyle(el).display, visibility: getComputedStyle(el).visibility, rect: el.getBoundingClientRect().toJSON() }));
+  assert.ok(summaryState.text, "Selected product must appear in the request summary");
+  assert.notEqual(summaryState.display, "none", "Request summary must not be display-hidden");
+  assert.notEqual(summaryState.visibility, "hidden", "Request summary must be visible");
+  assert.ok(summaryState.rect.width > 0 && summaryState.rect.height > 0, "Request summary must occupy visible space");
 
   const desktopColumns = await page.locator(".request-layout").evaluate(el =>
     getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length
