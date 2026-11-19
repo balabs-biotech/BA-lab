@@ -12,7 +12,7 @@
  Object.entries(visuals).forEach(([key,data])=>{
   const page=track.querySelector('.experience-page[data-chapter="'+key+'"]');if(!page)return;
   const figure=document.createElement('figure');figure.className='chapter-atmosphere';
-  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading='eager';img.decoding='async';img.addEventListener('error',()=>figure.classList.add('is-unavailable'),{once:true});img.addEventListener('load',()=>figure.classList.remove('is-unavailable'));
+  const img=document.createElement('img');img.src=data.src;img.alt=data.alt;img.loading='eager';img.fetchPriority=key==='home'?'high':'auto';img.decoding='async';img.addEventListener('error',()=>figure.classList.add('is-unavailable'),{once:true});img.addEventListener('load',()=>figure.classList.remove('is-unavailable'));
 
   const caption=document.createElement('figcaption');const tag=document.createElement('span');tag.textContent=data.tag;
   const credit=document.createElement('small');credit.textContent='IMAGE / '+data.credit;
