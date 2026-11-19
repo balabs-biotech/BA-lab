@@ -110,6 +110,10 @@
 
 
   const supplementalCoverage = [
+    ["Intelligence environnementale","Environmental intelligence","Inteligência ambiental","الذكاء البيئي"],
+    ["Suivi des lignées","Lineage tracking","Acompanhamento das linhagens","تتبّع السلالات"],
+    ["Traçabilité expérimentale","Experimental traceability","Rastreabilidade experimental","التتبّع التجريبي"],
+
     ["AGRONOMIE & ENVIRONNEMENT","AGRONOMY & ENVIRONMENT","AGRONOMIA & AMBIENTE","الزراعة والبيئة"],
     ["MYCOLOGIE & GÉNÉALOGIE","MYCOLOGY & LINEAGE","MICOLOGIA & GENEALOGIA","علم الفطريات والأنساب"],
     ["LABORATOIRE & BIOPROCÉDÉS","LABORATORY & BIOPROCESSES","LABORATÓRIO & BIOPROCESSOS","المختبر والعمليات الحيوية"],
