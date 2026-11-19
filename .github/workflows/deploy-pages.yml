@@ -1,6 +1,7 @@
 name: Deploy BA Labs website and Batch Tracker to GitHub Pages
 
 # GitHub Pages is the sole public deployment target for this repository.
+# Let an active deployment finish; newer pushes supersede the pending run.
 on:
   push:
     branches: [main]
@@ -13,7 +14,7 @@ permissions:
 
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
