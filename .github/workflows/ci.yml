@@ -172,6 +172,10 @@ jobs:
           node-version: "22"
       - name: Check create-store-order Edge Function TypeScript syntax
         run: node --experimental-strip-types --check supabase/functions/create-store-order/index.ts
+      - name: Check store-catalogue Edge Function TypeScript syntax
+        run: node --experimental-strip-types --check supabase/functions/store-catalogue/index.ts
+      - name: Test public catalogue privacy contract
+        run: node scripts/test-store-catalogue-contract.mjs
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
         run: node --experimental-strip-types supabase/tests/sync-culture-to-notion.test.mts
       - name: Test Sentinel-2 catalogue security and query contract
