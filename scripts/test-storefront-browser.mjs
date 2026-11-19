@@ -8,6 +8,7 @@ const pageErrors = [];
 page.on("pageerror", error => pageErrors.push(error.message));
 
 try {
+  await page.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
   await page.goto(base, { waitUntil: "networkidle" });
   await page.locator("#productGrid .add-product").first().click();
   await page.locator("#cartOpen").click();
