@@ -395,3 +395,26 @@ html[dir="rtl"] body>.chapter-rail{
  inset-inline-start:auto!important;
  inset-inline-end:max(0px,env(safe-area-inset-right))!important;
 }
+
+
+/* PASS 76 — compact mobile nav labels and expose the horizontal scroll affordance. */
+@media(max-width:760px){
+ #app.balabs-ui>.site-nav{
+  gap:clamp(6px,1.8vw,9px)!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#b96b4d #263b38!important;
+  scroll-padding-inline:10px!important;
+ }
+ #app.balabs-ui>.site-nav::-webkit-scrollbar{display:block!important;height:3px!important}
+ #app.balabs-ui>.site-nav::-webkit-scrollbar-track{background:#263b38!important}
+ #app.balabs-ui>.site-nav::-webkit-scrollbar-thumb{background:#b96b4d!important;border-radius:3px!important}
+ #app.balabs-ui>.site-nav>a{
+  font-size:8px!important;
+  letter-spacing:.045em!important;
+  padding-inline:1px!important;
+ }
+}
+@media(max-width:390px){
+ #app.balabs-ui>.site-nav{gap:6px!important;padding-inline:8px!important}
+ #app.balabs-ui>.site-nav>a{font-size:8px!important;letter-spacing:.035em!important}
+}
