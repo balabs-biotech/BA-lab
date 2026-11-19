@@ -36,8 +36,8 @@ assert.ok(js.includes('STORE_CATALOGUE_URL') && js.includes("method:'GET'") && j
 assert.ok(js.includes('STORE_REMOTE_CATALOGUE_ENABLED=false') && js.includes('if(!STORE_REMOTE_CATALOGUE_ENABLED)return;'), 'Remote catalogue access must remain disabled until cross-border processing and privacy disclosures are approved');
 assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Public catalogue requests must use only the publishable key');
 assert.ok(html.includes('./cookies.html') && html.includes('./privacy.html') && html.includes('./terms.html') && html.includes('./shipping.html') && html.includes('./legal.html'), 'Footer must expose legal and privacy pages');
-assert.ok(privacy.includes('point d\'accès Supabase du catalogue est désactivé') && privacy.includes('transfert international'), 'Privacy policy must disclose the disabled remote catalogue and cross-border review gate');
-assert.ok(cookies.includes('point d\'accès Supabase du catalogue est actuellement désactivé'), 'Cookie policy must disclose that no remote catalogue request is active');
+assert.ok(privacy.includes('appel depuis le navigateur reste désactivé') && privacy.includes('transfert international'), 'Privacy policy must disclose the disabled remote catalogue and cross-border review gate');
+assert.ok(cookies.includes('appel depuis le navigateur reste désactivé'), 'Cookie policy must disclose that no remote catalogue request is active');
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
