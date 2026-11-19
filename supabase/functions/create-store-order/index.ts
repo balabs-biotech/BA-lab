@@ -5,25 +5,6 @@ const DATA_SOURCE_ID = Deno.env.get("NOTION_STORE_DATA_SOURCE_ID") ?? "7a40b95b-
 const NOTION_VERSION = "2025-09-03";
 const MAX_BODY_BYTES = 16384;
 const MAX_ITEMS = 20;
-// Best-effort per-isolate throttle. Persistent HMAC rate limiting can be added
-// before public launch if traffic warrants it.
-const rateBuckets = new Map<string, { started: number; count: number }>();
-
-function isRateLimited(req: Request): boolean {
-  const ip = (req.headers.get("cf-connecting-ip") ??
-    req.headers.get("x-real-ip") ??
-    req.headers.get("x-forwarded-for")?.split(",").at(-1) ??
-    "unknown").trim().slice(0, 100);
-  const now = Date.now();
-  const bucket = rateBuckets.get(ip);
-  if (!bucket || now - bucket.started > 600_000) {
-    rateBuckets.set(ip, { started: now, count: 1 });
-    return false;
-  }
-  bucket.count += 1;
-  return bucket.count > 5;
-}
-
 type Product = {
   title: string;
   family: "liquid" | "agar" | "spawn";
@@ -92,6 +73,33 @@ async function supabaseRequest(path: string, key: string, method: string, body?:
   });
   const data = await response.json().catch(() => null);
   return { response, data };
+}
+
+async function isRateLimited(req: Request, secretKey: string): Promise<boolean> {
+  const ip = (req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-real-ip") ??
+    req.headers.get("x-forwarded-for")?.split(",").at(-1) ??
+    "").trim().slice(0, 100);
+  if (!ip) throw new Error("client_ip_unavailable");
+
+  const hmacKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secretKey),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", hmacKey, new TextEncoder().encode(ip));
+  const fingerprint = Array.from(new Uint8Array(signature), byte => byte.toString(16).padStart(2, "0")).join("");
+  const result = await supabaseRequest("rpc/consume_store_rate_limit", secretKey, "POST", {
+    p_fingerprint: fingerprint,
+    p_limit: 5,
+    p_window_seconds: 600
+  });
+  if (!result.response.ok || typeof result.data !== "boolean") {
+    throw new Error("rate_limit_service_unavailable");
+  }
+  return !result.data;
 }
 
 function rich(value: string) {
@@ -204,7 +212,6 @@ Deno.serve(async (req: Request) => {
     return json(422, { success: false, error: "invalid_payload" }, origin);
   }
   if (clean(body.website, 200)) return json(200, { success: true }, origin);
-  if (isRateLimited(req)) return json(429, { success: false, error: "rate_limited" }, origin);
 
   const customer = body.customer && typeof body.customer === "object" ? body.customer : {};
   const name = clean(customer.name, 120);
@@ -261,6 +268,14 @@ Deno.serve(async (req: Request) => {
   const secretKey = getSecretKey();
   if (!secretKey || !Deno.env.get("SUPABASE_URL")) {
     console.error("[create-store-order] Supabase server configuration missing");
+    return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
+  }
+  try {
+    if (await isRateLimited(req, secretKey)) {
+      return json(429, { success: false, error: "rate_limited" }, origin);
+    }
+  } catch (error) {
+    console.error("[create-store-order] Rate limit service unavailable", error instanceof Error ? error.message : "unknown");
     return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
   }
 
