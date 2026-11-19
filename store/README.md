@@ -47,6 +47,18 @@ Both tables have RLS enabled. Direct table access is revoked from `anon` and `au
 
 The migration has been applied to Supabase project `axcouwiodqsauwnsiotn`. A transaction-level smoke test inserted a synthetic request and then rolled back; no test row was retained.
 
+## Public catalogue API
+
+Source: `supabase/functions/store-catalogue/index.ts`
+
+- Deployed as a read-only public GET endpoint with an exact storefront-origin allowlist.
+- Reads only the dedicated Notion data source `CATALOGUE PUBLIC — Ressources publiables`.
+- Returns only rows where `Actif au catalogue` is checked.
+- Exposes an explicit field allowlist: public reference, short code, product title, family, availability, formats, applications, public summary, target use, evidence level and request URL.
+- Never queries or returns customer records, order records, internal notes, Notion page IDs or workspace metadata.
+- Uses a separate read-only Notion integration secret, `NOTION_CATALOGUE_API_KEY`, which must have access only to the public catalogue data source.
+- The frontend flag `STORE_REMOTE_CATALOGUE_ENABLED=false` remains off until this secret is configured and public catalogue codes are reconciled with the server-side order allowlist.
+
 ## Edge Function
 
 Source: `supabase/functions/create-store-order/index.ts`
@@ -64,7 +76,7 @@ Source: `supabase/functions/create-store-order/index.ts`
 - Applies a persistent limit of five requests per ten minutes using an HMAC-SHA-256 fingerprint of the gateway-provided client IP. The raw IP is not stored.
 - Does not process payment or confirm stock, delivery fees, or lead times.
 
-The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_STORE_API_KEY` (a separate Notion integration token with access limited to the commercial orders data source). The previous shared `NOTION_API_KEY` is deliberately no longer accepted by this storefront function.
+The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_STORE_API_KEY` (a separate Notion integration token with access limited to the commercial orders data source) and `NOTION_CATALOGUE_API_KEY` (a different read-only integration token with access limited to the public catalogue data source). The previous shared `NOTION_API_KEY` is deliberately no longer accepted by either storefront function.
 
 ## Catalogue
 
