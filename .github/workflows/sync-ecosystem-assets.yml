@@ -37,12 +37,12 @@ jobs:
 
       - name: Commit the reproducible image source set
         run: |
-          if git diff --quiet -- ecosystem/assets; then
+          git add -A ecosystem/assets/
+          if git diff --cached --quiet; then
             echo "All public image assets are already synchronized."
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add ecosystem/assets/
             git commit -m "Sync optimized BA Labs public image assets"
             git push origin HEAD:main
           fi
