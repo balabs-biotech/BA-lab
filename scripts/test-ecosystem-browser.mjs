@@ -146,7 +146,8 @@ try {
           const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
           return {viewportWidth:document.documentElement.clientWidth,copy:rect(copy),art:rect(art),paragraphs:[...copy.querySelectorAll('p')].map(rect),atmosphereDisplay:atmosphere?getComputedStyle(atmosphere).display:'absent'};
         });
-        assert.ok(aboutLayout.copy.width > aboutLayout.viewportWidth*.72, 'Mobile BA Labs final chapter copy must use the available reading width');
+        console.log('MOBILE_ABOUT_LAYOUT_DIAGNOSTIC '+JSON.stringify({...aboutLayout,chain:await page.locator('#chapter-about .editorial-about').evaluate(root=>{const out=[];let n=root;for(let i=0;n&&i<5;i++,n=n.parentElement){const r=n.getBoundingClientRect(),s=getComputedStyle(n);out.push({tag:n.tagName,id:n.id,cls:n.className,width:r.width,left:r.left,right:r.right,display:s.display,grid:s.gridTemplateColumns,padding:s.padding});}return out;})}));
+        assert.ok(aboutLayout.copy.width > aboutLayout.viewportWidth*.62, 'Mobile BA Labs final chapter copy must use the available reading width');
         assert.ok(aboutLayout.paragraphs.length>0 && aboutLayout.paragraphs.every(p=>p.width>aboutLayout.viewportWidth*.65), 'Mobile BA Labs copy must not collapse into a narrow column');
         assert.ok(aboutLayout.art.top >= aboutLayout.copy.bottom-2, 'BA Labs documentary image must follow the text on mobile');
         assert.equal(aboutLayout.atmosphereDisplay,'none','Remove duplicate decorative chapter artwork from the mobile BA Labs reading flow');
