@@ -5,6 +5,7 @@ const html = readFileSync('store/index.html', 'utf8');
 const css = readFileSync('store/store.css', 'utf8');
 const js = readFileSync('store/store.js', 'utf8');
 const workflow = readFileSync('.github/workflows/deploy-pages.yml', 'utf8');
+const ecosystem = readFileSync('ecosystem/index.html', 'utf8');
 
 for (const page of ['index.html', 'legal.html', 'privacy.html', 'terms.html', 'shipping.html', 'cookies.html']) {
   assert.ok(existsSync('store/' + page), 'Missing storefront page: ' + page);
@@ -23,4 +24,5 @@ assert.ok(!js.includes('fetch(') && !js.includes('createClient('), 'Preview stor
 assert.ok(html.includes('./cookies.html') && html.includes('./privacy.html') && html.includes('./terms.html') && html.includes('./shipping.html') && html.includes('./legal.html'), 'Footer must expose legal and privacy pages');
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
-console.log('Storefront regression checks passed: 12 references, 4 languages, cart, reduced motion, legal pages, no remote fonts or premature data submission.');
+assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
+console.log('Storefront regression checks passed: 12 references, 4 languages, ecosystem entry point, cart, reduced motion, legal pages, no remote fonts or premature data submission.');
