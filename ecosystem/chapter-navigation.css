@@ -344,3 +344,22 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
 @media(prefers-reduced-motion:reduce){
  .chapter-filament .filament-branches{filter:none!important}
 }
+
+
+/* MOBILE PASS 63 — keep the main navigation readable and genuinely scrollable. */
+@media(max-width:760px){
+ #app.balabs-ui>.site-nav{
+  display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;
+  align-items:center!important;gap:clamp(8px,2.5vw,14px)!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  overflow-x:auto!important;overflow-y:hidden!important;padding:0 12px!important;margin:0!important;
+  white-space:nowrap!important;overscroll-behavior-inline:contain!important;
+  -webkit-overflow-scrolling:touch!important;scrollbar-width:none!important;scroll-snap-type:x proximity!important;
+ }
+ #app.balabs-ui>.site-nav::-webkit-scrollbar{display:none!important}
+ #app.balabs-ui>.site-nav>a{display:inline-flex!important;flex:0 0 auto!important;white-space:nowrap!important;min-height:42px!important;padding:10px 3px!important;scroll-snap-align:start!important}
+}
+@media(max-width:390px){
+ #app.balabs-ui>.site-nav{gap:10px!important;padding-inline:10px!important}
+ #app.balabs-ui>.site-nav>a{font-size:9px!important;letter-spacing:.08em!important}
+}
