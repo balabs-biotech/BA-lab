@@ -37,11 +37,12 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST" || !ALLOWED_ORIGINS.has(origin)) return new Response("Forbidden", { status: 403 });
   const notionKey = Deno.env.get("NOTION_API_KEY");
   if (!notionKey) return reply({ success: false, error: "service_not_configured" }, 503, origin);
-  const declaredLength = Number(req.headers.get("content-length") || "0");
-  if (declaredLength > 12000) return reply({ success: false, error: "payload_too_large" }, 413, origin);
-
+  let rawBody = "";
+  try { rawBody = await req.text(); } catch { return reply({ success: false, error: "invalid_body" }, 400, origin); }
+  if (new TextEncoder().encode(rawBody).byteLength > 12000) return reply({ success: false, error: "payload_too_large" }, 413, origin);
   let body: Record<string, unknown>;
-  try { body = await req.json(); } catch { return reply({ success: false, error: "invalid_json" }, 400, origin); }
+  try { body = JSON.parse(rawBody); } catch { return reply({ success: false, error: "invalid_json" }, 400, origin); }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return reply({ success: false, error: "invalid_payload" }, 400, origin);
   if (clean(body.website, 200)) return reply({ success: true }, 200, origin);
 
   const customer = body.customer && typeof body.customer === "object" ? body.customer as Record<string, unknown> : {};
