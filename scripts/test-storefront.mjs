@@ -8,6 +8,8 @@ const workflow = readFileSync('.github/workflows/deploy-pages.yml', 'utf8');
 const ecosystem = readFileSync('ecosystem/index.html', 'utf8');
 const privacy = readFileSync('store/privacy.html', 'utf8');
 const cookies = readFileSync('store/cookies.html', 'utf8');
+const retiredStoreNotion = readFileSync('supabase/functions/store-notion-order/index.ts', 'utf8');
+const retiredNotionStore = readFileSync('supabase/functions/notion-store-order/index.ts', 'utf8');
 
 for (const page of ['index.html', 'legal.html', 'privacy.html', 'terms.html', 'shipping.html', 'cookies.html']) {
   assert.ok(existsSync('store/' + page), 'Missing storefront page: ' + page);
@@ -50,3 +52,6 @@ assert.ok(js.includes("credentials:'omit'"), 'Browser requests must never forwar
 assert.ok(!js.includes('localStorage.setItem') && js.includes('safeSet'), 'Customer form values must not be persisted directly in browser storage');
 
 assert.ok(js.includes('orderForm.addEventListener') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Browser submits through the public Supabase key only');
+
+assert.ok(retiredStoreNotion.includes('status: 410') && retiredNotionStore.includes('status: 410'), 'Legacy public direct-to-Notion endpoints must remain retired');
+assert.ok(!retiredStoreNotion.includes('NOTION_API_KEY') && !retiredNotionStore.includes('NOTION_API_KEY'), 'Retired endpoints must not retain access to customer-data integrations');
