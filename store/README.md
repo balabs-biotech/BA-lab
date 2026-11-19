@@ -88,10 +88,11 @@ The function is deployed as `create-store-order` with JWT verification disabled 
 
 ## Before enabling customer submissions
 
-1. Test the failure path by making Notion temporarily unavailable and confirming the Supabase request remains intact with `notion_sync_status='pending'`.
-2. Implement and test a reliable retry mechanism for pending Notion syncs.
-3. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
-4. Only then set `STORE_ORDER_ENABLED=true` and publish the storefront.
+1. Add a server-verified anti-bot challenge (for example, Turnstile) with a server-side secret; the current controls are a honeypot and persistent rate limiting, not a CAPTCHA.
+2. Test the failure path by making Notion temporarily unavailable and confirming the Supabase request remains intact with `notion_sync_status='pending'`.
+3. Implement and test a reliable retry mechanism for pending Notion syncs.
+4. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
+5. Only then set `STORE_ORDER_ENABLED=true` and publish the storefront.
 
 ## CultureOps boundary
 
