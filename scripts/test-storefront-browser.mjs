@@ -11,9 +11,12 @@ try {
   await page.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
   await page.goto(base, { waitUntil: "networkidle" });
   await page.locator("#productGrid .add-product").first().click();
+  await page.waitForFunction(() => document.querySelector("#cartCount")?.textContent?.trim() === "1");
   await page.locator("#cartOpen").click();
+  await page.locator("#cartItems .cart-line").first().waitFor();
   await page.locator("#requestQuote").click();
   await page.locator("#requestModal.is-open").waitFor();
+  await page.waitForFunction(() => Boolean(document.querySelector("#requestSummary")?.textContent?.trim()));
   assert.ok(await page.locator("#requestSummary").innerText(), "Selected product must appear in the request summary");
 
   const desktopColumns = await page.locator(".request-layout").evaluate(el =>
