@@ -184,6 +184,8 @@ jobs:
         run: node supabase/tests/iot-ingest-security.test.mjs
       - name: Test BA Labs Store public catalogue endpoint contract
         run: node supabase/tests/store-catalogue-contract.test.mjs
+      - name: Test BA Labs Store guest-order intake security contract
+        run: node supabase/tests/store-guest-order-contract.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
