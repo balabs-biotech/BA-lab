@@ -20,9 +20,9 @@ for (const id of ['productGrid', 'cartDrawer', 'cartItems', 'requestModal', 'con
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   assert.ok(js.includes(language + ':{'), 'Missing language dictionary: ' + language);
 }
-assert.equal((js.match(/code:'BAL-/g) || []).length, 15, 'Storefront must render 12 original references plus Petri, wheat grain spawn and liquid culture syringe products');
-assert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The inoculated Petri dish must show its confirmed 2,000 DZD unit price');
-assert.ok(js.includes('priceDzd:100') && js.includes('Water Agar — boîte non inoculée'), 'Uninoculated Water Agar must show its 100 DZD unit price');
+assert.equal((js.match(/(?:code:'BAL-|\\"code\\":\\"BAL-)/g) || []).length, 32, 'Storefront must retain all 29 active public catalogue references plus Petri, wheat grain spawn and liquid culture syringe');
+assert.ok(js.includes('statusOnRequest') && js.includes('statusToConfirm') && js.includes('statusUnavailable') && js.includes("p.status!=='unavailable'"), 'The catalogue must localize availability and block selection of unavailable references');\nassert.ok(js.includes('BAL-LC-TRI-HAMATUM-001') && js.includes('BAL-AG-PDAE-001'), 'Unavailable Notion catalogue references must remain visible in the static multilingual catalogue');\nassert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The inoculated Petri dish must show its confirmed 2,000 DZD unit price');
+assert.ok(!/priceDzd:100[,}]/.test(js) && js.includes('Water Agar — boîte non inoculée'), 'Water Agar must remain on request without an unconfirmed public price');
 assert.ok(js.includes('priceDzd:1000') && js.includes('grain spawn · 2,5 kg'), 'Wheat grain spawn must show its 2.5 kg / 1,000 DZD format');
 assert.ok(js.includes('priceDzd:5000') && js.includes('Prix envisagé · à confirmer') && js.includes('price-qualifier'), 'Liquid culture syringe price must be clearly marked indicative');
 assert.ok(js.includes("family:'spawn'") && js.includes("filterSpawn:'Grain spawn'"), 'Grain spawn must have a distinct localized catalogue filter');
@@ -41,7 +41,7 @@ assert.ok(cookies.includes('appel depuis le navigateur reste désactivé'), 'Coo
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
-console.log('Storefront regression checks passed: 15 references, four languages, cart, custom enquiry workspace, Supabase-first intake gate, legal pages and reduced-motion support.');
+console.log('Storefront regression checks passed: 32 references, four languages, availability gating, cart, custom enquiry workspace, Supabase-first intake gate, legal pages and reduced-motion support.');
 assert.equal((html.match(/id="copyRequest"/g)||[]).length,1,'Request copy action must have one unique DOM id');
 assert.ok(js.includes('STORE_ORDER_URL') && js.includes('STORE_ORDER_ENABLED=false'), 'Order endpoint must remain gated until deployment');
 assert.ok(html.includes('id="orderForm"') && html.includes('name="phone"') && html.includes('name="name"'), 'Guest order form must collect customer identity');
