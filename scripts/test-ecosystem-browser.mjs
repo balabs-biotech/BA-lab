@@ -146,6 +146,23 @@ try {
     assert.ok(allChapterImageAudits.length > 0, 'Editorial chapters must contain real image elements');
     const catalogueVisuals = await page.locator('.product-catalogue-visual-img').evaluateAll(imgs => ({count:imgs.length,unique:new Set(imgs.map(img=>img.currentSrc||img.src)).size,loaded:imgs.every(img=>img.complete&&img.naturalWidth>0)}));
     assert.deepEqual(catalogueVisuals,{count:3,unique:3,loaded:true},'Catalogue must show three distinct, decoded documentary photos rather than repeated card backgrounds');
+    if (viewport.name === 'mobile') {
+      const catalogueLayout = await page.locator('#chapter-catalogue').evaluate(root => {
+        const intro = root.querySelector('.product-catalogue-intro');
+        const paragraphs = [...root.querySelectorAll('.product-catalogue-intro p')].filter(el => getComputedStyle(el).display !== 'none');
+        const visuals = root.querySelector('.product-catalogue-visuals');
+        const rect = el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}; };
+        const ir = rect(intro), vr = rect(visuals);
+        return {
+          intro:ir,visuals:vr,
+          paragraphs:paragraphs.map(el => ({...rect(el),writingMode:getComputedStyle(el).writingMode,wordBreak:getComputedStyle(el).wordBreak,overflowWrap:getComputedStyle(el).overflowWrap})),
+          viewportWidth:document.documentElement.clientWidth
+        };
+      });
+      assert.ok(catalogueLayout.intro.width > catalogueLayout.viewportWidth * .72, 'Mobile catalogue introduction must use a full-width reading column');
+      assert.ok(catalogueLayout.visuals.top >= catalogueLayout.intro.bottom - 2, 'Catalogue photography must sit below the introduction, never beside it');
+      assert.ok(catalogueLayout.paragraphs.length > 0 && catalogueLayout.paragraphs.every(p => p.width > catalogueLayout.viewportWidth * .65 && p.writingMode === 'horizontal-tb'), 'Mobile catalogue copy must remain horizontal and readable, not stretched into a narrow vertical strip');
+    }
     const originalUrl = page.url();
     await page.locator('.chapter-rail-node').nth(2).click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
