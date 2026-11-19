@@ -351,3 +351,54 @@
     box-shadow:0 20px 48px rgba(0,0,0,.22)!important;
   }
 }
+
+
+/* Specificity guard: chapter styles predate the global refinement layer. */
+#app #chapter-research .editorial-work .work-card{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  justify-content:flex-start!important;gap:0!important;min-height:0!important;
+  height:auto!important;padding:16px!important;margin:0!important;
+  border:1px solid rgba(167,184,164,.18)!important;
+  border-left:2px solid rgba(185,107,77,.7)!important;
+  background:linear-gradient(155deg,rgba(38,59,56,.66),rgba(17,27,29,.94))!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.13)!important;
+}
+#app #chapter-research .editorial-work .work-card .work-index{
+  display:block!important;position:relative!important;height:auto!important;min-height:0!important;
+  margin:0 0 12px!important;padding:0!important;font:700 9px/1.4 ui-monospace,monospace!important;
+}
+#app #chapter-research .editorial-work .work-card .work-media{
+  width:100%!important;height:154px!important;min-height:0!important;max-height:none!important;
+  margin:0 0 14px!important;flex:0 0 auto!important;
+}
+#app #chapter-research .editorial-work .work-card .work-media img{
+  display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;
+}
+#app #chapter-research .editorial-work .work-card h3{
+  height:auto!important;min-height:0!important;margin:0 0 9px!important;
+  font-size:21px!important;line-height:1.16!important;
+}
+#app #chapter-research .editorial-work .work-card>p:not(.work-topics){
+  height:auto!important;min-height:0!important;margin:0 0 9px!important;
+  font-size:13px!important;line-height:1.62!important;
+}
+#app #chapter-research .editorial-work .work-card .work-topics{
+  height:auto!important;min-height:0!important;margin:auto 0 0!important;
+  padding:10px 0 0!important;font-size:9px!important;line-height:1.5!important;
+}
+#app #chapter-research .editorial-work .work-card .work-card-link{
+  height:auto!important;min-height:0!important;margin:10px 0 0!important;
+  padding:5px 0 3px!important;font-size:10px!important;line-height:1.4!important;
+}
+#app #chapter-network .universe-index .universe-index-card>span:first-of-type{
+  display:block!important;height:auto!important;min-height:0!important;
+  margin:0 0 8px!important;padding:0!important;line-height:1.3!important;
+}
+@media(max-width:760px){
+  #app #chapter-research .editorial-work .work-grid{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;
+    border:0!important;
+  }
+  #app #chapter-research .editorial-work .work-card{padding:14px!important}
+  #app #chapter-research .editorial-work .work-card .work-media{height:154px!important}
+}
