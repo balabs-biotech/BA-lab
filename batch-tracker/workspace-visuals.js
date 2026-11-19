@@ -39,31 +39,80 @@
         </div>`
     },
     agronomy: {
-      label: "Feuille stylisée avec balayage lumineux le long de la nervure",
+      label: "Planche botanique scientifique montrant une feuille, sa nervation principale et son réseau de nervures secondaires",
       particles: {
-        count: compact ? 5 : 10, color: "#b4f477", direction: "top", speed: 0.13,
+        count: compact ? 5 : 10,
+        color: "#b4f477",
+        direction: "none",
+        speed: 0.045,
         shape: "circle",
-        interactivity: { hover: { enable: true, mode: "repulse" }, click: { enable: true, mode: "push" } }
+        interactivity: {
+          hover: { enable: true, mode: "repulse" },
+          click: { enable: true, mode: "push" }
+        }
       },
       markup: `
-        <div class="ba-sector-visual ba-sector-visual--greentech" data-sector="agronomy">
-          <svg class="ba-sector-svg" viewBox="0 0 260 200" role="img" aria-label="Feuille stylisée et nervure centrale">
+        <div class="ba-sector-visual ba-sector-visual--greentech" data-sector="agronomy" data-visual="botanical-plate">
+          <svg class="ba-sector-svg ba-botanical-plate" viewBox="0 0 320 240" role="img" aria-label="Planche botanique : limbe foliaire, nervure médiane, nervures secondaires et réseau de nervilles">
             <defs>
-              <linearGradient id="ba-leaf-fill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b4f477" stop-opacity=".2"/><stop offset="1" stop-color="#5e9c56" stop-opacity=".025"/></linearGradient>
-              <linearGradient id="ba-leaf-scan"><stop stop-color="#b4f477" stop-opacity="0"/><stop offset=".5" stop-color="#d9ffae" stop-opacity=".95"/><stop offset="1" stop-color="#b4f477" stop-opacity="0"/></linearGradient>
+              <linearGradient id="ba-leaf-lamina" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#b9e58a" stop-opacity=".28"/>
+                <stop offset=".48" stop-color="#6f9f60" stop-opacity=".16"/>
+                <stop offset="1" stop-color="#294c38" stop-opacity=".08"/>
+              </linearGradient>
+              <linearGradient id="ba-leaf-margin" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#d5f2a7" stop-opacity=".88"/>
+                <stop offset="1" stop-color="#7eaf70" stop-opacity=".68"/>
+              </linearGradient>
+              <linearGradient id="ba-leaf-midrib" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#a4d27a"/>
+                <stop offset=".55" stop-color="#e0f5b8"/>
+                <stop offset="1" stop-color="#8ebd6d"/>
+              </linearGradient>
+              <radialGradient id="ba-leaf-light" cx=".42" cy=".42" r=".68">
+                <stop offset="0" stop-color="#d7f4b1" stop-opacity=".16"/>
+                <stop offset="1" stop-color="#d7f4b1" stop-opacity="0"/>
+              </radialGradient>
+              <pattern id="ba-leaf-grid" width="18" height="18" patternUnits="userSpaceOnUse">
+                <path d="M18 0H0V18" fill="none" stroke="#c5e4a7" stroke-opacity=".045" stroke-width=".6"/>
+              </pattern>
+              <clipPath id="ba-leaf-clip">
+                <path d="M47 177C44 139 61 98 91 66C129 26 190 19 273 42C256 91 232 137 197 169C158 205 99 211 47 177Z"/>
+              </clipPath>
             </defs>
-            <path d="M39 139C48 66 115 24 220 28c-7 84-55 139-132 142-23 1-39-10-49-31Z" fill="url(#ba-leaf-fill)" stroke="#91c86d" stroke-width="2"/>
-            <path d="M39 139C100 108 158 67 220 28" fill="none" stroke="#b4f477" stroke-width="2.2" stroke-linecap="round"/>
-            <g fill="none" stroke="#91c86d" stroke-width="1.2" stroke-linecap="round" opacity=".76">
-              <path d="M76 120c-5-23-17-38-31-48M106 103c-2-27-1-47 7-67M140 82c8-23 19-38 33-49M81 118c-18-1-31 5-42 21M111 101c-17-8-29-20-38-34M145 79c-12-16-17-31-17-47M104 105c18 7 36 7 53 1M139 83c19 6 37 4 55-5M171 59c16 2 31-2 45-12"/>
+
+            <rect x="9" y="9" width="302" height="204" rx="13" fill="url(#ba-leaf-grid)" opacity=".75"/>
+            <path d="M47 177C44 139 61 98 91 66C129 26 190 19 273 42C256 91 232 137 197 169C158 205 99 211 47 177Z"
+              fill="url(#ba-leaf-lamina)" stroke="url(#ba-leaf-margin)" stroke-width="1.8"/>
+            <g clip-path="url(#ba-leaf-clip)">
+              <path d="M38 183C112 145 191 91 280 38" fill="none" stroke="url(#ba-leaf-light)" stroke-width="52"/>
+              <g fill="none" stroke="#a8d287" stroke-width="1.05" stroke-linecap="round" opacity=".74">
+                <path d="M72 163C69 137 60 118 48 105M91 153C85 121 82 94 88 72M112 139C108 108 110 78 124 49M136 123C139 91 151 62 169 37M160 108C172 79 192 57 216 43M184 91C204 70 230 56 257 48"/>
+                <path d="M72 163C56 166 44 174 33 188M91 153C71 153 56 162 43 177M112 139C91 143 74 152 60 168M136 123C115 131 99 143 85 158M160 108C143 119 128 133 116 150M184 91C172 105 158 122 147 141"/>
+                <path d="M102 146C99 129 95 114 89 101M126 131C124 111 124 93 130 75M150 116C155 97 164 81 176 66M175 100C188 84 204 72 221 63"/>
+                <path d="M116 138C100 125 89 111 82 95M141 121C128 107 119 91 114 74M166 105C158 89 154 75 155 58M191 88C190 73 194 61 202 50"/>
+              </g>
+              <g fill="none" stroke="#d1edaa" stroke-width=".55" stroke-linecap="round" opacity=".42">
+                <path d="M61 124L91 153M75 105L112 139M101 82L136 123M128 58L160 108M154 45L184 91M187 43L205 76M73 180L91 153M94 185L112 139M119 184L136 123M148 181L160 108M177 169L184 91M206 144L208 80"/>
+              </g>
             </g>
-            <path class="ba-leaf-scan" d="M39 139C100 108 158 67 220 28" fill="none" stroke="url(#ba-leaf-scan)" stroke-width="5" stroke-linecap="round"/>
-            <circle class="ba-leaf-node" cx="39" cy="139" r="4" fill="#d6f6a8"/>
-            <circle class="ba-leaf-node ba-leaf-node--two" cx="220" cy="28" r="3" fill="#d6f6a8"/>
-            <text x="130" y="190" text-anchor="middle" fill="#b4f477" font-size="8" letter-spacing="2.2">PLANT SIGNAL / GROWTH</text>
+            <path d="M47 177C119 142 196 88 273 42" fill="none" stroke="url(#ba-leaf-midrib)" stroke-width="2.6" stroke-linecap="round"/>
+            <path class="ba-leaf-scan" d="M47 177C119 142 196 88 273 42" fill="none" stroke="#e5ffc3" stroke-width="5" stroke-linecap="round"/>
+            <path d="M47 177C39 187 31 194 23 199" fill="none" stroke="#8ebd6d" stroke-width="2" stroke-linecap="round"/>
+            <circle class="ba-leaf-node" cx="47" cy="177" r="4" fill="#e3f6bd"/>
+            <circle class="ba-leaf-node ba-leaf-node--two" cx="273" cy="42" r="3" fill="#e3f6bd"/>
+
+            <g fill="#b7d99b" font-family="Inter,system-ui,sans-serif" font-size="7" letter-spacing="1.25">
+              <text x="18" y="27">MORPHOLOGY / 01</text>
+              <text x="302" y="27" text-anchor="end">VENATION</text>
+              <text x="160" y="229" text-anchor="middle" font-size="8" letter-spacing="2.1">PLANT STRUCTURE / RESPONSE</text>
+            </g>
+            <g stroke="#8fb875" stroke-opacity=".48" stroke-width=".7" fill="none">
+              <path d="M18 34h27M275 34h27M18 204h27M275 204h27"/>
+            </g>
           </svg>
           <div class="ba-sector-particles" id="ba-sector-particles" aria-hidden="true"></div>
-          <span class="ba-visual-caption">PLANT RESPONSE <i></i></span>
+          <span class="ba-visual-caption">BOTANICAL MORPHOLOGY <i></i></span>
         </div>`
     },
     laboratory: {

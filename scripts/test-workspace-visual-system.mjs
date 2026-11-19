@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync("batch-tracker/workspace.html", "utf8");
 const visuals = fs.readFileSync("batch-tracker/workspace-visuals.js", "utf8");
+const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
+const unified = fs.readFileSync("batch-tracker/workspace-unified.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
 const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
 const mycology = fs.readFileSync("batch-tracker/styles/mycology-workspace.css", "utf8");
@@ -12,11 +14,16 @@ const greenTechEntry = fs.readFileSync("batch-tracker/green-tech/index.html", "u
 const laboratoryEntry = fs.readFileSync("batch-tracker/laboratory/index.html", "utf8");
 
 assert.ok(html.includes('class="app-hero"'), "Each sector must retain the shared workspace header");
+assert.ok(tracker.includes('id="heroTitlePrimary"') && tracker.includes('id="heroTitleSecondary"'), "Workspace switching must preserve the domain-specific hero title slots");
+assert.ok(tracker.includes('eyebrow: "AGRONOMIE & ENVIRONNEMENT"') && tracker.includes('eyebrow: "MYCOLOGIE & GÉNÉALOGIE"') && tracker.includes('eyebrow: "LABORATOIRE & BIOPROCÉDÉS"'), "Each domain must have its own scientific hero eyebrow");
+assert.ok(tracker.includes("title: '<span id=\"heroTitlePrimary\">Cultures végétales</span>") && tracker.includes("title: '<span id=\"heroTitlePrimary\">Cultures fongiques</span>") && tracker.includes("title: '<span id=\"heroTitlePrimary\">Production biologique</span>"), "The domain switcher must render the correct title for all three workspaces");
 assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particle layer must be removed from the shared workspace markup");
 assert.ok(!html.includes("visual-mycology"), "The obsolete branching mycelium hero SVG must not be shipped in the shared markup");
 assert.ok(!visuals.includes("workspace-particle-field"), "The old generic global particle field must be removed");
 assert.ok(visuals.includes('ba-sector-visual--mycology'), "Mycology must have a dedicated colony-growth scene");
-assert.ok(visuals.includes('ba-sector-visual--greentech'), "GreenTech must have a dedicated leaf-growth scene");
+assert.ok(visuals.includes('ba-sector-visual--greentech'), "GreenTech must have a dedicated botanical scene");
+assert.ok(visuals.includes('data-visual="botanical-plate"') && visuals.includes('ba-botanical-plate'), "GreenTech must render the detailed botanical plate");
+assert.ok(visuals.includes("secondary veins") || visuals.includes("nervures secondaires"), "GreenTech botanical plate must describe its scientific morphology");
 assert.ok(visuals.includes('ba-sector-visual--laboratory'), "Laboratory must have a dedicated bioreactor scene");
 assert.ok(visuals.includes('mode: "repulse"') && visuals.includes('mode: "push"'), "GreenTech particles must react to pointer hover and click");
 assert.ok(visuals.includes('mode: "bubble"'), "Laboratory particles must react with a controlled bubble interaction");
@@ -31,6 +38,12 @@ assert.ok(motion.includes("ba-reactor-bubble"), "Laboratory reactor bubbles must
 assert.ok(motion.includes("workspace-authenticated .hero-art.ba-sector-art"), "Sector identity must remain visible in authenticated workspaces");
 assert.ok(motion.includes("prefers-reduced-motion:reduce"), "CSS motion must include a reduced-motion fallback");
 assert.ok(shared.includes("backdrop-filter:blur(18px)"), "Workspace toolbar must retain the glass navigation treatment");
+assert.ok(unified.includes("scroll-snap-type:x proximity") && unified.includes("overflow-x:auto"), "Mobile module navigation must support horizontal scrolling");
+assert.ok(html.includes('class="muted auth-intro"') && unified.includes("#authCard .auth-intro") && unified.includes("@media(max-width:390px)"), "Compact mobile authentication must retain a short intro and responsive spacing");
+assert.ok(tracker.includes('inline: "nearest"') && tracker.includes('link.scrollIntoView'), "The active module tab must remain visible when navigating between modules");
+assert.ok(tracker.includes('["ArrowLeft", "ArrowRight", "Home", "End"]'), "Module navigation must support left/right and Home/End keyboard controls");
+assert.ok(greenTechEntry.includes("20261119-keyboard-nav-9") && mycologyEntry.includes("20261119-keyboard-nav-9") && laboratoryEntry.includes("20261119-keyboard-nav-9"), "All workspaces must load the current keyboard navigation runtime");
+assert.ok(greenTechEntry.includes("20261119-compact-auth-8") && mycologyEntry.includes("20261119-compact-auth-8") && laboratoryEntry.includes("20261119-compact-auth-8"), "All workspaces must load the current responsive navigation styles");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
 assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curved biological topology");
 assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
@@ -39,8 +52,8 @@ assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS l
 assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
-assert.ok(greenTechEntry.includes("20261117-sector-interaction-160"), "GreenTech must load the interactive sector particle runtime");
-assert.ok(laboratoryEntry.includes("20261117-sector-interaction-160"), "Laboratory must load the interactive sector particle runtime");
+assert.ok(greenTechEntry.includes("20261119-botanical-plate-1"), "GreenTech must load the current botanical visual runtime");
+assert.ok(laboratoryEntry.includes("20261119-botanical-plate-1"), "Laboratory must load the current shared visual runtime");
 
 const laboratoryProcess = fs.readFileSync("batch-tracker/laboratory-process-visuals.js", "utf8");
 const laboratoryStyles = fs.readFileSync("batch-tracker/styles/laboratory-process-map.css", "utf8");

@@ -335,3 +335,74 @@ html body[data-domain].workspace-authenticated .hero-tags {
     display:none !important;
   }
 }
+
+
+/* GreenTech botanical plate — scientific illustration, not decorative particle art. */
+html body[data-domain="agronomy"] .ba-sector-visual--greentech {
+  width:min(100%,310px) !important;
+  aspect-ratio:1.34 / 1 !important;
+  max-height:220px !important;
+  border-color:rgba(180,244,119,.28) !important;
+  border-radius:18px !important;
+  background:
+    radial-gradient(ellipse at 46% 42%,rgba(157,205,119,.13),transparent 64%),
+    linear-gradient(145deg,rgba(38,59,48,.94),rgba(15,25,21,.98)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(220,245,198,.08),
+    inset 0 0 34px rgba(130,178,104,.055),
+    0 18px 44px rgba(0,0,0,.24) !important;
+}
+html body[data-domain="agronomy"] .ba-botanical-plate {
+  max-height:220px !important;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.24)) !important;
+}
+html body[data-domain="agronomy"] .ba-sector-visual--greentech .ba-visual-caption {
+  color:#d0eab1 !important;
+  opacity:.9 !important;
+  letter-spacing:.16em !important;
+}
+html body[data-domain="agronomy"] .ba-sector-visual--greentech .ba-visual-caption i {
+  background:#c9e9a1 !important;
+  box-shadow:0 0 9px rgba(201,233,161,.7) !important;
+}
+html body[data-domain="agronomy"] .ba-botanical-plate .ba-leaf-scan {
+  stroke-dasharray:16 300 !important;
+  stroke-dashoffset:316 !important;
+  animation:ba-botanical-scan 8.5s cubic-bezier(.42,0,.58,1) infinite !important;
+}
+@keyframes ba-botanical-scan {
+  0% { stroke-dashoffset:316; opacity:.08; }
+  16%,68% { opacity:.92; }
+  100% { stroke-dashoffset:0; opacity:.08; }
+}
+@media(max-width:640px) {
+  html body[data-domain="agronomy"] .ba-sector-visual--greentech {
+    width:min(100%,270px) !important;
+    max-height:196px !important;
+  }
+  html body[data-domain="agronomy"] .ba-botanical-plate {
+    max-height:196px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain="agronomy"] .ba-botanical-plate .ba-leaf-scan {
+    animation:none !important;
+    stroke-dasharray:none !important;
+    opacity:.42 !important;
+  }
+}
+
+
+/* Domain-specific hero titles: only the ampersand carries the sector accent. */
+html body[data-domain] .app-hero h1 #heroTitlePrimary {
+  color:var(--paper) !important;
+  text-shadow:none !important;
+}
+html body[data-domain] .app-hero h1 #heroTitleSecondary {
+  color:#bdc9c2 !important;
+  text-shadow:none !important;
+}
+html body[data-domain] .app-hero h1 > span[aria-hidden="true"] {
+  color:var(--workspace-accent) !important;
+  text-shadow:0 0 24px color-mix(in srgb,var(--workspace-accent) 24%,transparent) !important;
+}

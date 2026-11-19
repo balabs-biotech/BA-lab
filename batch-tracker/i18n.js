@@ -110,6 +110,29 @@
 
 
   const supplementalCoverage = [
+    ["Connexion sécurisée à l’espace BA Labs.","Secure sign-in to the BA Labs workspace.","Acesso seguro ao espaço BA Labs.","تسجيل دخول آمن إلى مساحة BA Labs."],
+
+    ["Intelligence environnementale","Environmental intelligence","Inteligência ambiental","الذكاء البيئي"],
+    ["Suivi des lignées","Lineage tracking","Acompanhamento das linhagens","تتبّع السلالات"],
+    ["Traçabilité expérimentale","Experimental traceability","Rastreabilidade experimental","التتبّع التجريبي"],
+
+    ["AGRONOMIE & ENVIRONNEMENT","AGRONOMY & ENVIRONMENT","AGRONOMIA & AMBIENTE","الزراعة والبيئة"],
+    ["MYCOLOGIE & GÉNÉALOGIE","MYCOLOGY & LINEAGE","MICOLOGIA & GENEALOGIA","علم الفطريات والأنساب"],
+    ["LABORATOIRE & BIOPROCÉDÉS","LABORATORY & BIOPROCESSES","LABORATÓRIO & BIOPROCESSOS","المختبر والعمليات الحيوية"],
+    ["et intelligence environnementale","and environmental intelligence","e inteligência ambiental","والذكاء البيئي"],
+    ["Suivez les cultures, les substrats et les conditions de serre en reliant observations de terrain, mesures et données environnementales.","Track crops, substrates and greenhouse conditions by connecting field observations, measurements and environmental data.","Acompanhe culturas, substratos e condições da estufa, relacionando observações de campo, medições e dados ambientais.","تابع المحاصيل والركائز وظروف الدفيئة بربط الملاحظات الميدانية والقياسات والبيانات البيئية."],
+    ["Serre & substrats","Greenhouse & substrates","Estufa & substratos","الدفيئة والركائز"],
+    ["Données environnementales","Environmental data","Dados ambientais","البيانات البيئية"],
+    ["Cultures fongiques","Fungal cultures","Culturas fúngicas","المزارع الفطرية"],
+    ["et suivi des lignées","and lineage tracking","e acompanhamento das linhagens","وتتبّع السلالات"],
+    ["Suivez les souches, les générations et les transferts, puis reliez chaque observation à l’historique de sa culture.","Track strains, generations and transfers, then link every observation to its culture history.","Acompanhe estirpes, gerações e transferências e associe cada observação ao histórico da cultura.","تابع السلالات والأجيال وعمليات النقل، واربط كل ملاحظة بسجل المزرعة."],
+    ["Souches & cultures","Strains & cultures","Estirpes & culturas","السلالات والمزارع"],
+    ["Croissance & observations","Growth & observations","Crescimento & observações","النمو والملاحظات"],
+    ["Production biologique","Biological production","Produção biológica","الإنتاج الحيوي"],
+    ["et traçabilité expérimentale","and experimental traceability","e rastreabilidade experimental","والتتبّع التجريبي"],
+    ["Des milieux de culture aux lots de production : documentez les procédés, suivez les étapes et reliez chaque résultat à son historique expérimental.","From culture media to production batches: document processes, track each stage and connect every result to its experimental history.","Dos meios de cultura aos lotes de produção: documente os processos, acompanhe cada etapa e associe cada resultado ao seu histórico experimental.","من أوساط الزراعة إلى دفعات الإنتاج: وثّق العمليات وتابع المراحل واربط كل نتيجة بسجلها التجريبي."],
+    ["Milieux & cultures","Media & cultures","Meios & culturas","الأوساط والمزارع"],
+
     ["Préparation","Preparation","Preparação","التحضير"],
     ["Stérilisation","Sterilization","Esterilização","التعقيم"],
     ["Récolte","Harvest","Colheita","الحصاد"],
@@ -540,7 +563,7 @@
     ["Aucune mesure pour ces filtres.","No measurements match these filters.","Não existem medições para estes filtros.","لا توجد قياسات تطابق عوامل التصفية هذه."],
     ["Le graphique n’a pas pu être produit.","The chart could not be generated.","Não foi possível gerar o gráfico.","تعذر إنشاء الرسم البياني."],
     ["Données indisponibles.","Data unavailable.","Dados indisponíveis.","البيانات غير متاحة."],
-    ["Cultures végétales","Plant records","Registos vegetais","سجلات النباتات"],
+    ["Cultures végétales","Plant cultures","Culturas vegetais","المحاصيل النباتية"],
     ["Activité récente","Recent activity","Atividade recente","النشاط الأخير"],
     ["Afficher les dernières observations","Show latest observations","Mostrar as últimas observações","عرض أحدث الملاحظات"],
     ["Connectez-vous pour charger les données de l’organisation.","Sign in to load the organisation’s data.","Inicie sessão para carregar os dados da organização.","سجّل الدخول لتحميل بيانات المؤسسة."],
