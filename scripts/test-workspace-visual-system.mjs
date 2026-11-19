@@ -5,6 +5,7 @@ const html = fs.readFileSync("batch-tracker/workspace.html", "utf8");
 const visuals = fs.readFileSync("batch-tracker/workspace-visuals.js", "utf8");
 const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
+const unified = fs.readFileSync("batch-tracker/workspace-unified.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
 const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
 const mycology = fs.readFileSync("batch-tracker/styles/mycology-workspace.css", "utf8");
@@ -37,6 +38,9 @@ assert.ok(motion.includes("ba-reactor-bubble"), "Laboratory reactor bubbles must
 assert.ok(motion.includes("workspace-authenticated .hero-art.ba-sector-art"), "Sector identity must remain visible in authenticated workspaces");
 assert.ok(motion.includes("prefers-reduced-motion:reduce"), "CSS motion must include a reduced-motion fallback");
 assert.ok(shared.includes("backdrop-filter:blur(18px)"), "Workspace toolbar must retain the glass navigation treatment");
+assert.ok(unified.includes("scroll-snap-type:x proximity") && unified.includes("overflow-x:auto"), "Mobile module navigation must support horizontal scrolling");
+assert.ok(tracker.includes('inline: "nearest"') && tracker.includes('link.scrollIntoView'), "The active module tab must remain visible when navigating between modules");
+assert.ok(greenTechEntry.includes("20261119-mobile-tabs-5") && mycologyEntry.includes("20261119-mobile-tabs-5") && laboratoryEntry.includes("20261119-mobile-tabs-5"), "All workspaces must load the current responsive navigation styles");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
 assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curved biological topology");
 assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
