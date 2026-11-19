@@ -182,6 +182,8 @@ jobs:
         run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
       - name: Test IoT ingestion bounded-body and device-auth security contract
         run: node supabase/tests/iot-ingest-security.test.mjs
+      - name: Test BA Labs Store public catalogue endpoint contract
+        run: node supabase/tests/store-catalogue-contract.test.mjs
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
