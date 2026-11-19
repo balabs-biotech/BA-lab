@@ -1,0 +1,12 @@
+project_id = "axcouwiodqsauwnsiotn"
+
+# These endpoints are intentionally public at the gateway. Each function
+# enforces its own origin, payload, rate-limit, token and server-side checks.
+[functions.store-catalogue]
+verify_jwt = false
+
+[functions.create-store-order]
+verify_jwt = false
+
+[functions.track-store-order]
+verify_jwt = false
