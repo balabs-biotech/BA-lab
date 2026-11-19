@@ -647,3 +647,29 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
 html body[data-domain] .section-nav[hidden] {
   display:none !important;
 }
+
+
+/* Signed-out entry: a short, readable introduction keeps the primary action
+   within the first viewport on compact phones. */
+html body[data-domain] #authCard .auth-intro {
+  margin:0 !important;
+  max-width:46rem !important;
+  font-size:12px !important;
+  line-height:1.4 !important;
+}
+@media(max-width:390px) {
+  html body[data-domain] #authCard {
+    gap:7px !important;
+    padding:14px !important;
+  }
+  html body[data-domain] #authCard > label {
+    margin-top:4px !important;
+  }
+  html body[data-domain] #authCard .auth-actions {
+    gap:8px !important;
+    margin-top:4px !important;
+  }
+  html body[data-domain] #authCard .auth-actions button {
+    min-height:40px !important;
+  }
+}
