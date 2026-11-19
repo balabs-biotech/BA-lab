@@ -586,11 +586,12 @@ for (const selector of [
 assert.ok(editorialRefinementCss.includes('prefers-reduced-motion:reduce'), 'Phase 15 must respect reduced-motion preferences');
 
 
-// PASS76: mobile navigation must fit more primary labels and reveal horizontal overflow.
+// PASS77: every primary chapter link must remain visible on compact touch screens.
 // Reuse chapterNavigationCss loaded by the navigation regression checks above.
-assert.ok(chapterNavigationCss.includes('PASS 76 — compact mobile nav labels and expose the horizontal scroll affordance'), 'Mobile navigation must have a dedicated compact-scroll refinement');
-assert.ok(chapterNavigationCss.includes('scrollbar-width:thin!important') && chapterNavigationCss.includes('scrollbar-color:#b96b4d #263b38!important'), 'Mobile navigation overflow must be visibly discoverable');
-assert.ok(chapterNavigationCss.includes('font-size:8px!important') && chapterNavigationCss.includes('letter-spacing:.045em!important'), 'Mobile navigation labels must be compact enough to expose more primary destinations');
+assert.ok(chapterNavigationCss.includes('PASS 77 — show the complete mobile chapter navigation without a clipped last item'), 'Mobile navigation must use the complete two-row layout');
+assert.ok(chapterNavigationCss.includes('flex-wrap:wrap!important') && chapterNavigationCss.includes('overflow:visible!important'), 'Mobile navigation must wrap instead of clipping its final destinations');
+assert.ok(chapterNavigationCss.includes('min-height:24px!important') && chapterNavigationCss.includes('font-size:8px!important'), 'Wrapped mobile navigation links must retain compact but tappable targets');
+assert.match(html, /chapter-navigation\.css\?v=27/, 'Public homepage must request the wrapped mobile navigation stylesheet');
 
 // PASS75: chapter photography must be ready when horizontal navigation reveals it.
 const chapterAtmosphereJs = readFileSync('ecosystem/chapter-atmosphere.js', 'utf8');
