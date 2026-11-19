@@ -25,7 +25,8 @@ assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must valida
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
 assert.ok(edge.includes("Deno.env.get(\"NOTION_API_KEY\")"), "Notion credential must remain server-side");
 assert.ok(edge.includes("notion_sync_status") && edge.includes('"pending"'), "Notion failures must leave a recoverable pending state");
-assert.ok(edge.includes("isRateLimited(req)") && edge.includes("MAX_BODY_BYTES"), "Public endpoint must apply request throttling and body-size limits");
+assert.ok(edge.includes("isRateLimited(req, secretKey)") && edge.includes("MAX_BODY_BYTES"), "Public endpoint must apply persistent request throttling and body-size limits");
+assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 
 assert.ok(readme.includes("Supabase is the transactional source of truth"), "Architecture documentation must match the implementation");
