@@ -54,8 +54,9 @@ function clientIp(req: Request): string | null {
   if (direct && direct.trim()) return direct.trim().slice(0, 80);
   const forwarded = req.headers.get("x-forwarded-for");
   if (!forwarded) return null;
-  const first = forwarded.split(",")[0]?.trim();
-  return first ? first.slice(0, 80) : null;
+  // The edge proxy appends the connecting client address to the forwarded chain.
+  const last = forwarded.split(",").at(-1)?.trim();
+  return last ? last.slice(0, 80) : null;
 }
 
 function getServerCredentials(): { key: string; legacyJwt: boolean } | null {
