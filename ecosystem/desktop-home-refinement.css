@@ -402,3 +402,29 @@
   #app #chapter-research .editorial-work .work-card{padding:14px!important}
   #app #chapter-research .editorial-work .work-card .work-media{height:154px!important}
 }
+
+
+/* Mobile balance: the hero gateway must use the full text column.
+   The desktop end-alignment was shrinking the callout to its content width. */
+@media (max-width:760px){
+  #chapter-home #accueil.hero>.aside{
+    align-self:stretch!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+    margin:10px 0 0!important;
+    padding:12px 14px!important;
+  }
+  #chapter-home #accueil.hero>.aside b,
+  #chapter-home #accueil.hero>.aside>span{
+    width:100%!important;
+    max-width:42ch!important;
+  }
+  #chapter-home #accueil.hero>.aside .aside-link{
+    width:max-content!important;
+    max-width:100%!important;
+    white-space:normal!important;
+  }
+}
