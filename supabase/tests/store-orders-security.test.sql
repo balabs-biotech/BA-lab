@@ -87,7 +87,7 @@ begin
     'fr'
   );
 
-  if v_first->>'duplicate' <> 'false' or v_first->>'estimated_total_dzd' <> '4000' then
+  if v_first->>'duplicate' <> 'false' or (v_first->>'estimated_total_dzd')::numeric <> 4000 then
     raise exception 'Fixed-price request did not produce the expected 4,000 DZD estimate: %', v_first;
   end if;
 
