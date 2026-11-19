@@ -235,6 +235,35 @@ VALUES
  '{"fr":"Boîtes de Petri prêtes à l’emploi ; format et conditionnement à confirmer.","en":"Ready-to-use Petri dishes; format and packaging to be confirmed.","ar":"أطباق بتري جاهزة للاستعمال؛ يتم تأكيد الحجم والتغليف.","pt":"Placas de Petri prontas a utilizar; formato e embalagem a confirmar."}',
  'https://app.notion.com/p/3f473152f171812a814dd7b951786313','published',12);
 
+-- Confirmed BA Labs retail reference: one inoculated Petri dish, one strain, 2,000 DZD.
+WITH petri_product AS (
+  INSERT INTO public.store_products
+    (product_code, slug, family, organism_label, title_i18n, description_i18n, publication_status, display_order)
+  VALUES (
+    'BAL-PETRI-INOC-001',
+    'bal-petri-inoc-001',
+    'agar',
+    'INOCULATED PETRI DISH · ONE STRAIN',
+    '{"fr":"Boîte de Pétri inoculée · 1 souche","en":"Inoculated Petri dish · 1 strain","ar":"طبق بتري ملقح · سلالة واحدة","pt":"Placa de Petri inoculada · 1 estirpe"}'::jsonb,
+    '{"fr":"Boîte de Pétri préparée et inoculée avec une souche.","en":"Prepared Petri dish inoculated with one strain.","ar":"طبق بتري محضر وملقح بسلالة واحدة.","pt":"Placa de Petri preparada e inoculada com uma estirpe."}'::jsonb,
+    'published',
+    13
+  )
+  RETURNING id
+)
+INSERT INTO public.store_variants
+  (product_id, variant_code, label_i18n, unit_code, pack_quantity, price_mode, price_dzd, availability)
+SELECT
+  id,
+  'BAL-PETRI-INOC-001-UNIT',
+  '{"fr":"1 boîte · 1 souche","en":"1 dish · 1 strain","ar":"طبق واحد · سلالة واحدة","pt":"1 placa · 1 estirpe"}'::jsonb,
+  'dish',
+  1,
+  'fixed',
+  2000,
+  'made_to_order'
+FROM petri_product;
+
 COMMENT ON TABLE public.store_products IS 'Public-facing BA Labs product catalogue source; writes and reads are backend-only until a safe public catalogue endpoint is deployed.';
 COMMENT ON TABLE public.store_variants IS 'Commercial pack variants; prices and stock remain null until BA Labs confirms them.';
 COMMENT ON TABLE public.store_orders IS 'Guest checkout requests and orders; personal data is backend-only and never exposed directly through the Data API.';
