@@ -54,10 +54,11 @@ Source: `supabase/functions/store-catalogue/index.ts`
 - Deployed as a read-only public GET endpoint with an exact storefront-origin allowlist.
 - Reads only the dedicated Notion data source `CATALOGUE PUBLIC — Ressources publiables`.
 - Returns only rows where `Actif au catalogue` is checked.
-- Exposes an explicit field allowlist: public reference, short code, product title, family, availability, formats, applications, public summary, target use, evidence level and request URL.
+- Exposes an explicit field allowlist: public reference, short code, product title, family, availability, formats, applications and evidence level.
 - Never queries or returns customer records, order records, internal notes, Notion page IDs or workspace metadata.
 - Uses a separate read-only Notion integration secret, `NOTION_CATALOGUE_API_KEY`, which must have access only to the public catalogue data source.
 - The frontend flag `STORE_REMOTE_CATALOGUE_ENABLED=false` remains off until this secret is configured and public catalogue codes are reconciled with the server-side order allowlist.
+- When enabled after review, the remote loader updates availability only for product codes already present in the static multilingual catalogue. It never inserts remote products or replaces localized titles, descriptions or prices. Unknown availability values are ignored, and cart entries are removed if a reference becomes unavailable.
 
 ## Edge Function
 
@@ -80,7 +81,7 @@ The function is deployed as `create-store-order` with JWT verification disabled 
 
 ## Catalogue
 
-- The static storefront currently contains 15 references.
+- The static storefront currently contains 32 reviewed references (29 active public catalogue references plus three additional commercial references retained for review).
 - `STORE_REMOTE_CATALOGUE_ENABLED=false`; the remote catalogue endpoint is not part of this release.
 - Product presence in the catalogue does not mean current availability. BA Labs confirms availability, format, final price and delivery conditions after receiving an enquiry.
 - Prices that are still indicative are not treated as confirmed totals.
@@ -99,4 +100,4 @@ CultureOps, its tenant-scoped tables, authentication, culture synchronization an
 
 ### Catalogue publication and availability
 
-The reviewed static storefront currently contains 32 references: the 29 active public Notion catalogue records plus three additional commercial references retained for review. Each reference carries a localized availability state (`Sur demande`, `À confirmer`, or `Indisponible`). Unavailable references remain visible but cannot be added to the enquiry selection. Water Agar pricing is not published until the unit price and packaging are confirmed. The remote Notion catalogue loader remains disabled; the static multilingual catalogue is the publication layer until a dedicated integration and translation mapping are approved.
+The reviewed static storefront currently contains 32 references: the 29 active public Notion catalogue records plus three additional commercial references retained for review. Each reference carries a localized availability state (`Sur demande`, `À confirmer`, or `Indisponible`). Unavailable references remain visible but cannot be added to the enquiry selection. Water Agar pricing is not published until the unit price and packaging are confirmed. The remote Notion catalogue loader remains disabled; the static multilingual catalogue is the publication layer until a dedicated integration and translation mapping are approved. Once enabled, the remote source may update only availability for matching, pre-reviewed product codes; it cannot create products or overwrite multilingual commercial content.
