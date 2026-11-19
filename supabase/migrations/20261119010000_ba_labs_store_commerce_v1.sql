@@ -166,7 +166,7 @@ CREATE POLICY store_order_events_deny_clients ON public.store_order_events
   FOR ALL TO anon, authenticated USING (false) WITH CHECK (false);
 
 REVOKE ALL ON public.store_products, public.store_variants, public.store_orders,
-  public.store_order_items, public.store_order_events FROM PUBLIC, anon, authenticated;
+  public.store_order_items, public.store_order_events FROM PUBLIC, anon, authenticated, service_role;
 GRANT SELECT, INSERT, UPDATE ON public.store_products, public.store_variants,
   public.store_orders, public.store_order_items TO service_role;
 GRANT SELECT, INSERT ON public.store_order_events TO service_role;
