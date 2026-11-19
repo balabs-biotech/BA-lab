@@ -182,6 +182,17 @@ jobs:
         run: node supabase/tests/nasa-power-agroclimate-writer-authorization.test.mjs
       - name: Test IoT ingestion bounded-body and device-auth security contract
         run: node supabase/tests/iot-ingest-security.test.mjs
+      - name: Test BA Labs Store public catalogue endpoint contract
+        run: node supabase/tests/store-catalogue-contract.test.mjs
+      - name: Test BA Labs Store guest-order intake security contract
+        run: node supabase/tests/store-guest-order-contract.test.mjs
+      - name: Test BA Labs Store guest tracking security contract
+        run: node supabase/tests/store-order-tracking-contract.test.mjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check BA Labs Store Edge Functions
+        run: deno check supabase/functions/store-catalogue/index.ts supabase/functions/create-store-order/index.ts supabase/functions/track-store-order/index.ts
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
@@ -242,6 +253,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/environmental_observations_contract.test.sql
       - name: Test role-aware tenant write authorization after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
+      - name: Verify BA Labs Store guest-commerce schema and access boundary
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/store-commerce-security.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest

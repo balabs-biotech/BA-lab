@@ -24,11 +24,12 @@ jobs:
 
       - name: Prepare static site
         run: |
-          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-preview
+          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-preview _site/store
           cp index.html _site/index.html
           cp -R batch-tracker/. _site/batch-tracker/
           cp -R ecosystem/. _site/ecosystem/
           cp -R ecosystem-preview/. _site/ecosystem-preview/
+          cp -R store/. _site/store/
           touch _site/.nojekyll
 
       - name: Install image optimization dependency
@@ -39,6 +40,9 @@ jobs:
 
       - name: Optimize BA Labs website images
         run: python scripts/optimize-ecosystem-images.py --directory _site/ecosystem/assets --max-edge 1800 --jpeg-quality 84
+
+      - name: Verify storefront structure
+        run: node scripts/test-storefront.mjs
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
