@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("../functions/create-store-order/index.ts", import.meta.url), "utf8");
+const config = readFileSync(new URL("../config.toml", import.meta.url), "utf8");
 
-assert.match(source, /ALLOWED_ORIGINS[\s\S]*https:\/\/balabs-biotech\.github\.io/, "guest order CORS must be restricted to the storefront origin");
+for (const functionName of ["store-catalogue", "create-store-order", "track-store-order"]) {\n  assert.match(config, new RegExp("\\\\[functions\\\\." + functionName + "\\\\]\\\\s*verify_jwt = false"), functionName + " must explicitly disable gateway JWT verification and use its own access contract");\n}\nassert.match(source, /ALLOWED_ORIGINS[\s\S]*https:\/\/balabs-biotech\.github\.io/, "guest order CORS must be restricted to the storefront origin");
 assert.match(source, /MAX_BODY_BYTES\s*=\s*16\s*\*\s*1024/, "request body must be bounded");
 assert.match(source, /MAX_ITEMS\s*=\s*30/, "cart item count must be bounded");
 assert.match(source, /req\.method !== "POST"/, "guest order endpoint must accept only POST");
