@@ -1070,3 +1070,93 @@
   border-inline-start-color:var(--universe-accent)!important;
   outline-color:color-mix(in srgb,var(--universe-accent) 30%,transparent)!important;
 }
+
+
+/* PASS 61 — editorial hierarchy for the eight-universe directory.
+   Keep the specimens still: the image itself, not a generic zoom animation, carries the science. */
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:0!important;
+  padding:13px 15px 14px!important;
+  overflow:hidden!important;
+  background:
+    linear-gradient(145deg,var(--universe-wash),transparent 42%),
+    linear-gradient(155deg,rgba(38,59,56,.42),rgba(12,20,20,.82))!important;
+  transition:border-color .2s ease,background-color .2s ease!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > figure.universe-visual{
+  flex:0 0 auto!important;
+  height:clamp(150px,13vw,178px)!important;
+  margin:0 0 17px!important;
+  border-radius:4px!important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--universe-accent) 28%,transparent)!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > figure.universe-visual > img{
+  transform:none!important;
+  animation:none!important;
+  filter:saturate(.82) contrast(1.06)!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > span:first-child{
+  display:block!important;
+  margin:0 0 7px!important;
+  font:600 9px/1.2 ui-monospace,SFMono-Regular,monospace!important;
+  letter-spacing:.16em!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > b{
+  display:block!important;
+  max-width:20ch!important;
+  margin:0 0 7px!important;
+  color:#f1f0e8!important;
+  font:500 clamp(21px,1.8vw,27px)/1.06 Inter,system-ui,sans-serif!important;
+  letter-spacing:-.045em!important;
+  text-wrap:balance!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > small{
+  display:block!important;
+  margin:0 0 10px!important;
+  color:var(--universe-accent)!important;
+  font:600 9px/1.45 ui-monospace,SFMono-Regular,monospace!important;
+  letter-spacing:.045em!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > p{
+  max-width:44ch!important;
+  margin:0 0 16px!important;
+  color:rgba(225,230,220,.82)!important;
+  font:400 12px/1.62 Inter,system-ui,sans-serif!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > em{
+  display:block!important;
+  margin-top:auto!important;
+  padding-top:10px!important;
+  border-top:1px solid color-mix(in srgb,var(--universe-accent) 30%,transparent)!important;
+  font:600 9px/1.4 ui-monospace,SFMono-Regular,monospace!important;
+  letter-spacing:.1em!important;
+  text-transform:uppercase!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]:hover > figure.universe-visual > img,
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]:focus-visible > figure.universe-visual > img{
+  transform:none!important;
+  filter:saturate(1) contrast(1.08)!important;
+}
+@media(max-width:760px){
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]{
+  padding:11px 12px 13px!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > figure.universe-visual{
+  height:clamp(148px,43vw,174px)!important;margin-bottom:14px!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > b{
+  font-size:22px!important;max-width:24ch!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > p{
+  font-size:12px!important;line-height:1.58!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]{
+  transition:none!important;
+ }
+}
