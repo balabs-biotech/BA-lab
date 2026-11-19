@@ -27,7 +27,8 @@ Notion: 🛒 DEMANDES COMMERCIALES
 - **Notion is the commercial follow-up workspace** populated after the Supabase write succeeds.
 - A Notion API outage does not discard the enquiry: the Supabase record remains stored with `notion_sync_status='pending'`.
 - The Notion sync uses the existing server-side `NOTION_API_KEY` and the existing commercial data source. It does not alter the CultureOps `sync-culture-to-notion` function.
-- The older direct-to-Notion endpoints `store-notion-order` and `notion-store-order` remain deployed for now, but the storefront source has been redirected to the new `create-store-order` endpoint. The new endpoint is deployed in Supabase. The public form remains disabled, so the endpoint is not used by normal storefront visitors.
+- The legacy direct-to-Notion endpoints `store-notion-order` and `notion-store-order` have been retired. Both now return HTTP 410 and require an authenticated JWT at the gateway. Only `create-store-order` remains the supported intake endpoint.
+- The new endpoint is deployed in Supabase. The public form remains disabled, so normal storefront visitors cannot submit customer data.
 
 ## Supabase schema
 
@@ -52,6 +53,10 @@ Source: `supabase/functions/create-store-order/index.ts`
 
 - Validates the exact GitHub Pages origin, request size, customer fields, locale, product codes and quantities.
 - Rebuilds item titles and price snapshots from a server-side allowlist; browser prices are never trusted.
+- Returns only the public order reference and synchronization state. It never returns customer names, email addresses, phone numbers or message contents to the browser.
+- Does not log customer payloads or contact fields.
+- The browser persists only the product selection and language preference; customer form values are not written to local storage.
+- Catalogue strings are HTML-escaped before DOM rendering to reduce stored/reflected XSS risk.
 - Writes the request and all items atomically to Supabase before attempting Notion.
 - Uses a server-side Supabase secret/service-role key and `NOTION_API_KEY`; neither credential is present in browser code.
 - Uses a request UUID to make retries idempotent.
