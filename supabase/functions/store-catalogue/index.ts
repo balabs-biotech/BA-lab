@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
 // Read-only public catalogue endpoint for the independent BA Labs Store.
-import { createClient } from "npm:@supabase/supabase-js@2.119.1";
-
 const ALLOWED_ORIGINS = new Set([
   "https://balabs-biotech.github.io",
 ]);
@@ -20,17 +18,27 @@ function response(status: number, body: Record<string, unknown>, origin?: string
   return new Response(JSON.stringify(body), { status, headers });
 }
 
-function getServerKey(): string | null {
-  const keysRaw = Deno.env.get("SUPABASE_SECRET_KEYS");
-  if (keysRaw) {
+function getServerCredentials(): { key: string; legacyJwt: boolean } | null {
+  const raw = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (raw) {
     try {
-      const keys = JSON.parse(keysRaw);
-      if (typeof keys.default === "string") return keys.default;
+      const keys = JSON.parse(raw);
+      if (typeof keys.default === "string" && keys.default.startsWith("sb_secret_")) {
+        return { key: keys.default, legacyJwt: false };
+      }
     } catch {
       return null;
     }
   }
-  return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? null;
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  return legacy ? { key: legacy, legacyJwt: true } : null;
+}
+
+function serverHeaders(credentials: { key: string; legacyJwt: boolean }): Headers {
+  const headers = new Headers({ "apikey": credentials.key });
+  // New sb_secret keys are sent on apikey only; legacy service_role JWTs also need Authorization.
+  if (credentials.legacyJwt) headers.set("Authorization", "Bearer " + credentials.key);
+  return headers;
 }
 
 Deno.serve(async (req: Request) => {
@@ -52,41 +60,51 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "GET") return response(405, { error: "method_not_allowed" }, origin);
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = getServerKey();
-  if (!supabaseUrl || !serviceKey) {
+  const credentials = getServerCredentials();
+  if (!supabaseUrl || !credentials) {
     console.error("[store-catalogue] Server configuration is incomplete");
     return response(500, { error: "server_configuration_error" }, origin);
   }
 
-  const admin = createClient(supabaseUrl, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
   try {
-    const { data: products, error: productError } = await admin
-      .from("store_products")
-      .select("id, product_code, slug, family, organism_label, title_i18n, description_i18n, source_notion_url, passport_enabled, display_order")
-      .eq("publication_status", "published")
-      .order("display_order", { ascending: true });
+    const productUrl = new URL(supabaseUrl.replace(/\\/$/, "") + "/rest/v1/store_products");
+    productUrl.searchParams.set(
+      "select",
+      "id,product_code,slug,family,organism_label,title_i18n,description_i18n,source_notion_url,passport_enabled,display_order",
+    );
+    productUrl.searchParams.set("publication_status", "eq.published");
+    productUrl.searchParams.set("order", "display_order.asc");
 
-    if (productError) {
-      console.error("[store-catalogue] Product query failed:", productError.code);
+    const productResponse = await fetch(productUrl, { headers: serverHeaders(credentials) });
+    if (!productResponse.ok) {
+      console.error("[store-catalogue] Product query failed:", productResponse.status);
       return response(503, { error: "catalogue_temporarily_unavailable" }, origin);
     }
+    const products = await productResponse.json();
+    if (!Array.isArray(products)) return response(503, { error: "catalogue_temporarily_unavailable" }, origin);
 
-    const productIds = (products ?? []).map((product) => product.id);
+    const productIds = products
+      .map((product) => product && typeof product.id === "string" ? product.id : "")
+      .filter(Boolean);
+
     let variants: Record<string, unknown>[] = [];
     if (productIds.length > 0) {
-      const { data, error } = await admin
-        .from("store_variants")
-        .select("product_id, variant_code, label_i18n, unit_code, pack_quantity, price_mode, price_dzd, availability, lead_time_days")
-        .in("product_id", productIds)
-        .neq("availability", "hidden");
-      if (error) {
-        console.error("[store-catalogue] Variant query failed:", error.code);
+      const variantUrl = new URL(supabaseUrl.replace(/\\/$/, "") + "/rest/v1/store_variants");
+      variantUrl.searchParams.set(
+        "select",
+        "product_id,variant_code,label_i18n,unit_code,pack_quantity,price_mode,price_dzd,availability,lead_time_days",
+      );
+      variantUrl.searchParams.set("product_id", "in.(" + productIds.join(",") + ")");
+      variantUrl.searchParams.set("availability", "neq.hidden");
+
+      const variantResponse = await fetch(variantUrl, { headers: serverHeaders(credentials) });
+      if (!variantResponse.ok) {
+        console.error("[store-catalogue] Variant query failed:", variantResponse.status);
         return response(503, { error: "catalogue_temporarily_unavailable" }, origin);
       }
-      variants = data ?? [];
+      const data = await variantResponse.json();
+      if (!Array.isArray(data)) return response(503, { error: "catalogue_temporarily_unavailable" }, origin);
+      variants = data;
     }
 
     const variantsByProduct = new Map<string, Record<string, unknown>[]>();
@@ -97,7 +115,7 @@ Deno.serve(async (req: Request) => {
       variantsByProduct.set(productId, current);
     }
 
-    const safeProducts = (products ?? []).map((product) => ({
+    const safeProducts = products.map((product) => ({
       product_code: product.product_code,
       slug: product.slug,
       family: product.family,
