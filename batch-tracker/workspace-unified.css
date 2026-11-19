@@ -585,3 +585,57 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
     transition:none !important;
   }
 }
+
+
+/* Mobile module navigation: keep the full tab labels and move horizontally. */
+@media(max-width:760px) {
+  html body[data-domain].workspace-authenticated .section-nav {
+    display:flex !important;
+    flex:1 1 100% !important;
+    width:100% !important;
+    min-width:0 !important;
+    justify-content:flex-start !important;
+    align-items:center !important;
+    gap:6px !important;
+    padding:0 2px 5px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    overscroll-behavior-x:contain !important;
+    scroll-snap-type:x proximity !important;
+    scrollbar-width:thin !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  html body[data-domain].workspace-authenticated .section-nav a {
+    display:inline-flex !important;
+    flex:0 0 auto !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:7px !important;
+    width:auto !important;
+    min-width:max-content !important;
+    min-height:40px !important;
+    padding:7px 11px !important;
+    font-size:10px !important;
+    line-height:1.2 !important;
+    white-space:nowrap !important;
+    overflow-wrap:normal !important;
+    text-align:center !important;
+    scroll-snap-align:start !important;
+  }
+  html body[data-domain].workspace-authenticated .section-nav .nav-number {
+    display:inline-grid !important;
+    flex:0 0 auto !important;
+    min-width:18px !important;
+    width:18px !important;
+    height:17px !important;
+    font-size:7px !important;
+  }
+}
+@media(max-width:390px) {
+  html body[data-domain].workspace-authenticated .section-nav a {
+    min-height:38px !important;
+    padding:6px 9px !important;
+    font-size:9px !important;
+  }
+}
