@@ -95,3 +95,8 @@ The function is deployed as `create-store-order` with JWT verification disabled 
 ## CultureOps boundary
 
 CultureOps, its tenant-scoped tables, authentication, culture synchronization and Product Passport remain separate. Do not reuse or modify those systems as part of the public storefront order flow.
+
+
+### Catalogue publication and availability
+
+The reviewed static storefront currently contains 32 references: the 29 active public Notion catalogue records plus three additional commercial references retained for review. Each reference carries a localized availability state (`Sur demande`, `À confirmer`, or `Indisponible`). Unavailable references remain visible but cannot be added to the enquiry selection. Water Agar pricing is not published until the unit price and packaging are confirmed. The remote Notion catalogue loader remains disabled; the static multilingual catalogue is the publication layer until a dedicated integration and translation mapping are approved.
