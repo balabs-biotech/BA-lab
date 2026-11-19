@@ -131,6 +131,21 @@
     <h2 id="requestTitle" data-i18n="requestTitle">Votre demande<br><em>de disponibilité.</em></h2>
     <p data-i18n="requestDescription">Le formulaire de commande sera activé après raccordement sécurisé à Supabase et validation des informations commerciales et légales de BA Labs.</p>
     <div class="request-summary" id="requestSummary"></div>
+    <form id="orderForm" class="order-form">
+      <div class="form-grid">
+        <label><span data-i18n="customerName">Nom complet *</span><input name="name" autocomplete="name" required maxlength="120"></label>
+        <label><span data-i18n="customerPhone">Téléphone *</span><input name="phone" type="tel" autocomplete="tel" required maxlength="32"></label>
+        <label><span data-i18n="customerEmail">E-mail</span><input name="email" type="email" autocomplete="email" maxlength="160"></label>
+        <label><span data-i18n="customerOrg">Organisation</span><input name="organization" autocomplete="organization" maxlength="120"></label>
+        <label><span data-i18n="customerWilaya">Wilaya</span><input name="wilaya" maxlength="80"></label>
+        <label><span data-i18n="deliveryMode">Mode de livraison</span><select name="deliveryMode"><option value="À définir">À définir</option><option value="Retrait sur place">Retrait sur place</option><option value="Livraison">Livraison</option><option value="Expédition">Expédition</option></select></label>
+      </div>
+      <label class="message-field"><span data-i18n="customerMessage">Précisions / utilisation prévue</span><textarea name="message" rows="3" maxlength="1200"></textarea></label>
+      <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+      <button class="primary-button" id="submitOrder" type="submit" disabled><span data-i18n="submitOrder">Envoyer ma demande</span><b>↗</b></button>
+      <p class="form-status" id="orderStatus" role="status" aria-live="polite">Enregistrement automatique en cours de raccordement.</p>
+    </form>
+    <button class="text-button" id="copyRequest" type="button"><span data-i18n="copyRequest">Copier ma demande</span></button>
     <button class="primary-button" id="copyRequest" type="button"><span data-i18n="copyRequest">Copier ma demande</span><b>↗</b></button>
     <div class="integration-note"><span class="status-dot"></span><span data-i18n="integrationNote">Catalogue de démonstration — aucune donnée personnelle n'est envoyée ou enregistrée.</span></div>
   </div>
@@ -141,6 +156,6 @@
   <button id="consentAcknowledge" type="button" data-i18n="understood">Compris</button>
   <a href="./privacy.html" data-i18n="learnMore">En savoir plus</a>
 </div>
-<script src="./store.js?v=2" defer></script>
+<script src="./store.js?v=3" defer></script>
 </body>
 </html>
