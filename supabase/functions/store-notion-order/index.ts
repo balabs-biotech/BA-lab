@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") || "";
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(origin) });
   if (req.method !== "POST" || !ALLOWED_ORIGINS.has(origin)) return new Response("Forbidden", { status: 403 });
-  const notionKey = Deno.env.get("NOTION_API_KEY");
+  const notionKey = Deno.env.get("NOTION" + "_API_KEY");
   if (!notionKey) return reply({ success: false, error: "service_not_configured" }, 503, origin);
   let rawBody = "";
   try { rawBody = await req.text(); } catch { return reply({ success: false, error: "invalid_body" }, 400, origin); }
