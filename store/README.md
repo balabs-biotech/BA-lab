@@ -10,7 +10,7 @@ This branch contains the storefront, legal-page drafts, versioned commerce schem
 
 - **Notion:** editorial source for product descriptions, scientific copy, and language content.
 - **Supabase:** transactional source of truth for published store catalogue records, variants, guest orders, price snapshots, and order events.
-- **GitHub Pages:** static storefront delivery only. The browser makes a read-only GET to `store-catalogue` using the publishable key and retains the reviewed static catalogue as fallback; no customer data is sent by that request.
+- **GitHub Pages:** static storefront delivery only. The browser integration for the read-only `store-catalogue` GET is staged behind `STORE_REMOTE_CATALOGUE_ENABLED=false`. Keep it disabled until cross-border processing, provider disclosures, and the privacy notice are approved; the reviewed static catalogue remains the only active source.
 - **CultureOps:** remains separate; its tenant-scoped `orders` and `order_items` are not reused.
 - **Product Passport:** separate post-purchase traceability surface, linked to a product/lot only when a real lot exists.
 
