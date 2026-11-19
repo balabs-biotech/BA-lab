@@ -196,7 +196,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const fingerprintHash = await hmacFingerprint(rateLimitSecret, ip);
+    const fingerprintHash = await hmacFingerprint(rateLimitSecret, 'create-store-order:' + ip);
     const rate = await postRpc(supabaseUrl, credentials, "consume_store_checkout_rate_limit", {
       p_fingerprint_hash: fingerprintHash,
       p_limit: 5,
