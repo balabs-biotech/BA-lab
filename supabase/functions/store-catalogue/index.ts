@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Read-only public catalogue endpoint for the independent BA Labs Store.
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.119.1";
 
 const ALLOWED_ORIGINS = new Set([
   "https://balabs-biotech.github.io",
