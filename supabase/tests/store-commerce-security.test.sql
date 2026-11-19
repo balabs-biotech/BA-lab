@@ -197,7 +197,8 @@ BEGIN
   END IF;
 
   v_tracking := public.lookup_store_guest_order(v_order.order_code, v_hash);
-  IF v_tracking->>'status' <> 'pending_confirmation'
+  IF v_tracking IS NULL
+    OR v_tracking->>'status' <> 'pending_confirmation'
     OR v_tracking ? 'customer_phone'
     OR v_tracking ? 'customer_email'
     OR v_tracking ? 'delivery_address' THEN
