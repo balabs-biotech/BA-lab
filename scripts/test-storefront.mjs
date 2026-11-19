@@ -20,7 +20,7 @@ for (const id of ['productGrid', 'cartDrawer', 'cartItems', 'requestModal', 'con
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   assert.ok(js.includes(language + ':{'), 'Missing language dictionary: ' + language);
 }
-assert.equal((js.match(/(?:code:'BAL-|\\"code\\":\\"BAL-)/g) || []).length, 32, 'Storefront must retain all 29 active public catalogue references plus Petri, wheat grain spawn and liquid culture syringe');
+assert.equal((js.match(/(?:code:'BAL-|"code":"BAL-)/g) || []).length, 32, 'Storefront must retain all 29 active public catalogue references plus Petri, wheat grain spawn and liquid culture syringe');
 assert.ok(js.includes('statusOnRequest') && js.includes('statusToConfirm') && js.includes('statusUnavailable') && js.includes("p.status!=='unavailable'"), 'The catalogue must localize availability and block selection of unavailable references');\nassert.ok(js.includes('BAL-LC-TRI-HAMATUM-001') && js.includes('BAL-AG-PDAE-001'), 'Unavailable Notion catalogue references must remain visible in the static multilingual catalogue');\nassert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The inoculated Petri dish must show its confirmed 2,000 DZD unit price');
 assert.ok(!/priceDzd:100[,}]/.test(js) && js.includes('Water Agar — boîte non inoculée'), 'Water Agar must remain on request without an unconfirmed public price');
 assert.ok(js.includes('priceDzd:1000') && js.includes('grain spawn · 2,5 kg'), 'Wheat grain spawn must show its 2.5 kg / 1,000 DZD format');
