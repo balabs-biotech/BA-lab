@@ -49,7 +49,8 @@ assert.ok(js.includes('create-store-order') && !js.includes('/functions/v1/store
 assert.ok(js.includes('function escapeHtml(value)') && js.includes('escapeHtml(p.titles[language])') && js.includes('escapeHtml(p.descriptions[language])'), 'Catalogue text must be HTML-escaped before rendering to prevent stored/reflected XSS');
 assert.ok(!js.includes('SUPABASE_SERVICE_ROLE_KEY') && !js.includes('NOTION_API_KEY') && !js.includes('sb_secret_'), 'No server-side credentials may be shipped in the public storefront');
 assert.ok(js.includes("credentials:'omit'"), 'Browser requests must never forward browser cookies to Supabase');
-assert.ok(!js.includes('localStorage.setItem') && js.includes('safeSet'), 'Customer form values must not be persisted directly in browser storage');
+const persistedKeys = [...js.matchAll(/safeSet\\('([^']+)'/g)].map(match => match[1]).sort();
+assert.deepEqual(persistedKeys, ['balabs-privacy-notice-v1', 'balabs-store-cart', 'balabs-store-language'], 'Browser storage must be limited to cart, language and privacy-notice preference; no customer form fields');
 
 assert.ok(js.includes('orderForm.addEventListener') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Browser submits through the public Supabase key only');
 
