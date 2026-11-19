@@ -5,6 +5,8 @@ on:
       - 'store/**'
       - 'ecosystem/index.html'
       - 'scripts/test-storefront.mjs'
+      - 'scripts/test-store-notion-order.mjs'
+      - 'supabase/functions/store-notion-order/**'
       - '.github/workflows/storefront-checks.yml'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
@@ -21,4 +23,6 @@ jobs:
         with:
           node-version: 20
       - name: Run storefront regression checks
-        run: node scripts/test-storefront.mjs
+        run: |
+          node scripts/test-storefront.mjs
+          node scripts/test-store-notion-order.mjs

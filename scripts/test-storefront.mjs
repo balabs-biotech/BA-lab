@@ -32,11 +32,14 @@ assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstati
 assert.ok(js.includes('STORE_CATALOGUE_URL') && js.includes("method:'GET'") && js.includes("credentials:'omit'"), 'Storefront may read the public catalogue only through a credential-free GET request');
 assert.ok(js.includes('STORE_REMOTE_CATALOGUE_ENABLED=false') && js.includes('if(!STORE_REMOTE_CATALOGUE_ENABLED)return;'), 'Remote catalogue access must remain disabled until cross-border processing and privacy disclosures are approved');
 assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Public catalogue requests must use only the publishable key');
-assert.ok(!js.includes("method:'POST'") && !js.includes('customer_phone') && !js.includes('customer_email'), 'Guest personal data must not be submitted before the order endpoint is deployed');
 assert.ok(html.includes('./cookies.html') && html.includes('./privacy.html') && html.includes('./terms.html') && html.includes('./shipping.html') && html.includes('./legal.html'), 'Footer must expose legal and privacy pages');
 assert.ok(privacy.includes('point d\'accès Supabase du catalogue est désactivé') && privacy.includes('transfert international'), 'Privacy policy must disclose the disabled remote catalogue and cross-border review gate');
 assert.ok(cookies.includes('point d\'accès Supabase du catalogue est actuellement désactivé'), 'Cookie policy must disclose that no remote catalogue request is active');
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
-console.log('Storefront regression checks passed: 15 references, including Water Agar 100 DZD, grain spawn 1,000 DZD, indicative liquid culture 5,000 DZD and confirmed 2,000 DZD Petri dish, 4 languages, ecosystem entry point, cart, reduced motion, legal pages, no remote fonts or premature data submission.');
+console.log('Storefront regression checks passed: 15 references, four languages, cart, customer order form, guarded Notion submission, legal pages and reduced-motion support.');
+assert.equal((html.match(/id="copyRequest"/g)||[]).length,1,'Request copy action must have one unique DOM id');
+assert.ok(js.includes('STORE_ORDER_URL') && js.includes('STORE_ORDER_ENABLED=false'), 'Order endpoint must remain gated until deployment');
+assert.ok(html.includes('id="orderForm"') && html.includes('name="phone"') && html.includes('name="name"'), 'Guest order form must collect customer identity');
+assert.ok(js.includes('orderForm.addEventListener') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Browser submits through the public Supabase key only');
