@@ -128,3 +128,142 @@
     font-size: 9px !important;
   }
 }
+
+
+/* VISUAL PASS — editorial hierarchy, scientific imagery and tactile interaction.
+   Scoped to the public ecosystem site; content and navigation remain unchanged. */
+#app.balabs-ui .hero{
+  position:relative!important;
+  isolation:isolate!important;
+  background:
+    radial-gradient(ellipse at 82% 18%,rgba(121,154,139,.16),transparent 34%),
+    radial-gradient(ellipse at 8% 88%,rgba(185,107,77,.09),transparent 30%),
+    linear-gradient(132deg,#1d302c 0%,#111b1d 62%,#172522 100%)!important;
+}
+#app.balabs-ui .hero:after{
+  content:"";position:absolute;z-index:-1;inset:12% 3% 12% 48%;
+  border:1px solid rgba(167,184,164,.12);border-left:0;border-radius:48% 0 0 48%;
+  pointer-events:none;
+}
+#app.balabs-ui .hero h1{
+  max-width:11ch!important;
+  font-size:clamp(42px,6.1vw,86px)!important;
+  line-height:.98!important;letter-spacing:-.065em!important;
+  text-wrap:balance!important;
+}
+#app.balabs-ui .hero h1 span{
+  color:#b96b4d!important;
+  text-shadow:0 8px 36px rgba(185,107,77,.13)!important;
+}
+#app.balabs-ui .hero .eyebrow{
+  display:inline-flex!important;align-items:center;gap:10px;
+  color:#a7b8a4!important;letter-spacing:.19em!important;
+}
+#app.balabs-ui .hero .eyebrow:before{
+  content:"";width:26px;height:1px;background:#b96b4d;display:inline-block;
+}
+#app.balabs-ui .hero>div>p{
+  max-width:48ch!important;color:#c4cec4!important;
+  font-size:clamp(14px,1.12vw,17px)!important;line-height:1.8!important;
+}
+#app.balabs-ui .hero .hero-micrograph{
+  border:1px solid rgba(167,184,164,.22)!important;
+  box-shadow:0 28px 90px rgba(0,0,0,.28),0 0 0 8px rgba(167,184,164,.025)!important;
+}
+#app.balabs-ui .hero .hero-action-primary{
+  background:#b96b4d!important;border-color:#b96b4d!important;color:#111b1d!important;
+  box-shadow:0 10px 30px rgba(185,107,77,.16)!important;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1),box-shadow .24s ease,background .24s ease!important;
+}
+#app.balabs-ui .hero .hero-action-primary:hover{
+  transform:translateY(-3px)!important;background:#d18a6b!important;
+  box-shadow:0 16px 38px rgba(185,107,77,.24)!important;
+}
+#app.balabs-ui .hero .hero-action-secondary{
+  border-color:rgba(167,184,164,.3)!important;color:#d1d0c5!important;
+  transition:border-color .2s ease,background .2s ease!important;
+}
+#app.balabs-ui .hero .hero-action-secondary:hover{
+  border-color:#9baea4!important;background:rgba(155,174,164,.08)!important;
+}
+#app.balabs-ui .hero .aside{
+  border:1px solid rgba(167,184,164,.2)!important;
+  border-left:2px solid #b96b4d!important;
+  background:linear-gradient(115deg,rgba(38,59,56,.72),rgba(17,27,29,.38))!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.12)!important;
+  backdrop-filter:blur(12px)!important;
+}
+#app.balabs-ui .work-heading h2,
+#app.balabs-ui .universe-index-heading h2,
+#app.balabs-ui .product-catalogue-head h2{
+  letter-spacing:-.055em!important;text-wrap:balance!important;
+}
+#app.balabs-ui .work-card{
+  position:relative!important;isolation:isolate!important;
+  overflow:hidden!important;border:1px solid rgba(167,184,164,.18)!important;
+  background:linear-gradient(150deg,rgba(38,59,56,.72),rgba(17,27,29,.96))!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.12)!important;
+  transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s ease,box-shadow .3s ease!important;
+}
+#app.balabs-ui .work-card:before{
+  content:"";position:absolute;z-index:-1;inset:0;opacity:0;pointer-events:none;
+  background:radial-gradient(ellipse at 85% 0%,rgba(185,107,77,.13),transparent 46%);
+  transition:opacity .35s ease!important;
+}
+#app.balabs-ui .work-card:hover{
+  transform:translateY(-6px)!important;border-color:rgba(185,107,77,.55)!important;
+  box-shadow:0 24px 58px rgba(0,0,0,.24)!important;
+}
+#app.balabs-ui .work-card:hover:before{opacity:1}
+#app.balabs-ui .work-media{
+  overflow:hidden!important;border:1px solid rgba(167,184,164,.12)!important;
+  background:#172522!important;
+}
+#app.balabs-ui .work-media img{
+  transition:transform .7s cubic-bezier(.16,1,.3,1),filter .5s ease!important;
+  filter:saturate(.78) contrast(1.04)!important;
+}
+#app.balabs-ui .work-card:hover .work-media img{
+  transform:scale(1.035)!important;filter:saturate(.96) contrast(1.06)!important;
+}
+#app.balabs-ui .work-card .work-index,
+#app.balabs-ui .work-card .work-tag{
+  color:#d18a6b!important;letter-spacing:.14em!important;
+}
+#app.balabs-ui .work-card h3{letter-spacing:-.035em!important}
+#app.balabs-ui .work-card>p{color:#c1ccc2!important;line-height:1.7!important}
+#app.balabs-ui .work-card .work-card-link{
+  color:#e1a184!important;border-bottom:1px solid rgba(185,107,77,.55)!important;
+}
+#app.balabs-ui .universe-index-card{
+  position:relative!important;overflow:hidden!important;
+  border:1px solid rgba(64,83,77,.24)!important;
+  box-shadow:0 10px 30px rgba(17,27,29,.09)!important;
+  transition:transform .32s cubic-bezier(.16,1,.3,1),box-shadow .32s ease,border-color .32s ease!important;
+}
+#app.balabs-ui .universe-index-card:hover{
+  transform:translateY(-5px)!important;
+  border-color:rgba(185,107,77,.55)!important;
+  box-shadow:0 22px 48px rgba(17,27,29,.2)!important;
+}
+#app.balabs-ui .universe-index-card .universe-card-image{
+  filter:saturate(.76) contrast(1.06)!important;
+  transition:transform .65s cubic-bezier(.16,1,.3,1),filter .4s ease!important;
+}
+#app.balabs-ui .universe-index-card:hover .universe-card-image{
+  transform:scale(1.045)!important;filter:saturate(.96) contrast(1.08)!important;
+}
+#app.balabs-ui .universe-index-card>em{
+  display:inline-flex!important;align-items:center;gap:8px;
+  border-bottom:1px solid rgba(185,107,77,.55)!important;padding-bottom:4px!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui .hero:after{inset:8% 0 8% 34%;opacity:.6}
+  #app.balabs-ui .hero h1{font-size:clamp(38px,10.8vw,54px)!important;line-height:1.02!important}
+  #app.balabs-ui .hero>div>p{font-size:14px!important;line-height:1.7!important}
+  #app.balabs-ui .work-card:hover,#app.balabs-ui .universe-index-card:hover{transform:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #app.balabs-ui .work-card,#app.balabs-ui .work-media img,#app.balabs-ui .universe-index-card,
+  #app.balabs-ui .universe-index-card .universe-card-image,#app.balabs-ui .hero .hero-action-primary{transition:none!important}
+}
