@@ -73,6 +73,8 @@ try {
     for (const language of ['fr', 'en', 'ar', 'pt']) {
       await page.locator('[data-lang="' + language + '"]').first().click();
       await page.waitForFunction((expected) => document.documentElement.lang === expected && document.querySelector('#loading')?.hidden === true, language, { timeout: 15000 });
+      const visibleCatalogueLanguages = await page.locator('#chapter-catalogue .product-catalogue-intro p[data-cat-lang]').evaluateAll(nodes => nodes.filter(node => getComputedStyle(node).display !== 'none').map(node => node.dataset.catLang));
+      assert.deepEqual(visibleCatalogueLanguages, [language], 'Catalogue page 5 must show only the selected language (' + language + ')');
     }
     await page.locator('[data-lang="fr"]').first().click();
     await page.waitForFunction(() => document.documentElement.lang === 'fr' && document.querySelector('#loading')?.hidden === true, undefined, { timeout: 15000 });
@@ -159,7 +161,7 @@ try {
           viewportWidth:document.documentElement.clientWidth
         };
       });
-      assert.ok(catalogueLayout.intro.width > catalogueLayout.viewportWidth * .72, 'Mobile catalogue introduction must use a full-width reading column');
+      assert.ok(catalogueLayout.intro.width > catalogueLayout.viewportWidth * .72, 'Mobile catalogue introduction must use a full-width reading column: ' + JSON.stringify(catalogueLayout));
       assert.ok(catalogueLayout.visuals.top >= catalogueLayout.intro.bottom - 2, 'Catalogue photography must sit below the introduction, never beside it');
       assert.ok(catalogueLayout.paragraphs.length > 0 && catalogueLayout.paragraphs.every(p => p.width > catalogueLayout.viewportWidth * .65 && p.writingMode === 'horizontal-tb'), 'Mobile catalogue copy must remain horizontal and readable, not stretched into a narrow vertical strip');
     }
