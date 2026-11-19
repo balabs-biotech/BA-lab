@@ -136,3 +136,8 @@
 @media(max-width:560px){
   .request-details .form-grid{grid-template-columns:1fr}
 }
+
+
+/* Keep the active request summary explicitly visible inside the modal. */
+#requestModal.is-open{visibility:visible;pointer-events:auto}
+#requestModal.is-open .request-summary{visibility:visible}
