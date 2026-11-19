@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const html=await readFile(new URL("../store/index.html",import.meta.url),"utf8");
+const js=await readFile(new URL("../store/store.js",import.meta.url),"utf8");
+const checkout=await readFile(new URL("../store/checkout.js",import.meta.url),"utf8");
+const fn=await readFile(new URL("../supabase/functions/notion-store-order/index.ts",import.meta.url),"utf8");
+assert.match(html,/id="checkoutForm"/);
+assert.match(html,/checkout\.js/);
+assert.match(js,/window\.BALABS_STORE\s*=/);
+assert.match(js,/if\s*\(privacySettings\)/);
+assert.match(checkout,/functions\/v1\/notion-store-order/);
+assert.match(checkout,/privacy_consent/);
+assert.match(fn,/NOTION_API_KEY/);
+assert.match(fn,/data_sources/);
+assert.match(fn,/🆕 Nouvelle/);
+assert.match(fn,/Mode de livraison/);
+assert.doesNotMatch(checkout,/NOTION_API_KEY|secret_[A-Za-z0-9]/);
+console.log("Storefront Notion checkout contract: OK");

@@ -7,7 +7,7 @@
 <meta name="description" content="Boutique BA Labs — ressources biologiques, cultures, milieux et solutions de biotechnologie appliquée.">
 <title>Boutique — BA Labs</title>
 <link rel="stylesheet" href="../ecosystem/brand-system.css?v=19">
-<link rel="stylesheet" href="./store.css?v=1">
+<link rel="stylesheet" href="./store.css?v=2">
 </head>
 <body class="store-page">
 <a class="skip-link" href="#catalogue">Aller au catalogue</a>
@@ -129,10 +129,25 @@
     <button class="icon-button modal-close" id="requestClose" aria-label="Fermer">×</button>
     <p class="eyebrow">BA / STORE — 03</p>
     <h2 id="requestTitle" data-i18n="requestTitle">Votre demande<br><em>de disponibilité.</em></h2>
-    <p data-i18n="requestDescription">Le formulaire de commande sera activé après raccordement sécurisé à Supabase et validation des informations commerciales et légales de BA Labs.</p>
-    <div class="request-summary" id="requestSummary"></div>
-    <button class="primary-button" id="copyRequest" type="button"><span data-i18n="copyRequest">Copier ma demande</span><b>↗</b></button>
-    <div class="integration-note"><span class="status-dot"></span><span data-i18n="integrationNote">Catalogue de démonstration — aucune donnée personnelle n'est envoyée ou enregistrée.</span></div>
+    <p id="checkoutIntro">Renseignez vos coordonnées pour enregistrer votre demande dans le registre commercial BA Labs.</p>
+    <div class="request-summary checkout-summary" id="requestSummary"></div>
+    <form id="checkoutForm" class="checkout-form" novalidate>
+      <div class="checkout-field"><label for="checkoutName" data-checkout-i18n="name">Nom complet</label><input id="checkoutName" name="customer_name" autocomplete="name" minlength="2" maxlength="160" required></div>
+      <div class="checkout-field"><label for="checkoutPhone" data-checkout-i18n="phone">Téléphone</label><input id="checkoutPhone" name="customer_phone" type="tel" autocomplete="tel" minlength="6" maxlength="40" required></div>
+      <div class="checkout-field"><label for="checkoutEmail" data-checkout-i18n="email">E-mail (facultatif)</label><input id="checkoutEmail" name="customer_email" type="email" autocomplete="email" maxlength="254"></div>
+      <div class="checkout-field"><label for="checkoutCompany" data-checkout-i18n="company">Organisation (facultatif)</label><input id="checkoutCompany" name="company_name" autocomplete="organization" maxlength="180"></div>
+      <div class="checkout-field"><label for="checkoutWilaya" data-checkout-i18n="wilaya">Wilaya</label><input id="checkoutWilaya" name="wilaya" autocomplete="address-level1" maxlength="100" required></div>
+      <div class="checkout-field"><label for="checkoutDelivery" data-checkout-i18n="delivery">Mode de remise</label><select id="checkoutDelivery" name="delivery_mode"><option value="pickup" data-checkout-i18n="pickup">Retrait au laboratoire</option><option value="delivery" data-checkout-i18n="shipping">Livraison / expédition</option></select></div>
+      <div class="checkout-field" id="checkoutCommuneWrap" hidden><label for="checkoutCommune" data-checkout-i18n="commune">Commune</label><input id="checkoutCommune" name="commune" autocomplete="address-level2" maxlength="100"></div>
+      <div class="checkout-field full" id="checkoutAddressWrap" hidden><label for="checkoutAddress" data-checkout-i18n="address">Adresse de livraison</label><input id="checkoutAddress" name="delivery_address" autocomplete="street-address" maxlength="500"></div>
+      <div class="checkout-field full"><label for="checkoutNote" data-checkout-i18n="note">Instructions complémentaires (facultatif)</label><textarea id="checkoutNote" name="customer_note" maxlength="1000"></textarea></div>
+      <label class="checkout-consent"><input type="checkbox" name="privacy_consent" required><span data-checkout-i18n="consent">J'accepte l'utilisation de mes coordonnées pour traiter cette demande. Voir la politique de confidentialité.</span></label>
+      <div class="checkout-honeypot" aria-hidden="true"><label for="checkoutWebsite">Website</label><input id="checkoutWebsite" name="website" tabindex="-1" autocomplete="off"></div>
+      <button class="primary-button checkout-submit" id="checkoutSubmit" type="submit">Envoyer ma demande <b>↗</b></button>
+    </form>
+    <div id="checkoutFeedback" class="checkout-feedback" role="status" aria-live="polite" hidden></div>
+    <button class="primary-button" id="copyRequest" type="button" hidden>Copier ma demande</button>
+    <div class="integration-note"><span class="status-dot"></span><span id="checkoutIntegration">Transmission vers le registre commercial Notion BA Labs. Aucun paiement n'est effectué à cette étape.</span></div>
   </div>
 </div>
 
@@ -141,6 +156,7 @@
   <button id="consentAcknowledge" type="button" data-i18n="understood">Compris</button>
   <a href="./privacy.html" data-i18n="learnMore">En savoir plus</a>
 </div>
-<script src="./store.js?v=1" defer></script>
+<script src="./store.js?v=2" defer></script>
+<script src="./checkout.js?v=1" defer></script>
 </body>
 </html>
