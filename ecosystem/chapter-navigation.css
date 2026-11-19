@@ -363,3 +363,19 @@ body>.chapter-rail .chapter-rail-dot{pointer-events:none!important;}
  #app.balabs-ui>.site-nav{gap:10px!important;padding-inline:10px!important}
  #app.balabs-ui>.site-nav>a{font-size:9px!important;letter-spacing:.08em!important}
 }
+
+
+/* MOBILE PASS 72 — reserve a dedicated footer lane for chapter controls.
+   The pager must never sit on top of the final reading lines or method steps. */
+@media(max-width:760px){
+ #main-content.experience-main{display:flex!important;flex-direction:column!important;min-height:0!important}
+ #main-content.experience-main>.experience-track{
+  flex:0 0 calc(100% - 58px)!important;
+  height:calc(100% - 58px)!important;
+  min-height:0!important;
+ }
+ #main-content.experience-main>.experience-controls{
+  bottom:4px!important;
+  inset-inline-end:10px!important;
+ }
+}
