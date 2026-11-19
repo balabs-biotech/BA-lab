@@ -477,3 +477,35 @@ html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-cha
   max-width:100%!important;margin:22px 0!important;gap:14px!important;
  }
 }
+
+
+/* PASS 67 — method headline: keep animated character wrappers on one horizontal reading line.
+   Prevent per-letter stacking, excessive tracking and the resulting artificial page height. */
+#app.balabs-ui > main > section.editorial-method .method-top h2{
+  display:block!important;width:100%!important;max-width:100%!important;
+  writing-mode:horizontal-tb!important;text-orientation:mixed!important;
+  white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;
+  letter-spacing:-.035em!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-top h2 *,
+#app.balabs-ui > main > section.editorial-method .method-top h2 span,
+#app.balabs-ui > main > section.editorial-method .method-top h2 em{
+  display:inline!important;position:static!important;float:none!important;
+  writing-mode:horizontal-tb!important;text-orientation:mixed!important;
+  width:auto!important;min-width:0!important;max-width:none!important;
+  white-space:normal!important;letter-spacing:inherit!important;
+  word-break:normal!important;overflow-wrap:normal!important;
+  transform:none!important;opacity:1!important;visibility:visible!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-top h2 br{display:block!important}
+@media(max-width:760px){
+  #app.balabs-ui > main > section.editorial-method .method-top{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+  }
+  #app.balabs-ui > main > section.editorial-method .method-top h2{
+    width:100%!important;max-width:100%!important;
+    font-size:clamp(25px,7vw,32px)!important;
+    line-height:1.08!important;letter-spacing:-.04em!important;
+    text-wrap:pretty!important;
+  }
+}
