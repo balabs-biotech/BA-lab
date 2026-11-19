@@ -26,13 +26,13 @@ assert.ok(rateMigration.includes("create or replace function public.consume_stor
 assert.ok(rateMigration.includes("grant execute on function public.consume_store_rate_limit(text,integer,integer) to service_role"), "Only the backend service role may call the rate-limit RPC");
 
 assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must validate the 15 currently requestable references");
-const productBlock = js.slice(js.indexOf("let products=["), js.indexOf("\\n];", js.indexOf("let products=[")));
-const storefrontRequestable = productBlock.split("\\n").flatMap(line => {
-  const code = line.match(/(?:code:'|\\"code\\":\\")(BAL-[A-Z0-9-]+)/);
-  const status = line.match(/(?:status:'|\\"status\\":\\")([a-z_]+)/);
+const productBlock = js.slice(js.indexOf("let products=["), js.indexOf("\n];", js.indexOf("let products=[")));
+const storefrontRequestable = productBlock.split("\n").flatMap(line => {
+  const code = line.match(/(?:code:'|"code":")(BAL-[A-Z0-9-]+)/);
+  const status = line.match(/(?:status:'|"status":")([a-z_]+)/);
   return code && status && status[1] !== "unavailable" ? [code[1]] : [];
 }).sort();
-const serverRequestable = [...edge.matchAll(/"(BAL-[A-Z0-9-]+)"\\s*:/g)].map(match => match[1]).sort();
+const serverRequestable = [...edge.matchAll(/"(BAL-[A-Z0-9-]+)"\s*:/g)].map(match => match[1]).sort();
 assert.deepEqual(serverRequestable, storefrontRequestable, "Browser-selectable products and the server-side order allowlist must match exactly");
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
 assert.ok(edge.includes("Deno.env.get(\"NOTION_STORE_API_KEY\")"), "Notion credential must remain server-side");
