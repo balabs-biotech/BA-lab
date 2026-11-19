@@ -93,6 +93,8 @@ jobs:
           node scripts/test-workspace-visual-system.mjs
           node scripts/test-workspace-scenarios.mjs
           node scripts/test-qc-check-session-errors.mjs
+          node scripts/test-storefront.mjs
+          node scripts/test-store-order-contract.mjs
           node scripts/test-smart-entry.mjs
           node scripts/test-auth-transition-workspace-lockdown.mjs
           node scripts/test-auth-init-tenant-revision-guards.mjs
@@ -236,6 +238,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/iot_ingestion_idempotency_contract.test.sql
       - name: Verify sensitive RPC search-path contracts after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
+      - name: Verify storefront order storage security and idempotency
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/store-orders-security.test.sql
       - name: Verify append-only audit table privileges after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract
