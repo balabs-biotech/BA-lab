@@ -6503,6 +6503,19 @@ function setupUiEnhancements() {
       }
     });
   });
+  const sectionNavigation = document.getElementById("sectionNavigation");
+  sectionNavigation?.addEventListener("keydown", event => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const links = [...sectionNavigation.querySelectorAll("a")].filter(link => !link.hidden);
+    const currentIndex = links.indexOf(document.activeElement);
+    if (currentIndex < 0 || !links.length) return;
+    const rtl = document.documentElement.dir === "rtl";
+    const delta = event.key === "ArrowRight" ? (rtl ? -1 : 1) : event.key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
+    const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? links.length - 1 : (currentIndex + delta + links.length) % links.length;
+    event.preventDefault();
+    links[nextIndex]?.focus();
+    links[nextIndex]?.click();
+  });
   const domain = document.body.dataset.domain;
   if (domain !== "laboratory") {
     document.getElementById("batchCard")?.classList.add("hidden");
