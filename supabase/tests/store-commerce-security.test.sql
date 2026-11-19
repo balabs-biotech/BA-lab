@@ -45,6 +45,11 @@ BEGIN
     RAISE EXCEPTION 'Commerce order events must be append-only, including for service_role';
   END IF;
 
+  IF has_table_privilege('service_role', 'public.store_order_items', 'UPDATE')
+    OR has_table_privilege('service_role', 'public.store_order_items', 'DELETE') THEN
+    RAISE EXCEPTION 'Commerce order item price/product snapshots must be immutable';
+  END IF;
+
   IF (SELECT count(*) FROM public.store_products) <> 12 THEN
     RAISE EXCEPTION 'Expected 12 seeded catalogue products, found %',
       (SELECT count(*) FROM public.store_products);
