@@ -62,9 +62,23 @@ BEGIN
     RAISE EXCEPTION 'Commerce order item price/product snapshots must be immutable';
   END IF;
 
-  IF (SELECT count(*) FROM public.store_products) <> 12 THEN
-    RAISE EXCEPTION 'Expected 12 seeded catalogue products, found %',
+  IF (SELECT count(*) FROM public.store_products) <> 13 THEN
+    RAISE EXCEPTION 'Expected 13 seeded catalogue products including the confirmed Petri dish, found %',
       (SELECT count(*) FROM public.store_products);
+  END IF;
+
+
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.store_products p
+    JOIN public.store_variants v ON v.product_id = p.id
+    WHERE p.product_code = 'BAL-PETRI-INOC-001'
+      AND v.variant_code = 'BAL-PETRI-INOC-001-UNIT'
+      AND v.price_mode = 'fixed'
+      AND v.price_dzd = 2000
+      AND v.pack_quantity = 1
+  ) THEN
+    RAISE EXCEPTION 'Inoculated Petri dish must have a confirmed unit variant priced at 2,000 DZD';
   END IF;
 
   IF NOT EXISTS (
