@@ -509,3 +509,27 @@ html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-cha
     text-wrap:pretty!important;
   }
 }
+
+
+/* PASS 68 — hard reset for the method headline's character-split reveal wrappers. */
+#app.balabs-ui > main > section.editorial-method .method-top h2,
+#app.balabs-ui > main > section.editorial-method .method-top h2 *{
+  writing-mode:horizontal-tb!important;text-orientation:mixed!important;
+  direction:ltr!important;word-break:keep-all!important;overflow-wrap:normal!important;
+  letter-spacing:-.035em!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-top h2{
+  display:block!important;white-space:normal!important;width:100%!important;max-width:none!important;
+}
+#app.balabs-ui > main > section.editorial-method .method-top h2 :is(span,em,strong,i){
+  display:inline!important;position:static!important;float:none!important;
+  width:auto!important;height:auto!important;min-width:0!important;max-width:none!important;
+  margin:0!important;padding:0!important;border:0!important;flex:none!important;grid-area:auto!important;
+  transform:none!important;translate:none!important;opacity:1!important;visibility:visible!important;
+  white-space:inherit!important;
+}
+@media(max-width:760px){
+  #app.balabs-ui > main > section.editorial-method .method-top h2{
+    max-width:100%!important;font-size:clamp(26px,7.2vw,34px)!important;line-height:1.08!important;
+  }
+}
