@@ -127,7 +127,8 @@ async function syncToNotion(order: Record<string, any>, items: Array<Record<stri
   if (existing?.id) return String(existing.id);
 
   const families = new Set(items.map(item => String(item.product_family)));
-  const category = families.size !== 1 ? "Autre" : families.has("agar") ? "Géloses" : "Cultures";
+  const allCultureFamilies = [...families].every(family => family === "liquid" || family === "spawn");
+  const category = families.size === 1 && families.has("agar") ? "Géloses" : allCultureFamilies ? "Cultures" : "Autre";
   const productText = items.map(item =>
     Number(item.quantity) + " × " + String(item.product_title) + " [" + String(item.product_code) + "]"
   ).join("\n");
