@@ -35,7 +35,7 @@ async function notion(path:string,token:string,method:string,body?:Obj){
 }
 Deno.serve(async(req:Request)=>{
  const origin=req.headers.get("origin");
- if(origin&&!ALLOWED_ORIGINS.has(origin))return json(403,{error:"origin_not_allowed"},origin);
+ if(!origin||!ALLOWED_ORIGINS.has(origin))return json(403,{error:"origin_not_allowed"},origin);
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{"Access-Control-Allow-Origin":origin??"https://balabs-biotech.github.io","Access-Control-Allow-Methods":"POST, OPTIONS","Access-Control-Allow-Headers":"apikey, content-type, x-client-info","Vary":"Origin"}});
  if(req.method!=="POST")return json(405,{error:"method_not_allowed"},origin);
  const declared=Number(req.headers.get("content-length")??"0");
