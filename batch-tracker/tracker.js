@@ -6509,53 +6509,11 @@ function setupUiEnhancements() {
     document.querySelector(".bio-lineage-panel")?.classList.add("hidden");
   }
   const workspaceHeadings = {
-    agronomy: {
-      tracker: "Cultures végétales et substrats", measurement: "Suivi environnemental", stats: "Analyse agronomique",
-      hero: {
-        eyebrow: "AGRONOMIE & ENVIRONNEMENT",
-        primary: "Cultures végétales",
-        secondary: "et intelligence environnementale",
-        description: "Suivez les cultures, les substrats et les conditions de serre en reliant observations de terrain, mesures et données environnementales.",
-        tags: ["Cultures végétales", "Serre & substrats", "Données environnementales"]
-      }
-    },
-    mycology: {
-      tracker: "Souches et cultures fongiques", measurement: "Observations mycologiques", stats: "Analyse mycologique",
-      hero: {
-        eyebrow: "MYCOLOGIE & GÉNÉALOGIE",
-        primary: "Cultures fongiques",
-        secondary: "et suivi des lignées",
-        description: "Suivez les souches, les générations et les transferts, puis reliez chaque observation à l’historique de sa culture.",
-        tags: ["Souches & cultures", "Générations", "Croissance & observations"]
-      }
-    },
-    laboratory: {
-      tracker: "Cultures sources et matières biologiques", measurement: "Mesures et résultats expérimentaux", stats: "Analyse expérimentale",
-      hero: {
-        eyebrow: "LABORATOIRE & BIOPROCÉDÉS",
-        primary: "Production biologique",
-        secondary: "et traçabilité expérimentale",
-        description: "Des milieux de culture aux lots de production : documentez les procédés, suivez les étapes et reliez chaque résultat à son historique expérimental.",
-        tags: ["Milieux & cultures", "Lots de production", "Contrôle qualité"]
-      }
-    }
+    agronomy: { tracker: "Cultures végétales et substrats", measurement: "Suivi environnemental", stats: "Analyse agronomique" },
+    mycology: { tracker: "Souches et cultures fongiques", measurement: "Observations mycologiques", stats: "Analyse mycologique" },
+    laboratory: { tracker: "Cultures sources et matières biologiques", measurement: "Mesures et résultats expérimentaux", stats: "Analyse expérimentale" }
   };
   const labels = workspaceHeadings[domain] || workspaceHeadings.laboratory;
-  const hero = labels.hero;
-  const heroTargets = {
-    eyebrow: document.getElementById("heroEyebrowLabel"),
-    primary: document.getElementById("heroTitlePrimary"),
-    secondary: document.getElementById("heroTitleSecondary"),
-    description: document.getElementById("heroDescription"),
-    tags: ["heroTagOne", "heroTagTwo", "heroTagThree"].map(id => document.getElementById(id))
-  };
-  if (heroTargets.eyebrow) heroTargets.eyebrow.textContent = hero.eyebrow;
-  if (heroTargets.primary) heroTargets.primary.textContent = hero.primary;
-  if (heroTargets.secondary) heroTargets.secondary.textContent = hero.secondary;
-  if (heroTargets.description) heroTargets.description.textContent = hero.description;
-  heroTargets.tags.forEach((target, index) => {
-    if (target) target.textContent = hero.tags[index];
-  });
   const trackerTitle = document.querySelector("#trackerCard h2");
   const measurementTitle = document.querySelector("#measurementCard h2");
   const statsTitle = document.querySelector("#statisticsCard h2");
