@@ -138,6 +138,13 @@
  prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
  track.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
  track.addEventListener('scrollend',update,{passive:true});
+ // Editorial chapters scroll vertically inside each horizontal panel.
+ // Keep the primary section marker synchronized with that independent scroll.
+ pages.forEach(page=>{
+  page.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
+  page.addEventListener('scrollend',update,{passive:true});
+ });
+ window.addEventListener('hashchange',()=>requestAnimationFrame(update),{passive:true});
  window.addEventListener('resize',()=>{scheduleRailGeometry();requestAnimationFrame(update)},{passive:true});
  if('ResizeObserver' in window){const railResizeObserver=new ResizeObserver(scheduleRailGeometry);railResizeObserver.observe(rail);railResizeObserver.observe(railNodes)}
  // Each chapter-rail button owns its own click handler above; do not dispatch go() twice.
