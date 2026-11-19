@@ -402,6 +402,12 @@ BEGIN
         RAISE EXCEPTION 'product_variant_unavailable' USING ERRCODE = '22023';
       END IF;
 
+      IF v_variant.availability = 'available'
+        AND v_variant.stock_quantity IS NOT NULL
+        AND v_variant.stock_quantity < v_quantity THEN
+        RAISE EXCEPTION 'insufficient_stock' USING ERRCODE = '22023';
+      END IF;
+
       v_price_mode := v_variant.price_mode;
       v_unit_price := v_variant.price_dzd;
       IF v_price_mode = 'fixed' THEN
