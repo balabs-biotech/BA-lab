@@ -165,7 +165,7 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       const expectedHeroPrimary = { agronomy: "Cultures végétales", mycology: "Cultures fongiques", laboratory: "Production biologique" }[workspace.domain];
-      if (metrics.heroPrimary !== expectedHeroPrimary) failures.push(`${workspace.slug}/${viewport.name}: domain-specific hero title mismatch (${metrics.heroPrimary})`);
+      if (!metrics.heroPrimaryExists || metrics.heroPrimary !== expectedHeroPrimary) failures.push(`${workspace.slug}/${viewport.name}: domain-specific hero title mismatch (${JSON.stringify({ exists: metrics.heroPrimaryExists, primary: metrics.heroPrimary, html: metrics.heroPrimaryHtml, heading: metrics.heroHeadingText })})`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
       if (workspace.domain === "agronomy" && (metrics.heroVisualKind !== "botanical-plate" || metrics.botanicalPathCount < 5 || !metrics.botanicalScanPresent)) failures.push(`${workspace.slug}/${viewport.name}: GreenTech botanical plate is incomplete (${JSON.stringify({ kind: metrics.heroVisualKind, paths: metrics.botanicalPathCount, scan: metrics.botanicalScanPresent })})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
