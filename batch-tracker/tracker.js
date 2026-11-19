@@ -6899,7 +6899,7 @@ function setupDomainWorkspaces() {
       heading: "GreenTech",
       description: "Cultures végétales, serre, substrats et données environnementales.",
       eyebrow: "AGRONOMIE & ENVIRONNEMENT",
-      title: '<span id="heroTitlePrimary">Cultures végétales</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">et intelligence environnementale</span>',
+      title: '<span id="heroTitlePrimary">Cultures végétales</span> <span aria-hidden="true">&amp;</span> <br><span id="heroTitleSecondary">Intelligence environnementale</span>',
       descriptionHero: "Suivez les cultures, les substrats et les conditions de serre en reliant observations de terrain, mesures et données environnementales.",
       tags: ["Cultures végétales", "Serre & substrats", "Données environnementales"],
       status: "AGRITECH / MONITORING"
@@ -6908,7 +6908,7 @@ function setupDomainWorkspaces() {
       heading: "Mycology",
       description: "Souches, lignées, générations, transferts et fructification.",
       eyebrow: "MYCOLOGIE & GÉNÉALOGIE",
-      title: '<span id="heroTitlePrimary">Cultures fongiques</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">et suivi des lignées</span>',
+      title: '<span id="heroTitlePrimary">Cultures fongiques</span> <span aria-hidden="true">&amp;</span> <br><span id="heroTitleSecondary">Suivi des lignées</span>',
       descriptionHero: "Suivez les souches, les générations et les transferts, puis reliez chaque observation à l’historique de sa culture.",
       tags: ["Souches & cultures", "Générations", "Croissance & observations"],
       status: "MYCOLOGY / SPECIMEN LEDGER"
@@ -6917,7 +6917,7 @@ function setupDomainWorkspaces() {
       heading: "Laboratory",
       description: "Cultures sur milieux, protocoles, variables et résultats.",
       eyebrow: "LABORATOIRE & BIOPROCÉDÉS",
-      title: '<span id="heroTitlePrimary">Production biologique</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">et traçabilité expérimentale</span>',
+      title: '<span id="heroTitlePrimary">Production biologique</span> <span aria-hidden="true">&amp;</span> <br><span id="heroTitleSecondary">Traçabilité expérimentale</span>',
       descriptionHero: "Des milieux de culture aux lots de production : documentez les procédés, suivez les étapes et reliez chaque résultat à son historique expérimental.",
       tags: ["Milieux & cultures", "Lots de production", "Contrôle qualité"],
       status: "LAB / EXPERIMENT TRACKING"
