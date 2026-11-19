@@ -35,7 +35,7 @@ All store tables enable RLS. `anon` and `authenticated` have no direct table pri
 | `create-store-order` | Guest POST; `verify_jwt=false` | Validate guest input, enforce origin and body limits, apply HMAC rate limiting, hash tracking/idempotency tokens, and call the atomic database RPC. |
 | `track-store-order` | Guest POST; `verify_jwt=false` | Validate order code + bearer token, rate-limit lookups, and return order state only (no contact/address data). |
 
-The guest order RPC recalculates prices from database variants. Browser-supplied prices, discounts, and totals are ignored. A quote-only item keeps its price and total null until BA Labs confirms the quote. The initial payment state is unpaid and the payment method is to be agreed; no payment gateway is integrated.
+The guest order RPC recalculates prices from database variants and rejects quantities above tracked available stock. Browser-supplied prices, discounts, and totals are ignored. A quote-only item keeps its price and total null until BA Labs confirms the quote. The initial payment state is unpaid and the payment method is to be agreed; no payment gateway is integrated.
 
 ### Required server-side secrets before deployment
 
