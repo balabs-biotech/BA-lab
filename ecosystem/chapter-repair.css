@@ -1039,3 +1039,34 @@
   padding:12px!important;
   background:radial-gradient(ellipse at 50% 48%,rgba(126,170,163,.13),rgba(17,27,29,.08) 72%)!important;
 }
+
+
+/* PASS 60 — give each scientific universe its own restrained specimen accent.
+   Shared BA Labs palette; original imagery, order and Notion routes stay untouched. */
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="myco"]{--universe-accent:#b96b4d;--universe-wash:rgba(185,107,77,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="bio"]{--universe-accent:#91aa91;--universe-wash:rgba(145,170,145,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="iot"]{--universe-accent:#83aaa7;--universe-wash:rgba(131,170,167,.13)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="soil"]{--universe-accent:#b79a70;--universe-wash:rgba(183,154,112,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="lab"]{--universe-accent:#aeb9b1;--universe-wash:rgba(174,185,177,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="products"]{--universe-accent:#c18a70;--universe-wash:rgba(193,138,112,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="work"]{--universe-accent:#9bb2a3;--universe-wash:rgba(155,178,163,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page="learn"]{--universe-accent:#c2c2b2;--universe-wash:rgba(194,194,178,.12)}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]{
+  border-inline-start:2px solid var(--universe-accent)!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > span:first-of-type{
+  color:var(--universe-accent)!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > figure.universe-visual{
+  background:linear-gradient(145deg,var(--universe-wash),rgba(17,27,29,.48)),#172522!important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--universe-accent) 22%,transparent)!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > em{
+  color:var(--universe-accent)!important;
+  border-top-color:color-mix(in srgb,var(--universe-accent) 28%,transparent)!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]:hover,
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]:focus-visible{
+  border-inline-start-color:var(--universe-accent)!important;
+  outline-color:color-mix(in srgb,var(--universe-accent) 30%,transparent)!important;
+}
