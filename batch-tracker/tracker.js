@@ -6933,30 +6933,30 @@ async function savePlantCulture(event) {
 function setupDomainWorkspaces() {
   const modes = {
     agronomy: {
-      heading: "Green Tech",
-      description: "Serre, substrats, irrigation, climat et croissance.",
-      eyebrow: "BA LABS / AGRITECH",
-      title: 'Culture <span>&amp;</span><br>supervision agronomique',
-      descriptionHero: "Suivez les conditions de culture, les mesures environnementales et l’évolution des plantes.",
-      tags: ["Capteurs", "Substrats", "Croissance"],
+      heading: "GreenTech",
+      description: "Cultures végétales, serre, substrats et données environnementales.",
+      eyebrow: "AGRONOMIE & ENVIRONNEMENT",
+      title: '<span id="heroTitlePrimary">Cultures végétales</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">et intelligence environnementale</span>',
+      descriptionHero: "Suivez les cultures, les substrats et les conditions de serre en reliant observations de terrain, mesures et données environnementales.",
+      tags: ["Cultures végétales", "Serre & substrats", "Données environnementales"],
       status: "AGRITECH / MONITORING"
     },
     mycology: {
-      heading: "Registre mycologique",
+      heading: "Mycology",
       description: "Souches, lignées, générations, transferts et fructification.",
-      eyebrow: "BA LABS / MYCOLOGIE",
-      title: 'Souches <span>&amp;</span><br>traçabilité fongique',
-      descriptionHero: "Documentez l’identité des souches, les étapes de propagation, les observations morphologiques et les incidents.",
-      tags: ["Souches", "Générations", "Contamination"],
+      eyebrow: "MYCOLOGIE & GÉNÉALOGIE",
+      title: '<span id="heroTitlePrimary">Cultures fongiques</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">et suivi des lignées</span>',
+      descriptionHero: "Suivez les souches, les générations et les transferts, puis reliez chaque observation à l’historique de sa culture.",
+      tags: ["Souches & cultures", "Générations", "Croissance & observations"],
       status: "MYCOLOGY / SPECIMEN LEDGER"
     },
     laboratory: {
-      heading: "Suivi expérimental",
+      heading: "Laboratory",
       description: "Cultures sur milieux, protocoles, variables et résultats.",
-      eyebrow: "BA LABS / LABORATOIRE",
-      title: 'Cultures <span>&amp;</span><br>suivi scientifique',
-      descriptionHero: "Enregistrez les conditions expérimentales, les variables mesurées et les résultats avec leur contexte.",
-      tags: ["Milieux", "Protocoles", "Mesures"],
+      eyebrow: "LABORATOIRE & BIOPROCÉDÉS",
+      title: '<span id="heroTitlePrimary">Production biologique</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">et traçabilité expérimentale</span>',
+      descriptionHero: "Des milieux de culture aux lots de production : documentez les procédés, suivez les étapes et reliez chaque résultat à son historique expérimental.",
+      tags: ["Milieux & cultures", "Lots de production", "Contrôle qualité"],
       status: "LAB / EXPERIMENT TRACKING"
     }
   };
@@ -6988,7 +6988,7 @@ function setupDomainWorkspaces() {
     if (cultureEntryTitle) cultureEntryTitle.textContent = entryLabels.cultureTitle;
     if (strainLabel?.firstChild) strainLabel.firstChild.textContent = entryLabels.strain;
     if (cultureTypeLabel?.firstChild) cultureTypeLabel.firstChild.textContent = entryLabels.cultureType;
-    if (eyebrow) eyebrow.innerHTML = config.eyebrow.replace(" / ", ' <span class="eyebrow-separator">/</span> ');
+    if (eyebrow) eyebrow.innerHTML = '<span class="eyebrow-dot" aria-hidden="true"></span> BA LABS <span class="eyebrow-separator">/</span> <span id="heroEyebrowLabel">' + config.eyebrow + '</span>';
     if (title) title.innerHTML = config.title;
     if (heroDescription) heroDescription.textContent = config.descriptionHero;
     if (heroTags) {
