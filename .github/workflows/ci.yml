@@ -188,6 +188,11 @@ jobs:
         run: node supabase/tests/store-guest-order-contract.test.mjs
       - name: Test BA Labs Store guest tracking security contract
         run: node supabase/tests/store-order-tracking-contract.test.mjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check BA Labs Store Edge Functions
+        run: deno check supabase/functions/store-catalogue/index.ts supabase/functions/create-store-order/index.ts supabase/functions/track-store-order/index.ts
 
   supabase-migration-replay:
     runs-on: ubuntu-latest
