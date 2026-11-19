@@ -31,6 +31,7 @@ assert.ok(js.includes('balabs-store-cart') && js.includes('safeGet') && js.inclu
 assert.ok(js.includes("const privacySettings=$('#privacySettings');if(privacySettings)privacySettings.addEventListener"), 'Optional privacy settings control must not stop storefront initialization when absent');
 assert.ok(js.includes('prefers-reduced-motion') && js.includes('IntersectionObserver'), 'Motion must respect reduced-motion preference and progressive reveal');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'Storefront must not request remote Google Fonts');
+assert.ok(html.includes("Content-Security-Policy") && html.includes("script-src 'self'") && html.includes("object-src 'none'") && html.includes("connect-src 'self' https://axcouwiodqsauwnsiotn.supabase.co"), 'Storefront must enforce a restrictive CSP while allowing only its own assets and Supabase API');
 assert.ok(js.includes('STORE_CATALOGUE_URL') && js.includes("method:'GET'") && js.includes("credentials:'omit'"), 'Storefront may read the public catalogue only through a credential-free GET request');
 assert.ok(js.includes('STORE_REMOTE_CATALOGUE_ENABLED=false') && js.includes('if(!STORE_REMOTE_CATALOGUE_ENABLED)return;'), 'Remote catalogue access must remain disabled until cross-border processing and privacy disclosures are approved');
 assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Public catalogue requests must use only the publishable key');
