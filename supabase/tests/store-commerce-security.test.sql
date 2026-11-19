@@ -96,6 +96,7 @@ DECLARE
   v_quote jsonb;
   v_order public.store_orders%ROWTYPE;
   v_allowed boolean;
+  v_tracking jsonb;
   v_hash bytea := decode(repeat('a', 64), 'hex');
   v_idem bytea := decode(repeat('b', 64), 'hex');
 BEGIN
@@ -176,6 +177,35 @@ BEGIN
       AND line_total_dzd = 4000
   ) THEN
     RAISE EXCEPTION 'order item must preserve the database price snapshot';
+  END IF;
+
+  IF NOT has_function_privilege('service_role',
+    'public.lookup_store_guest_order(text,bytea)', 'EXECUTE')
+    OR has_function_privilege('anon',
+    'public.lookup_store_guest_order(text,bytea)', 'EXECUTE')
+    OR has_function_privilege('authenticated',
+    'public.lookup_store_guest_order(text,bytea)', 'EXECUTE') THEN
+    RAISE EXCEPTION 'guest tracking RPC execution grants are not least-privilege';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_proc
+    WHERE oid = 'public.lookup_store_guest_order(text,bytea)'::regprocedure
+      AND proconfig @> ARRAY['search_path=""']
+  ) THEN
+    RAISE EXCEPTION 'guest tracking RPC must pin an empty search_path';
+  END IF;
+
+  v_tracking := public.lookup_store_guest_order(v_order.order_code, v_hash);
+  IF v_tracking->>'status' <> 'pending_confirmation'
+    OR v_tracking ? 'customer_phone'
+    OR v_tracking ? 'customer_email'
+    OR v_tracking ? 'delivery_address' THEN
+    RAISE EXCEPTION 'guest tracking must return order state only, without customer PII';
+  END IF;
+
+  IF public.lookup_store_guest_order(v_order.order_code, decode(repeat('f', 64), 'hex')) IS NOT NULL THEN
+    RAISE EXCEPTION 'guest tracking must reject an invalid token hash';
   END IF;
 
   v_replay := public.create_store_guest_order(
