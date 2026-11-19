@@ -9,6 +9,7 @@ assert.match(source, /MAX_ITEMS\s*=\s*30/, "cart item count must be bounded");
 assert.match(source, /req\.method !== "POST"/, "guest order endpoint must accept only POST");
 assert.match(source, /STORE_RATE_LIMIT_HMAC_SECRET/, "rate limiting must use a server-only HMAC secret");
 assert.match(source, /consume_store_checkout_rate_limit/, "requests must pass through the atomic database rate limiter");
+assert.match(source, /create-store-order:\s*\+\s*ip/, "checkout rate limits must use an endpoint-specific fingerprint");
 assert.match(source, /create_store_guest_order/, "order creation must use the atomic database RPC");
 assert.match(source, /STORE_TERMS_VERSION[\s\S]*STORE_PRIVACY_NOTICE_VERSION/, "the active legal document versions must be enforced server-side");
 assert.match(source, /website/, "honeypot field must be checked");
