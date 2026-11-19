@@ -114,12 +114,14 @@
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   // A horizontal chapter can contain several editorial sections. Highlight only
   // the section nearest the reading line, never every link in the same chapter.
-  const navLinks=[...app.querySelectorAll('.site-nav a[href^="#"]')];
+  const navLinks=[...app.querySelectorAll('.site-nav a[href*="#"]')];
   const page=pages[idx],pageRect=page.getBoundingClientRect();
   const readingLine=pageRect.top+Math.min(180,page.clientHeight*.28);
   let activeLink=null,activeDistance=Infinity;
   navLinks.forEach(a=>{
-   const id=decodeURIComponent(a.getAttribute('href').slice(1));
+   let url;try{url=new URL(a.href,location.href)}catch(_){return}
+   if(url.origin!==location.origin||url.pathname!==location.pathname)return;
+   let id;try{id=decodeURIComponent(url.hash.slice(1))}catch(_){return}
    const target=id&&document.getElementById(id);
    if(!target||target.closest('.experience-page')!==page)return;
    const rect=target.getBoundingClientRect();
@@ -152,8 +154,10 @@
  document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;const page=pages[current];if(!page)return;const atTop=page.scrollTop<=4;const atBottom=page.scrollTop+page.clientHeight>=page.scrollHeight-4;if(e.key==='PageDown'&&atBottom&&current<pages.length-1){e.preventDefault();go(current+1)}if(e.key==='PageUp'&&atTop&&current>0){e.preventDefault();go(current-1)}});
  track.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY)||e.shiftKey){e.preventDefault();track.scrollBy({left:e.deltaX||e.deltaY,behavior:'auto'})}},{passive:false});
  app.addEventListener('click',e=>{
-  const a=e.target.closest('a[href^="#"]');if(!a)return;
-  const id=decodeURIComponent(a.getAttribute('href').slice(1));if(!id)return;
+  const a=e.target.closest('a[href*="#"]');if(!a)return;
+  let url;try{url=new URL(a.href,location.href)}catch(_){return}
+  if(url.origin!==location.origin||url.pathname!==location.pathname)return;
+  let id;try{id=decodeURIComponent(url.hash.slice(1))}catch(_){return}if(!id)return;
   const target=document.getElementById(id);if(!target)return;
   const page=target.closest('.experience-page');if(!page)return;
   e.preventDefault();go(pages.indexOf(page));
