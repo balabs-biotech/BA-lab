@@ -150,7 +150,7 @@ try {
         assert.ok(aboutLayout.copy.width > aboutLayout.viewportWidth*.62, 'Mobile BA Labs final chapter copy must use the available reading width');
         assert.ok(aboutLayout.paragraphs.length>0 && aboutLayout.paragraphs.every(p=>p.width>aboutLayout.viewportWidth*.65), 'Mobile BA Labs copy must not collapse into a narrow column');
         assert.ok(aboutLayout.art.top >= aboutLayout.copy.bottom-2, 'BA Labs documentary image must follow the text on mobile');
-        assert.equal(aboutLayout.atmosphereDisplay,'none','Remove duplicate decorative chapter artwork from the mobile BA Labs reading flow');
+        assert.ok(['none','absent'].includes(aboutLayout.atmosphereDisplay),'Remove duplicate decorative chapter artwork from the mobile BA Labs reading flow');
       }
       await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
     }
