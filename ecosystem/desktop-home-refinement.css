@@ -596,3 +596,20 @@ html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-cha
  }
  #app.balabs-ui #demarche.editorial-method .method-no{color:#99563F!important}
 }
+
+
+/* PASS 71 — keep the mobile method chapter on its intended mineral-paper surface. */
+@media(max-width:760px){
+ #app.balabs-ui #demarche.editorial-method{
+  background:#D1D0C5!important;color:#263B38!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-top :is(.eyebrow,h2,p),
+ #app.balabs-ui #demarche.editorial-method .method-steps :is(b,p){
+  color:#263B38!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-trigger{
+  color:#263B38!important;background:transparent!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-no{color:#99563F!important}
+ #app.balabs-ui #demarche.editorial-method .method-arrow{color:#99563F!important}
+}
