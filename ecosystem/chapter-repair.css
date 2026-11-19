@@ -974,3 +974,59 @@
   height:clamp(148px,43vw,174px)!important;min-height:0!important;max-height:none!important;
  }
 }
+
+/* PASS 58 — remove the redundant second copy of each card image.
+   The credited figure above it is the single canonical visual. */
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > img.universe-card-image{
+  display:none!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual{
+  display:block!important;
+  position:relative!important;
+  width:100%!important;
+  height:clamp(148px,12vw,168px)!important;
+  min-height:148px!important;
+  margin:0 0 14px!important;
+  overflow:hidden!important;
+  border-radius:7px!important;
+  background:#172522!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual > img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual > figcaption{
+  box-sizing:border-box!important;
+  inset:auto 0 0!important;
+  width:100%!important;
+  padding:22px 10px 8px!important;
+  background:linear-gradient(transparent,rgba(10,17,17,.86))!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:3px 8px!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual > figcaption span{
+  color:#f0eee3!important;
+  font:600 8px/1.35 ui-monospace,SFMono-Regular,monospace!important;
+  letter-spacing:.1em!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual > figcaption small{
+  color:rgba(240,238,227,.72)!important;
+  font:500 7px/1.35 Inter,system-ui,sans-serif!important;
+}
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual > figcaption a{
+  margin-inline-start:auto!important;
+  color:#e0a184!important;
+  font:600 7px/1.35 Inter,system-ui,sans-serif!important;
+  letter-spacing:.06em!important;
+}
+@media(max-width:760px){
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card > figure.universe-visual{
+  height:clamp(148px,43vw,168px)!important;
+ }
+}
