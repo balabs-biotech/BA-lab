@@ -1099,7 +1099,7 @@
   animation:none!important;
   filter:saturate(.82) contrast(1.06)!important;
 }
-#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > span:first-child{
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > span:first-of-type{
   display:block!important;
   margin:0 0 7px!important;
   font:600 9px/1.2 ui-monospace,SFMono-Regular,monospace!important;
@@ -1159,4 +1159,15 @@
  #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page]{
   transition:none!important;
  }
+}
+
+
+/* PASS 62 — the specimen figure is prepended before the card index.
+   Target the first span element so the numeric index keeps its editorial style. */
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="network"] > .universe-index .universe-index-card[data-domain-page] > span:first-of-type{
+  color:var(--universe-accent)!important;
+  display:block!important;
+  margin:0 0 7px!important;
+  font:600 9px/1.2 ui-monospace,SFMono-Regular,monospace!important;
+  letter-spacing:.16em!important;
 }
