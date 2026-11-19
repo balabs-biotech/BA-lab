@@ -566,3 +566,33 @@ html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-cha
     letter-spacing:-.04em!important;text-wrap:pretty!important;
   }
 }
+
+
+/* PASS 70 — mobile method steps need a readable single-column rhythm. */
+@media(max-width:760px){
+ #app.balabs-ui #demarche.editorial-method .method-steps{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;max-width:none!important;gap:0!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-steps li,
+ #app.balabs-ui #demarche.editorial-method .method-steps li:nth-child(3),
+ #app.balabs-ui #demarche.editorial-method .method-steps li:nth-child(4){
+  display:block!important;grid-column:1!important;width:100%!important;min-width:0!important;
+  border-left:0!important;border-top:1px solid #9BA69D!important;padding:14px 0!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-trigger{
+  display:grid!important;grid-template-columns:36px minmax(0,1fr) 20px!important;
+  align-items:start!important;gap:12px!important;width:100%!important;min-width:0!important;padding:0!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-trigger-copy{
+  display:block!important;width:100%!important;min-width:0!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-steps b{
+  display:block!important;font-size:17px!important;line-height:1.2!important;color:#263B38!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-steps p{
+  max-width:54ch!important;width:100%!important;margin:5px 0 0!important;
+  font-size:12px!important;line-height:1.5!important;color:#263B38!important;
+ }
+ #app.balabs-ui #demarche.editorial-method .method-no{color:#99563F!important}
+}
