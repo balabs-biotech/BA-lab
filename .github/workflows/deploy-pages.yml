@@ -31,6 +31,7 @@ jobs:
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           cp -R store/. _site/store/
           node scripts/test-storefront.mjs
+          node scripts/test-store-order-notion.mjs
           touch _site/.nojekyll
 
       - name: Install image optimization dependency
