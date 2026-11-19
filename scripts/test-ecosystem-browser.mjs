@@ -154,6 +154,16 @@ try {
       }
       await page.screenshot({ path: outputDir + '/' + viewport.name + '-chapter-' + chapter + '.png', fullPage: false });
     }
+    // Absolute same-page links in the primary navigation must synchronize with the reading section.
+    for (const sectionId of ['a-la-une', 'chantiers']) {
+      await page.locator('.site-nav a[href*="#' + sectionId + '"]').first().click();
+      await page.waitForFunction((id) => {
+        const active = [...document.querySelectorAll('.site-nav a.chapter-active')];
+        return active.length === 1 && active[0].getAttribute('aria-current') === 'location' && new URL(active[0].href).hash === '#' + id;
+      }, sectionId, { timeout: 10000 });
+      assert.equal(await page.locator('.site-nav a[aria-current="location"]').count(), 1, 'Exactly one primary navigation link must be active while reading ' + sectionId);
+    }
+
     // Scroll the track independently of the rail and verify that the active point follows it.
     await page.evaluate(() => {
       const track = document.querySelector('#experienceTrack');
