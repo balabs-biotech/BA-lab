@@ -3615,3 +3615,29 @@ html[lang="ar"] .product-open{right:auto;left:20px}
     white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
   }
 }
+
+/* PASS 59 — improve product reference readability without changing catalogue density. */
+#app.balabs-ui > main .product-catalogue .product-catalogue-card .product-ref{
+  color:#a9c0aa!important;
+  font-size:10px!important;
+  line-height:1.5!important;
+  letter-spacing:.055em!important;
+}
+#app.balabs-ui > main .product-catalogue .product-catalogue-card .product-kind{
+  color:#d28c6e!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+  letter-spacing:.12em!important;
+}
+#app.balabs-ui > main .product-catalogue .product-catalogue-card p{
+  color:#c5d0c7!important;
+  font-size:12px!important;
+  line-height:1.65!important;
+  max-width:48ch!important;
+}
+@media(max-width:600px){
+  #app.balabs-ui > main .product-catalogue .product-catalogue-card p{
+    font-size:12px!important;
+    line-height:1.62!important;
+  }
+}
