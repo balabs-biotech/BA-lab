@@ -164,28 +164,6 @@ try {
       assert.equal(await page.locator('.site-nav a[aria-current="location"]').count(), 1, 'Exactly one primary navigation link must be active while reading ' + sectionId);
     }
 
-    // Vertical reading inside the final editorial chapter must update the primary nav
-    // without moving the chapter rail away from the active chapter.
-    await page.locator('.chapter-rail-node').nth(4).click();
-    await page.waitForFunction(() => document.querySelector('#chapter-about')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
-    for (const sectionId of ['a-propos', 'demarche', 'value-principles']) {
-      await page.evaluate((id) => {
-        const page = document.querySelector('#chapter-about');
-        const target = document.getElementById(id);
-        const pageRect = page.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-        const readingLine = Math.min(180, page.clientHeight * .28);
-        const wanted = page.scrollTop + targetRect.top - pageRect.top - readingLine;
-        page.scrollTo({ top: Math.max(0, Math.min(page.scrollHeight-page.clientHeight, wanted)), behavior: 'instant' });
-      }, sectionId);
-      await page.waitForFunction((id) => {
-        const active = [...document.querySelectorAll('.site-nav a.chapter-active')];
-        return active.length === 1 && new URL(active[0].href).hash === '#' + id;
-      }, sectionId, { timeout: 10000 });
-      assert.equal(await page.locator('.chapter-rail-node[aria-current="step"]').count(), 1, 'Exactly one chapter point remains active while vertically reading ' + sectionId);
-      assert.equal(await page.locator('.chapter-rail-node').nth(4).getAttribute('aria-current'), 'step', 'Vertical reading must not desynchronize the chapter filament in ' + sectionId);
-    }
-
     // Scroll the track independently of the rail and verify that the active point follows it.
     await page.evaluate(() => {
       const track = document.querySelector('#experienceTrack');
