@@ -26,7 +26,7 @@ Notion: 🛒 DEMANDES COMMERCIALES
 - **Supabase is the transactional source of truth** for guest enquiries and their item snapshots.
 - **Notion is the commercial follow-up workspace** populated after the Supabase write succeeds.
 - A Notion API outage does not discard the enquiry: the Supabase record remains stored with `notion_sync_status='pending'`.
-- The Notion sync uses the existing server-side `NOTION_API_KEY` and the existing commercial data source. It does not alter the CultureOps `sync-culture-to-notion` function.
+- The storefront sync uses a dedicated server-side `NOTION_STORE_API_KEY`, separate from CultureOps. Its Notion integration must be shared only with the commercial orders data source, never with CultureOps databases.
 - The legacy direct-to-Notion endpoints `store-notion-order` and `notion-store-order` have been retired. Both now return HTTP 410 and require an authenticated JWT at the gateway. Only `create-store-order` remains the supported intake endpoint.
 - The new endpoint is deployed in Supabase. The public form remains disabled, so normal storefront visitors cannot submit customer data.
 
@@ -58,12 +58,12 @@ Source: `supabase/functions/create-store-order/index.ts`
 - The browser persists only the product selection and language preference; customer form values are not written to local storage.
 - Catalogue strings are HTML-escaped before DOM rendering to reduce stored/reflected XSS risk.
 - Writes the request and all items atomically to Supabase before attempting Notion.
-- Uses a server-side Supabase secret/service-role key and `NOTION_API_KEY`; neither credential is present in browser code.
+- Uses a server-side Supabase secret/service-role key and the dedicated `NOTION_STORE_API_KEY`; neither credential is present in browser code.
 - Uses a request UUID to make retries idempotent.
 - Applies a persistent limit of five requests per ten minutes using an HMAC-SHA-256 fingerprint of the gateway-provided client IP. The raw IP is not stored.
 - Does not process payment or confirm stock, delivery fees, or lead times.
 
-The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_API_KEY`.
+The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_STORE_API_KEY` (a separate Notion integration token with access limited to the commercial orders data source). The previous shared `NOTION_API_KEY` is deliberately no longer accepted by this storefront function.
 
 ## Catalogue
 
