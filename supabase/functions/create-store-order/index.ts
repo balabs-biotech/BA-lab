@@ -5,6 +5,24 @@ const DATA_SOURCE_ID = Deno.env.get("NOTION_STORE_DATA_SOURCE_ID") ?? "7a40b95b-
 const NOTION_VERSION = "2025-09-03";
 const MAX_BODY_BYTES = 16384;
 const MAX_ITEMS = 20;
+// Best-effort per-isolate throttle. Persistent HMAC rate limiting can be added
+// before public launch if traffic warrants it.
+const rateBuckets = new Map<string, { started: number; count: number }>();
+
+function isRateLimited(req: Request): boolean {
+  const ip = (req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-real-ip") ??
+    req.headers.get("x-forwarded-for")?.split(",").at(-1) ??
+    "unknown").trim().slice(0, 100);
+  const now = Date.now();
+  const bucket = rateBuckets.get(ip);
+  if (!bucket || now - bucket.started > 600_000) {
+    rateBuckets.set(ip, { started: now, count: 1 });
+    return false;
+  }
+  bucket.count += 1;
+  return bucket.count > 5;
+}
 
 type Product = {
   title: string;
@@ -185,6 +203,7 @@ Deno.serve(async (req: Request) => {
     return json(422, { success: false, error: "invalid_payload" }, origin);
   }
   if (clean(body.website, 200)) return json(200, { success: true }, origin);
+  if (isRateLimited(req)) return json(429, { success: false, error: "rate_limited" }, origin);
 
   const customer = body.customer && typeof body.customer === "object" ? body.customer : {};
   const name = clean(customer.name, 120);
