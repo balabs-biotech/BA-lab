@@ -5,6 +5,7 @@ const html = readFileSync("store/index.html", "utf8");
 const css = readFileSync("store/store.css", "utf8");
 const js = readFileSync("store/store.js", "utf8");
 const migration = readFileSync("supabase/migrations/20261119230000_store_orders_v1.sql", "utf8");
+const rateMigration = readFileSync("supabase/migrations/20261119235000_store_checkout_rate_limits_v1.sql", "utf8");
 const edge = readFileSync("supabase/functions/create-store-order/index.ts", "utf8");
 const readme = readFileSync("store/README.md", "utf8");
 
@@ -20,6 +21,9 @@ assert.ok(migration.includes("create table if not exists public.store_order_item
 assert.ok(migration.includes("alter table public.store_orders enable row level security"), "Store order table must enable RLS");
 assert.ok(migration.includes("revoke all on table public.store_orders from public, anon, authenticated"), "Public roles must not access store orders directly");
 assert.ok(migration.includes("grant execute on function public.create_store_order(uuid,jsonb,jsonb,text) to service_role"), "Only the backend service role may call the insert RPC");
+assert.ok(rateMigration.includes("create table if not exists public.store_checkout_rate_limits"), "Persistent rate-limit table must exist");
+assert.ok(rateMigration.includes("create or replace function public.consume_store_rate_limit"), "Persistent rate-limit RPC must exist");
+assert.ok(rateMigration.includes("grant execute on function public.consume_store_rate_limit(text,integer,integer) to service_role"), "Only the backend service role may call the rate-limit RPC");
 
 assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must validate all 15 published catalogue references");
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
