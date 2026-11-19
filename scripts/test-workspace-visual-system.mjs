@@ -41,7 +41,7 @@ assert.ok(shared.includes("backdrop-filter:blur(18px)"), "Workspace toolbar must
 assert.ok(unified.includes("scroll-snap-type:x proximity") && unified.includes("overflow-x:auto"), "Mobile module navigation must support horizontal scrolling");
 assert.ok(html.includes('class="muted auth-intro"') && unified.includes("#authCard .auth-intro") && unified.includes("@media(max-width:390px)"), "Compact mobile authentication must retain a short intro and responsive spacing");
 assert.ok(tracker.includes('inline: "nearest"') && tracker.includes('link.scrollIntoView'), "The active module tab must remain visible when navigating between modules");
-assert.ok(greenTechEntry.includes("20261119-mobile-tabs-5") && mycologyEntry.includes("20261119-mobile-tabs-5") && laboratoryEntry.includes("20261119-mobile-tabs-5"), "All workspaces must load the current responsive navigation styles");
+assert.ok(greenTechEntry.includes("20261119-compact-auth-8") && mycologyEntry.includes("20261119-compact-auth-8") && laboratoryEntry.includes("20261119-compact-auth-8"), "All workspaces must load the current responsive navigation styles");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
 assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curved biological topology");
 assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
