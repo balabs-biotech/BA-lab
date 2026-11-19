@@ -79,6 +79,11 @@ jobs:
             return 1
           }
           verify_asset "assets/chapter-home.jpg" "image/jpeg"
+          verify_asset "assets/home-hero.jpg" "image/jpeg"
+          verify_asset "assets/universe-myco.jpg" "image/jpeg"
+          verify_asset "assets/universe-bio.jpg" "image/jpeg"
+          verify_asset "assets/universe-soil.jpg" "image/jpeg"
+          verify_asset "assets/universe-products.jpg" "image/jpeg"
           verify_asset "assets/editorial-penicillium.png" "image/png"
           verify_asset "explorer-2d.js?v=selection-dock-1" "javascript"
 
