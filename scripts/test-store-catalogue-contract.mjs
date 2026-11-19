@@ -15,5 +15,9 @@ assert.ok(source.includes('ALLOWED_ORIGINS.has(origin)') && source.includes('"GE
 assert.ok(source.includes('"Cache-Control": cache') && source.includes('"public, max-age=60, s-maxage=300"'), "Public catalogue responses must use short-lived shared caching");
 assert.ok(!source.includes("return payload") && !source.includes("JSON.stringify(page)"), "Raw Notion pages and internal metadata must never be exposed");
 assert.ok(storefront.includes("STORE_REMOTE_CATALOGUE_ENABLED=false"), "Remote catalogue integration must remain disabled until the dedicated secret and product reconciliation are complete");
+assert.ok(storefront.includes("const REMOTE_STATUS_MAP=Object.freeze({") && storefront.includes('"sur demande":"on_request"') && storefront.includes('"à confirmer":"to_confirm"') && storefront.includes('"indisponible":"unavailable"'), "Remote availability values must map to the storefront status model");
+assert.ok(storefront.includes("products=products.map(product=>{") && storefront.includes("return remoteStatus?{...product,status:remoteStatus}:product;"), "Remote catalogue may update availability only while preserving local multilingual titles, descriptions and prices");
+assert.ok(storefront.includes(".filter(([,status])=>status!==null)") && storefront.includes("if(!updates.size)return;"), "Unknown remote availability values must not overwrite reviewed local statuses");
+assert.ok(!storefront.includes("products=remote") && !storefront.includes("titles:p.title_i18n") && !storefront.includes("descriptions:p.description_i18n"), "Remote catalogue must not replace curated multilingual storefront content with absent or unreviewed fields");
 
 console.log("Public catalogue contract passed: isolated read-only credential, active-only records, field allowlist, no customer data and disabled frontend switch.");
