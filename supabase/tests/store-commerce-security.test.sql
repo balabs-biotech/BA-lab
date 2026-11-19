@@ -235,6 +235,34 @@ BEGIN
     RAISE EXCEPTION 'guest-order idempotency contract failed';
   END IF;
 
+  UPDATE public.store_variants SET stock_quantity = 1
+  WHERE variant_code = 'TEST-AGAR-UNIT';
+
+  BEGIN
+    PERFORM public.create_store_guest_order(
+      jsonb_build_object(
+        'customer_name', 'Stock Test',
+        'customer_phone', '0550000002',
+        'delivery_mode', 'pickup',
+        'locale', 'fr',
+        'terms_accepted', true,
+        'terms_version', 'test-terms-v1',
+        'privacy_notice_version', 'test-privacy-v1',
+        'marketing_opt_in', false
+      ),
+      jsonb_build_array(jsonb_build_object(
+        'product_code', 'BAL-CUL-AGAR-001',
+        'variant_code', 'TEST-AGAR-UNIT',
+        'quantity', 2
+      )),
+      decode(repeat('1', 64), 'hex'),
+      decode(repeat('2', 64), 'hex')
+    );
+    RAISE EXCEPTION 'out-of-stock variant was accepted' USING ERRCODE = 'P0001';
+  EXCEPTION WHEN SQLSTATE '22023' THEN
+    NULL;
+  END;
+
   v_quote := public.create_store_guest_order(
     jsonb_build_object(
       'customer_name', 'Quote Customer',
