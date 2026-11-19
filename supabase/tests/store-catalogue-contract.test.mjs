@@ -5,7 +5,7 @@ const source = readFileSync(new URL("../functions/store-catalogue/index.ts", imp
 
 assert.match(source, /req\.method !== "GET"/, "catalogue endpoint must be read-only");
 assert.match(source, /ALLOWED_ORIGINS[\s\S]*https:\/\/balabs-biotech\.github\.io/, "GitHub Pages origin must be explicitly allow-listed");
-assert.match(source, /publication_status", "eq\\.published"/, "only published catalogue products may be returned");
+assert.match(source, /publication_status", "eq\.published"/, "only published catalogue products may be returned");
 assert.match(source, /store_variants/, "published product variants must be returned");
 assert.match(source, /price_dzd/, "the public catalogue may expose the confirmed public price");
 assert.doesNotMatch(source, /customer_phone|customer_email|delivery_address|tracking_token_hash|store_orders/, "catalogue endpoint must never query or expose guest order data");
