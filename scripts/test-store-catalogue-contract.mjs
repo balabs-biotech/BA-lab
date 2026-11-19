@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+const source = readFileSync("supabase/functions/store-catalogue/index.ts", "utf8");
+const storefront = readFileSync("store/store.js", "utf8");
+
+assert.ok(source.includes('Deno.env.get("NOTION_CATALOGUE_API_KEY")'), "Public catalogue must use its own read-only Notion credential");
+assert.ok(!source.includes("NOTION_STORE_API_KEY") && !source.includes("NOTION_API_KEY"), "Public catalogue must not share the commercial order or CultureOps credentials");
+assert.ok(source.includes('8998bc08-5a51-4c61-a94c-d9fd144a7236'), "Catalogue API must target the dedicated public data source");
+assert.ok(source.includes('filter: { property: "Actif au catalogue", checkbox: { equals: true } }'), "Only explicitly active public catalogue records may be returned");
+assert.ok(source.includes('"Référence publique"') && source.includes('"Produit"') && source.includes('"Disponibilité"'), "Response must use the approved public catalogue fields");
+assert.ok(!source.includes("customer_email") && !source.includes("customer_phone") && !source.includes("customer_message"), "Catalogue endpoint must never query customer data");
+assert.ok(source.includes('ALLOWED_ORIGINS.has(origin)') && source.includes('"GET", "OPTIONS"'), "Catalogue endpoint must be read-only and origin-restricted for browser use");
+assert.ok(source.includes('"Cache-Control": cache') && source.includes('"public, max-age=60, s-maxage=300"'), "Public catalogue responses must use short-lived shared caching");
+assert.ok(!source.includes("return payload") && !source.includes("JSON.stringify(page)"), "Raw Notion pages and internal metadata must never be exposed");
+assert.ok(storefront.includes("STORE_REMOTE_CATALOGUE_ENABLED=false"), "Remote catalogue integration must remain disabled until the dedicated secret and product reconciliation are complete");
+
+console.log("Public catalogue contract passed: isolated read-only credential, active-only records, field allowlist, no customer data and disabled frontend switch.");
