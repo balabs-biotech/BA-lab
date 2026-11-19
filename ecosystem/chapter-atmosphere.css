@@ -151,3 +151,17 @@
 }
 .experience-page>.chapter-atmosphere.is-unavailable img{opacity:0}
 .experience-page>.chapter-atmosphere figcaption a{pointer-events:auto;position:relative;z-index:4;color:#f2f1e9;text-decoration:underline;text-underline-offset:2px}
+
+
+/* PASS74 — the BA Labs chapter cover is a data plot, not a specimen photo.
+   Keep its scientific context, but subordinate it to the actual Penicillium
+   micrograph and the editorial heading instead of letting it dominate the page. */
+.experience-page[data-chapter="about"]>.chapter-atmosphere{
+  opacity:.58;
+}
+.experience-page[data-chapter="about"]>.chapter-atmosphere img{
+  filter:grayscale(.58) saturate(.52) contrast(1.02) brightness(.68);
+}
+@media(max-width:760px){
+  .experience-page[data-chapter="about"]>.chapter-atmosphere{opacity:.42}
+}
