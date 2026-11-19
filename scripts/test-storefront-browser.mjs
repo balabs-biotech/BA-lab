@@ -16,7 +16,7 @@ try {
   assert.ok(await page.locator("#requestSummary").innerText(), "Selected product must appear in the request summary");
 
   const desktopColumns = await page.locator(".request-layout").evaluate(el =>
-    getComputedStyle(el).gridTemplateColumns.trim().split(/\\s+/).length
+    getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length
   );
   assert.equal(desktopColumns, 2, "Desktop request workspace must use two columns");
 
@@ -26,7 +26,7 @@ try {
 
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileColumns = await page.locator(".request-layout").evaluate(el =>
-    getComputedStyle(el).gridTemplateColumns.trim().split(/\\s+/).length
+    getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length
   );
   assert.equal(mobileColumns, 1, "Mobile request workspace must stack into one column");
 
