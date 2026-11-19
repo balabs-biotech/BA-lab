@@ -428,3 +428,52 @@
     white-space:normal!important;
   }
 }
+
+
+/* PASS 66 — page 5: enforce the selected catalogue language and a true mobile column.
+   This file loads after the chapter, visual and chromatic stylesheets. */
+#app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue [data-cat-lang]{
+ display:none!important;
+}
+html[lang="fr"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue [data-cat-lang="fr"],
+html[lang="en"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue [data-cat-lang="en"],
+html[lang="ar"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue [data-cat-lang="ar"],
+html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue [data-cat-lang="pt"]{
+ display:inline!important;
+}
+html[lang="fr"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-intro p[data-cat-lang="fr"],
+html[lang="en"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-intro p[data-cat-lang="en"],
+html[lang="ar"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-intro p[data-cat-lang="ar"],
+html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-intro p[data-cat-lang="pt"],
+html[lang="fr"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-visual-note[data-cat-lang="fr"],
+html[lang="en"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-visual-note[data-cat-lang="en"],
+html[lang="ar"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-visual-note[data-cat-lang="ar"],
+html[lang="pt"] #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-visual-note[data-cat-lang="pt"]{
+ display:block!important;
+}
+@media(max-width:760px){
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"]{
+  padding-inline:14px!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] > .product-catalogue{
+  display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;
+  margin-inline:0!important;padding-inline:0!important;box-sizing:border-box!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-head{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;gap:14px!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-head>div,
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-intro{
+  display:block!important;float:none!important;position:static!important;grid-column:1/-1!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-intro p{
+  width:100%!important;max-width:44ch!important;white-space:normal!important;
+  font-size:14px!important;line-height:1.72!important;overflow-wrap:break-word!important;
+ }
+ #app.balabs-ui > main #experienceTrack .experience-page[data-chapter="catalogue"] .product-catalogue-visuals{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;
+  max-width:100%!important;margin:22px 0!important;gap:14px!important;
+ }
+}
