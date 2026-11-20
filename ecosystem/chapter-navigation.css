@@ -397,27 +397,27 @@ html[dir="rtl"] body>.chapter-rail{
 }
 
 
-/* PASS 77 — show the complete mobile chapter navigation without a clipped last item.
-   Two compact rows replace the ambiguous horizontal overflow on touch screens. */
+/* PASS 80 — keep every mobile destination visible without sacrificing legibility.
+   Flexible rows grow as needed; 26px links remain comfortable touch targets. */
 @media(max-width:760px){
  #app.balabs-ui>.site-nav{
   display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;
   align-content:center!important;align-items:center!important;
-  gap:2px clamp(9px,2.8vw,14px)!important;
-  height:auto!important;min-height:54px!important;max-height:none!important;
+  gap:3px clamp(9px,2.8vw,14px)!important;
+  height:auto!important;min-height:58px!important;max-height:none!important;
   overflow:visible!important;white-space:normal!important;
-  padding:4px 8px!important;margin:0!important;
+  padding:5px 8px!important;margin:0!important;
  }
  #app.balabs-ui>.site-nav>a{
   display:inline-flex!important;flex:0 0 auto!important;
-  min-height:24px!important;height:24px!important;
+  min-height:26px!important;height:26px!important;
   align-items:center!important;padding:2px 1px!important;
-  font-size:8px!important;letter-spacing:.045em!important;
+  font-size:9px!important;letter-spacing:.035em!important;
   white-space:nowrap!important;scroll-snap-align:none!important;
  }
  #app.balabs-ui>.site-nav::-webkit-scrollbar{display:none!important}
 }
 @media(max-width:390px){
- #app.balabs-ui>.site-nav{column-gap:8px!important;row-gap:1px!important;padding-inline:6px!important}
- #app.balabs-ui>.site-nav>a{font-size:8px!important;letter-spacing:.025em!important}
+ #app.balabs-ui>.site-nav{column-gap:8px!important;row-gap:2px!important;padding-inline:6px!important}
+ #app.balabs-ui>.site-nav>a{font-size:9px!important;letter-spacing:.025em!important}
 }
