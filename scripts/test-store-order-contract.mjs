@@ -54,7 +54,7 @@ const serverRequestable = [...edge.matchAll(/"(BAL-[A-Z0-9-]+)"\s*:/g)].map(matc
 assert.deepEqual(serverRequestable, storefrontRequestable, "Browser-selectable products and the server-side order allowlist must match exactly");
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
 assert.ok(!edge.includes("NOTION_STORE_API_KEY") && !edge.includes("api.notion.com") && !edge.includes("syncToNotion"), "Public intake must not contain Notion credentials or synchronization logic");
-assert.ok(edge.includes("notion_sync_status") && edge.includes('"pending"'), "Notion failures must leave a recoverable pending state");
+assert.ok(edge.includes("return json(202,") && edge.includes('notionSync: "pending"'), "Persisted enquiries must remain pending until the isolated worker confirms Notion synchronization");
 const publicResponse = edge.slice(edge.lastIndexOf("return json("));
 assert.ok(publicResponse.includes("orderRef") && publicResponse.includes("notionSync") && !/customer_(?:name|phone|email|message)/.test(publicResponse), "Public response must never return customer contact details");
 assert.ok(edge.includes('"Cache-Control": "no-store"'), "Customer enquiry responses must not be cached");
