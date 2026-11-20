@@ -246,6 +246,7 @@ function loadTurnstile(){
  mount.hidden=false;
  const render=()=>{
   if(!window.turnstile||turnstileWidgetId!==null)return;
+  if(!$('#requestModal').classList.contains('is-open'))return;
   turnstileWidgetId=window.turnstile.render(mount,{sitekey:TURNSTILE_SITE_KEY,action:'store_order',language,callback(token){turnstileToken=token;submitOrder.disabled=false;},'expired-callback'(){turnstileToken='';submitOrder.disabled=true;orderStatus.textContent=t('turnstileRequired');},'error-callback'(){turnstileToken='';submitOrder.disabled=true;orderStatus.textContent=t('turnstileUnavailable');}});
  };
  if(window.turnstile){render();return;}
