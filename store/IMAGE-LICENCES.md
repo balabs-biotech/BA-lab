@@ -11,6 +11,14 @@ Aucune image de cette liste n'est intégrée à la boutique tant que le fichier 
 | Mycélium de Pleurotus en boîte de Petri (illustration de catégorie) | **Oyster mushroom (Pleurotus ostreatus) mycelium in petri dish on coffee grounds.JPG** — Tobi Kellner, 10 février 2012 | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Oyster_mushroom_(Pleurotus_ostreatus)_mycelium_in_petri_dish_on_coffee_grounds.JPG |
 | Pleurotes cultivés (visuel éditorial) | **20210719 Pleurotus ostreatus 001-016.jpg** — Zinnmann, 19 juillet 2021 | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:20210719_Pleurotus_ostreatus_001-016.jpg |
 
+## Médias intégrés à la boutique
+
+| Emplacement | Fichier / auteur | Licence | Hébergement BA Labs | État |
+|---|---|---|---|---|
+| Illustration éditoriale de la section d'introduction | **Oyster mushroom (Pleurotus ostreatus) mycelium in petri dish on coffee grounds.JPG** — Tobi Kellner, 10 février 2012 | CC BY-SA 3.0 | Cloudinary BA Labs : `ba-labs-product-passport/pleurotus-mycelium-tobi-kellner.jpg` (1024 × 768, 194 292 octets) | Intégré avec attribution visible, lien source et licence |
+
+L'asset Cloudinary a été comparé aux métadonnées du fichier original : dimensions, poids, auteur et date concordent. Le JPEG original est conservé sans retouche de pixels ; la boutique ne l'utilise qu'en illustration éditoriale. Il ne représente pas un lot ou une culture BA Labs.
+
 ## Conditions de réutilisation
 
 - Conserver l'auteur, le titre, la source et le lien vers la licence à proximité de l'image ou dans une page de crédits accessible.
