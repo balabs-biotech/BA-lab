@@ -88,6 +88,18 @@ try {
       await page.waitForFunction((index) => { const track=document.querySelector('#experienceTrack'); return !!track && Math.abs(track.scrollLeft-index*track.clientWidth)<3; }, index, { timeout: 10000 });
       assert.equal(await page.locator('.chapter-rail-node').nth(index).getAttribute('aria-current'),'step','The tapped chapter dot must remain the active navigation point');
       await page.waitForTimeout(650);
+      if (viewport.name === 'mobile' && chapter === 'network') {
+        const frame = await page.locator('#inlineExplorer').evaluate(root => {
+          const stage = root.querySelector('.inline-explorer-stage');
+          const canvas = root.querySelector('#field');
+          const rect = el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; };
+          return {viewportWidth:document.documentElement.clientWidth,documentWidth:document.documentElement.scrollWidth,root:rect(root),stage:rect(stage),canvas:rect(canvas)};
+        });
+        console.log('MOBILE_NETWORK_FRAME '+JSON.stringify(frame));
+        assert.ok(frame.root.left >= -1 && frame.root.right <= frame.viewportWidth + 1, 'Mobile network explorer must fit inside the visible reading viewport: '+JSON.stringify(frame));
+        assert.ok(frame.stage.left >= frame.root.left - 1 && frame.stage.right <= frame.root.right + 1, 'Mobile network stage must not exceed its frame: '+JSON.stringify(frame));
+        assert.ok(frame.canvas.left >= frame.stage.left - 1 && frame.canvas.right <= frame.stage.right + 1, 'Mobile network canvas must use the actual stage width: '+JSON.stringify(frame));
+      }
       const audit = await page.evaluate(async (chapterId) => {
         const root = document.querySelector('#app .experience-page[data-chapter="' + chapterId + '"]') || document.querySelector('#app .experience-page');
         if (!root) return { chapter: chapterId, images: [], missing: ['chapter root not found'] };
