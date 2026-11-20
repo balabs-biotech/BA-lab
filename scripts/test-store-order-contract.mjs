@@ -33,12 +33,12 @@ assert.ok(rateMigration.includes("create table if not exists public.store_checko
 assert.ok(rateMigration.includes("create or replace function public.consume_store_rate_limit"), "Persistent rate-limit RPC must exist");
 assert.ok(rateMigration.includes("grant execute on function public.consume_store_rate_limit(text,integer,integer) to service_role"), "Only the backend service role may call the rate-limit RPC");
 
-for (const [label, migration, expected] of [
+for (const [label, migrationText, expected] of [
   ["order persistence", migration, 1],
   ["rate limiting", rateMigration, 1],
   ["Notion retry worker", retryMigration, 3]
 ]) {
-  const hardenedFunctions = migration.match(/security definer\\s+set search_path = ''/gi) || [];
+  const hardenedFunctions = migrationText.match(/security definer\s+set search_path = ''/gi) || [];
   assert.equal(hardenedFunctions.length, expected, label + " SECURITY DEFINER functions must pin an empty search_path");
 }
 
