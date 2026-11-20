@@ -219,7 +219,7 @@ Deno.serve(async (req: Request) => {
   }
 
   // The browser flag is UX only; the server must remain closed by default.
-  if (Deno.env.get("STORE_ORDER_ENABLED") !== "true") {
+  if (Deno.env.get("STORE_ORDER_ENABLED") !== "true" || Deno.env.get("TURNSTILE_ENABLED") !== "true") {
     return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
   }
 
@@ -292,7 +292,7 @@ Deno.serve(async (req: Request) => {
     }
     const code = clean(rawItem.code, 64);
     const quantity = Number(rawItem.quantity);
-    const product = PRODUCTS[code];
+    const product = Object.hasOwn(PRODUCTS, code) ? PRODUCTS[code] : undefined;
     if (!product || !Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
       return json(422, { success: false, error: "invalid_item" }, origin);
     }
