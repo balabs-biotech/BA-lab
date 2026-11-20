@@ -7,7 +7,7 @@ const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'wor
 for (const language of expectedLanguages) {
   const path = new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url);
   const manifest = JSON.parse(await readFile(path, 'utf8'));
-  assert.equal(manifest.version, 4, language + ': unsupported manifest version');
+  assert.equal(manifest.version, 5, language + ': unsupported manifest version');
   assert.equal(manifest.relationModel, 'notion-crosslinks-and-documented-topics-v1', language + ': relation model marker missing');
   assert.equal(manifest.language, language, language + ': language marker mismatch');
   assert.ok(Array.isArray(manifest.domains), language + ': domains must be an array');
