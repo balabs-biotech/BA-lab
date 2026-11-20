@@ -115,6 +115,7 @@ export async function createPixiRenderer(canvas){
    occupied.push(box);live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
+  canvas.dataset.visibleNodeIds=JSON.stringify([...live]);
   app.render();
  }
  return{render,resize,destroy:()=>app.destroy({removeView:false,children:true})};
