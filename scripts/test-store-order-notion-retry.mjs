@@ -17,6 +17,7 @@ assert.ok(migration.includes("for update skip locked"), "Concurrent workers must
 assert.ok(migration.includes("notion_sync_attempts >= 8"), "Retries must have a hard maximum");
 assert.ok(migration.includes("interval '1 minute'") && migration.includes("interval '24 hours'"), "Retry delays must use bounded backoff");
 assert.ok(worker.includes("payload?.role === \"service_role\""), "Retry worker must require a service-role JWT claim");
+assert.ok(worker.includes("const MAX_BATCH = 3;"), "Sequential Notion sync batch must stay small enough to remain below the five-minute processing lock even when API calls approach their timeouts");
 assert.ok(worker.includes("rpc/claim_store_order_sync") && worker.includes("rpc/complete_store_order_sync") && worker.includes("rpc/fail_store_order_sync"), "Worker must use atomic claim and completion/failure RPCs");
 assert.equal((worker.match(/AbortSignal\.timeout\(20_000\)/g) ?? []).length, 2, "Supabase and Notion requests must time out well before the five-minute processing lock expires");
 assert.equal((intake.match(/AbortSignal\.timeout\(20_000\)/g) ?? []).length, 1, "Order intake Supabase requests must have a bounded network timeout");
