@@ -53,7 +53,7 @@ const storefrontRequestable = productBlock.split("\n").flatMap(line => {
 const serverRequestable = [...edge.matchAll(/"(BAL-[A-Z0-9-]+)"\s*:/g)].map(match => match[1]).sort();
 assert.deepEqual(serverRequestable, storefrontRequestable, "Browser-selectable products and the server-side order allowlist must match exactly");
 assert.ok(edge.includes("rpc/create_store_order"), "Edge Function must persist the enquiry in Supabase first");
-assert.ok(edge.includes("Deno.env.get(\"NOTION_STORE_API_KEY\")"), "Notion credential must remain server-side");
+assert.ok(!edge.includes("NOTION_STORE_API_KEY") && !edge.includes("api.notion.com") && !edge.includes("syncToNotion"), "Public intake must not contain Notion credentials or synchronization logic");
 assert.ok(edge.includes("notion_sync_status") && edge.includes('"pending"'), "Notion failures must leave a recoverable pending state");
 const publicResponse = edge.slice(edge.lastIndexOf("return json("));
 assert.ok(publicResponse.includes("orderRef") && publicResponse.includes("notionSync") && !/customer_(?:name|phone|email|message)/.test(publicResponse), "Public response must never return customer contact details");
@@ -70,7 +70,7 @@ assert.ok(edge.includes('new Set(["https://balabs-biotech.github.io"])') && !edg
 assert.ok(edge.indexOf("if (clean(body.website, 200))") < edge.indexOf("const secretKey = getSecretKey()") && edge.includes("return json(200, { success: true }, origin)"), "Honeypot submissions must be silently discarded before database access");
 assert.ok(edge.indexOf("isRateLimited(req, secretKey)") < edge.indexOf('rpc/create_store_order'), "Rate limiting must run before any customer record is written");
 assert.ok(edge.includes("rate_limit_service_unavailable") && edge.includes("return json(503, { success: false, error: \"store_temporarily_unavailable\" }, origin)"), "Rate-limit failures must fail closed rather than bypass abuse controls");
-assert.ok(edge.includes('Deno.env.get("NOTION_STORE_API_KEY") ?? ""') && !edge.includes('Deno.env.get("NOTION_API_KEY")'), "Storefront Notion sync must use its dedicated credential and never fall back to the shared CultureOps key");
+assert.ok(!edge.includes("NOTION_STORE_API_KEY") && !edge.includes("NOTION_API_KEY"), "Notion credentials must exist only in the isolated retry worker");
 assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|customer_phone|customer_message)/.test(edge), "Customer contact fields must never be written to application logs");
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
