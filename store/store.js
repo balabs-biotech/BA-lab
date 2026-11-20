@@ -239,7 +239,7 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click'
 $('#catalogSearch').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();renderProducts()});
 $('#cartOpen').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#cartBackdrop').addEventListener('click',closeCart);$('#continueShopping').addEventListener('click',closeCart);$('#requestQuote').addEventListener('click',openRequest);$('#copyRequest').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(requestText);$('#copyRequest').textContent=t('copySuccess')}catch(_){$('#copyRequest').textContent=t('copyRequest')}});
 const orderForm=$('#orderForm'),orderStatus=$('#orderStatus'),submitOrder=$('#submitOrder');
-let turnstileToken='',turnstileWidgetId=null;
+let turnstileToken='',turnstileWidgetId=null,turnstileScriptLoading=false;
 function loadTurnstile(){
  if(!STORE_ORDER_ENABLED||!TURNSTILE_SITE_KEY)return;
  const mount=$('#turnstileWidget');if(!mount)return;
@@ -249,7 +249,9 @@ function loadTurnstile(){
   turnstileWidgetId=window.turnstile.render(mount,{sitekey:TURNSTILE_SITE_KEY,action:'store_order',language,callback(token){turnstileToken=token;submitOrder.disabled=false;},'expired-callback'(){turnstileToken='';submitOrder.disabled=true;orderStatus.textContent=t('turnstileRequired');},'error-callback'(){turnstileToken='';submitOrder.disabled=true;orderStatus.textContent=t('turnstileUnavailable');}});
  };
  if(window.turnstile){render();return;}
- const script=document.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;script.defer=true;script.onload=render;script.onerror=()=>{orderStatus.textContent=t('turnstileUnavailable');};document.head.appendChild(script);
+ if(turnstileScriptLoading)return;
+ turnstileScriptLoading=true;
+ const script=document.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;script.defer=true;script.onload=()=>{turnstileScriptLoading=false;render();};script.onerror=()=>{turnstileScriptLoading=false;orderStatus.textContent=t('turnstileUnavailable');};document.head.appendChild(script);
 }
 if(STORE_ORDER_ENABLED){orderForm.querySelectorAll('input,select,textarea').forEach(el=>{el.disabled=false;});submitOrder.disabled=true;orderStatus.textContent=t('turnstileRequired');}
 else{orderForm.querySelectorAll('input,select,textarea,button[type="submit"]').forEach(el=>{el.disabled=true;});}
