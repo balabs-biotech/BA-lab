@@ -602,3 +602,11 @@ assert.ok(!chapterAtmosphereJs.includes("img.loading=key==='home'?'eager':'lazy'
 assert.ok(chapterAtmosphereCss.includes('.experience-page>.chapter-atmosphere.is-unavailable{') && chapterAtmosphereCss.includes('background:'), 'A failed chapter image must retain its mineral fallback visual');
 assert.ok(chapterAtmosphereCss.includes('data-chapter="about"') && chapterAtmosphereCss.includes('grayscale(.58)'), 'The scientific chart cover must remain visually subordinate to editorial content');
 assert.match(html, /chapter-atmosphere\.js\?v=15/, 'Public homepage must request the preloading chapter atmosphere script');
+
+
+// PASS78: restore mobile network framing within the narrower chapter content column.
+// This is a presentation-only viewport adjustment; the WebGL engine and camera remain untouched.
+assert.ok(overridesCss.includes('PASS78 — widen the mobile WebGL viewport without touching scene or camera logic'), 'Mobile network framing must be corrected in the site presentation layer');
+assert.ok(overridesCss.includes('width:122%!important') && overridesCss.includes('left:-11%!important'), 'Mobile WebGL stage must widen symmetrically to compensate for the chapter rail');
+assert.ok(overridesCss.includes('.webgl-stage .webgl-focus{left:9.5%!important}') && overridesCss.includes('.webgl-stage .webgl-controls{right:9.5%!important}'), 'Mobile overlays must stay aligned inside the visible viewport');
+assert.match(html, /site-overrides\.css\?v=9/, 'Public homepage must request the corrected mobile network viewport stylesheet');
