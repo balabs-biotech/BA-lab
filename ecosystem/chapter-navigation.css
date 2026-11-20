@@ -694,3 +694,40 @@ body>.chapter-rail.neural-rail{
 @media(max-width:760px){
  body>.chapter-rail.neural-rail>.neural-network{opacity:.42!important}
 }
+
+
+/* FINAL MOBILE MYCELIUM FIX v44 — visible in its reserved gutter, never buried under the chapter panel. */
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail{
+  position:fixed!important;
+  z-index:3!important;
+  top:50%!important;
+  bottom:auto!important;
+  height:min(60vh,430px)!important;
+  transform:translateY(-50%)!important;
+  opacity:1!important;
+  pointer-events:none!important;
+ }
+ body>.chapter-rail.neural-rail>.neural-network{
+  opacity:.82!important;
+  visibility:visible!important;
+ }
+ body>.chapter-rail.neural-rail .mycelium-unit{
+  opacity:.9!important;
+ }
+ body>.chapter-rail.neural-rail .axon-base{
+  opacity:.78!important;
+ }
+ body>.chapter-rail.neural-rail .axon-progress{
+  opacity:1!important;
+ }
+ body>.chapter-rail.neural-rail .neural-hitareas,
+ body>.chapter-rail.neural-rail .neural-node{
+  pointer-events:auto!important;
+ }
+ .wrap.balabs-ui>.site-nav{z-index:10!important}
+ .experience-page{z-index:2!important}
+}
+@media(min-width:761px){
+ body>.chapter-rail.neural-rail{z-index:3!important}
+}
