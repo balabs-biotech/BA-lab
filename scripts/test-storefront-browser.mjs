@@ -82,7 +82,7 @@ try {
   await turnstilePage.evaluate(() => window.__turnstileState.options.callback("mock-valid-token"));
   await turnstilePage.evaluate(() => window.__turnstileState.options["error-callback"]());
   assert.equal(await turnstilePage.locator("#submitOrder").isDisabled(), true, "A Turnstile error must disable submission");
-  assert.equal(await turnstilePage.locator("#orderStatus").textContent(), "Verification is temporarily unavailable. Please try again.", "Turnstile errors must show localized unavailable feedback");
+  assert.equal(await turnstilePage.locator("#orderStatus").textContent(), "Le contrôle anti-robot est indisponible. Réessayez plus tard.", "Turnstile errors must show localized unavailable feedback");
   await turnstilePage.close();
   console.log("Storefront browser smoke passed: cart, request summary, desktop/mobile layout, language switching and disabled intake.");
 } finally {
