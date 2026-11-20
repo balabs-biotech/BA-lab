@@ -19,7 +19,7 @@ assert.ok(migration.includes("interval '1 minute'") && migration.includes("inter
 assert.ok(worker.includes("payload?.role === \"service_role\""), "Retry worker must require a service-role JWT claim");
 assert.ok(worker.includes("rpc/claim_store_order_sync") && worker.includes("rpc/complete_store_order_sync") && worker.includes("rpc/fail_store_order_sync"), "Worker must use atomic claim and completion/failure RPCs");
 assert.ok(worker.includes('filter: { property: "Demande", title: { equals: title } }'), "Worker must look up the exact order reference before creating a Notion page");
-assert.ok(worker.includes("notionToken") && !worker.includes("NOTION_API_KEY"), "Worker must use the dedicated commercial Notion credential");
+assert.ok(worker.includes('Deno.env.get("NOTION_STORE_API_KEY")'), "Worker must use the dedicated commercial Notion credential");
 assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|customer_phone|customer_message)/.test(worker), "Worker must not log customer PII");
 assert.ok(!/return Response\.json\([^\n]*(?:customer_name|customer_email|customer_phone)/.test(worker), "Worker response must not expose customer PII");
 assert.ok(intake.includes("notion_sync_next_attempt_at") || migration.includes("default (now() + interval '10 minutes')"), "New requests must have a delayed retry fallback if inline sync exits early");
