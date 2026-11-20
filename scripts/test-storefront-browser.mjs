@@ -10,6 +10,10 @@ page.on("pageerror", error => pageErrors.push(error.message));
 try {
   await page.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
   await page.goto(base, { waitUntil: "networkidle" });
+  await page.locator("#biologicalIntro").waitFor({ state: "visible" });
+  assert.equal(await page.locator("#biologicalIntro").getAttribute("aria-hidden"), "false", "Biological opening sequence must be exposed as the active introduction");
+  await page.locator("#introSkip").click();
+  await page.waitForFunction(() => document.querySelector("#biologicalIntro")?.hidden === true, null, { timeout: 1500 });
   const firstProductCard = page.locator("#productGrid .product-card").first();
   await firstProductCard.locator("[data-details]").click();
   await page.locator("#productDetailModal.is-open").waitFor();
@@ -99,6 +103,11 @@ try {
   await page.locator("#cartOpen").click();
   assert.equal(await page.locator("#cartItems .quantity-control span").first().textContent(), "2", "Persisted numeric-string quantities must be normalized to integers");
   assert.deepEqual(pageErrors, [], "Storefront must not raise uncaught browser errors");
+  const reducedMotionPage = await browser.newPage({ reducedMotion: "reduce" });
+  await reducedMotionPage.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
+  await reducedMotionPage.goto(base, { waitUntil: "networkidle" });
+  assert.equal(await reducedMotionPage.locator("#biologicalIntro").isVisible(), false, "Opening animation must be absent when reduced motion is preferred");
+  await reducedMotionPage.close();
   const unconfiguredPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await unconfiguredPage.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
   await unconfiguredPage.route("**/store.js**", async route => {
