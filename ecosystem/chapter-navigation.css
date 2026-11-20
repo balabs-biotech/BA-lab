@@ -421,3 +421,65 @@ html[dir="rtl"] body>.chapter-rail{
  #app.balabs-ui>.site-nav{column-gap:8px!important;row-gap:2px!important;padding-inline:6px!important}
  #app.balabs-ui>.site-nav>a{font-size:9px!important;letter-spacing:.025em!important}
 }
+
+
+/* BA Labs — replace the cluttered chapter-point rail with one liquid progress gauge. */
+body>.chapter-rail.liquid-gauge{
+ position:fixed!important;z-index:2147483647!important;
+ left:max(12px,env(safe-area-inset-left))!important;right:auto!important;
+ top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;
+ width:18px!important;height:clamp(150px,30vh,250px)!important;
+ display:block!important;pointer-events:none!important;
+ padding:0!important;margin:0!important;filter:drop-shadow(0 3px 10px #0005)!important;
+}
+html[dir="rtl"] body>.chapter-rail.liquid-gauge{
+ left:auto!important;right:max(12px,env(safe-area-inset-right))!important;
+}
+body>.chapter-rail.liquid-gauge .chapter-filament,
+body>.chapter-rail.liquid-gauge .chapter-rail-nodes{display:none!important}
+.liquid-glass{
+ position:absolute;inset:0;overflow:hidden;display:block;
+ border:1px solid rgba(209,208,197,.52);border-radius:999px;
+ background:linear-gradient(90deg,rgba(209,208,197,.13),rgba(255,255,255,.025) 48%,rgba(209,208,197,.17));
+ box-shadow:inset 0 0 0 2px rgba(17,27,29,.8),inset 2px 0 5px #d1d0c522,0 0 0 1px #111b1d;
+}
+.liquid-fill{
+ position:absolute;left:2px;right:2px;bottom:2px;height:var(--fill,0%);
+ display:block;overflow:hidden;border-radius:0 0 999px 999px;
+ background:linear-gradient(90deg,#6d8978 0%,#9eb39a 42%,#c87952 100%);
+ box-shadow:0 0 12px #8ea88a66;
+ transition:height .45s cubic-bezier(.2,.7,.2,1);
+}
+.liquid-fill:before{
+ content:"";position:absolute;left:-30%;right:-30%;top:-5px;height:9px;border-radius:50%;
+ background:rgba(221,226,204,.72);filter:blur(3px);
+}
+.air-bubble{
+ position:absolute;bottom:12%;left:35%;width:4px;height:4px;border:1px solid #e6eee0;
+ border-radius:50%;background:rgba(226,238,221,.3);
+ box-shadow:0 0 5px #e6eee088;
+ animation:balabs-air-rise 3.2s ease-in infinite;
+}
+.bubble-two{left:66%;width:3px;height:3px;animation-delay:1.1s;animation-duration:3.8s}
+.bubble-three{left:48%;width:2px;height:2px;animation-delay:2s;animation-duration:2.8s}
+.liquid-glint{
+ position:absolute;top:10%;bottom:10%;left:4px;width:2px;border-radius:99px;
+ background:linear-gradient(180deg,transparent,#e6eee055 24%,#e6eee022 75%,transparent);
+ pointer-events:none;
+}
+@keyframes balabs-air-rise{
+ 0%{transform:translate3d(0,8px,0) scale(.72);opacity:0}
+ 18%{opacity:.9}
+ 82%{opacity:.72}
+ 100%{transform:translate3d(2px,-46px,0) scale(1.12);opacity:0}
+}
+@media(max-width:760px){
+ body>.chapter-rail.liquid-gauge{left:max(8px,env(safe-area-inset-left))!important;width:14px!important;height:clamp(116px,23vh,180px)!important}
+ html[dir="rtl"] body>.chapter-rail.liquid-gauge{left:auto!important;right:max(8px,env(safe-area-inset-right))!important}
+ .experience-page{padding-inline-start:10px!important;padding-inline-end:10px!important}
+ [dir="rtl"] .experience-page{padding-inline-start:10px!important;padding-inline-end:10px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .liquid-fill{transition:none}
+ .air-bubble{animation:none;opacity:.65}
+}
