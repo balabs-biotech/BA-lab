@@ -13,6 +13,7 @@ const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
 assert.ok(publicExplorerJs.includes('selection-dock') && publicExplorerJs.includes('selection-open-link'), 'Selecting a 2D node must render a compact selection dock with its direct resource action');
 assert.ok(publicExplorerJs.includes('selected.data.url') && publicExplorerJs.includes('https:'), 'The selection action must use the verified Notion URL carried by the selected manifest node');
 assert.ok(publicExplorerJs.includes('function activateNode(n)') && publicExplorerJs.includes('window.open(url,"_blank","noopener,noreferrer")'), 'Clicking a visible 2D point must open that exact node page in Notion in a new tab while preserving the explorer');
+assert.ok(publicExplorerJs.includes('function pointerUp(e)') && publicExplorerJs.includes('if(n)activateNode(n)') && publicExplorerJs.includes('canvas.addEventListener("pointerup",pointerUp)'), 'Direct canvas pointer activation must open the same canonical Notion destination as accessible node controls');
 assert.ok(!html.includes('#selection{position:absolute!important;width:1px!important'), 'The public explorer must not clip the selected-node dock out of view');
 
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
