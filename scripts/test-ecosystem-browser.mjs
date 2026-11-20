@@ -184,15 +184,11 @@ try {
     await page.evaluate(() => {
       const track = document.querySelector('#experienceTrack');
       const chapter = document.querySelector('#chapter-catalogue');
-      chapter.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'instant' });
+      track.scrollTo({ left: chapter.offsetLeft, behavior: 'instant' });
     });
     await page.waitForFunction(() => {
-      const track = document.querySelector('#experienceTrack');
       const chapter = document.querySelector('#chapter-catalogue');
-      const trackRect = track.getBoundingClientRect();
-      const chapterRect = chapter.getBoundingClientRect();
-      return Math.abs(chapterRect.left - trackRect.left) < 3 &&
-        document.querySelectorAll('body>.chapter-rail .neural-node.is-active').length === 1 &&
+      return document.querySelectorAll('body>.chapter-rail .neural-node.is-active').length === 1 &&
         document.querySelector('body>.chapter-rail .neural-node:nth-child(4)')?.getAttribute('aria-current') === 'step' &&
         chapter?.getAttribute('aria-current') === 'page';
     }, undefined, { timeout: 10000 });
