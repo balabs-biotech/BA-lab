@@ -69,6 +69,7 @@ try {
     await route.fulfill({ response, body: source });
   });
   await turnstilePage.goto(base, { waitUntil: "networkidle" });
+  if (await turnstilePage.locator("#consentNotice").isVisible()) await turnstilePage.locator("#consentAcknowledge").click();
   assert.equal(await turnstilePage.locator("#submitOrder").isDisabled(), true, "Order submission must start disabled until Turnstile validates");
   await turnstilePage.locator("#productGrid .add-product").first().click();
   await turnstilePage.locator("#cartOpen").click();
