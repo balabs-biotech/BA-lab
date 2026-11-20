@@ -744,7 +744,7 @@
       "children": [
         {
           "id": "ar-public-catalogue",
-          "title": "الكتالوج العام — الموارد القابلة للنشر",
+          "title": "CATALOGUE PUBLIC — Ressources publiables",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "description": "كتالوج موحد للموارد والمنتجات؛ يجب تأكيد الدفعة والتغليف والتوفر قبل أي طلب.",
@@ -1218,7 +1218,7 @@
         },
         {
           "id": "evidence-resource-3",
-          "title": "الكتالوج العام",
+          "title": "CATALOGUE PUBLIC — Ressources publiables",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
           "kind": "reference",
