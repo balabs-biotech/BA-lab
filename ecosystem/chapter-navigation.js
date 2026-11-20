@@ -29,11 +29,12 @@
  const controls=document.createElement('div');controls.className='experience-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Navigation entre les espaces');
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
- const rail=document.createElement('div');rail.className='chapter-rail liquid-gauge';rail.setAttribute('role','progressbar');rail.setAttribute('aria-label','Progression dans les chapitres');rail.setAttribute('aria-valuemin','1');rail.setAttribute('aria-valuemax',String(pages.length));rail.setAttribute('aria-valuenow','1');rail.setAttribute('aria-valuetext','Chapitre 1 sur '+pages.length);
- rail.innerHTML='<span class="liquid-glass" aria-hidden="true"><span class="liquid-fill"><i class="air-bubble bubble-one"></i><i class="air-bubble bubble-two"></i><i class="air-bubble bubble-three"></i></span><span class="liquid-glint"></span></span><svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 L32 476"/><path class="filament-progress" d="M32 24 L32 476"/><circle class="filament-signal" cx="32" cy="24" r="4"/></svg>';
- const railNodes=document.createElement('div');railNodes.className='chapter-rail-nodes';
- groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
- document.body.append(rail);
+ const rail=document.createElement('div');rail.className='chapter-rail neural-rail';rail.setAttribute('role','group');rail.setAttribute('aria-label','Navigation neuronale des chapitres');
+ const svgNS='http://www.w3.org/2000/svg';
+ rail.innerHTML='<svg class="neural-network" viewBox="0 0 100 600" preserveAspectRatio="none" aria-hidden="true"><path class="axon-base" d="M50 42 C18 105 82 150 50 175 C18 225 82 275 50 300 C18 350 82 400 50 425 C18 475 82 515 50 558"/><path class="axon-progress" d="M50 42 C18 105 82 150 50 175 C18 225 82 275 50 300 C18 350 82 400 50 425 C18 475 82 515 50 558"/><g class="dendrites"><path d="M50 65 C34 55 29 42 21 31 M34 55 L17 56 M21 31 L22 18 M50 65 C65 52 71 39 80 29 M71 39 L88 42 M80 29 L82 16 M50 185 C35 173 27 161 18 150 M27 161 L12 166 M18 150 L19 137 M50 185 C65 173 73 161 83 149 M73 161 L89 166 M83 149 L82 136 M50 310 C34 298 26 286 17 275 M26 286 L10 291 M17 275 L18 262 M50 310 C66 298 74 286 84 274 M74 286 L90 291 M84 274 L83 261 M50 435 C34 423 26 411 17 400 M26 411 L10 416 M17 400 L18 387 M50 435 C66 423 74 411 84 399 M74 411 L90 416 M84 399 L83 386 M50 550 C35 538 27 526 18 515 M27 526 L12 531 M18 515 L19 502 M50 550 C65 538 73 526 83 514 M73 526 L89 531 M83 514 L82 501"/></g><g class="neuron-nodes"><circle cx="50" cy="42" r="7"/><circle cx="50" cy="175" r="7"/><circle cx="50" cy="300" r="7"/><circle cx="50" cy="425" r="7"/><circle cx="50" cy="558" r="7"/></g><circle class="neural-pulse" cx="50" cy="42" r="3"/></svg>';
+ const railNodes=document.createElement('div');railNodes.className='neural-hitareas';
+ groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='neural-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.setAttribute('aria-label',(g.label.fr||g.id)+' — '+(i+1));b.style.setProperty('--node-y',[7,29.2,50,70.8,93][i]+'%');b.innerHTML='<span class="neural-node-core"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
+ rail.append(railNodes);document.body.append(rail);
  // Scroll-led editorial typography: reveal only key section headings, not body copy.
  if('IntersectionObserver' in window){
   pages.forEach(page=>{
@@ -60,52 +61,12 @@
    images.forEach(img=>{img.classList.add('rb-image-armed');revealObserver.observe(img)});
   });
  }
- const filament=rail.querySelector('.filament-progress'),filamentBase=rail.querySelector('.filament-base'),signal=rail.querySelector('.filament-signal'),railSvg=rail.querySelector('.chapter-filament');
- const svgNS='http://www.w3.org/2000/svg';
- const branchLayer=document.createElementNS(svgNS,'path');branchLayer.setAttribute('class','filament-branches');branchLayer.setAttribute('aria-hidden','true');railSvg.insertBefore(branchLayer,filament);
-
+ const axon=rail.querySelector('.axon-progress');
+ const axonLength=axon.getTotalLength();
+ axon.style.strokeDasharray=String(axonLength);
+ axon.style.strokeDashoffset=String(axonLength);
+ let current=0;
  const getLanguage=()=>{const value=(document.documentElement.lang||'fr').toLowerCase().split('-')[0];return ['fr','en','ar','pt'].includes(value)?value:'fr'};
- let filamentLength=0,filamentStops=[],current=0,railGeometryFrame=0;
- const syncRailGeometry=()=>{
-  const railRect=rail.getBoundingClientRect(),nodes=[...railNodes.querySelectorAll('.chapter-rail-node')];
-  if(!nodes.length||!railRect.width||!railRect.height)return;
-  const pts=nodes.map(node=>{const r=node.getBoundingClientRect();return{x:r.left+r.width/2-railRect.left,y:r.top+r.height/2-railRect.top}});
-  railSvg.setAttribute('viewBox',`0 0 ${railRect.width} ${railRect.height}`);
-  railSvg.setAttribute('preserveAspectRatio','none');
-  const segments=[];
-  const d=pts.reduce((path,p,i)=>{
-   if(!i)return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
-   const prev=pts[i-1],mid=(prev.y+p.y)/2,dir=i%2?1:-1,curve=Math.min(10,railRect.width*.16)*dir;
-   const segment=`C ${(prev.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${(p.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
-   segments.push(`M ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${segment}`);
-   return path+' '+segment;
-  },'');
-  filament.setAttribute('d',d);filamentBase.setAttribute('d',d);
-  // Map each chapter interval to its own measured SVG arc length. A uniform
-  // fraction of the whole curve drifts when individual organic bends differ.
-  const measurePath=document.createElementNS(svgNS,'path');
-  measurePath.setAttribute('fill','none');measurePath.setAttribute('stroke','none');measurePath.setAttribute('visibility','hidden');
-  railSvg.append(measurePath);
-  const segmentLengths=segments.map(segment=>{measurePath.setAttribute('d',segment);return measurePath.getTotalLength()});
-  measurePath.remove();
-  filamentStops=[0];
-  segmentLengths.forEach(length=>filamentStops.push(filamentStops[filamentStops.length-1]+length));
-  filamentLength=filamentStops[filamentStops.length-1];
-  filament.style.strokeDasharray=String(filamentLength);
-  const tendrils=[];
-  for(let i=0;i<pts.length-1;i++){
-   const a=pts[i],b=pts[i+1],side=i%2?1:-1,dx=Math.min(19,railRect.width*.34)*side;
-   const at=(t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
-   [.28,.68].forEach((t,j)=>{
-    const p=at(t),len=Math.min(12,railRect.width*.22)*(j?-.78:1);
-    tendrils.push(`M ${p.x.toFixed(2)} ${p.y.toFixed(2)} C ${(p.x+dx*.38).toFixed(2)} ${(p.y+len*.22).toFixed(2)}, ${(p.x+dx*.88).toFixed(2)} ${(p.y+len*.7).toFixed(2)}, ${(p.x+dx).toFixed(2)} ${(p.y+len).toFixed(2)}`);
-   });
-  }
-  branchLayer.setAttribute('d',tendrils.join(' '));
-  try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){filamentLength=0;filamentStops=[]}
-  update();
- };
- const scheduleRailGeometry=()=>{if(railGeometryFrame)return;railGeometryFrame=requestAnimationFrame(()=>{railGeometryFrame=0;syncRailGeometry()})};
  const pageStart=page=>{
   const trackRect=track.getBoundingClientRect(),pageRect=page.getBoundingClientRect();
   return track.scrollLeft+pageRect.left-trackRect.left;
@@ -127,13 +88,15 @@
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
   progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
   rail.style.setProperty('--fill',(rawProgress/Math.max(1,pages.length-1)*100)+'%');rail.setAttribute('aria-valuenow',String(idx+1));rail.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
-  if(filamentLength&&filamentStops.length===pages.length){
-   const segment=Math.min(pages.length-2,Math.floor(rawProgress));
-   const fraction=rawProgress>=pages.length-1?1:rawProgress-segment;
-   const targetLength=filamentStops[segment]+(filamentStops[segment+1]-filamentStops[segment])*fraction;
-   filament.style.strokeDashoffset=String(filamentLength-targetLength);
-   if(signal){const point=filament.getPointAtLength(targetLength);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2))}
-  }
+  const activeLength=axonLength*(rawProgress/Math.max(1,pages.length-1));
+  axon.style.strokeDashoffset=String(axonLength-activeLength);
+  railNodes.querySelectorAll('.neural-node').forEach((node,i)=>{
+   node.classList.toggle('is-past',i<idx);
+   node.classList.toggle('is-active',i===idx);
+   node.classList.toggle('is-next',i>idx);
+   node.setAttribute('aria-current',i===idx?'step':'false');
+  });
+  rail.style.setProperty('--active-index',String(idx));
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   // A horizontal chapter can contain several editorial sections. Highlight only
   // the section nearest the reading line, never every link in the same chapter.
@@ -170,8 +133,7 @@
   page.addEventListener('scrollend',update,{passive:true});
  });
  window.addEventListener('hashchange',()=>requestAnimationFrame(update),{passive:true});
- window.addEventListener('resize',()=>{scheduleRailGeometry();requestAnimationFrame(update)},{passive:true});
- if('ResizeObserver' in window){const railResizeObserver=new ResizeObserver(scheduleRailGeometry);railResizeObserver.observe(rail);railResizeObserver.observe(railNodes)}
+ window.addEventListener('resize',()=>requestAnimationFrame(update),{passive:true});
  // Each chapter-rail button owns its own click handler above; do not dispatch go() twice.
  track.addEventListener('keydown',e=>{const panel=e.target.closest&&e.target.closest('.experience-page');if(e.target!==track&&e.target!==panel)return;if(e.key==='ArrowRight'){e.preventDefault();go(current+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(current-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(pages.length-1)}});
  document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;const page=pages[current];if(!page)return;const atTop=page.scrollTop<=4;const atBottom=page.scrollTop+page.clientHeight>=page.scrollHeight-4;if(e.key==='PageDown'&&atBottom&&current<pages.length-1){e.preventDefault();go(current+1)}if(e.key==='PageUp'&&atTop&&current>0){e.preventDefault();go(current-1)}});
@@ -205,11 +167,11 @@
   prev.setAttribute('aria-label',({fr:'Espace précédent',en:'Previous space',ar:'المساحة السابقة',pt:'Espaço anterior'})[l]);
   next.setAttribute('aria-label',({fr:'Espace suivant',en:'Next space',ar:'المساحة التالية',pt:'Próximo espaço'})[l]);
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
-  rail.setAttribute('aria-label',({fr:'Progression dans les chapitres',en:'Chapter progress',ar:'التقدم بين الفصول',pt:'Progresso dos capítulos'})[l]);
+  rail.setAttribute('aria-label',({fr:'Réseau neuronal — navigation des chapitres',en:'Neural network — chapter navigation',ar:'شبكة عصبية — التنقل بين الفصول',pt:'Rede neural — navegação dos capítulos'})[l]);
   update();
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
- localize();scheduleRailGeometry();update();
+ localize();update();
  const hash=location.hash&&document.getElementById(decodeURIComponent(location.hash.slice(1)));
  if(hash){const page=hash.closest('.experience-page');if(page){go(pages.indexOf(page));requestAnimationFrame(()=>hash.scrollIntoView({block:'start',behavior:scrollBehavior()}));}}
 })();
