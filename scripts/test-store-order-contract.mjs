@@ -74,6 +74,8 @@ assert.ok(edge.includes('Deno.env.get("NOTION_STORE_API_KEY") ?? ""') && !edge.i
 assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|customer_phone|customer_message)/.test(edge), "Customer contact fields must never be written to application logs");
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
+assert.ok(edge.includes('Deno.env.get("TURNSTILE_ENABLED") !== "true"'), "Order intake must fail closed unless server-side anti-bot verification is enabled");
+assert.ok(edge.includes("Object.hasOwn(PRODUCTS, code)"), "Product allowlist must reject inherited object-property names rather than accepting prototype keys");
 
 assert.ok(readme.includes("Supabase is the transactional source of truth"), "Architecture documentation must match the implementation");
 assert.ok(readme.includes("Turnstile browser integration scaffold") && readme.includes("server-side verifier is deployed"), "Launch gate must distinguish the deployed server verifier from the browser integration configuration that remains pending");
