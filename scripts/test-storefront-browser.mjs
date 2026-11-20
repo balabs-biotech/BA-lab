@@ -29,6 +29,7 @@ try {
   await page.locator("#requestQuote").click();
   await page.locator("#requestModal.is-open").waitFor();
   assert.equal(await page.locator("#requestModal").getAttribute("aria-hidden"), "false", "Opening the request dialog must expose it to assistive technology");
+  await page.waitForFunction(() => document.activeElement?.id === "requestClose");
   assert.equal(await page.evaluate(() => document.activeElement?.id), "requestClose", "Opening the request dialog must move focus to its close control");
   await page.keyboard.press("Shift+Tab");
   assert.equal(await page.evaluate(() => document.activeElement?.id), "copyRequest", "Shift+Tab from the first request control must wrap to the last");
