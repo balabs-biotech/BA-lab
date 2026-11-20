@@ -28,7 +28,7 @@
 .order-form input,.order-form select,.order-form textarea{width:100%;min-width:0;border:1px solid #71877a55;border-radius:2px;background:#172321;color:#f0eee5;padding:12px;font:12px/1.5 var(--store-sans);outline:none}
 .order-form input:focus,.order-form select:focus,.order-form textarea:focus{border-color:#b96b4d;box-shadow:0 0 0 2px #b96b4d22}
 .order-form textarea{resize:vertical}
-.order-form .message-field{grid-column:1/-1}
+.order-form .message-field{grid-column:1/-1}.turnstile-widget{grid-column:1/-1;min-height:0}.turnstile-widget:not([hidden]){min-height:65px}
 .order-form .honeypot{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
 .order-form button:disabled{opacity:.45;cursor:not-allowed}
 .form-status{min-height:18px;margin:0;color:#d3b18d;font:9px/1.6 var(--store-mono)}
