@@ -629,3 +629,31 @@ body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!impor
  }
 }
 .chapter-rail .mycelium-unit{opacity:.675!important}
+
+
+/* FINAL MOBILE READABILITY FIX — reserve a true gutter for the full mycelial artwork.
+   The motif extends beyond the rail's hit-area, so 42–52px was not enough. */
+@media(max-width:760px){
+ .experience-page{
+  padding-inline-start:88px!important;
+  padding-inline-end:12px!important;
+ }
+ html[dir="rtl"] .experience-page{
+  padding-inline-start:12px!important;
+  padding-inline-end:88px!important;
+ }
+ .experience-page>.hero,
+ .experience-page>.editorial-work,
+ .experience-page>.scene,
+ .experience-page>.universe-index,
+ .experience-page>.product-catalogue,
+ .experience-page>section{
+  max-width:100%!important;
+  min-width:0!important;
+ }
+ .experience-page-label{
+  margin-inline-start:0!important;
+  transform:none!important;
+ }
+ .experience-page>.hero{padding-inline-start:0!important}
+}
