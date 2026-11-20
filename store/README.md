@@ -109,7 +109,7 @@ The function is deployed as `create-store-order` with JWT verification disabled 
 Source: `supabase/functions/store-order-sync/index.ts`.
 
 - Requires a valid Supabase JWT at the gateway and independently checks that its role claim is `service_role`.
-- Claims at most ten requests per run using `FOR UPDATE SKIP LOCKED`; a five-minute lease prevents concurrent workers from processing the same row.
+- Claims at most three requests per run (`MAX_BATCH = 3`) using `FOR UPDATE SKIP LOCKED`; a five-minute lease prevents concurrent workers from processing the same row.
 - Checks the exact commercial request title in Notion before creating a page, so a timeout after page creation can be safely retried without intentionally creating a duplicate.
 - Uses bounded retries (maximum eight attempts) with increasing delays from one minute to 24 hours. Exhausted records move to `failed` for manual review.
 - Sends only aggregate counts in its HTTP response. Customer contact fields are used only server-side and are never logged or returned.
