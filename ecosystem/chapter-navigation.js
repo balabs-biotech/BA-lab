@@ -31,9 +31,37 @@
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
  const rail=document.createElement('div');rail.className='chapter-rail neural-rail';rail.setAttribute('role','navigation');rail.setAttribute('aria-label','Navigation neuronale des chapitres');
  const svgNS='http://www.w3.org/2000/svg';
- rail.innerHTML='<svg class="neural-network" viewBox="0 0 120 600" preserveAspectRatio="none" aria-hidden="true"><path id="neural-axon" class="axon-base" d="M60 50 C45 105 77 145 60 180 C43 225 77 265 60 305 C43 350 77 390 60 430 C43 475 77 520 60 560"/><path class="axon-progress" d="M60 50 C45 105 77 145 60 180 C43 225 77 265 60 305 C43 350 77 390 60 430 C43 475 77 520 60 560"/><g class="myelin"><path d="M55 90h10 M53 112h14 M55 134h10 M54 220h12 M54 244h12 M55 265h10 M54 345h12 M55 368h10 M54 390h12 M55 470h10 M54 492h12 M55 515h10"/></g><g class="dendrites"><path d="M54 50L39 40L27 22 M39 40L23 45 M27 22L27 10 M54 50L40 58L26 75 M40 58L21 58 M66 50L81 40L93 22 M81 40L97 45 M93 22L93 10 M66 50L80 58L94 75 M80 58L99 58 M54 180L39 170L27 152 M39 170L23 175 M27 152L27 140 M54 180L40 188L26 205 M40 188L21 188 M66 180L81 170L93 152 M81 170L97 175 M93 152L93 140 M66 180L80 188L94 205 M80 188L99 188 M54 305L39 295L27 277 M39 295L23 300 M27 277L27 265 M54 305L40 313L26 330 M40 313L21 313 M66 305L81 295L93 277 M81 295L97 300 M93 277L93 265 M66 305L80 313L94 330 M80 313L99 313 M54 430L39 420L27 402 M39 420L23 425 M27 402L27 390 M54 430L40 438L26 455 M40 438L21 438 M66 430L81 420L93 402 M81 420L97 425 M93 402L93 390 M66 430L80 438L94 455 M80 438L99 438 M54 560L39 550L27 532 M39 550L23 555 M27 532L27 520 M66 560L81 550L93 532 M81 550L97 555 M93 532L93 520"/></g><g class="neuron-bodies"><circle cx="60" cy="50" r="8"/><circle cx="60" cy="180" r="8"/><circle cx="60" cy="305" r="8"/><circle cx="60" cy="430" r="8"/><circle cx="60" cy="560" r="8"/></g><g class="axon-terminals"><circle cx="60" cy="169" r="2.5"/><circle cx="60" cy="294" r="2.5"/><circle cx="60" cy="419" r="2.5"/><circle cx="60" cy="549" r="2.5"/></g><circle class="neural-pulse" r="3"><animateMotion dur="5s" repeatCount="indefinite"><mpath href="#neural-axon"/></animateMotion></circle></svg>'
+ const somaPoints=[{x:112,y:42},{x:139,y:170},{x:91,y:300},{x:132,y:430},{x:106,y:558}];
+ const axonPath='M112 42 C68 87 178 121 139 170 S55 251 91 300 S181 383 132 430 S60 516 106 558';
+ let dendritePaths='',meshPaths='';
+ const rng=seed=>()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ somaPoints.forEach((p,i)=>{
+  const rand=rng(711+i*997);
+  for(let k=0;k<11;k++){
+   const angle=Math.PI*2*k/11+(rand()-.5)*.32,reach=34+rand()*43;
+   const x1=p.x+Math.cos(angle)*reach*.52,y1=p.y+Math.sin(angle)*reach*.52;
+   const x2=p.x+Math.cos(angle)*reach,y2=p.y+Math.sin(angle)*reach;
+   const bend=(rand()-.5)*19,mx=(p.x+x2)/2-Math.sin(angle)*bend,my=(p.y+y2)/2+Math.cos(angle)*bend;
+   dendritePaths+='<path d="M'+p.x+' '+p.y+' Q'+mx.toFixed(1)+' '+my.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1)+'"/>';
+   [-1,1].forEach(side=>{
+    const ba=angle+side*(.48+rand()*.5),bl=13+rand()*24,bx=x1+Math.cos(ba)*bl,by=y1+Math.sin(ba)*bl;
+    const cx=x1+Math.cos(ba)*bl*.55-Math.sin(ba)*4,cy=y1+Math.sin(ba)*bl*.55+Math.cos(ba)*4;
+    dendritePaths+='<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+bx.toFixed(1)+' '+by.toFixed(1)+'"/>';
+    if(rand()>.34){const ca=ba+(rand()-.5)*.8,cl=10+rand()*15,ex=bx+Math.cos(ca)*cl,ey=by+Math.sin(ca)*cl;dendritePaths+='<path d="M'+bx.toFixed(1)+' '+by.toFixed(1)+' Q'+(bx+Math.cos(ca)*cl*.5).toFixed(1)+' '+(by+Math.sin(ca)*cl*.5).toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'"/>';}
+   });
+  }
+ });
+ for(let i=0;i<somaPoints.length-1;i++){
+  const p=somaPoints[i],q=somaPoints[i+1],mid=(p.y+q.y)/2;
+  for(let j=0;j<6;j++){
+   const x1=22+j*38+(i%2)*7,x2=28+j*35+((i+1)%2)*8,y1=p.y+45+(j%3)*15,y2=q.y-43-(j%2)*16,cx=(x1+x2)/2+(j%2?22:-22),cy=mid+(j-2)*12;
+   meshPaths+='<path d="M'+x1+' '+y1+' C'+cx+' '+(cy-22)+' '+(cx-12)+' '+(cy+22)+' '+x2+' '+y2+'"/>';
+  }
+ }
+ const myelin=somaPoints.slice(0,-1).map((p,i)=>{const q=somaPoints[i+1],x=(p.x+q.x)/2,y=(p.y+q.y)/2;return '<path d="M'+(x-5)+' '+(y-7)+'q8 7 10 14 M'+(x+1)+' '+(y-9)+'q8 7 10 14"/>';}).join('');
+ rail.innerHTML='<svg class="neural-network" viewBox="0 0 240 600" preserveAspectRatio="none" aria-hidden="true"><g class="network-anastomoses">'+meshPaths+'</g><g class="dendrites">'+dendritePaths+'</g><path id="neural-axon" class="axon-base" d="'+axonPath+'"/><path class="axon-progress" d="'+axonPath+'"/><g class="myelin">'+myelin+'</g><g class="neuron-bodies">'+somaPoints.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="7.5"/>').join('')+'</g><g class="axon-terminals">'+somaPoints.slice(1).map(p=>'<circle cx="'+p.x+'" cy="'+(p.y-12)+'" r="2.2"/>').join('')+'</g><circle class="neural-pulse" r="3"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#neural-axon"/></animateMotion></circle></svg>';
  const railNodes=document.createElement('div');railNodes.className='neural-hitareas';
- groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='neural-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.setAttribute('aria-label',(g.label.fr||g.id)+' — '+(i+1));b.style.setProperty('--node-y',[7,29.2,50,70.8,93][i]+'%');b.innerHTML='<span class="neural-node-core"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
+ groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='neural-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.setAttribute('aria-label',(g.label.fr||g.id)+' — '+(i+1));b.style.setProperty('--node-y',[7,28.3,50,71.7,93][i]+'%');b.style.setProperty('--node-x',[46.7,57.9,37.9,55,44.2][i]+'%');b.innerHTML='<span class="neural-node-core"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  rail.append(railNodes);document.body.append(rail);
  // Scroll-led editorial typography: reveal only key section headings, not body copy.
  if('IntersectionObserver' in window){
