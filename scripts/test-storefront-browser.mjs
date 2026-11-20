@@ -114,6 +114,8 @@ try {
   await turnstilePage.locator("#drawerBottom").waitFor({ state: "visible" });
   await turnstilePage.locator("#requestQuote").click();
   await turnstilePage.locator("#requestModal.is-open").waitFor();
+  assert.match(await turnstilePage.locator(".request-description").textContent(), /securely sent/i, "Enabled intake must explain that submitted contact details are transmitted securely");
+  assert.match(await turnstilePage.locator("[data-i18n=integrationNote]").textContent(), /securely sent/i, "Enabled intake must not claim contact details are never sent");
   await turnstilePage.waitForFunction(() => Boolean(window.__turnstileState));
   assert.equal(await turnstilePage.evaluate(() => window.__turnstileState.visibleAtRender), true, "Turnstile must render only after the request dialog is visible");
   await turnstilePage.evaluate(() => window.__turnstileState.options.callback("mock-valid-token"));
