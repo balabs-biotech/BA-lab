@@ -65,15 +65,33 @@
  const branchLayer=document.createElementNS(svgNS,'path');branchLayer.setAttribute('class','filament-branches');branchLayer.setAttribute('aria-hidden','true');railSvg.insertBefore(branchLayer,filament);
 
  const getLanguage=()=>{const value=(document.documentElement.lang||'fr').toLowerCase().split('-')[0];return ['fr','en','ar','pt'].includes(value)?value:'fr'};
- let filamentLength=0,current=0,railGeometryFrame=0;
+ let filamentLength=0,filamentStops=[],current=0,railGeometryFrame=0;
  const syncRailGeometry=()=>{
   const railRect=rail.getBoundingClientRect(),nodes=[...railNodes.querySelectorAll('.chapter-rail-node')];
   if(!nodes.length||!railRect.width||!railRect.height)return;
   const pts=nodes.map(node=>{const r=node.getBoundingClientRect();return{x:r.left+r.width/2-railRect.left,y:r.top+r.height/2-railRect.top}});
   railSvg.setAttribute('viewBox',`0 0 ${railRect.width} ${railRect.height}`);
   railSvg.setAttribute('preserveAspectRatio','none');
-  const d=pts.reduce((path,p,i)=>{if(!i)return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;const prev=pts[i-1],mid=(prev.y+p.y)/2,dir=i%2?1:-1,curve=Math.min(10,railRect.width*.16)*dir;return path+` C ${(prev.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${(p.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${p.x.toFixed(2)} ${p.y.toFixed(2)}`},'');
+  const segments=[];
+  const d=pts.reduce((path,p,i)=>{
+   if(!i)return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+   const prev=pts[i-1],mid=(prev.y+p.y)/2,dir=i%2?1:-1,curve=Math.min(10,railRect.width*.16)*dir;
+   const segment=`C ${(prev.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${(p.x+curve).toFixed(2)} ${mid.toFixed(2)}, ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+   segments.push(`M ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${segment}`);
+   return path+' '+segment;
+  },'');
   filament.setAttribute('d',d);filamentBase.setAttribute('d',d);
+  // Map each chapter interval to its own measured SVG arc length. A uniform
+  // fraction of the whole curve drifts when individual organic bends differ.
+  const measurePath=document.createElementNS(svgNS,'path');
+  measurePath.setAttribute('fill','none');measurePath.setAttribute('stroke','none');measurePath.setAttribute('visibility','hidden');
+  railSvg.append(measurePath);
+  const segmentLengths=segments.map(segment=>{measurePath.setAttribute('d',segment);return measurePath.getTotalLength()});
+  measurePath.remove();
+  filamentStops=[0];
+  segmentLengths.forEach(length=>filamentStops.push(filamentStops[filamentStops.length-1]+length));
+  filamentLength=filamentStops[filamentStops.length-1];
+  filament.style.strokeDasharray=String(filamentLength);
   const tendrils=[];
   for(let i=0;i<pts.length-1;i++){
    const a=pts[i],b=pts[i+1],side=i%2?1:-1,dx=Math.min(19,railRect.width*.34)*side;
@@ -84,7 +102,7 @@
    });
   }
   branchLayer.setAttribute('d',tendrils.join(' '));
-  try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){filamentLength=0}
+  try{filamentLength=filament.getTotalLength();filament.style.strokeDasharray=String(filamentLength);filament.style.strokeDashoffset=String(filamentLength)}catch(_){filamentLength=0;filamentStops=[]}
   update();
  };
  const scheduleRailGeometry=()=>{if(railGeometryFrame)return;railGeometryFrame=requestAnimationFrame(()=>{railGeometryFrame=0;syncRailGeometry()})};
@@ -110,7 +128,13 @@
   progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
   rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false')});
   rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[getLanguage()]||groups[i].label.fr});
-  if(filamentLength){const p=rawProgress/Math.max(1,pages.length-1);filament.style.strokeDashoffset=String(filamentLength*(1-p));if(signal){const point=filament.getPointAtLength(filamentLength*p);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2))}}
+  if(filamentLength&&filamentStops.length===pages.length){
+   const segment=Math.min(pages.length-2,Math.floor(rawProgress));
+   const fraction=rawProgress>=pages.length-1?1:rawProgress-segment;
+   const targetLength=filamentStops[segment]+(filamentStops[segment+1]-filamentStops[segment])*fraction;
+   filament.style.strokeDashoffset=String(filamentLength-targetLength);
+   if(signal){const point=filament.getPointAtLength(targetLength);signal.setAttribute('cx',point.x.toFixed(2));signal.setAttribute('cy',point.y.toFixed(2))}
+  }
   pages.forEach((p,i)=>p.setAttribute('aria-current',i===idx?'page':'false'));
   // A horizontal chapter can contain several editorial sections. Highlight only
   // the section nearest the reading line, never every link in the same chapter.
