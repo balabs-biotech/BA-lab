@@ -8,6 +8,7 @@ const workflow = readFileSync('.github/workflows/deploy-pages.yml', 'utf8');
 const ecosystem = readFileSync('ecosystem/index.html', 'utf8');
 const privacy = readFileSync('store/privacy.html', 'utf8');
 const cookies = readFileSync('store/cookies.html', 'utf8');
+const legalPages = ['legal.html', 'privacy.html', 'terms.html', 'shipping.html', 'cookies.html'].map(page => readFileSync('store/' + page, 'utf8'));
 const retiredStoreNotion = readFileSync('supabase/functions/store-notion-order/index.ts', 'utf8');
 const retiredNotionStore = readFileSync('supabase/functions/notion-store-order/index.ts', 'utf8');
 
@@ -51,6 +52,7 @@ assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBL
 assert.ok(html.includes('./cookies.html') && html.includes('./privacy.html') && html.includes('./terms.html') && html.includes('./shipping.html') && html.includes('./legal.html'), 'Footer must expose legal and privacy pages');
 assert.ok(privacy.includes('appel depuis le navigateur reste désactivé') && privacy.includes('transfert international'), 'Privacy policy must disclose the disabled remote catalogue and cross-border review gate');
 assert.ok(cookies.includes('appel depuis le navigateur reste désactivé'), 'Cookie policy must disclose that no remote catalogue request is active');
+assert.ok(legalPages.every(page => /<meta name="robots" content="noindex, nofollow">/.test(page)), 'Unfinished legal and privacy drafts must stay out of search indexes until formally approved');
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
