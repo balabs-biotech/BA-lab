@@ -121,6 +121,24 @@
   </div>
 </footer>
 
+<div class="product-detail-modal" id="productDetailModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="productDetailTitle">
+  <div class="product-detail-backdrop" id="productDetailBackdrop"></div>
+  <section class="product-detail-panel">
+    <button class="icon-button product-detail-close" id="productDetailClose" type="button" aria-label="Fermer la fiche" data-i18n-aria="detailClose">×</button>
+    <p class="eyebrow">BA / RESOURCE DOCUMENTATION</p>
+    <p class="product-detail-family" id="productDetailFamily"></p>
+    <h2 id="productDetailTitle"></h2>
+    <p class="product-detail-description" id="productDetailDescription"></p>
+    <dl class="product-detail-facts">
+      <div><dt data-i18n="detailReference">Référence</dt><dd id="productDetailCode"></dd></div>
+      <div><dt data-i18n="detailType">Type de ressource</dt><dd id="productDetailType"></dd></div>
+      <div><dt data-i18n="detailAvailability">Disponibilité</dt><dd id="productDetailAvailability"></dd></div>
+      <div id="productDetailPrice" class="product-detail-price" hidden></div>
+    </dl>
+    <button class="primary-button product-detail-add" id="productDetailAdd" type="button"><span data-i18n="detailAdd">Ajouter à ma sélection</span><b>↗</b></button>
+  </section>
+</div>
+
 <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="false" aria-hidden="true" aria-labelledby="cartTitle">
   <div class="drawer-backdrop" id="cartBackdrop"></div>
   <div class="drawer-panel">
