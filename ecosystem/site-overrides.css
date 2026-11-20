@@ -3641,3 +3641,20 @@ html[lang="ar"] .product-open{right:auto;left:20px}
     line-height:1.62!important;
   }
 }
+
+
+/* PASS78 — widen the mobile WebGL viewport without touching scene or camera logic.
+   The chapter rail reduces the available column; a wider stage restores horizontal field of view. */
+@media(max-width:760px){
+  #mainView.webgl-ready{position:relative!important;overflow:hidden!important;min-width:0!important}
+  #mainView.webgl-ready>.webgl-stage{
+    left:-11%!important;right:auto!important;top:0!important;bottom:0!important;
+    width:122%!important;max-width:none!important;min-height:100%!important;
+  }
+  #mainView.webgl-ready .webgl-stage .webgl-focus{left:9.5%!important}
+  #mainView.webgl-ready .webgl-stage .webgl-path{left:9.5%!important}
+  #mainView.webgl-ready .webgl-stage .webgl-controls{right:9.5%!important}
+  #mainView.webgl-ready .webgl-stage .webgl-branch-dock{left:9.5%!important;right:9.5%!important}
+  #mainView.webgl-ready .webgl-stage .webgl-hint{left:9.5%!important;max-width:calc(100% - 25%)!important}
+  #mainView.webgl-ready .webgl-stage .webgl-status{right:9.5%!important}
+}
