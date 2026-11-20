@@ -8,6 +8,8 @@ const migration = readFileSync("supabase/migrations/20261119223731_store_orders_
 const rateMigration = readFileSync("supabase/migrations/20261119224223_store_checkout_rate_limits_v1.sql", "utf8");
 const edge = readFileSync("supabase/functions/create-store-order/index.ts", "utf8");
 const readme = readFileSync("store/README.md", "utf8");
+const syncWorker = readFileSync("supabase/functions/store-order-sync/index.ts", "utf8");
+
 
 assert.ok(html.includes('class="request-layout"') && html.includes('id="requestSummary"'), "Enquiry layout must show selected items beside the customer form");
 assert.ok(css.includes(".request-layout") && css.includes("@media(max-width:760px)"), "Enquiry layout must be responsive");
@@ -54,4 +56,9 @@ assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint m
 
 assert.ok(readme.includes("Supabase is the transactional source of truth"), "Architecture documentation must match the implementation");
 assert.ok(readme.includes("server-verified anti-bot challenge") && readme.includes("not a CAPTCHA"), "Public intake launch gate must disclose that server-verified bot protection is still required");
+
+assert.ok(syncWorker.includes('if (!orderId || !lockToken)') && syncWorker.includes('if (!items.length) throw new Error("claimed_order_has_no_items")'), "Claimed orders without items must enter the failure/retry path instead of remaining locked in processing");
+assert.ok(syncWorker.indexOf('if (!items.length) throw new Error("claimed_order_has_no_items")') < syncWorker.indexOf('const pageId = await syncToNotion(order, items, notionToken)'), "Invalid claimed orders must be rejected before any Notion request");
+assert.ok(syncWorker.includes('rpc/fail_store_order_sync'), "Every processing failure must release/update retry state through the guarded failure RPC");
+
 console.log("Store order contract checks passed: Supabase-first persistence, Notion mirror, isolated RLS tables, idempotency, 15-reference request allowlist, unavailable-reference exclusion and disabled public intake.");
