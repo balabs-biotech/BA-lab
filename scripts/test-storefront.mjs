@@ -42,6 +42,7 @@ const requestOpener = js.match(/function openRequest\(\)\{[\s\S]*?(?=\nfunction 
 assert.ok(requestOpener.includes('loadTurnstile()') && requestOpener.indexOf("classList.add('is-open')") < requestOpener.indexOf('loadTurnstile()'), 'Turnstile must initialize only after the request dialog becomes visible');
 const orderGate = js.slice(js.indexOf('if(STORE_ORDER_ENABLED){'), js.indexOf('\norderForm.addEventListener'));
 assert.ok(!orderGate.includes('loadTurnstile()'), 'Turnstile must not render inside the initially hidden request dialog');
+assert.ok(js.includes('let turnstileToken=\'\',turnstileWidgetId=null,turnstileScriptLoading=false') && js.includes('if(turnstileScriptLoading)return;') && js.includes('turnstileScriptLoading=true;') && js.includes('turnstileScriptLoading=false;render();'), 'Turnstile script loading must be idempotent across repeated dialog openings');
 assert.ok(js.includes("STORE_CATALOGUE_URL") && /method\s*:\s*["\']GET["\']/.test(js) && /credentials\s*:\s*["\']omit["\']/.test(js), "Storefront may read the public catalogue only through a cookie-free GET request");
 assert.ok(js.includes('STORE_REMOTE_CATALOGUE_ENABLED=false') && js.includes('if(!STORE_REMOTE_CATALOGUE_ENABLED)return;'), 'Remote catalogue access must remain disabled until cross-border processing and privacy disclosures are approved');
 assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Public catalogue requests must use only the publishable key');
