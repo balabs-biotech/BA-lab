@@ -32,7 +32,7 @@ assert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The ino
 assert.ok(!/priceDzd:100[,}]/.test(js) && js.includes('Water Agar — boîte non inoculée'), 'Water Agar must remain on request without an unconfirmed public price');
 const wheatSpawn = js.match(/\{code:'BAL-GRAIN-SPAWN-WHEAT-25-001',[\s\S]*?\},\n\{code:/)?.[0] || '';
 assert.ok(wheatSpawn.includes("status:'to_confirm'") && wheatSpawn.includes('grain spawn · 2,5 kg') && !wheatSpawn.includes('priceDzd:'), 'Wheat grain spawn must remain visible as to-confirm with no unconfirmed public price');
-const wheatServerProduct = orderFunction.match(/\"BAL-GRAIN-SPAWN-WHEAT-25-001\":\\s*\\{[^}]*\\}/)?.[0] || '';
+const wheatServerProduct = orderFunction.split('\\n').find(line => line.includes('\\"BAL-GRAIN-SPAWN-WHEAT-25-001\\"')) || '';
 assert.ok(wheatServerProduct.includes('family: \"spawn\"') && !wheatServerProduct.includes('price:'), 'Server order intake must not assign an unconfirmed price to wheat grain spawn');
 assert.ok(js.includes('priceDzd:5000') && js.includes('Prix envisagé · à confirmer') && js.includes('price-qualifier'), 'Liquid culture syringe price must be clearly marked indicative');
 assert.ok(js.includes("family:'spawn'") && js.includes("filterSpawn:'Grain spawn'"), 'Grain spawn must have a distinct localized catalogue filter');
