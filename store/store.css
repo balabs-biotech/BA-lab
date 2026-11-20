@@ -171,3 +171,29 @@
 [dir="rtl"] .product-detail-close{right:auto;left:18px}
 [dir="rtl"] .product-detail-panel>.eyebrow{margin:0 0 22px 48px}
 @media(prefers-reduced-motion:reduce){.product-detail-backdrop,.product-detail-panel{transition:none}}
+
+/* Short mycelial growth sequence shown on first page entry. */
+.biological-intro{position:fixed;inset:0;z-index:200;display:grid;place-items:center;overflow:hidden;background:#111b1d;color:#e8e9df;opacity:1;transition:opacity .34s ease}
+.biological-intro[hidden]{display:none}
+.biological-intro.is-exiting{opacity:0;pointer-events:none}
+.intro-content{width:min(560px,calc(100% - 36px));text-align:center}
+.intro-network{display:block;width:min(480px,90vw);height:auto;margin:0 auto 20px;overflow:visible}
+.intro-spore-halo{fill:none;stroke:#d39a7e;stroke-width:1;opacity:0;transform-origin:240px 130px;animation:intro-spore-pulse 1.1s ease-out .05s forwards}
+.intro-spore-core{fill:#d39a7e;opacity:0;animation:intro-spore-appear .4s ease-out forwards}
+.intro-hypha{fill:none;stroke:#9db9a3;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:500;stroke-dashoffset:500;animation:intro-hypha-grow 1.45s cubic-bezier(.2,.7,.2,1) forwards}
+.intro-hypha-1{animation-delay:.12s}.intro-hypha-2{animation-delay:.32s}.intro-hypha-3{animation-delay:.25s}.intro-hypha-4{animation-delay:.52s}.intro-hypha-5{animation-delay:.2s}.intro-hypha-6{animation-delay:.46s}.intro-hypha-7{animation-delay:.3s}.intro-hypha-8{animation-delay:.58s}.intro-hypha-9{animation-delay:.72s;stroke:#d39a7e}
+.intro-wordmark{display:flex;flex-direction:column;gap:7px;opacity:0;animation:intro-copy-appear .55s ease-out 1s forwards}
+.intro-wordmark>span{font:500 25px/1 var(--store-sans);letter-spacing:.24em}
+.intro-wordmark small{color:#9eafa4;font:8px var(--store-mono);letter-spacing:.2em}
+.intro-tagline{margin:19px 0 0;color:#d39a7e;font:8px var(--store-mono);letter-spacing:.16em;opacity:0;animation:intro-copy-appear .5s ease-out 1.2s forwards}
+.intro-skip{position:absolute;top:20px;right:22px;padding:10px 13px;border:1px solid #71877a88;background:#172522;color:#e8e9df;font:9px var(--store-mono);cursor:pointer}
+.intro-skip:hover{border-color:#d39a7e;color:#f0c0a3}
+.intro-skip:focus-visible{outline:2px solid #e0a080;outline-offset:4px}
+body.intro-active{overflow:hidden}
+@keyframes intro-hypha-grow{to{stroke-dashoffset:0}}
+@keyframes intro-spore-appear{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+@keyframes intro-spore-pulse{0%{opacity:0;transform:scale(.45)}45%{opacity:.8}100%{opacity:.18;transform:scale(1.8)}}
+@keyframes intro-copy-appear{to{opacity:1}}
+[dir="rtl"] .intro-skip{right:auto;left:22px}
+@media(max-width:560px){.intro-skip{top:14px;right:14px}.intro-content{width:calc(100% - 28px)}.intro-network{width:min(440px,96vw)}.intro-wordmark>span{font-size:22px}.intro-tagline{font-size:7px;letter-spacing:.1em}}
+@media(prefers-reduced-motion:reduce){.biological-intro{display:none!important}.intro-hypha,.intro-spore-halo,.intro-spore-core,.intro-wordmark,.intro-tagline{animation:none!important}}
