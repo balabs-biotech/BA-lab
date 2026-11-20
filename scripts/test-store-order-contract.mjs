@@ -6,6 +6,7 @@ const css = readFileSync("store/store.css", "utf8");
 const js = readFileSync("store/store.js", "utf8");
 const migration = readFileSync("supabase/migrations/20261119223731_store_orders_v1.sql", "utf8");
 const rateMigration = readFileSync("supabase/migrations/20261119224223_store_checkout_rate_limits_v1.sql", "utf8");
+const retryMigration = readFileSync("supabase/migrations/20261120000100_store_order_notion_retry_v1.sql", "utf8");
 const edge = readFileSync("supabase/functions/create-store-order/index.ts", "utf8");
 const readme = readFileSync("store/README.md", "utf8");
 const syncWorker = readFileSync("supabase/functions/store-order-sync/index.ts", "utf8");
@@ -31,6 +32,16 @@ assert.ok(migration.includes("grant execute on function public.create_store_orde
 assert.ok(rateMigration.includes("create table if not exists public.store_checkout_rate_limits"), "Persistent rate-limit table must exist");
 assert.ok(rateMigration.includes("create or replace function public.consume_store_rate_limit"), "Persistent rate-limit RPC must exist");
 assert.ok(rateMigration.includes("grant execute on function public.consume_store_rate_limit(text,integer,integer) to service_role"), "Only the backend service role may call the rate-limit RPC");
+
+for (const [label, migration, expected] of [
+  ["order persistence", migration, 1],
+  ["rate limiting", rateMigration, 1],
+  ["Notion retry worker", retryMigration, 3]
+]) {
+  const hardenedFunctions = migration.match(/security definer\\s+set search_path = ''/gi) || [];
+  assert.equal(hardenedFunctions.length, expected, label + " SECURITY DEFINER functions must pin an empty search_path");
+}
+
 
 assert.equal((edge.match(/"BAL-/g) || []).length, 15, "Edge Function must validate the 15 currently requestable references");
 const productBlock = js.slice(js.indexOf("let products=["), js.indexOf("\n];", js.indexOf("let products=[")));
