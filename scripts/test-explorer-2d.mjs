@@ -71,11 +71,14 @@ try {
     const rootButton = nav.first();
     const rootNodeId = await rootButton.getAttribute('data-node-id');
     const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
-    const rootPagePromise = page.context().waitForEvent('page');
+    await page.evaluate(() => {
+      window.__openedNotionUrls = [];
+      const nativeOpen = window.open.bind(window);
+      window.open = (...args) => { window.__openedNotionUrls.push(args[0]); return nativeOpen(...args); };
+    });
     await rootButton.click();
-    const rootPage = await rootPagePromise;
-    assert.equal(rootPage.url(), rootExpectedUrl, 'Clicking a universe point must open its exact canonical Notion page');
-    await rootPage.close();
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
+    assert.equal((await page.evaluate(() => window.__openedNotionUrls[0])), rootExpectedUrl, 'Clicking a universe point must call window.open with its exact canonical Notion page');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
@@ -83,11 +86,9 @@ try {
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
     const childExpectedUrl = mappedTree.nodeUrls[childNodeId];
-    const childPagePromise = page.context().waitForEvent('page');
     await firstChild.click();
-    const childPage = await childPagePromise;
-    assert.equal(childPage.url(), childExpectedUrl, 'Clicking a child point must open its own canonical Notion page');
-    await childPage.close();
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 2);
+    assert.equal((await page.evaluate(() => window.__openedNotionUrls[1])), childExpectedUrl, 'Clicking a child point must call window.open with its own canonical Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
