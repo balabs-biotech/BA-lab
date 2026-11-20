@@ -7,7 +7,7 @@ const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'wor
 for (const language of expectedLanguages) {
   const path = new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url);
   const manifest = JSON.parse(await readFile(path, 'utf8'));
-  assert.equal(manifest.version, 3, language + ': unsupported manifest version');
+  assert.equal(manifest.version, 4, language + ': unsupported manifest version');
   assert.equal(manifest.relationModel, 'notion-crosslinks-and-documented-topics-v1', language + ': relation model marker missing');
   assert.equal(manifest.language, language, language + ': language marker mismatch');
   assert.ok(Array.isArray(manifest.domains), language + ': domains must be an array');
@@ -72,6 +72,6 @@ for (const language of expectedLanguages) {
   for (const reference of references) assert.ok(urls.has(reference.url), reference.trail + ': cross-universe reference must point to a canonical mapped page');
   assert.ok(nodeCount >= 100, language + ': the manifest must retain the complete mapped Notion hierarchy');
   const productSections = manifest.domains.find((domain) => domain.id === 'products').children.filter((node) => node.kind === 'section');
-  assert.equal(productSections.length, 4, language + ': product-page headings must remain represented as four explicit navigable sections');
+  assert.equal(productSections.length, 4, language + ': product-page headings must remain represented as four non-clickable grouping sections');
   console.log(language + ': ' + manifest.domains.length + ' public roots, ' + nodeCount + ' mapped nodes — valid');
 }
