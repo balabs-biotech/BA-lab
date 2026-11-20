@@ -1253,6 +1253,11 @@
       "relations": []
     }
   ],
-  "hub": null,
+  "hub": {
+    "title": "BA Labs — Applied biotechnology",
+    "notionId": "40173152f171815f9f01ea5fd1add73f",
+    "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
+    "parentId": "language"
+  },
   "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }
