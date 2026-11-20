@@ -731,3 +731,14 @@ body>.chapter-rail.neural-rail{
 @media(min-width:761px){
  body>.chapter-rail.neural-rail{z-index:3!important}
 }
+
+
+/* v45 — nudge the mycelium just below the chapter selector band. */
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail{
+  top:calc(50% + 12px)!important;
+ }
+ html[dir="rtl"] body>.chapter-rail.neural-rail{
+  top:calc(50% + 12px)!important;
+ }
+}
