@@ -91,6 +91,36 @@ try {
     await firstChild.press('Enter');
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 2);
     assert.equal((await page.evaluate(() => window.__openedNotionUrls[1])), childExpectedUrl, 'Clicking a child point must call window.open with its own canonical Notion page');
+
+    // Regression: clicking the visible text label (not only its tiny node
+    // anchor) must open the exact Notion resource. Black Pearl is the fixture.
+    const blackPearl = await page.evaluate(async () => {
+      const data = await (await fetch('./notion-tree.fr.json')).json();
+      let result = null;
+      const visit = (items, parent = null) => (items || []).forEach(node => {
+        if (node.id === 'myco-black-pearl') result = { parentId: parent?.id || null, url: node.url, title: node.title };
+        visit(node.children, node);
+      });
+      visit(data.domains);
+      return result;
+    });
+    assert.ok(blackPearl?.parentId && blackPearl.url, 'Black Pearl must have a canonical parent and Notion URL');
+    const parentButton = nav.locator(`button[data-node-id="${blackPearl.parentId}"]`);
+    await parentButton.focus();
+    await parentButton.press('Enter');
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 3);
+    await page.waitForFunction(id => {
+      const boxes = JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}');
+      return Boolean(boxes[id]);
+    }, 'myco-black-pearl', { timeout: 15000 });
+    const labelPoint = await page.locator('#field').evaluate(el => {
+      const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')['myco-black-pearl'];
+      const rect = el.getBoundingClientRect();
+      return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
+    });
+    await page.mouse.click(labelPoint.x, labelPoint.y);
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 4);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[3]), blackPearl.url, 'Clicking the visible Black Pearl label on the canvas must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
