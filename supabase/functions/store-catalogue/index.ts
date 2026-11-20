@@ -79,6 +79,7 @@ Deno.serve(async (req: Request) => {
     for (let pageIndex = 0; pageIndex < MAX_PAGES; pageIndex++) {
       const response = await fetch("https://api.notion.com/v1/data_sources/" + DATA_SOURCE_ID + "/query", {
         method: "POST",
+        signal: AbortSignal.timeout(15_000),
         headers: {
           "Authorization": "Bearer " + token,
           "Notion-Version": NOTION_VERSION,
