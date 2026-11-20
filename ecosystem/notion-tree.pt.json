@@ -1180,6 +1180,23 @@
           "url": "https://app.notion.com/p/40273152f17181ee8b40f19e198d8ffc",
           "description": "Sous-page directement référencée par la page R&D de cette langue.",
           "children": []
+        },
+        {
+          "id": "pt-work-documented",
+          "title": "Trabalhos e realizações documentados",
+          "notionId": "40173152f171817e90c1e145abcde4f2",
+          "url": "https://app.notion.com/p/40173152f171817e90c1e145abcde4f2",
+          "description": "Panorama dos trabalhos documentados e respetivos níveis de evidência.",
+          "children": [
+            {
+              "id": "pt-work-detailed-examples",
+              "title": "Exemplos detalhados de projetos documentados",
+              "notionId": "40173152f171818fb366e51fc9ba0f18",
+              "url": "https://app.notion.com/p/40173152f171818fb366e51fc9ba0f18",
+              "description": "Exemplos detalhados de projetos acompanhados pela BA Labs.",
+              "children": []
+            }
+          ]
         }
       ],
       "notionParentId": "language",
