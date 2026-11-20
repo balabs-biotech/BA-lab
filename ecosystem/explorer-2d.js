@@ -2,10 +2,10 @@ import { createPixiRenderer } from "./explorer-2d-pixi.js?v=zoom-label-gating-1"
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={bio:"#79a991",myco:"#b18fc2",soil:"#c19b73",lab:"#80aeb8",products:"#c88773",iot:"#7eaaa3",work:"#aa9cbb",evidence:"#b5b58d"};
 const COPY={
-fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · TOUCHER UN POINT POUR OUVRIR NOTION",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
-en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · TAP A NODE TO OPEN NOTION",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
-ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · المس نقطة لفتح صفحة Notion",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
-pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · TOCAR NUM PONTO PARA ABRIR O NOTION",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
+fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · TOUCHER UN POINT POUR SÉLECTIONNER",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
+en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · TAP A NODE TO SELECT",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
+ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · المس نقطة لاختيارها",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
+pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · TOCAR NUM PONTO PARA SELECIONAR",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
 const $=id=>document.getElementById(id),canvas=$("field"),reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let pixiRenderer=null,relationIndex=new Map();
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
@@ -119,7 +119,7 @@ function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selecte
 function renderUniverseRail(){
  const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
  const names={fr:{bio:"BIO",myco:"MYCO",soil:"SOL",lab:"R&D",products:"OBJ",iot:"IoT",work:"PROJ",evidence:"DOC"},en:{bio:"BIO",myco:"MYCO",soil:"SOIL",lab:"R&D",products:"KIT",iot:"IoT",work:"WORK",evidence:"LOG"},ar:{bio:"حيوي",myco:"فطر",soil:"تربة",lab:"بحث",products:"عدة",iot:"IoT",work:"عمل",evidence:"توثيق"},pt:{bio:"BIO",myco:"MICO",soil:"SOLO",lab:"I&D",products:"KIT",iot:"IoT",work:"PROJ",evidence:"DOC"}};
- tree.forEach(root=>{const b=el("button","universe-point",(names[lang]||names.fr)[root.id]||root.title.slice(0,4));b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)activateNode(n);};rail.append(b);});
+ tree.forEach(root=>{const b=el("button","universe-point",(names[lang]||names.fr)[root.id]||root.title.slice(0,4));b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)focusNode(n);};rail.append(b);});
  syncUniverseRail(selected);
 }
 function syncUniverseRail(n){
@@ -134,7 +134,7 @@ function syncUniverseRail(n){
  canvas.dataset.activeUniverse=active||"";
 }
 function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
-function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
+function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  let found=null,best=22;
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
