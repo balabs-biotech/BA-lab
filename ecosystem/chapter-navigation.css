@@ -662,11 +662,11 @@ body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!impor
 /* MOBILE RAIL PLACEMENT — shift the complete mycelium lower, below the chapter menu. */
 @media(max-width:760px){
  body>.chapter-rail.neural-rail{
-  top:calc(50% + 160px)!important;
+  top:calc(50% + 120px)!important;
   transform:translateY(-50%)!important;
  }
  html[dir="rtl"] body>.chapter-rail.neural-rail{
-  top:calc(50% + 160px)!important;
+  top:calc(50% + 120px)!important;
  }
 }
 
