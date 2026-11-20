@@ -96,7 +96,20 @@ Source: `supabase/functions/store-order-sync/index.ts`.
 - Checks the exact commercial request title in Notion before creating a page, so a timeout after page creation can be safely retried without intentionally creating a duplicate.
 - Uses bounded retries (maximum eight attempts) with increasing delays from one minute to 24 hours. Exhausted records move to `failed` for manual review.
 - Sends only aggregate counts in its HTTP response. Customer contact fields are used only server-side and are never logged or returned.
-- The function is deployed with JWT verification enabled. Scheduling is deliberately not activated until a service-role JWT is stored in Supabase Vault and the dedicated Notion commercial credential is configured.
+- The function is deployed with JWT verification enabled. A five-minute `pg_cron` schedule is installed but remains dormant until the service-role JWT is stored in Supabase Vault. Before activating it, configure `NOTION_STORE_API_KEY` under Supabase Edge Function secrets, then add the legacy `service_role` JWT to Vault under the name `store_sync_service_role_jwt`. The cron job reads that secret only at execution time; no credential is stored in the repository.
+
+## Activate the private retry schedule
+
+1. In Supabase Dashboard → Edge Functions → Secrets, add `NOTION_STORE_API_KEY` using the dedicated Notion integration that has access only to the commercial orders data source.
+2. In Supabase SQL Editor, store the legacy `service_role` JWT in Vault (never in GitHub or the browser):
+
+   ```sql
+   select vault.create_secret('PASTE_SERVICE_ROLE_JWT_HERE', 'store_sync_service_role_jwt');
+   ```
+
+3. The existing five-minute cron job will then invoke `store-order-sync`. Verify the function logs and confirm a synthetic request moves from `pending` to `synced` before considering any public intake launch.
+
+Do not paste the JWT or Notion token into a chat, source file, SQL migration, or browser code.
 
 ## Before enabling customer submissions
 
