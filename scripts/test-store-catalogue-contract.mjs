@@ -14,6 +14,7 @@ assert.ok(!source.includes('properties["Résumé public"]') && !source.includes(
 assert.ok(source.includes('ALLOWED_ORIGINS.has(origin)') && source.includes('"Access-Control-Allow-Methods": "GET, OPTIONS"') && source.includes('req.method !== "GET"'), "Catalogue endpoint must be read-only and origin-restricted for browser use");
 assert.ok(source.includes('"Cache-Control": cache') && source.includes('"public, max-age=60, s-maxage=300"'), "Public catalogue responses must use short-lived shared caching");
 assert.ok(!source.includes("return payload") && !source.includes("JSON.stringify(page)"), "Raw Notion pages and internal metadata must never be exposed");
+assert.ok(source.includes("signal: AbortSignal.timeout(15_000)"), "Notion catalogue requests must have a bounded network timeout");
 assert.ok(storefront.includes("STORE_REMOTE_CATALOGUE_ENABLED=false"), "Remote catalogue integration must remain disabled until the dedicated secret and product reconciliation are complete");
 assert.ok(storefront.includes("const REMOTE_STATUS_MAP=Object.freeze({") && storefront.includes('"sur demande":"on_request"') && storefront.includes('"à confirmer":"to_confirm"') && storefront.includes('"indisponible":"unavailable"'), "Remote availability values must map to the storefront status model");
 assert.ok(storefront.includes("products=products.map(product=>{") && storefront.includes("return remoteStatus?{...product,status:remoteStatus}:product;"), "Remote catalogue may update availability only while preserving local multilingual titles, descriptions and prices");
@@ -23,4 +24,4 @@ assert.ok(storefront.includes("products.some(product=>product.code===code&&produ
 assert.ok(storefront.includes("products=products.map(product=>{") && storefront.includes("const remoteStatus=updates.get(product.code);"), "Remote catalogue may only update existing locally curated products and must never inject unreviewed product records");
 assert.ok(storefront.includes("credentials:\"omit\"") && storefront.includes("method:\"GET\""), "Public catalogue request must be read-only and must not send browser cookies");
 
-console.log("Public catalogue contract passed: isolated read-only credential, active-only records, field allowlist, no customer data and disabled frontend switch.");
+console.log("Public catalogue contract passed: isolated read-only credential, active-only records, field allowlist, no customer data, bounded network timeout and disabled frontend switch.");
