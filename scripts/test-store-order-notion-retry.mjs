@@ -19,6 +19,7 @@ assert.ok(migration.includes("interval '1 minute'") && migration.includes("inter
 assert.ok(worker.includes("payload?.role === \"service_role\""), "Retry worker must require a service-role JWT claim");
 assert.ok(worker.includes("rpc/claim_store_order_sync") && worker.includes("rpc/complete_store_order_sync") && worker.includes("rpc/fail_store_order_sync"), "Worker must use atomic claim and completion/failure RPCs");
 assert.equal((worker.match(/AbortSignal\.timeout\(20_000\)/g) ?? []).length, 2, "Supabase and Notion requests must time out well before the five-minute processing lock expires");
+assert.equal((intake.match(/AbortSignal\.timeout\(20_000\)/g) ?? []).length, 1, "Order intake Supabase requests must have a bounded network timeout");
 assert.ok(worker.includes('if (!orderId || !lockToken)') && worker.includes('if (!items.length) throw new Error("claimed_order_has_no_items")'), "A claimed request with no items must be rejected inside the guarded try/catch so it enters retry handling");
 assert.ok(worker.indexOf('if (!items.length) throw new Error("claimed_order_has_no_items")') < worker.indexOf("const pageId = await syncToNotion(order, items, notionToken)"), "Malformed claims must be rejected before a Notion API call");
 assert.ok(worker.includes('rpc/fail_store_order_sync'), "Malformed claimed requests must use the failure RPC to clear the processing lock and schedule retry");
