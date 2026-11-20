@@ -128,9 +128,7 @@ try {
       const rect = el.getBoundingClientRect();
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
     });
-    await page.mouse.click(focusedLabelPoint.x, focusedLabelPoint.y);
-    await page.waitForTimeout(90);
-    await page.mouse.click(focusedLabelPoint.x, focusedLabelPoint.y);
+    await page.mouse.dblclick(focusedLabelPoint.x, focusedLabelPoint.y, { delay: 80 });
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), blackPearl.url, 'Double-clicking the visible Black Pearl label must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
