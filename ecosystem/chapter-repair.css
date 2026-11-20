@@ -1171,3 +1171,16 @@
   font:600 9px/1.2 ui-monospace,SFMono-Regular,monospace!important;
   letter-spacing:.16em!important;
 }
+
+
+/* v53 — authoritative mobile rail placement, after all chapter layout overrides. */
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail{
+  top:calc(50% + 176px)!important;
+  height:min(38vh,320px)!important;
+  transform:translateY(-50%)!important;
+ }
+ html[dir="rtl"] body>.chapter-rail.neural-rail{
+  top:calc(50% + 176px)!important;
+ }
+}
