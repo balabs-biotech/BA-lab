@@ -1,9 +1,17 @@
 {
-  "version": 4,
+  "version": 5,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "fr",
-  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
+  "coverage": "Every interactive point resolves to its canonical Notion page; includes the French public landing page and the collaboration/R&D detail pages.",
   "domains": [
+    {
+      "id": "fr-home",
+      "title": "Accueil — Français",
+      "notionId": "40173152f1718152b715fae75581764d",
+      "url": "https://app.notion.com/p/40173152f1718152b715fae75581764d",
+      "description": "Page d’entrée de l’espace public francophone BA Labs.",
+      "children": []
+    },
     {
       "id": "myco",
       "title": "MYCOLOGIE",
@@ -1133,6 +1141,14 @@
               "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation.",
               "kind": "reference",
               "children": []
+            },
+            {
+              "id": "work-detailed-examples",
+              "title": "Exemples détaillés de projets documentés",
+              "notionId": "41d73152f1718185bb5fe6c269bf2fcb",
+              "url": "https://app.notion.com/p/41d73152f1718185bb5fe6c269bf2fcb",
+              "description": "Exemples détaillés rattachés aux travaux et réalisations documentés.",
+              "children": []
             }
           ],
           "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
@@ -1224,7 +1240,16 @@
           "title": "Collaborer avec BA Labs",
           "url": "https://app.notion.com/p/3e273152f17181a8bedae0bfd2452543",
           "notionId": "3e273152f17181a8bedae0bfd2452543",
-          "children": []
+          "children": [
+            {
+              "id": "collaboration-guide",
+              "title": "Guide de collaboration — informations détaillées",
+              "notionId": "41d73152f1718153bdfbfe816c5bba87",
+              "url": "https://app.notion.com/p/41d73152f1718153bdfbfe816c5bba87",
+              "description": "Informations détaillées et modalités de collaboration avec BA Labs.",
+              "children": []
+            }
+          ]
         }
       ],
       "relations": []
