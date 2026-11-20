@@ -554,3 +554,19 @@ body>.chapter-rail.neural-rail{width:54px!important;height:min(72vh,560px)!impor
  body>.chapter-rail.neural-rail{width:44px!important;height:min(64vh,480px)!important}
  .neural-node{left:var(--node-x,50%)!important}
 }
+
+
+/* CALM PASS — readable colonies, one continuous neural trunk, no visual crosshatch. */
+body>.chapter-rail.neural-rail{width:48px!important;height:min(66vh,500px)!important}
+.neural-network .axon-base{stroke:#9aafa266!important;stroke-width:2.1!important;stroke-dasharray:none!important;opacity:.9}
+.neural-network .axon-progress{stroke:#b96b4d!important;stroke-width:2.35!important;stroke-dasharray:none!important;filter:drop-shadow(0 0 2px #b96b4d66)!important}
+.neural-network .dendrites{stroke:#a9b9a6a0!important;stroke-width:1.05!important;stroke-dasharray:none!important;opacity:.82!important}
+.neural-network .myelin{stroke:#b8c6ad66!important;stroke-width:2.5!important;opacity:.55!important}
+.neural-network .neuron-bodies circle{fill:#263b38!important;stroke:#d1d0c5!important;stroke-width:1.4!important;filter:none!important}
+.neural-network .axon-terminals circle{fill:#b96b4d!important;stroke:#d1b29b!important;filter:none!important}
+.neural-network .neural-pulse{opacity:.85!important;filter:drop-shadow(0 0 3px #e7c6a7)!important}
+.neural-node-core{width:8px!important;height:8px!important;box-shadow:0 0 0 2px #111b1dcc!important}
+.neural-node.is-active .neural-node-core{width:12px!important;height:12px!important;box-shadow:0 0 0 3px #b96b4d28,0 0 9px #b96b4d99!important}
+.neural-node.is-active .neural-node-core:after{width:18px!important;height:18px!important;animation-duration:2.6s!important}
+@media(max-width:760px){body>.chapter-rail.neural-rail{width:38px!important;height:min(60vh,420px)!important}}
+@media(prefers-reduced-motion:reduce){.neural-network .neural-pulse{display:none!important}}
