@@ -23,7 +23,7 @@ Aucune image de cette liste n'est intégrée à la boutique tant que le fichier 
 ## État
 
 - Vérification des pages de licence : effectuée le 20 novembre 2026.
-- Vérification de présence de personnes : les trois visuels retenus ne montrent pas de personne dans l'aperçu / la description consultée.
+- Vérification visuelle finale des trois fichiers : à refaire sur les fichiers téléchargés avant intégration ; ne pas présumer de l'absence de personnes à partir du seul nom ou de la description.
 - Hébergement local ou sur CDN contrôlé par BA Labs : en attente.
 - Intégration dans la boutique : non effectuée.
 - Contrôle des crédits visibles et test navigateur : en attente.
