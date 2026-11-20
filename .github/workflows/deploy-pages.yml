@@ -94,6 +94,10 @@ jobs:
       - name: Verify storefront publication
         run: curl --fail --silent --show-error --output /dev/null --write-out 'Storefront HTTP %{http_code} (%{content_type})\n' https://balabs-biotech.github.io/BA-lab/store/index.html
 
+      - name: Check out repository for published storefront test
+        uses: actions/checkout@v4
+
+
       - name: Set up Node.js for ecosystem browser regression
         uses: actions/setup-node@v4
         with:
@@ -118,9 +122,6 @@ jobs:
           path: artifacts/vernpixi-primary/
           if-no-files-found: ignore
           retention-days: 7
-      - name: Check out repository for published storefront test
-        uses: actions/checkout@v4
-
       - name: Set up Node.js for published storefront test
         uses: actions/setup-node@v4
         with:
