@@ -31,6 +31,7 @@ assert.ok(js.includes('priceDzd:5000') && js.includes('Prix envisagé · à conf
 assert.ok(js.includes("family:'spawn'") && js.includes("filterSpawn:'Grain spawn'"), 'Grain spawn must have a distinct localized catalogue filter');
 assert.ok(html.includes('id="copyRequest"') && js.includes('navigator.clipboard.writeText(requestText)'), 'The guest selection must be copyable as a request without submitting personal data');
 assert.ok(js.includes('balabs-store-cart') && js.includes('safeGet') && js.includes('safeSet'), 'Cart and preferences must use guarded local storage');
+assert.ok(js.includes('Number.isInteger(Number(quantity))') && js.includes('Number(quantity)<=100') && js.includes('Math.min(100,(cart[id]||0)+1)'), 'Persisted cart quantities must be sanitized and capped at the server-side maximum');
 assert.ok(js.includes("const privacySettings=$('#privacySettings');if(privacySettings)privacySettings.addEventListener"), 'Optional privacy settings control must not stop storefront initialization when absent');
 assert.ok(js.includes('prefers-reduced-motion') && js.includes('IntersectionObserver'), 'Motion must respect reduced-motion preference and progressive reveal');
 assert.ok(html.includes('id="cartDrawer" role="dialog" aria-modal="false"') && html.includes('id="requestModal" aria-hidden="true" role="dialog" aria-modal="true"'), 'Cart and request surfaces must expose dialog semantics');
