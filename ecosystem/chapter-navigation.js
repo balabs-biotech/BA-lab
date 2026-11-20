@@ -33,32 +33,32 @@
  const svgNS='http://www.w3.org/2000/svg';
  const somaPoints=[{x:112,y:42},{x:139,y:170},{x:91,y:300},{x:132,y:430},{x:106,y:558}];
  const axonPath='M112 42 C68 87 178 121 139 170 S55 251 91 300 S181 383 132 430 S60 516 106 558';
- let dendritePaths='',meshPaths='';
+ let dendritePaths='';
  const rng=seed=>()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+ // Five distinct colonisation centres. Each emits a small number of tapered,
+ // irregular hyphae; only a few tips fork. No decorative cross-hatching.
  somaPoints.forEach((p,i)=>{
-  const rand=rng(711+i*997);
-  for(let k=0;k<11;k++){
-   const angle=Math.PI*2*k/11+(rand()-.5)*.32,reach=34+rand()*43;
-   const x1=p.x+Math.cos(angle)*reach*.52,y1=p.y+Math.sin(angle)*reach*.52;
-   const x2=p.x+Math.cos(angle)*reach,y2=p.y+Math.sin(angle)*reach;
-   const bend=(rand()-.5)*19,mx=(p.x+x2)/2-Math.sin(angle)*bend,my=(p.y+y2)/2+Math.cos(angle)*bend;
-   dendritePaths+='<path d="M'+p.x+' '+p.y+' Q'+mx.toFixed(1)+' '+my.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1)+'"/>';
-   [-1,1].forEach(side=>{
-    const ba=angle+side*(.48+rand()*.5),bl=13+rand()*24,bx=x1+Math.cos(ba)*bl,by=y1+Math.sin(ba)*bl;
-    const cx=x1+Math.cos(ba)*bl*.55-Math.sin(ba)*4,cy=y1+Math.sin(ba)*bl*.55+Math.cos(ba)*4;
-    dendritePaths+='<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+bx.toFixed(1)+' '+by.toFixed(1)+'"/>';
-    if(rand()>.34){const ca=ba+(rand()-.5)*.8,cl=10+rand()*15,ex=bx+Math.cos(ca)*cl,ey=by+Math.sin(ca)*cl;dendritePaths+='<path d="M'+bx.toFixed(1)+' '+by.toFixed(1)+' Q'+(bx+Math.cos(ca)*cl*.5).toFixed(1)+' '+(by+Math.sin(ca)*cl*.5).toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'"/>';}
-   });
+  const rand=rng(1907+i*313),rays=7;
+  for(let k=0;k<rays;k++){
+   const angle=Math.PI*2*k/rays+(rand()-.5)*.38;
+   const reach=25+rand()*17;
+   const bend=(rand()-.5)*15;
+   const mx=p.x+Math.cos(angle)*reach*.55-Math.sin(angle)*bend;
+   const my=p.y+Math.sin(angle)*reach*.55+Math.cos(angle)*bend;
+   const ex=p.x+Math.cos(angle)*reach,ey=p.y+Math.sin(angle)*reach;
+   dendritePaths+='<path d="M'+p.x+' '+p.y+' Q'+mx.toFixed(1)+' '+my.toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'"/>';
+   if(k%2===0){
+    const fork=reach*.68,fx=p.x+Math.cos(angle)*fork,fy=p.y+Math.sin(angle)*fork;
+    [-1,1].forEach(side=>{
+     const a=angle+side*(.38+rand()*.22),len=12+rand()*10;
+     const tx=fx+Math.cos(a)*len,ty=fy+Math.sin(a)*len;
+     const cx=fx+Math.cos(a)*len*.55-Math.sin(a)*3,cy=fy+Math.sin(a)*len*.55+Math.cos(a)*3;
+     dendritePaths+='<path d="M'+fx.toFixed(1)+' '+fy.toFixed(1)+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+tx.toFixed(1)+' '+ty.toFixed(1)+'"/>';
+    });
+   }
   }
  });
- for(let i=0;i<somaPoints.length-1;i++){
-  const p=somaPoints[i],q=somaPoints[i+1],mid=(p.y+q.y)/2;
-  for(let j=0;j<6;j++){
-   const x1=22+j*38+(i%2)*7,x2=28+j*35+((i+1)%2)*8,y1=p.y+45+(j%3)*15,y2=q.y-43-(j%2)*16,cx=(x1+x2)/2+(j%2?22:-22),cy=mid+(j-2)*12;
-   meshPaths+='<path d="M'+x1+' '+y1+' C'+cx+' '+(cy-22)+' '+(cx-12)+' '+(cy+22)+' '+x2+' '+y2+'"/>';
-  }
- }
- const myelin=somaPoints.slice(0,-1).map((p,i)=>{const q=somaPoints[i+1],x=(p.x+q.x)/2,y=(p.y+q.y)/2;return '<path d="M'+(x-5)+' '+(y-7)+'q8 7 10 14 M'+(x+1)+' '+(y-9)+'q8 7 10 14"/>';}).join('');
+ const myelin=somaPoints.slice(0,-1).map((p,i)=>{const q=somaPoints[i+1],x=(p.x+q.x)/2,y=(p.y+q.y)/2;return '<path d="M'+(x-4)+' '+(y-6)+'q6 6 8 12"/>';}).join('');
  rail.innerHTML='<svg class="neural-network" viewBox="0 0 240 600" preserveAspectRatio="none" aria-hidden="true"><g class="network-anastomoses">'+meshPaths+'</g><g class="dendrites">'+dendritePaths+'</g><path id="neural-axon" class="axon-base" d="'+axonPath+'"/><path class="axon-progress" d="'+axonPath+'"/><g class="myelin">'+myelin+'</g><g class="neuron-bodies">'+somaPoints.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="7.5"/>').join('')+'</g><g class="axon-terminals">'+somaPoints.slice(1).map(p=>'<circle cx="'+p.x+'" cy="'+(p.y-12)+'" r="2.2"/>').join('')+'</g><circle class="neural-pulse" r="3"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#neural-axon"/></animateMotion></circle></svg>';
  const railNodes=document.createElement('div');railNodes.className='neural-hitareas';
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='neural-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.setAttribute('aria-label',(g.label.fr||g.id)+' — '+(i+1));b.style.setProperty('--node-y',[7,28.3,50,71.7,93][i]+'%');b.style.setProperty('--node-x',[46.7,57.9,37.9,55,44.2][i]+'%');b.innerHTML='<span class="neural-node-core"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
