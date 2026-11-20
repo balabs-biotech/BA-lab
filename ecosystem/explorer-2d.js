@@ -136,8 +136,21 @@ function syncUniverseRail(n){
 function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
 function hit(x,y){
- let found=null,best=22;
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
+ const hitBoxes=JSON.parse(canvas.dataset.visibleNodeHitBoxes||"{}");
+ // Pixi labels are offset from their anchor points. Test the full rendered
+ // label rectangle first so clicking a visible resource title activates it.
+ let labelHit=null,labelArea=Infinity;
+ for(const n of nodes){
+  if(!visibleLabels.has(n.id))continue;
+  const box=hitBoxes[n.id];if(!box)continue;
+  if(x>=box.left-8&&x<=box.right+8&&y>=box.top-6&&y<=box.bottom+6){
+   const area=(box.right-box.left)*(box.bottom-box.top);
+   if(area<labelArea){labelHit=n;labelArea=area;}
+  }
+ }
+ if(labelHit)return labelHit;
+ let found=null,best=22;
  const labelZoom=[0,.72,1.3,2.55,4.3];
  for(const n of nodes){
   const threshold=labelZoom[Math.min(n.level,labelZoom.length-1)]||0;
