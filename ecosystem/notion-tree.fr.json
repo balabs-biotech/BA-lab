@@ -1,8 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "fr",
-  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
+  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
   "domains": [
     {
       "id": "myco",
@@ -18,7 +18,7 @@
           "children": [
             {
               "id": "myco-pleurotus",
-              "title": "Pleurotus — espèces et ressources cultivées",
+              "title": "Pleurotes et ressources associées",
               "notionId": "40073152f17181d1822cfb0e92d55485",
               "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485",
               "description": "Collection de fiches sur les pleurotes, distinguant les repères biologiques des ressources et désignations de culture. Un nom de travail ne suffit pas à confirmer l’identité ni les performances d’une souche.",
@@ -131,7 +131,7 @@
             },
             {
               "id": "myco-other-fungi",
-              "title": "Autres champignons cultivés et étudiés",
+              "title": "Autres champignons",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
               "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a",
               "description": "Fiches consacrées à d’autres champignons étudiés ou cultivés, avec des repères biologiques et des informations générales. Cette collection ne constitue pas un inventaire de cultures validées ou disponibles.",
@@ -226,11 +226,12 @@
           "title": "Culture & multiplication",
           "notionId": "3e273152f171817c82bdee3cf1c68bb8",
           "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8",
-          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert."
+          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert.",
+          "children": []
         },
         {
           "id": "myco-interactions",
-          "title": "Mycorhizes & interactions biologiques",
+          "title": "Champignons associés aux racines",
           "notionId": "3e273152f17181c88bbbe98171594535",
           "url": "https://app.notion.com/p/3e273152f17181c88bbbe98171594535",
           "children": [
@@ -356,7 +357,8 @@
           "title": "Applications mycologiques",
           "notionId": "3e273152f1718144bb67d07e93c3aa2d",
           "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
-          "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées."
+          "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées.",
+          "children": []
         }
       ],
       "description": "Explorer les champignons cultivés ou étudiés par BA Labs, leurs ressources biologiques, leurs méthodes de multiplication et leurs applications.",
@@ -392,35 +394,40 @@
               "title": "Trichoderma hamatum — fiche d’organisme",
               "notionId": "3ff73152f171816bb083c55a9a51cd2b",
               "url": "https://app.notion.com/p/3ff73152f171816bb083c55a9a51cd2b",
-              "description": "Fiche de Trichoderma hamatum : champignon filamenteux étudié pour ses interactions avec les microorganismes et les plantes. Les caractéristiques observées dépendent de la souche et de son environnement."
+              "description": "Fiche de Trichoderma hamatum : champignon filamenteux étudié pour ses interactions avec les microorganismes et les plantes. Les caractéristiques observées dépendent de la souche et de son environnement.",
+              "children": []
             },
             {
               "id": "bio-organism-trichoderma-harzianum",
               "title": "Trichoderma harzianum — fiche d’organisme",
               "notionId": "3ff73152f17181a8871ffd7837a160df",
               "url": "https://app.notion.com/p/3ff73152f17181a8871ffd7837a160df",
-              "description": "Fiche de Trichoderma harzianum, espèce de champignon filamenteux dont certaines souches sont étudiées pour leurs interactions biologiques. Le nom d’espèce ne prédit pas à lui seul les propriétés d’une ressource."
+              "description": "Fiche de Trichoderma harzianum, espèce de champignon filamenteux dont certaines souches sont étudiées pour leurs interactions biologiques. Le nom d’espèce ne prédit pas à lui seul les propriétés d’une ressource.",
+              "children": []
             },
             {
               "id": "bio-organism-trichoderma-koningii",
               "title": "Trichoderma koningii — fiche d’organisme",
               "notionId": "3ff73152f1718169ab7dfe0417a63cbc",
               "url": "https://app.notion.com/p/3ff73152f1718169ab7dfe0417a63cbc",
-              "description": "Repères sur Trichoderma koningii, champignon filamenteux présent dans les environnements terrestres et étudié notamment pour ses enzymes et ses interactions microbiennes."
+              "description": "Repères sur Trichoderma koningii, champignon filamenteux présent dans les environnements terrestres et étudié notamment pour ses enzymes et ses interactions microbiennes.",
+              "children": []
             },
             {
               "id": "bio-organism-trichoderma-longibrachiatum",
               "title": "Trichoderma longibrachiatum — fiche d’organisme",
               "notionId": "3ff73152f17181598282ef83b40dbf7a",
               "url": "https://app.notion.com/p/3ff73152f17181598282ef83b40dbf7a",
-              "description": "Fiche de Trichoderma longibrachiatum, champignon filamenteux connu pour sa production d’enzymes extracellulaires et étudié dans des contextes de transformation de biomasse."
+              "description": "Fiche de Trichoderma longibrachiatum, champignon filamenteux connu pour sa production d’enzymes extracellulaires et étudié dans des contextes de transformation de biomasse.",
+              "children": []
             },
             {
               "id": "bio-organism-trichoderma-reesei",
               "title": "Trichoderma reesei — fiche d’organisme",
               "notionId": "3ff73152f1718184bcacee1fac9f6aba",
               "url": "https://app.notion.com/p/3ff73152f1718184bcacee1fac9f6aba",
-              "description": "Fiche de Trichoderma reesei, organisme de référence en biotechnologie industrielle pour ses enzymes impliquées dans la dégradation de composants de la biomasse végétale."
+              "description": "Fiche de Trichoderma reesei, organisme de référence en biotechnologie industrielle pour ses enzymes impliquées dans la dégradation de composants de la biomasse végétale.",
+              "children": []
             },
             {
               "id": "bio-organism-bacillus",
@@ -540,7 +547,8 @@
               "title": "PGPR — Bactéries associées aux racines et potentiel agronomique",
               "notionId": "3ff73152f17181cf8346d696db59ae79",
               "url": "https://app.notion.com/p/3ff73152f17181cf8346d696db59ae79",
-              "description": "Présentation des PGPR, bactéries associées à la rhizosphère pouvant contribuer, selon la souche et les conditions, à la nutrition et aux interactions racinaires des plantes."
+              "description": "Présentation des PGPR, bactéries associées à la rhizosphère pouvant contribuer, selon la souche et les conditions, à la nutrition et aux interactions racinaires des plantes.",
+              "children": []
             }
           ],
           "description": "Présentation des microorganismes étudiés par BA Labs, notamment Bacillus, Trichoderma et des ressources bactériennes ; l’intérêt dépend de la souche, du support et de l’usage étudié."
@@ -550,28 +558,32 @@
           "title": "Biostimulants & solutions biologiques",
           "notionId": "3e273152f17181218800c2a6011b054b",
           "url": "https://app.notion.com/p/3e273152f17181218800c2a6011b054b",
-          "description": "Axe de recherche sur les solutions biologiques destinées aux systèmes agricoles, combinant selon les essais microorganismes, matières organiques et supports. Les formulations expérimentales ne sont pas présentées comme des produits validés."
+          "description": "Axe de recherche sur les solutions biologiques destinées aux systèmes agricoles, combinant selon les essais microorganismes, matières organiques et supports. Les formulations expérimentales ne sont pas présentées comme des produits validés.",
+          "children": []
         },
         {
           "id": "bio-substrates",
           "title": "Substrats & supports biologiques",
           "notionId": "3e273152f17181e7ab61c84b44557e9c",
           "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c",
-          "description": "Étude des substrats comme systèmes biologiques : composition, structure, humidité et microbiote influencent la colonisation et les transformations. Les supports sont suivis de leur préparation à leur application."
+          "description": "Étude des substrats comme systèmes biologiques : composition, structure, humidité et microbiote influencent la colonisation et les transformations. Les supports sont suivis de leur préparation à leur application.",
+          "children": []
         },
         {
           "id": "bio-fermentation",
           "title": "Fermentation biologique",
           "notionId": "3e273152f17181929dcbe5581e2ebd48",
           "url": "https://app.notion.com/p/3e273152f17181929dcbe5581e2ebd48",
-          "description": "Travaux sur les cultures liquides et les procédés de fermentation : formulation, inoculation, suivi des variables, récolte et caractérisation. Une culture liquide n’est pas automatiquement un procédé fermentaire maîtrisé."
+          "description": "Travaux sur les cultures liquides et les procédés de fermentation : formulation, inoculation, suivi des variables, récolte et caractérisation. Une culture liquide n’est pas automatiquement un procédé fermentaire maîtrisé.",
+          "children": []
         },
         {
           "id": "bio-micropropagation",
           "title": "Micropropagation végétale",
           "notionId": "3e273152f17181f29500f85586dac04c",
           "url": "https://app.notion.com/p/3e273152f17181f29500f85586dac04c",
-          "description": "Expérimentation de systèmes de micropropagation végétale contrôlée, notamment l’architecture Twin Bottle, avec une attention portée à la reproductibilité, aux échanges gazeux et à l’environnement de culture."
+          "description": "Expérimentation de systèmes de micropropagation végétale contrôlée, notamment l’architecture Twin Bottle, avec une attention portée à la reproductibilité, aux échanges gazeux et à l’environnement de culture.",
+          "children": []
         }
       ],
       "description": "Découvrir les microorganismes d’intérêt agricole, les biostimulants, les substrats biologiques et les procédés de fermentation.",
@@ -595,151 +607,24 @@
           "title": "Instrumentation & capteurs",
           "notionId": "3e273152f17181f58c57c93b4c8c790f",
           "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f",
-          "description": "Capteurs et microcontrôleurs envisagés pour suivre les paramètres des systèmes expérimentaux ; le déploiement opérationnel reste à distinguer des études."
+          "description": "Capteurs et microcontrôleurs envisagés pour suivre les paramètres des systèmes expérimentaux ; le déploiement opérationnel reste à distinguer des études.",
+          "children": []
         },
         {
           "id": "iot-automation",
           "title": "Automatisation des cultures",
           "notionId": "3e273152f171818a8ffff2585126f904",
           "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904",
-          "description": "Étude du pilotage des conditions de culture : renouvellement d’air, humidification, température et éclairage."
+          "description": "Étude du pilotage des conditions de culture : renouvellement d’air, humidification, température et éclairage.",
+          "children": []
         },
         {
           "id": "iot-traceability",
           "title": "Traçabilité & données",
           "notionId": "3e273152f171811db9a6f46cc9959da4",
           "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
-          "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats."
-        },
-        {
-          "id": "iot-environment",
-          "title": "Mesure des environnements",
-          "description": "Surveiller les paramètres physiques qui conditionnent les systèmes biologiques.",
-          "children": [
-            {
-              "id": "iot-temperature",
-              "title": "Température",
-              "description": "Suivre les gradients, les cycles et la stabilité thermique des espaces de culture.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidity",
-              "title": "Humidité & hygrométrie",
-              "description": "Observer l’humidité de l’air et les conditions de disponibilité en eau.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-gas",
-              "title": "Gaz & renouvellement d’air",
-              "description": "Étudier la ventilation et les échanges gazeux dans les enceintes de culture.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-instrumentation",
-          "title": "Architecture instrumentale",
-          "description": "Assembler des capteurs, interfaces et unités de commande adaptés aux essais.",
-          "children": [
-            {
-              "id": "iot-sensors-types",
-              "title": "Capteurs & sondes",
-              "description": "Comparer les technologies de mesure, leurs plages, leur précision et leurs limites.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-microcontrollers",
-              "title": "Microcontrôleurs",
-              "description": "Explorer les interfaces de lecture, les entrées-sorties et les unités embarquées.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-power",
-              "title": "Alimentation & sécurité",
-              "description": "Documenter l’alimentation, la protection électrique et la fiabilité des montages.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-control",
-          "title": "Pilotage des cultures",
-          "description": "Étudier le contrôle progressif des conditions de culture sans confondre prototype et système opérationnel.",
-          "children": [
-            {
-              "id": "iot-airflow",
-              "title": "Ventilation & flux d’air",
-              "description": "Concevoir le suivi et le pilotage du renouvellement d’air.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidification",
-              "title": "Humidification",
-              "description": "Étudier la régulation de l’humidité et la distribution de l’eau.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-lighting",
-              "title": "Éclairage & cycles",
-              "description": "Définir des scénarios d’éclairage et de temporisation selon les essais.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-data",
-          "title": "Acquisition & traitement des données",
-          "description": "Transformer les signaux mesurés en séries temporelles exploitables et comparables.",
-          "children": [
-            {
-              "id": "iot-logging",
-              "title": "Enregistrement continu",
-              "description": "Horodater les mesures et conserver les données brutes avec leur contexte.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-dashboard",
-              "title": "Visualisation & alertes",
-              "description": "Représenter les tendances, seuils et écarts pour faciliter le suivi.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-quality",
-              "title": "Qualité des mesures",
-              "description": "Repérer dérives, valeurs manquantes, étalonnage et incertitudes.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-traceability-detail",
-          "title": "Traçabilité expérimentale",
-          "description": "Relier chaque mesure à une culture, un lot, un protocole et une période d’essai.",
-          "children": [
-            {
-              "id": "iot-batch-links",
-              "title": "Lots & cultures",
-              "description": "Associer les relevés aux identifiants de lots et aux étapes de culture.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-protocol-links",
-              "title": "Protocoles & événements",
-              "description": "Consigner les changements de consigne, interventions et incidents.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-comparison",
-              "title": "Historique & comparaisons",
-              "description": "Comparer les cycles expérimentaux sans perdre les conditions initiales.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
+          "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats.",
+          "children": []
         }
       ],
       "description": "Suivre les systèmes de mesure, les capteurs et l’automatisation appliqués aux cultures et aux expérimentations.",
@@ -781,35 +666,40 @@
           "title": "Équipements expérimentaux",
           "notionId": "3e273152f1718167be9fc11cf0b00386",
           "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386",
-          "description": "Équipements conçus ou étudiés pour les besoins de recherche : fermentation, préparation des substrats, culture et instrumentation."
+          "description": "Équipements conçus ou étudiés pour les besoins de recherche : fermentation, préparation des substrats, culture et instrumentation.",
+          "children": []
         },
         {
           "id": "soil-preparation",
           "title": "Préparation des substrats",
           "notionId": "3e273152f171812e9dd5f9df0b269046",
           "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046",
-          "description": "Préparation des supports biologiques selon leur granulométrie, leur humidité, leur structure et leur fonction expérimentale."
+          "description": "Préparation des supports biologiques selon leur granulométrie, leur humidité, leur structure et leur fonction expérimentale.",
+          "children": []
         },
         {
           "id": "soil-prototyping",
           "title": "Prototypage & fabrication",
           "notionId": "3e273152f17181ffa96cee6f70fb11e3",
           "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3",
-          "description": "Conception et adaptation de dispositifs, de l’idée initiale à la fabrication et aux essais lorsque le projet le permet."
+          "description": "Conception et adaptation de dispositifs, de l’idée initiale à la fabrication et aux essais lorsque le projet le permet.",
+          "children": []
         },
         {
           "id": "soil-fermenters",
           "title": "Fermenteurs & procédés pilotes",
           "notionId": "3e273152f17181ec9ee4dcf0c18a2abc",
           "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc",
-          "description": "Architectures de fermentation modulaires étudiées comme outils de R&D ; les conceptions ne sont pas nécessairement construites ou validées."
+          "description": "Architectures de fermentation modulaires étudiées comme outils de R&D ; les conceptions ne sont pas nécessairement construites ou validées.",
+          "children": []
         },
         {
           "id": "soil-integrated-instrumentation",
           "title": "Instrumentation intégrée",
           "notionId": "3e273152f171818bae74c015daa192cd",
           "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
-          "description": "Relier les équipements, les capteurs, les données et les actions pour rendre les procédés biologiques observables."
+          "description": "Relier les équipements, les capteurs, les données et les actions pour rendre les procédés biologiques observables.",
+          "children": []
         }
       ],
       "description": "Présenter les équipements, matériaux, substrats et procédés développés pour les essais agrotechniques et les prototypes.",
@@ -824,7 +714,7 @@
     },
     {
       "id": "lab",
-      "title": "LABORATOIRE & EXPÉRIMENTATION",
+      "title": "LE LABORATOIRE",
       "notionId": "3e273152f17181e2aeaad4ed4ac3f230",
       "url": "https://app.notion.com/p/3e273152f17181e2aeaad4ed4ac3f230",
       "children": [
@@ -833,7 +723,8 @@
           "title": "Expérimentation végétale",
           "notionId": "3e273152f171817a81d6f806b3804d6b",
           "url": "https://app.notion.com/p/3e273152f171817a81d6f806b3804d6b",
-          "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux."
+          "description": "Étude de la réponse des plantes aux supports, à l’eau et aux conditions de culture dans des systèmes expérimentaux.",
+          "children": []
         }
       ],
       "description": "Découvrir les espaces et démarches d’expérimentation, notamment les essais végétaux et les dispositifs de laboratoire.",
@@ -848,7 +739,7 @@
     },
     {
       "id": "products",
-      "title": "PRODUITS & RESSOURCES BIOLOGIQUES",
+      "title": "Produits & ressources biologiques",
       "notionId": "3ec73152f1718125b1a7c58bc58ebcaa",
       "url": "https://app.notion.com/p/3ec73152f1718125b1a7c58bc58ebcaa",
       "children": [
@@ -857,35 +748,40 @@
           "title": "Catalogue public — Ressources publiables",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "description": "Point d’entrée du catalogue public : ressources et produits dont les informations sont destinées aux visiteurs. Les prototypes, essais et références disponibles doivent rester clairement distingués."
+          "description": "Point d’entrée du catalogue public : ressources et produits dont les informations sont destinées aux visiteurs. Les prototypes, essais et références disponibles doivent rester clairement distingués.",
+          "children": []
         },
         {
           "id": "products-wa-agar",
           "title": "WA — gélose à l’eau prête à l’emploi",
           "notionId": "3f473152f171812a814dd7b951786313",
           "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
-          "description": "WA (Water Agar) : gélose à l’eau pauvre en nutriments, coulée en boîte de Petri. Vente sur demande selon le lot ; quantité, conditionnement, prix et conservation sont confirmés avant fourniture."
+          "description": "WA (Water Agar) : gélose à l’eau pauvre en nutriments, coulée en boîte de Petri. Vente sur demande selon le lot ; quantité, conditionnement, prix et conservation sont confirmés avant fourniture.",
+          "children": []
         },
         {
           "id": "products-myco-start",
           "title": "Myco Start — prototype de kit de démarrage mycologique",
           "notionId": "3ff73152f1718157b723ddd66e88e6b1",
           "url": "https://app.notion.com/p/3ff73152f1718157b723ddd66e88e6b1",
-          "description": "Prototype pédagogique en développement — non disponible à la vente. Le contenu, la ressource attribuée, les contrôles qualité et les conditions de conservation restent à définir et à vérifier."
+          "description": "Prototype pédagogique en développement — non disponible à la vente. Le contenu, la ressource attribuée, les contrôles qualité et les conditions de conservation restent à définir et à vérifier.",
+          "children": []
         },
         {
           "id": "products-myco-plate",
-          "title": "Myco Plate — prototype de kit d’observation sur gélose",
+          "title": "Myco Plate — prototype de kit d'observation sur gélose",
           "notionId": "3ff73152f171817c8255e44fed840560",
           "url": "https://app.notion.com/p/3ff73152f171817c8255e44fed840560",
-          "description": "Prototype de kit d’observation sur gélose — non disponible à la vente. Le support, la ressource biologique, la traçabilité du lot et les contrôles restent à définir et à vérifier."
+          "description": "Prototype de kit d’observation sur gélose — non disponible à la vente. Le support, la ressource biologique, la traçabilité du lot et les contrôles restent à définir et à vérifier.",
+          "children": []
         },
         {
           "id": "products-qr-guide",
-          "title": "Guide de démarrage Myco Start / Myco Plate",
+          "title": "QR — Guide de démarrage Myco Start / Myco Plate",
           "notionId": "3fb73152f171815da580d60596e9e8b0",
           "url": "https://app.notion.com/p/3fb73152f171815da580d60596e9e8b0",
-          "description": "Guide d’accompagnement accessible par QR pour comprendre et suivre les prototypes Myco Start et Myco Plate."
+          "description": "Guide d’accompagnement accessible par QR pour comprendre et suivre les prototypes Myco Start et Myco Plate.",
+          "children": []
         },
         {
           "id": "fr-products-reference-collection",
@@ -904,7 +800,7 @@
             },
             {
               "id": "fr-products-pleurotus",
-              "title": "Pleurotus — espèces et ressources cultivées",
+              "title": "Pleurotes et ressources associées",
               "notionId": "40073152f17181d1822cfb0e92d55485",
               "url": "https://app.notion.com/p/40073152f17181d1822cfb0e92d55485",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -913,7 +809,7 @@
             },
             {
               "id": "fr-products-other-fungi",
-              "title": "Autres champignons cultivés et étudiés",
+              "title": "Autres champignons",
               "notionId": "40073152f171813e9a83fb6e0a8c474a",
               "url": "https://app.notion.com/p/40073152f171813e9a83fb6e0a8c474a",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -931,7 +827,7 @@
             },
             {
               "id": "fr-products-mycorrhizae",
-              "title": "Mycorhizes & interactions biologiques",
+              "title": "Champignons associés aux racines",
               "notionId": "3e273152f17181c88bbbe98171594535",
               "url": "https://app.notion.com/p/3e273152f17181c88bbbe98171594535",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -1219,7 +1115,7 @@
     },
     {
       "id": "work",
-      "title": "RECHERCHE & DÉVELOPPEMENT",
+      "title": "R&D",
       "notionId": "3e273152f17181d8b65af8f6b7de0b0b",
       "url": "https://app.notion.com/p/3e273152f17181d8b65af8f6b7de0b0b",
       "children": [
@@ -1235,7 +1131,8 @@
               "notionId": "3e973152f171816781fbf56674cfe55c",
               "url": "https://app.notion.com/p/3e973152f171816781fbf56674cfe55c",
               "description": "Repères de maturité et niveaux de preuve : distinguer hypothèse, conception, réalisation, observation, répétition et validation.",
-              "kind": "reference"
+              "kind": "reference",
+              "children": []
             }
           ],
           "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
@@ -1245,14 +1142,16 @@
           "title": "Mesure & reproductibilité",
           "notionId": "3e273152f1718119b0f7eeeb897f206a",
           "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
-          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité."
+          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité.",
+          "children": []
         },
         {
           "id": "iot-prototypes",
           "title": "Prototypes & essais",
           "notionId": "3e273152f1718174904bd0043fc5d976",
           "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
-          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement."
+          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement.",
+          "children": []
         },
         {
           "id": "work-methodology",
@@ -1298,7 +1197,7 @@
       "children": [
         {
           "id": "evidence-resource-1",
-          "title": "Travaux documentés",
+          "title": "Travaux & réalisations documentés",
           "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
           "children": [],
           "kind": "reference",
@@ -1306,7 +1205,7 @@
         },
         {
           "id": "evidence-resource-2",
-          "title": "Méthodologie de R&D",
+          "title": "Méthodologie R&D",
           "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
           "children": [],
           "kind": "reference",
