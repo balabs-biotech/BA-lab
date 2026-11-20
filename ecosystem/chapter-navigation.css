@@ -734,15 +734,15 @@ body>.chapter-rail.neural-rail{
 
 
 
-/* v47 — second measured mobile shift: another 44px below v46.
-   Preserve the rail dimensions, stacking and transparency. */
+/* v48 — move the complete mobile mycelium another 44px down.
+   Keep rail size, stacking and transparency unchanged. */
 @media(max-width:760px){
  body>.chapter-rail.neural-rail{
-  top:calc(50% + 100px)!important;
+  top:calc(50% + 144px)!important;
   height:min(60vh,430px)!important;
   transform:translateY(-50%)!important;
  }
  html[dir="rtl"] body>.chapter-rail.neural-rail{
-  top:calc(50% + 100px)!important;
+  top:calc(50% + 144px)!important;
  }
 }
