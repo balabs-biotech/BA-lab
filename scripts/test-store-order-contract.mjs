@@ -10,6 +10,10 @@ const retryMigration = readFileSync("supabase/migrations/20261120000100_store_or
 const edge = readFileSync("supabase/functions/create-store-order/index.ts", "utf8");
 const readme = readFileSync("store/README.md", "utf8");
 const syncWorker = readFileSync("supabase/functions/store-order-sync/index.ts", "utf8");
+const legalPages = ["legal.html", "privacy.html", "terms.html", "shipping.html"].map(file => readFileSync("store/" + file, "utf8"));
+const legalPlaceholdersRemain = legalPages.some(page => /\\[[A-ZÀ-ÖØ-Þ0-9_ ,./-]+\\]/.test(page));
+const legalDraftLanguageRemains = legalPages.some(page => /version de travail|projet de conditions|à compléter|à renseigner|non définitif|canevas de travail/i.test(page));
+
 
 
 assert.ok(html.includes('class="request-layout"') && html.includes('id="requestSummary"'), "Enquiry layout must show selected items beside the customer form");
@@ -18,6 +22,9 @@ assert.ok(js.includes("create-store-order") && !js.includes("functions/v1/store-
 assert.ok(js.includes("request_id:activeRequestId"), "Browser must send a stable idempotency reference");
 assert.ok(js.includes("const STORE_ORDER_ENABLED=false"), "Guest submission must remain disabled until end-to-end verification");
 assert.ok(js.includes("const TURNSTILE_SITE_KEY=''"), "The public Turnstile site key must remain blank until provisioned");
+assert.ok(legalPages.every(page => page.includes('name="robots" content="noindex, nofollow"')), "Incomplete legal and privacy drafts must remain excluded from search indexing");
+assert.ok(!/const STORE_ORDER_ENABLED=true/.test(js) || (!legalPlaceholdersRemain && !legalDraftLanguageRemains), "Public order intake cannot be enabled while legal identity, privacy, commercial or shipping pages remain drafts");
+
 assert.ok(html.includes('id="turnstileWidget"') && html.includes('frame-src https://challenges.cloudflare.com') && html.includes("script-src 'self' https://challenges.cloudflare.com"), "Turnstile mount and narrowly scoped CSP permissions must exist");
 assert.ok(js.includes("window.turnstile.render") && js.includes("turnstileToken,customer:") && js.includes("submitOrder.disabled=true"), "Guest submission must require a browser-verified Turnstile token");
 assert.ok(js.includes("if(!STORE_ORDER_ENABLED||!TURNSTILE_SITE_KEY)return;"), "Turnstile must not load while order intake is disabled or the site key is absent");
