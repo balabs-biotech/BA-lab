@@ -530,3 +530,14 @@ html[dir="rtl"] body>.chapter-rail.neural-rail{left:auto!important;right:max(3px
  .neural-network .axon-progress,.neural-node-core{transition:none!important}
  .neural-node.is-active .neural-node-core:after{animation:none!important;opacity:.4}
 }
+
+/* Neuron anatomy refinement: soma, branched dendrites, myelin and axon terminals. */
+body>.chapter-rail.neural-rail{width:42px!important}
+.neural-network .axon-base{stroke:#9eb5a455;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:none}
+.neural-network .axon-progress{stroke:#c87952;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1 3;filter:drop-shadow(0 0 3px #c87952aa)}
+.neural-network .dendrites{stroke:#a9b9a6b0;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none}
+.neural-network .myelin{fill:none;stroke:#b8c6ad88;stroke-width:4;stroke-linecap:round;opacity:.72}
+.neural-network .neuron-bodies circle{fill:#263b38;stroke:#d1d0c5;stroke-width:1.7;filter:drop-shadow(0 0 3px #a6b9a455)}
+.neural-network .axon-terminals circle{fill:#c87952;stroke:#e1c2a9;stroke-width:.8;filter:drop-shadow(0 0 3px #c87952)}
+.neural-network .neural-pulse{fill:#f2dfc5;filter:drop-shadow(0 0 5px #f2dfc5)}
+@media(max-width:760px){body>.chapter-rail.neural-rail{width:38px!important}}
