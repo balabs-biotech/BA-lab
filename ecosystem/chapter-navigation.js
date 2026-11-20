@@ -29,7 +29,7 @@
  const controls=document.createElement('div');controls.className='experience-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Navigation entre les espaces');
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
- const rail=document.createElement('div');rail.className='chapter-rail neural-rail';rail.setAttribute('role','group');rail.setAttribute('aria-label','Navigation neuronale des chapitres');
+ const rail=document.createElement('div');rail.className='chapter-rail neural-rail';rail.setAttribute('role','navigation');rail.setAttribute('aria-label','Navigation neuronale des chapitres');
  const svgNS='http://www.w3.org/2000/svg';
  rail.innerHTML='<svg class="neural-network" viewBox="0 0 100 600" preserveAspectRatio="none" aria-hidden="true"><path class="axon-base" d="M50 42 C18 105 82 150 50 175 C18 225 82 275 50 300 C18 350 82 400 50 425 C18 475 82 515 50 558"/><path class="axon-progress" d="M50 42 C18 105 82 150 50 175 C18 225 82 275 50 300 C18 350 82 400 50 425 C18 475 82 515 50 558"/><g class="dendrites"><path d="M50 65 C34 55 29 42 21 31 M34 55 L17 56 M21 31 L22 18 M50 65 C65 52 71 39 80 29 M71 39 L88 42 M80 29 L82 16 M50 185 C35 173 27 161 18 150 M27 161 L12 166 M18 150 L19 137 M50 185 C65 173 73 161 83 149 M73 161 L89 166 M83 149 L82 136 M50 310 C34 298 26 286 17 275 M26 286 L10 291 M17 275 L18 262 M50 310 C66 298 74 286 84 274 M74 286 L90 291 M84 274 L83 261 M50 435 C34 423 26 411 17 400 M26 411 L10 416 M17 400 L18 387 M50 435 C66 423 74 411 84 399 M74 411 L90 416 M84 399 L83 386 M50 550 C35 538 27 526 18 515 M27 526 L12 531 M18 515 L19 502 M50 550 C65 538 73 526 83 514 M73 526 L89 531 M83 514 L82 501"/></g><g class="neuron-nodes"><circle cx="50" cy="42" r="7"/><circle cx="50" cy="175" r="7"/><circle cx="50" cy="300" r="7"/><circle cx="50" cy="425" r="7"/><circle cx="50" cy="558" r="7"/></g><circle class="neural-pulse" cx="50" cy="42" r="3"/></svg>';
  const railNodes=document.createElement('div');railNodes.className='neural-hitareas';
@@ -87,7 +87,7 @@
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
   progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
-  rail.style.setProperty('--fill',(rawProgress/Math.max(1,pages.length-1)*100)+'%');rail.setAttribute('aria-valuenow',String(idx+1));rail.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
+  rail.style.setProperty('--active-index',String(idx));
   const activeLength=axonLength*(rawProgress/Math.max(1,pages.length-1));
   axon.style.strokeDashoffset=String(axonLength-activeLength);
   railNodes.querySelectorAll('.neural-node').forEach((node,i)=>{
