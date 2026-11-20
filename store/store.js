@@ -4,6 +4,7 @@ const STORE_PUBLISHABLE_KEY='sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992';
 const STORE_REMOTE_CATALOGUE_ENABLED=false;
 const STORE_ORDER_URL='https://axcouwiodqsauwnsiotn.supabase.co/functions/v1/create-store-order';
 const STORE_ORDER_ENABLED=false;
+const TURNSTILE_SITE_KEY='';
 let products=[
 {code:'BAL-LC-PPU-ETE-001',status:'on_request',family:'liquid',kind:'PLEUROTUS PULMONARIUS',symbol:'P.',titles:{fr:'LC — Pleurotus pulmonarius · été',en:'LC — Pleurotus pulmonarius · summer',ar:'مزرعة سائلة — Pleurotus pulmonarius · الصيف',pt:'LC — Pleurotus pulmonarius · verão'},descriptions:{fr:'Culture liquide de Pleurotus pulmonarius — désignation « été ».',en:'Pleurotus pulmonarius liquid culture — “summer” designation.',ar:'مزرعة سائلة من Pleurotus pulmonarius — تسمية «الصيف».',pt:'Cultura líquida de Pleurotus pulmonarius — designação «verão».'}},
 {code:'BAL-LC-PPU-HIV-001',status:'on_request',family:'liquid',kind:'PLEUROTUS PULMONARIUS',symbol:'P.',titles:{fr:'LC — Pleurotus pulmonarius · hiver',en:'LC — Pleurotus pulmonarius · winter',ar:'مزرعة سائلة — Pleurotus pulmonarius · الشتاء',pt:'LC — Pleurotus pulmonarius · inverno'},descriptions:{fr:'Culture liquide de Pleurotus pulmonarius — désignation « hiver ».',en:'Pleurotus pulmonarius liquid culture — “winter” designation.',ar:'مزرعة سائلة من Pleurotus pulmonarius — تسمية «الشتاء».',pt:'Cultura líquida de Pleurotus pulmonarius — designação «inverno».'}},
@@ -238,14 +239,28 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click'
 $('#catalogSearch').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();renderProducts()});
 $('#cartOpen').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#cartBackdrop').addEventListener('click',closeCart);$('#continueShopping').addEventListener('click',closeCart);$('#requestQuote').addEventListener('click',openRequest);$('#copyRequest').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(requestText);$('#copyRequest').textContent=t('copySuccess')}catch(_){$('#copyRequest').textContent=t('copyRequest')}});
 const orderForm=$('#orderForm'),orderStatus=$('#orderStatus'),submitOrder=$('#submitOrder');
-if(STORE_ORDER_ENABLED){submitOrder.disabled=false;orderStatus.textContent='';}else{orderForm.querySelectorAll('input,select,textarea,button[type="submit"]').forEach(el=>{el.disabled=true;});}
+let turnstileToken='',turnstileWidgetId=null;
+function loadTurnstile(){
+ if(!STORE_ORDER_ENABLED||!TURNSTILE_SITE_KEY)return;
+ const mount=$('#turnstileWidget');if(!mount)return;
+ mount.hidden=false;
+ const render=()=>{
+  if(!window.turnstile||turnstileWidgetId!==null)return;
+  turnstileWidgetId=window.turnstile.render(mount,{sitekey:TURNSTILE_SITE_KEY,action:'store_order',language,callback(token){turnstileToken=token;submitOrder.disabled=false;},'expired-callback'(){turnstileToken='';submitOrder.disabled=true;orderStatus.textContent=t('turnstileRequired');},'error-callback'(){turnstileToken='';submitOrder.disabled=true;orderStatus.textContent=t('turnstileUnavailable');}});
+ };
+ if(window.turnstile){render();return;}
+ const script=document.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;script.defer=true;script.onload=render;script.onerror=()=>{orderStatus.textContent=t('turnstileUnavailable');};document.head.appendChild(script);
+}
+if(STORE_ORDER_ENABLED){orderForm.querySelectorAll('input,select,textarea').forEach(el=>{el.disabled=false;});submitOrder.disabled=true;orderStatus.textContent=t('turnstileRequired');loadTurnstile();}
+else{orderForm.querySelectorAll('input,select,textarea,button[type="submit"]').forEach(el=>{el.disabled=true;});}
 orderForm.addEventListener('submit',async event=>{
  event.preventDefault();
  if(!STORE_ORDER_ENABLED){orderStatus.textContent=t('orderNotActive');return;}
  const entries=Object.entries(cart).filter(([,n])=>n>0);
  if(!entries.length){orderStatus.textContent=t('orderEmpty');return;}
+ if(!turnstileToken){orderStatus.textContent=t('turnstileRequired');return;}
  const f=new FormData(orderForm);
- const payload={request_id:activeRequestId,customer:{name:String(f.get('name')||'').trim(),phone:String(f.get('phone')||'').trim(),email:String(f.get('email')||'').trim(),organization:String(f.get('organization')||'').trim(),wilaya:String(f.get('wilaya')||'').trim(),deliveryMode:String(f.get('deliveryMode')||'À définir'),message:String(f.get('message')||'').trim()},items:entries.map(([code,quantity])=>({code,quantity})),locale:language,website:String(f.get('website')||'')};
+ const payload={request_id:activeRequestId,turnstileToken,customer:{name:String(f.get('name')||'').trim(),phone:String(f.get('phone')||'').trim(),email:String(f.get('email')||'').trim(),organization:String(f.get('organization')||'').trim(),wilaya:String(f.get('wilaya')||'').trim(),deliveryMode:String(f.get('deliveryMode')||'À définir'),message:String(f.get('message')||'').trim()},items:entries.map(([code,quantity])=>({code,quantity})),locale:language,website:String(f.get('website')||'')};
  submitOrder.disabled=true;orderStatus.textContent=t('orderSending');
  try{
   const response=await fetch(STORE_ORDER_URL,{method:'POST',headers:{'Content-Type':'application/json',apikey:STORE_PUBLISHABLE_KEY},credentials:'omit',body:JSON.stringify(payload)});
@@ -253,7 +268,7 @@ orderForm.addEventListener('submit',async event=>{
   if(!response.ok||!result.success)throw new Error('submission_failed');
   orderStatus.textContent=t('orderSuccess')+' — '+result.orderRef;cart={};saveCart();orderForm.reset();activeRequestId='';
  }catch(_){orderStatus.textContent=t('orderError');}
- finally{submitOrder.disabled=false;}
+ finally{turnstileToken='';if(window.turnstile&&turnstileWidgetId!==null)window.turnstile.reset(turnstileWidgetId);submitOrder.disabled=true;}
 });$('#requestClose').addEventListener('click',closeRequest);$('#requestBackdrop').addEventListener('click',closeRequest);function trapDialogFocus(event,dialog){const focusable=Array.from(dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(el=>el.getClientRects().length);if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#requestModal').classList.contains('is-open'))closeRequest();else if($('#cartDrawer').classList.contains('is-open'))closeCart();return}if(e.key==='Tab'){if($('#requestModal').classList.contains('is-open'))trapDialogFocus(e,$('#requestModal'));else if($('#cartDrawer').classList.contains('is-open'))trapDialogFocus(e,$('#cartDrawer'))}});
 $('#year').textContent=new Date().getFullYear();
