@@ -90,7 +90,7 @@ export async function createPixiRenderer(canvas){
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
   const rootCount=candidates.filter(c=>c.n.level===0).length;
   const labelBudget=rootCount+Math.min(52,Math.max(12,Math.round(14+scale*6)));
-  const occupied=[];let drawn=0;
+  const occupied=[];const hitBoxes={};let drawn=0;
   for(const {n,alpha} of candidates){
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
@@ -110,12 +110,14 @@ export async function createPixiRenderer(canvas){
    const y=clamp(rawY,56+anchorY*label.height,height-14-(1-anchorY)*label.height);
    label.position.set(x,y);label.alpha=Math.max(alpha,selected?0.76:0.88);label.visible=true;
    const box={left:x-anchorX*label.width,right:x+(1-anchorX)*label.width,top:y-anchorY*label.height,bottom:y+(1-anchorY)*label.height};
+   hitBoxes[n.id]=box;
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
    occupied.push(box);live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
   canvas.dataset.visibleNodeIds=JSON.stringify([...live]);
+  canvas.dataset.visibleNodeHitBoxes=JSON.stringify(hitBoxes);
   app.render();
  }
  return{render,resize,destroy:()=>app.destroy({removeView:false,children:true})};
