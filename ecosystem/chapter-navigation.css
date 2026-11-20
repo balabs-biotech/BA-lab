@@ -593,3 +593,16 @@ body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!impor
  .experience-page>.universe-index,.experience-page>.product-catalogue,
  .experience-page>section{scroll-margin-inline-start:8px}
 }
+
+
+/* Master motif pass: one authored hyphal colony, reused at every chapter node. */
+.chapter-rail .mycelium-unit{opacity:.9;pointer-events:none;overflow:visible;filter:drop-shadow(0 0 3px #9aafa222)}
+.chapter-rail .axon-base{stroke:#9aafa255;stroke-width:1.25;stroke-dasharray:1.5 5;fill:none;stroke-linecap:round}
+.chapter-rail .axon-progress{stroke:#b96b4d;stroke-width:2;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 3px #b96b4d66)}
+@media(max-width:760px){
+ .experience-page{padding-inline-start:42px!important;padding-inline-end:10px!important}
+ [dir=rtl] .experience-page{padding-inline-start:10px!important;padding-inline-end:42px!important}
+ .experience-page-label{margin-top:-5px!important;margin-bottom:12px!important;transform:translateY(-2px)}
+ .experience-page>.hero,.experience-page>.editorial-work,.experience-page>.scene,.experience-page>.universe-index,.experience-page>.product-catalogue,.experience-page>section{scroll-margin-top:8px}
+ .chapter-rail .mycelium-unit{opacity:.82}
+}
