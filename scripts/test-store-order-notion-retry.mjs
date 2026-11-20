@@ -28,4 +28,9 @@ assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|custom
 assert.ok(!/return Response\.json\([^\n]*(?:customer_name|customer_email|customer_phone)/.test(worker), "Worker response must not expose customer PII");
 assert.ok(intake.includes("notion_sync_next_attempt_at") || migration.includes("default (now() + interval '10 minutes')"), "New requests must have a delayed retry fallback if inline sync exits early");
 assert.ok(readme.includes("store-order-sync") && readme.includes("eight attempts") && readme.includes("service_role"), "Documentation must explain the secured retry worker and retry cap");
+
+const immediateMigration = readFileSync("supabase/migrations/20261120002000_store_order_sync_immediate_first_attempt.sql", "utf8");
+assert.ok(/alter column notion_sync_next_attempt_at set default pg_catalog\.now\(\)/.test(immediateMigration), "New requests must be eligible for the next worker cycle immediately");
+assert.ok(immediateMigration.includes("notion_sync_attempts = 0") && immediateMigration.includes("notion_sync_status = 'pending'"), "Only never-attempted pending requests may be accelerated");
+
 console.log("Store Notion retry contract checks passed: service-role-only worker, atomic claims, duplicate lookup, bounded backoff and PII-safe responses.");
