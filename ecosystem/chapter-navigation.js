@@ -36,7 +36,7 @@
  // One carefully drawn master hypha is reused at every navigation colony.
  // Geometry lives in assets/mycelium-unit.svg so every instance stays identical,
  // crisp and easy to refine without hand-tuning dozens of generated branches.
- const colonyMotifs=somaPoints.map(p=>'<image class="mycelium-unit" href="./assets/mycelium-unit.svg" x="'+(p.x-31)+'" y="'+(p.y-31)+'" width="62" height="62"/>').join('');
+ const colonyMotifs=somaPoints.map(p=>'<image class="mycelium-unit" href="./assets/mycelium-unit.svg" x="'+(p.x-38)+'" y="'+(p.y-31)+'" width="76" height="62"/>').join('');
  const myelin=somaPoints.slice(0,-1).map((p,i)=>{const q=somaPoints[i+1],x=(p.x+q.x)/2,y=(p.y+q.y)/2;return '<path d="M'+(x-4)+' '+(y-6)+'q6 6 8 12"/>';}).join('');
  rail.innerHTML='<svg class="neural-network" viewBox="0 0 80 600" preserveAspectRatio="none" aria-hidden="true"><path id="neural-axon" class="axon-base" d="'+axonPath+'"/><path class="axon-progress" d="'+axonPath+'"/><g class="myelin">'+myelin+'</g>'+colonyMotifs+'<circle class="neural-pulse" r="2.5"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#neural-axon"/></animateMotion></circle></svg>';
  const railNodes=document.createElement('div');railNodes.className='neural-hitareas';
