@@ -5,14 +5,6 @@
   "coverage": "Every interactive point resolves to its canonical Notion page; includes the language landing page and collaboration proposal page.",
   "domains": [
     {
-      "id": "ar-home",
-      "title": "BA Labs — التكنولوجيا الحيوية التطبيقية",
-      "notionId": "40173152f17181eaaffbeb758d7dc175",
-      "url": "https://app.notion.com/p/40173152f17181eaaffbeb758d7dc175",
-      "description": "الصفحة الرئيسية العامة باللغة العربية.",
-      "children": []
-    },
-    {
       "id": "myco",
       "title": "علم الفطريات",
       "notionId": "40173152f171813ba690d5064844f54a",
@@ -1134,6 +1126,15 @@
       "notionId": "40173152f17181668ddef98b9e1ddec4",
       "url": "https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4",
       "children": [
+        {
+          "id": "ar-home",
+          "title": "BA Labs — التكنولوجيا الحيوية التطبيقية",
+          "notionId": "40173152f17181eaaffbeb758d7dc175",
+          "url": "https://app.notion.com/p/40173152f17181eaaffbeb758d7dc175",
+          "description": "الصفحة الرئيسية العامة باللغة العربية.",
+          "children": [],
+          "kind": "page"
+        },
         {
           "id": "ar-work-documented",
           "title": "الأعمال والإنجازات الموثقة",
