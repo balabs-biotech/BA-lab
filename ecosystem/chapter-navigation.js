@@ -3,8 +3,8 @@
  const main=document.getElementById('main-content'),app=document.getElementById('app');
  if(!main||!app||main.dataset.chaptersReady)return;
  const groups=[
-  {id:'home',label:{fr:'Accueil',en:'Home',ar:'الرئيسية',pt:'Início'},sections:['accueil']},
-  {id:'research',label:{fr:'Explorations',en:'Explorations',ar:'الاستكشاف',pt:'Exploração'},sections:['chantiers','a-la-une'],extras:['.field-atlas']},
+  {id:'home',label:{fr:'À la une',en:'Featured',ar:'في الواجهة',pt:'Em destaque'},sections:['a-la-une','accueil']},
+  {id:'research',label:{fr:'Explorations',en:'Explorations',ar:'الاستكشاف',pt:'Exploração'},sections:['chantiers'],extras:['.field-atlas']},
   {id:'network',label:{fr:'Univers',en:'Universe',ar:'العوالم',pt:'Universo'},sections:['universe','universes'],extras:['.universe-bridge']},
   {id:'catalogue',label:{fr:'Catalogue',en:'Catalogue',ar:'الكتالوج',pt:'Catálogo'},sections:['product-catalogue']},
   {id:'about',label:{fr:'BA Labs',en:'About BA Labs',ar:'حول BA Labs',pt:'Sobre BA Labs'},sections:['a-propos','demarche','value-principles']}
