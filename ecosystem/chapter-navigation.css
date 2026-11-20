@@ -570,3 +570,14 @@ body>.chapter-rail.neural-rail{width:48px!important;height:min(66vh,500px)!impor
 .neural-node.is-active .neural-node-core:after{width:18px!important;height:18px!important;animation-duration:2.6s!important}
 @media(max-width:760px){body>.chapter-rail.neural-rail{width:38px!important;height:min(60vh,420px)!important}}
 @media(prefers-reduced-motion:reduce){.neural-network .neural-pulse{display:none!important}}
+
+
+/* COLONY SCALE PASS — make the five radial growth centres legible at phone size. */
+body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!important}
+.neural-network{overflow:visible!important}
+.neural-network .dendrites{stroke:#c0cbb9c9!important;stroke-width:1.55!important;opacity:.96!important}
+.neural-network .axon-base{stroke:#9aafa288!important;stroke-width:2.35!important}
+.neural-network .axon-progress{stroke:#b96b4d!important;stroke-width:2.7!important}
+.neural-network .neuron-bodies circle{r:4.8px;stroke-width:1.7!important}
+.neural-node{width:38px!important;height:40px!important}
+@media(max-width:760px){body>.chapter-rail.neural-rail{width:48px!important;height:min(64vh,470px)!important}.neural-network .dendrites{stroke-width:1.45!important}}
