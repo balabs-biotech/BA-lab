@@ -46,7 +46,8 @@ try {
         unmapped: nodes.filter(node => node.kind !== 'label' && (!node.notionId || !node.url) && !(node.kind === 'section' && (node.children || []).length > 0)).map(node => node.title),
         uniquePages: new Set(nodes.filter(node => node.notionId && node.kind !== 'reference').map(node => node.notionId)).size,
         canonicalPages: nodes.filter(node => node.notionId && node.kind !== 'reference').length,
-        catalogueRecords: (() => { const product = tree.domains.find(node => node.id === 'products'); const records = []; const visit = list => (list || []).forEach(node => { if (node.notionId && node.kind !== 'reference') records.push(node); visit(node.children); }); visit(product?.children); return records.length; })()
+        catalogueRecords: (() => { const product = tree.domains.find(node => node.id === 'products'); const records = []; const visit = list => (list || []).forEach(node => { if (node.notionId && node.kind !== 'reference') records.push(node); visit(node.children); }); visit(product?.children); return records.length; })(),
+        nodeUrls: Object.fromEntries(nodes.filter(node => node.notionId && node.kind !== 'section' && node.kind !== 'label').map(node => [node.id, node.url]))
       };
     });
     assert.equal(mappedTree.roots.length, 8, 'Eight universes must be backed by actual Notion pages');
@@ -65,18 +66,30 @@ try {
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
     const visibleNodes = await nav.count();
     assert.ok(visibleNodes >= 8, 'At least the eight universe roots must be available');
-    // Select the first universe through the explorer's keyboard-accessible
-    // node list. This exercises the same in-scene focus path without relying
-    // on a guessed canvas coordinate that varies with viewport and layout.
-    await nav.first().evaluate(button => button.click());
+    // A real point activation must preserve the explorer and open the exact
+    // canonical Notion page in a separate tab. Use trusted Playwright clicks.
+    const rootButton = nav.first();
+    const rootNodeId = await rootButton.getAttribute('data-node-id');
+    const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
+    const rootPagePromise = page.context().waitForEvent('page');
+    await rootButton.click();
+    const rootPage = await rootPagePromise;
+    assert.equal(rootPage.url(), rootExpectedUrl, 'Clicking a universe point must open its exact canonical Notion page');
+    await rootPage.close();
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(page.url(), initialUrl, 'Selecting a branch must not navigate to another page');
+    assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
     const firstChild = page.locator('#accessibleNodes button[data-level="1"]').first();
     await firstChild.waitFor({ state: 'attached' });
-    await firstChild.evaluate(button => button.click());
+    const childNodeId = await firstChild.getAttribute('data-node-id');
+    const childExpectedUrl = mappedTree.nodeUrls[childNodeId];
+    const childPagePromise = page.context().waitForEvent('page');
+    await firstChild.click();
+    const childPage = await childPagePromise;
+    assert.equal(childPage.url(), childExpectedUrl, 'Clicking a child point must open its own canonical Notion page');
+    await childPage.close();
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
-    assert.equal(page.url(), initialUrl, 'Opening a child branch must stay inside the explorer scene');
+    assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
     assert.equal(await page.locator('#selection').innerText(), selectedRoot, 'Back must restore the selected branch as well as the camera');
