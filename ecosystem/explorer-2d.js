@@ -1,4 +1,4 @@
-import { createPixiRenderer } from "./explorer-2d-pixi.js?v=contrast-cleanup-1";
+import { createPixiRenderer } from "./explorer-2d-pixi.js?v=zoom-label-gating-1";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={bio:"#79a991",myco:"#b18fc2",soil:"#c19b73",lab:"#80aeb8",products:"#c88773",iot:"#7eaaa3",work:"#aa9cbb",evidence:"#b5b58d"};
 const COPY={
@@ -135,7 +135,17 @@ function syncUniverseRail(n){
 }
 function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
-function hit(x,y){let found=null,best=22;for(const n of nodes){if(levelOpacity(n.level)<.12)continue;const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);if(d<limit){best=d;found=n;}}return found;}
+function hit(x,y){
+ let found=null,best=22;
+ const labelZoom=[0,.72,1.3,2.55,4.3];
+ for(const n of nodes){
+  const threshold=labelZoom[Math.min(n.level,labelZoom.length-1)]||0;
+  if(scale<threshold||levelOpacity(n.level)<.5)continue;
+  const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);
+  if(d<limit){best=d;found=n;}
+ }
+ return found;
+}
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
 function updateBreadcrumbs(){
  const nav=$("crumbs");if(!nav)return;nav.replaceChildren();
