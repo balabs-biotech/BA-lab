@@ -41,7 +41,7 @@ assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstati
 assert.ok(html.includes("Content-Security-Policy") && html.includes("script-src 'self' https://challenges.cloudflare.com") && html.includes("frame-src https://challenges.cloudflare.com") && html.includes("object-src 'none'") && html.includes("connect-src 'self' https://axcouwiodqsauwnsiotn.supabase.co https://challenges.cloudflare.com"), 'Storefront must enforce a restrictive CSP while allowing only its own assets, Supabase API and Turnstile challenge');
 assert.ok(html.includes("default-src 'self'") && html.includes("base-uri 'self'") && html.includes("form-action 'self'") && html.includes("style-src 'self'") && html.includes("img-src 'self' data:") && html.includes("font-src 'self' data:") && html.includes("upgrade-insecure-requests"), 'Storefront CSP must restrict resource origins, form targets and insecure transport');
 assert.ok(html.includes('<meta name="referrer" content="strict-origin-when-cross-origin">'), 'Storefront must limit cross-origin referrer disclosure');
-assert.equal((html.match(/<script\\b[^>]*>/gi)||[]).filter(tag=>! /\\bsrc=/.test(tag)).length, 0, 'Storefront must not introduce inline script blocks that weaken CSP');
+assert.equal((html.match(/<script\b[^>]*>/gi)||[]).filter(tag=>! /\bsrc=/.test(tag)).length, 0, 'Storefront must not introduce inline script blocks that weaken CSP');
 
 assert.ok(html.includes('id="turnstileWidget"') && js.includes("const TURNSTILE_SITE_KEY=''"), 'Turnstile mount must exist while its unprovisioned public key stays blank');
 const requestOpener = js.match(/function openRequest\(\)\{[\s\S]*?(?=\nfunction closeRequest)/)?.[0] || '';
