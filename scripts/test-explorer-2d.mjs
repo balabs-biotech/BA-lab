@@ -105,7 +105,7 @@ try {
       return result;
     });
     assert.ok(blackPearl?.parentId && blackPearl.url, 'Black Pearl must have a canonical parent and Notion URL');
-    const parentButton = nav.locator(`button[data-node-id="${blackPearl.parentId}"]`);
+    const parentButton = page.locator(`#accessibleNodes button[data-node-id="${blackPearl.parentId}"]`);
     await parentButton.focus();
     await parentButton.press('Enter');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
