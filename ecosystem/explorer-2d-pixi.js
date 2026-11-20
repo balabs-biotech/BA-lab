@@ -98,12 +98,18 @@ export async function createPixiRenderer(canvas){
    const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
    let fontSize=n.level===0?clamp(11.5+Math.log2(Math.max(.5,scale))*1.25,10.5,15):clamp(10.2+Math.log2(Math.max(.7,scale))*.92,9.5,13.5);if(selected&&activeBranch.has(n.id))fontSize+=.7;if(selected?.id===n.id)fontSize+=1;
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
+   // Wrap long names to the available phone width before positioning the label.
+   label.style.wordWrap=true;label.style.breakWords=true;label.style.align="center";
+   label.style.wordWrapWidth=Math.max(100,Math.min(width*.46,220));
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
    const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
-   const x=clamp(sx+dx*radius,5,width-5),y=clamp(sy+dy*radius,64,height-18);
-   label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=Math.max(alpha,selected?0.76:0.88);label.visible=true;
-   const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
+   label.anchor.set(anchorX,anchorY);
+   const rawX=sx+dx*radius,rawY=sy+dy*radius;
+   const x=clamp(rawX,8+anchorX*label.width,width-8-(1-anchorX)*label.width);
+   const y=clamp(rawY,56+anchorY*label.height,height-14-(1-anchorY)*label.height);
+   label.position.set(x,y);label.alpha=Math.max(alpha,selected?0.76:0.88);label.visible=true;
+   const box={left:x-anchorX*label.width,right:x+(1-anchorX)*label.width,top:y-anchorY*label.height,bottom:y+(1-anchorY)*label.height};
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
    occupied.push(box);live.add(n.id);drawn++;
