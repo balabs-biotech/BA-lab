@@ -581,3 +581,15 @@ body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!impor
 .neural-network .neuron-bodies circle{r:4.8px;stroke-width:1.7!important}
 .neural-node{width:38px!important;height:40px!important}
 @media(max-width:760px){body>.chapter-rail.neural-rail{width:48px!important;height:min(64vh,470px)!important}.neural-network .dendrites{stroke-width:1.45!important}}
+
+
+/* MOBILE CLEARANCE — keep chapter rail outside text and chapter ribbons. */
+@media(max-width:760px){
+ .experience-page{padding-inline-start:52px!important;padding-inline-end:12px!important}
+ [dir="rtl"] .experience-page{padding-inline-start:12px!important;padding-inline-end:52px!important}
+ .experience-page-label{margin-inline-start:8px!important;min-height:22px}
+ .experience-page>.hero{padding-inline-start:8px!important}
+ .experience-page>.scene,.experience-page>.editorial-work,
+ .experience-page>.universe-index,.experience-page>.product-catalogue,
+ .experience-page>section{scroll-margin-inline-start:8px}
+}
