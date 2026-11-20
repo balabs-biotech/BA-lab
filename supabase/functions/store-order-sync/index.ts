@@ -151,11 +151,13 @@ Deno.serve(async (req: Request) => {
     const items = Array.isArray(record?.items) ? record.items : [];
     const lockToken = String(order?.notion_sync_lock_token ?? "");
     const orderId = String(order?.id ?? "");
-    if (!orderId || !lockToken || !items.length) {
+    if (!orderId || !lockToken) {
       deferred++;
+      console.error("[store-order-sync] Claimed record lacks its processing lock");
       continue;
     }
     try {
+      if (!items.length) throw new Error("claimed_order_has_no_items");
       const pageId = await syncToNotion(order, items, notionToken);
       const completed = await supabaseRequest("rpc/complete_store_order_sync", secretKey, "POST", {
         p_order_id: orderId,
