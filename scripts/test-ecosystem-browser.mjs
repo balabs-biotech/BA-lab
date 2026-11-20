@@ -87,6 +87,14 @@ try {
       await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
       await page.waitForFunction((index) => { const track=document.querySelector('#experienceTrack'); return !!track && Math.abs(track.scrollLeft-index*track.clientWidth)<3; }, index, { timeout: 10000 });
       assert.equal(await page.locator('.chapter-rail-node').nth(index).getAttribute('aria-current'),'step','The tapped chapter dot must remain the active navigation point');
+      const railAlignment = await page.evaluate((i) => {
+        const rail=document.querySelector('body>.chapter-rail');
+        const node=rail.querySelectorAll('.chapter-rail-node')[i];
+        const signal=rail.querySelector('.filament-signal');
+        const rr=rail.getBoundingClientRect(),nr=node.getBoundingClientRect();
+        return Math.hypot(Number(signal.getAttribute('cx'))-(nr.left+nr.width/2-rr.left),Number(signal.getAttribute('cy'))-(nr.top+nr.height/2-rr.top));
+      }, index);
+      assert.ok(railAlignment < 1.5, 'The filament signal must land on the exact centre of chapter point '+(index+1)+'; measured offset: '+railAlignment.toFixed(2)+'px');
       await page.waitForTimeout(650);
       if (viewport.name === 'mobile' && chapter === 'network') {
         const frame = await page.locator('#inlineExplorer').evaluate(root => {
