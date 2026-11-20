@@ -1,9 +1,17 @@
 {
-  "version": 4,
+  "version": 5,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "en",
-  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
+  "coverage": "Every interactive point resolves to its canonical Notion page; includes the English public landing page and additional collaboration, R&D and traceability pages.",
   "domains": [
+    {
+      "id": "en-home",
+      "title": "BA Labs — Applied biotechnology",
+      "notionId": "40173152f171815f9f01ea5fd1add73f",
+      "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
+      "description": "English public landing page for BA Labs.",
+      "children": []
+    },
     {
       "id": "myco",
       "title": "Mycology",
@@ -626,6 +634,14 @@
           "url": "https://app.notion.com/p/40173152f17181aa843ace690303e7c8",
           "description": "An introduction to the sensors and measurement tools used to observe biological and cultivation systems.",
           "children": []
+        },
+        {
+          "id": "iot-traceability-data",
+          "title": "Traceability and data",
+          "notionId": "40173152f171811189c3ca46beeea37f",
+          "url": "https://app.notion.com/p/40173152f171811189c3ca46beeea37f",
+          "description": "Traceability systems, biological data and their structured management.",
+          "children": []
         }
       ],
       "notionParentId": "hub",
@@ -1197,7 +1213,16 @@
           "title": "Documented work and achievements",
           "url": "https://app.notion.com/p/40173152f17181baa905d6afb836f038",
           "notionId": "40173152f17181baa905d6afb836f038",
-          "children": []
+          "children": [
+            {
+              "id": "work-detailed-examples-en",
+              "title": "Documented project examples",
+              "notionId": "40173152f171812084fcc3e45ece4ec9",
+              "url": "https://app.notion.com/p/40173152f171812084fcc3e45ece4ec9",
+              "description": "Detailed examples connected to documented R&D work.",
+              "children": []
+            }
+          ]
         },
         {
           "id": "evidence-resource-3",
@@ -1212,7 +1237,16 @@
           "title": "Collaborate with BA Labs",
           "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4",
           "notionId": "40173152f1718118ac1ad58358720ae4",
-          "children": []
+          "children": [
+            {
+              "id": "collaboration-proposal-en",
+              "title": "Prepare a project proposal",
+              "notionId": "40273152f171814db551d28574919ca7",
+              "url": "https://app.notion.com/p/40273152f171814db551d28574919ca7",
+              "description": "Guidance for submitting a collaboration proposal to BA Labs.",
+              "children": []
+            }
+          ]
         }
       ],
       "relations": []
