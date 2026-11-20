@@ -1,8 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "en",
-  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
+  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
   "domains": [
     {
       "id": "myco",
@@ -20,7 +20,7 @@
           "children": [
             {
               "id": "en-myco-pleurotus-library",
-              "title": "Pleurotus — cultivated species and resources",
+              "title": "Oyster mushrooms and related resources",
               "notionId": "40273152f17181eba1bbcaf1b1d491d6",
               "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
               "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
@@ -133,7 +133,7 @@
             },
             {
               "id": "en-myco-other-fungi",
-              "title": "Other fungi studied and cultivated",
+              "title": "Other fungi",
               "notionId": "40273152f171812aad80e9a88edf1be6",
               "url": "https://app.notion.com/p/40273152f171812aad80e9a88edf1be6",
               "description": "Sous-page publique de ressources fongiques, relevée dans la page parente.",
@@ -232,7 +232,7 @@
         },
         {
           "id": "en-myco-mycorrhizae",
-          "title": "Mycorrhizae and biological interactions",
+          "title": "Fungi associated with plant roots",
           "notionId": "40173152f1718101965cc766e3d7e27f",
           "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
           "description": "Biological relationships among fungi, plants and other organisms.",
@@ -626,136 +626,6 @@
           "url": "https://app.notion.com/p/40173152f17181aa843ace690303e7c8",
           "description": "An introduction to the sensors and measurement tools used to observe biological and cultivation systems.",
           "children": []
-        },
-        {
-          "id": "iot-environment",
-          "title": "Environmental monitoring",
-          "description": "Monitor physical parameters that shape biological systems.",
-          "children": [
-            {
-              "id": "iot-temperature",
-              "title": "Temperature",
-              "description": "Track gradients, cycles and thermal stability in cultivation spaces.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidity",
-              "title": "Humidity",
-              "description": "Observe air humidity and water availability conditions.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-gas",
-              "title": "Gas exchange & airflow",
-              "description": "Study ventilation and gas exchange in cultivation enclosures.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-instrumentation",
-          "title": "Instrumentation architecture",
-          "description": "Combine sensors, interfaces and control units suited to experimental work.",
-          "children": [
-            {
-              "id": "iot-sensors-types",
-              "title": "Sensors & probes",
-              "description": "Compare measurement technologies, ranges, accuracy and limitations.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-microcontrollers",
-              "title": "Microcontrollers",
-              "description": "Explore reading interfaces, inputs, outputs and embedded units.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-power",
-              "title": "Power & safety",
-              "description": "Document power supply, electrical protection and setup reliability.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-control",
-          "title": "Cultivation control",
-          "description": "Study gradual control of cultivation conditions, distinguishing prototypes from operational systems.",
-          "children": [
-            {
-              "id": "iot-airflow",
-              "title": "Ventilation & airflow",
-              "description": "Design monitoring and control of air renewal.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidification",
-              "title": "Humidification",
-              "description": "Study humidity regulation and water distribution.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-lighting",
-              "title": "Lighting & cycles",
-              "description": "Define lighting and timing scenarios for experimental trials.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-data",
-          "title": "Data acquisition & processing",
-          "description": "Turn measured signals into useful, comparable time series.",
-          "children": [
-            {
-              "id": "iot-logging",
-              "title": "Continuous logging",
-              "description": "Timestamp measurements and retain raw data with context.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-dashboard",
-              "title": "Visualization & alerts",
-              "description": "Present trends, thresholds and deviations for monitoring.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-quality",
-              "title": "Measurement quality",
-              "description": "Identify drift, missing values, calibration needs and uncertainty.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-traceability-detail",
-          "title": "Experimental traceability",
-          "description": "Connect every measurement to a culture, batch, protocol and trial period.",
-          "children": [
-            {
-              "id": "iot-batch-links",
-              "title": "Batches & cultures",
-              "description": "Associate readings with batch identifiers and cultivation stages.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-protocol-links",
-              "title": "Protocols & events",
-              "description": "Record setpoint changes, interventions and incidents.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-comparison",
-              "title": "History & comparisons",
-              "description": "Compare experimental cycles without losing their initial conditions.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
         }
       ],
       "notionParentId": "hub",
@@ -873,7 +743,7 @@
     },
     {
       "id": "products",
-      "title": "Products and biological resources",
+      "title": "Products & biological resources",
       "notionId": "40173152f171812f813cf1b792d83281",
       "url": "https://app.notion.com/p/40173152f171812f813cf1b792d83281",
       "children": [
@@ -911,7 +781,7 @@
         },
         {
           "id": "en-products-qr",
-          "title": "QR quick-start guide",
+          "title": "QR quick-start guide — Myco Start / Myco Plate",
           "notionId": "40173152f17181829e83c268007aed91",
           "url": "https://app.notion.com/p/40173152f17181829e83c268007aed91",
           "description": "A quick-start guide for the Myco Start and Myco Plate prototypes.",
@@ -934,7 +804,7 @@
             },
             {
               "id": "en-products-pleurotus",
-              "title": "Pleurotus — cultivated species and resources",
+              "title": "Oyster mushrooms and related resources",
               "notionId": "40273152f17181eba1bbcaf1b1d491d6",
               "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -943,7 +813,7 @@
             },
             {
               "id": "en-products-other-fungi",
-              "title": "Other fungi studied and cultivated",
+              "title": "Other fungi",
               "notionId": "40273152f171812aad80e9a88edf1be6",
               "url": "https://app.notion.com/p/40273152f171812aad80e9a88edf1be6",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -961,7 +831,7 @@
             },
             {
               "id": "en-products-mycorrhizae",
-              "title": "Mycorrhizae and biological interactions",
+              "title": "Fungi associated with plant roots",
               "notionId": "40173152f1718101965cc766e3d7e27f",
               "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -1114,7 +984,7 @@
           "children": [
             {
               "id": "en-products-solid-1",
-              "title": "WA — Water Agar",
+              "title": "WA — gélose à l’eau prête à l’emploi",
               "notionId": "3f473152f171812a814dd7b951786313",
               "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
               "description": "Page publique référencée dans la page Produits & ressources biologiques.",
@@ -1324,7 +1194,7 @@
       "children": [
         {
           "id": "evidence-resource-1",
-          "title": "Documented work",
+          "title": "Documented work and achievements",
           "url": "https://app.notion.com/p/40173152f17181baa905d6afb836f038",
           "notionId": "40173152f17181baa905d6afb836f038",
           "children": []
