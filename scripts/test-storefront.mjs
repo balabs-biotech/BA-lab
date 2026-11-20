@@ -38,6 +38,10 @@ assert.ok(js.includes('requestOpener.focus()') && js.includes('cartOpener.focus(
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'Storefront must not request remote Google Fonts');
 assert.ok(html.includes("Content-Security-Policy") && html.includes("script-src 'self' https://challenges.cloudflare.com") && html.includes("frame-src https://challenges.cloudflare.com") && html.includes("object-src 'none'") && html.includes("connect-src 'self' https://axcouwiodqsauwnsiotn.supabase.co https://challenges.cloudflare.com"), 'Storefront must enforce a restrictive CSP while allowing only its own assets, Supabase API and Turnstile challenge');
 assert.ok(html.includes('id="turnstileWidget"') && js.includes("const TURNSTILE_SITE_KEY=''"), 'Turnstile mount must exist while its unprovisioned public key stays blank');
+const requestOpener = js.match(/function openRequest\(\)\{[\s\S]*?\$\('#requestClose'\)\.focus\(\)\}/)?.[0] || '';
+assert.ok(requestOpener.includes('loadTurnstile()') && requestOpener.indexOf("classList.add('is-open')") < requestOpener.indexOf('loadTurnstile()'), 'Turnstile must initialize only after the request dialog becomes visible');
+const orderGate = js.slice(js.indexOf('if(STORE_ORDER_ENABLED){'), js.indexOf('\norderForm.addEventListener'));
+assert.ok(!orderGate.includes('loadTurnstile()'), 'Turnstile must not render inside the initially hidden request dialog');
 assert.ok(js.includes("STORE_CATALOGUE_URL") && /method\s*:\s*["\']GET["\']/.test(js) && /credentials\s*:\s*["\']omit["\']/.test(js), "Storefront may read the public catalogue only through a cookie-free GET request");
 assert.ok(js.includes('STORE_REMOTE_CATALOGUE_ENABLED=false') && js.includes('if(!STORE_REMOTE_CATALOGUE_ENABLED)return;'), 'Remote catalogue access must remain disabled until cross-border processing and privacy disclosures are approved');
 assert.ok(js.includes('STORE_PUBLISHABLE_KEY') && js.includes('apikey:STORE_PUBLISHABLE_KEY'), 'Public catalogue requests must use only the publishable key');
