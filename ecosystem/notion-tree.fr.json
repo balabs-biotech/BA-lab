@@ -745,7 +745,7 @@
       "children": [
         {
           "id": "products-public-catalogue",
-          "title": "Catalogue public — Ressources publiables",
+          "title": "CATALOGUE PUBLIC — Ressources publiables",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "description": "Point d’entrée du catalogue public : ressources et produits dont les informations sont destinées aux visiteurs. Les prototypes, essais et références disponibles doivent rester clairement distingués.",
@@ -1213,7 +1213,7 @@
         },
         {
           "id": "evidence-resource-3",
-          "title": "Catalogue public",
+          "title": "CATALOGUE PUBLIC — Ressources publiables",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
           "kind": "reference",
