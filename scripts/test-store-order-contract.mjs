@@ -75,6 +75,7 @@ assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|custom
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 const rateLimitSource = edge.slice(edge.indexOf("async function isRateLimited"), edge.indexOf("async function verifyTurnstile"));
 assert.ok(rateLimitSource.includes('req.headers.get("cf-connecting-ip")') && !rateLimitSource.includes("x-forwarded-for") && !rateLimitSource.includes("x-real-ip"), "Rate limiting must trust only the Cloudflare client-IP header, never caller-controlled forwarding fallbacks");
+assert.ok(rateLimitSource.includes('if (!ip) throw new Error("client_ip_unavailable")'), "Missing trusted client-IP metadata must fail closed before consuming the shared rate-limit bucket");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 const publicOrderHandler = edge.slice(edge.indexOf("Deno.serve"));
 assert.ok(!publicOrderHandler.includes("syncToNotion(") && !publicOrderHandler.includes('"store_orders?id=eq."'), "Public intake must not read customer rows or create Notion pages inline; the locked retry worker owns synchronization");
