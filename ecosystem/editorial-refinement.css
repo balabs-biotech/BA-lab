@@ -1780,3 +1780,27 @@ html[lang="pt"] #app.balabs-ui .product-catalogue-visual-note[data-cat-lang="pt"
   min-height:0!important;max-height:220px!important;object-fit:cover!important;
  }
 }
+
+
+/* PASS79 — constrain the embedded mycelial explorer to the mobile reading column.
+   Keep the chapter rail clear; size the canvas from its real stage, not the viewport. */
+@media(max-width:760px){
+ #app.balabs-ui .experience-page[data-chapter="network"] #inlineExplorer{
+  width:min(100%,calc(100vw - 84px))!important;
+  max-width:calc(100vw - 84px)!important;
+  min-width:0!important;
+  margin-inline:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="network"] #inlineExplorer>.inline-explorer-stage{
+  position:relative!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;overflow:hidden!important;
+ }
+ #app.balabs-ui .experience-page[data-chapter="network"] #inlineExplorer #field{
+  position:absolute!important;inset:0!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:100%!important;box-sizing:border-box!important;
+ }
+}
