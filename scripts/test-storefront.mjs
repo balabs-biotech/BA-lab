@@ -29,7 +29,7 @@ assert.ok(js.includes('statusOnRequest') && js.includes('statusToConfirm') && js
 assert.ok(js.includes('BAL-LC-TRI-HAMATUM-001') && js.includes('BAL-AG-PDAE-001'), 'Unavailable Notion catalogue references must remain visible in the static multilingual catalogue');
 assert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The inoculated Petri dish must show its confirmed 2,000 DZD unit price');
 assert.ok(!/priceDzd:100[,}]/.test(js) && js.includes('Water Agar — boîte non inoculée'), 'Water Agar must remain on request without an unconfirmed public price');
-assert.ok(js.includes('priceDzd:1000') && js.includes('grain spawn · 2,5 kg'), 'Wheat grain spawn must show its 2.5 kg / 1,000 DZD format');
+const wheatSpawn = js.match(/\{code:'BAL-GRAIN-SPAWN-WHEAT-25-001',[\s\S]*?\},\n\{code:/)?.[0] || '';\nassert.ok(wheatSpawn.includes("status:'to_confirm'") && wheatSpawn.includes('grain spawn · 2,5 kg') && !wheatSpawn.includes('priceDzd:'), 'Wheat grain spawn must remain visible as to-confirm with no unconfirmed public price');
 assert.ok(js.includes('priceDzd:5000') && js.includes('Prix envisagé · à confirmer') && js.includes('price-qualifier'), 'Liquid culture syringe price must be clearly marked indicative');
 assert.ok(js.includes("family:'spawn'") && js.includes("filterSpawn:'Grain spawn'"), 'Grain spawn must have a distinct localized catalogue filter');
 assert.ok(html.includes('id="copyRequest"') && js.includes('navigator.clipboard.writeText(requestText)'), 'The guest selection must be copyable as a request without submitting personal data');
