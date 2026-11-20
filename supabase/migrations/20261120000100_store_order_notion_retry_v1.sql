@@ -54,7 +54,7 @@ begin
     update public.store_orders as orders
     set notion_sync_status = 'processing',
         notion_sync_attempts = orders.notion_sync_attempts + 1,
-        notion_sync_lock_token = extensions.uuid_generate_v4(),
+        notion_sync_lock_token = gen_random_uuid(),
         notion_sync_locked_until = pg_catalog.now() + interval '5 minutes',
         updated_at = pg_catalog.now()
     from candidates

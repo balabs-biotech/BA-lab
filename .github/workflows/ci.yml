@@ -172,6 +172,10 @@ jobs:
           node-version: "22"
       - name: Check create-store-order Edge Function TypeScript syntax
         run: node --experimental-strip-types --check supabase/functions/create-store-order/index.ts
+      - name: Check store-order-sync Edge Function TypeScript syntax
+        run: node --experimental-strip-types --check supabase/functions/store-order-sync/index.ts
+      - name: Test storefront Notion retry worker contract
+        run: node scripts/test-store-order-notion-retry.mjs
       - name: Check store-catalogue Edge Function TypeScript syntax
         run: node --experimental-strip-types --check supabase/functions/store-catalogue/index.ts
       - name: Test public catalogue privacy contract
@@ -246,6 +250,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/sensitive_rpc_search_path_contract.test.sql
       - name: Verify storefront order storage security and idempotency
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/store-orders-security.test.sql
+      - name: Verify storefront Notion retry locking, backoff and grants
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/store-order-notion-retry.test.sql
       - name: Verify append-only audit table privileges after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/audit_table_write_privileges.test.sql
       - name: Test environmental observation schema and access contract

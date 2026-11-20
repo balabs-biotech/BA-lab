@@ -6,6 +6,9 @@ on:
       - 'ecosystem/index.html'
       - 'scripts/test-storefront.mjs'
       - 'scripts/test-store-order-contract.mjs'
+      - 'scripts/test-store-order-notion-retry.mjs'
+      - 'supabase/functions/store-order-sync/**'
+      - 'supabase/migrations/*store_order_notion_retry*'
       - 'scripts/test-store-catalogue-contract.mjs'
       - 'supabase/functions/create-store-order/**'
       - 'supabase/functions/store-catalogue/**'
@@ -30,5 +33,6 @@ jobs:
         run: |
           node scripts/test-storefront.mjs
           node scripts/test-store-order-contract.mjs
+          node scripts/test-store-order-notion-retry.mjs
           node scripts/test-store-catalogue-contract.mjs
           node scripts/test-store-notion-order.mjs
