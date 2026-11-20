@@ -5,14 +5,6 @@
   "coverage": "Every interactive point resolves to its canonical Notion page; includes the French public landing page and the collaboration/R&D detail pages.",
   "domains": [
     {
-      "id": "fr-home",
-      "title": "Accueil — Français",
-      "notionId": "40173152f1718152b715fae75581764d",
-      "url": "https://app.notion.com/p/40173152f1718152b715fae75581764d",
-      "description": "Page d’entrée de l’espace public francophone BA Labs.",
-      "children": []
-    },
-    {
       "id": "myco",
       "title": "MYCOLOGIE",
       "notionId": "3e273152f1718161b154d8b8fc50f063",
@@ -1127,6 +1119,15 @@
       "notionId": "3e273152f17181d8b65af8f6b7de0b0b",
       "url": "https://app.notion.com/p/3e273152f17181d8b65af8f6b7de0b0b",
       "children": [
+        {
+          "id": "fr-home",
+          "title": "Accueil — Français",
+          "notionId": "40173152f1718152b715fae75581764d",
+          "url": "https://app.notion.com/p/40173152f1718152b715fae75581764d",
+          "description": "Page d’entrée de l’espace public francophone BA Labs.",
+          "children": [],
+          "kind": "page"
+        },
         {
           "id": "work-documented",
           "title": "Travaux & réalisations documentés",
