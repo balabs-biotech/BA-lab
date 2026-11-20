@@ -8,6 +8,17 @@ The storefront is a catalogue and request-preparation interface. **Guest order s
 
 The request form has been redesigned as a two-column enquiry workspace: selected references on one side, customer details on the other. It is localized in FR / EN / AR / PT. The form remains disabled until the end-to-end intake and privacy checks are complete.
 
+## Verified operational state — 20 November 2026
+
+- Public order submission is disabled in both the browser and the deployed Edge Function. Do not enable either switch yet.
+- The remote public catalogue is disabled. Its dedicated read-only Notion credential is not provisioned.
+- The private Notion order-sync worker and five-minute cron schedule are deployed, but the worker cannot run until its dedicated Notion credential and Vault-held service-role JWT are provisioned.
+- Turnstile verification code is deployed, but the public site key and private secret are not provisioned; the browser challenge has only been exercised with a mocked test widget.
+- Legal identity, privacy, retention, shipping and cross-border-processing details remain draft items requiring verified company information and review.
+- Database access controls have been rechecked: RLS is enabled on the order and rate-limit tables; `anon` and `authenticated` have no direct order-table read/insert privileges and cannot execute the sensitive order/sync/rate-limit RPCs. The service role retains the required execution privileges.
+
+This is a readiness snapshot, not authorization to launch. Recheck deployed flags, secrets and database grants immediately before any production activation.
+
 ## Data flow
 
 ```
@@ -79,7 +90,7 @@ Source: `supabase/functions/create-store-order/index.ts`
 - Includes a Cloudflare Turnstile browser integration scaffold. The widget loads only when both `STORE_ORDER_ENABLED` and a non-empty public `TURNSTILE_SITE_KEY` are set; its token is sent with the request, and the submit control remains locked until verification succeeds. The Content Security Policy allows only the required Cloudflare challenge origin. The site key is intentionally blank and guest submissions remain disabled. The server-side verifier is deployed behind `TURNSTILE_ENABLED=true`; it validates the exact hostname (`balabs-biotech.github.io`) and action (`store_order`) and fails closed on invalid tokens or verification outages.
 - Does not process payment or confirm stock, delivery fees, or lead times.
 
-The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_STORE_API_KEY` (a separate Notion integration token with access limited to the commercial orders data source) and `NOTION_CATALOGUE_API_KEY` (a different read-only integration token with access limited to the public catalogue data source). The previous shared `NOTION_API_KEY` is deliberately no longer accepted by either storefront function.
+The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. A historical synthetic integration smoke test previously returned HTTP 201 and confirmed a matching Notion page; its test record was subsequently marked cancelled. Treat that result only as evidence that the integration worked at that earlier point in time, not as proof that the current deployment has its credentials configured or that the worker is operational. Current readiness requires either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus the dedicated `NOTION_STORE_API_KEY`. The separate read-only `NOTION_CATALOGUE_API_KEY` is required only if the remote public catalogue is intentionally enabled. The previous shared `NOTION_API_KEY` is deliberately no longer accepted by either storefront function.
 
 ## Catalogue
 
