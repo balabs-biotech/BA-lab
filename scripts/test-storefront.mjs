@@ -18,6 +18,9 @@ for (const page of ['index.html', 'legal.html', 'privacy.html', 'terms.html', 's
 for (const id of ['productGrid', 'cartDrawer', 'cartItems', 'requestModal', 'consentNotice', 'languageSelect']) {
   assert.ok(html.includes('id="' + id + '"'), 'Missing storefront mount: ' + id);
 }
+assert.ok(html.includes('<link rel="canonical" href="https://balabs-biotech.github.io/BA-lab/store/">'), 'Storefront must declare its canonical public URL');
+assert.ok(html.includes('property="og:title"') && html.includes('property="og:description"') && html.includes('property="og:url"') && html.includes('property="og:type"'), 'Storefront must provide Open Graph metadata for link previews');
+assert.ok(html.includes('name="twitter:card" content="summary"'), 'Storefront must provide a lightweight social preview without an unapproved image');
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   assert.ok(js.includes(language + ':{'), 'Missing language dictionary: ' + language);
 }
