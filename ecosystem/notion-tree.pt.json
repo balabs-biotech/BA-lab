@@ -1,8 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "pt",
-  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
+  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
   "domains": [
     {
       "id": "myco",
@@ -20,7 +20,7 @@
           "children": [
             {
               "id": "pt-myco-pleurotus-library",
-              "title": "Pleurotus — espécies e recursos cultivados",
+              "title": "Cogumelos-ostra e recursos associados",
               "notionId": "40273152f17181f29a8efba7e0d87825",
               "description": "Coleção que distingue fichas de espécies de registos de recursos e designações de cultura, sem presumir identidade ou disponibilidade.",
               "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
@@ -133,7 +133,7 @@
             },
             {
               "id": "pt-myco-other-fungi",
-              "title": "Outros fungos estudados e cultivados",
+              "title": "Outros fungos",
               "notionId": "40273152f17181ec9770df8a5a662720",
               "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
               "description": "Sous-page publique de ressources fongiques, relevée dans la page parente.",
@@ -232,7 +232,7 @@
         },
         {
           "id": "pt-myco-mycorrhizae",
-          "title": "Micorrizas e interações biológicas",
+          "title": "Fungos associados às raízes das plantas",
           "notionId": "40173152f1718134a778d4c8d405ca62",
           "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
           "description": "Relações entre fungos, plantas e outros organismos.",
@@ -684,136 +684,6 @@
           "url": "https://app.notion.com/p/40173152f17181888deee64e2fcc1597",
           "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
           "children": []
-        },
-        {
-          "id": "iot-environment",
-          "title": "Monitorização ambiental",
-          "description": "Acompanhar parâmetros físicos que condicionam os sistemas biológicos.",
-          "children": [
-            {
-              "id": "iot-temperature",
-              "title": "Temperatura",
-              "description": "Acompanhar gradientes, ciclos e estabilidade térmica dos espaços de cultivo.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidity",
-              "title": "Humidade",
-              "description": "Observar a humidade do ar e as condições de disponibilidade de água.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-gas",
-              "title": "Trocas gasosas e ventilação",
-              "description": "Estudar a ventilação e as trocas gasosas nas câmaras de cultivo.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-instrumentation",
-          "title": "Arquitetura de instrumentação",
-          "description": "Combinar sensores, interfaces e unidades de controlo adequadas aos ensaios.",
-          "children": [
-            {
-              "id": "iot-sensors-types",
-              "title": "Sensores e sondas",
-              "description": "Comparar tecnologias de medição, gamas, precisão e limitações.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-microcontrollers",
-              "title": "Microcontroladores",
-              "description": "Explorar interfaces de leitura, entradas, saídas e unidades integradas.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-power",
-              "title": "Alimentação e segurança",
-              "description": "Documentar alimentação, proteção elétrica e fiabilidade da montagem.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-control",
-          "title": "Controlo do cultivo",
-          "description": "Estudar o controlo gradual das condições de cultivo, distinguindo protótipos de sistemas operacionais.",
-          "children": [
-            {
-              "id": "iot-airflow",
-              "title": "Ventilação e fluxo de ar",
-              "description": "Desenhar a monitorização e o controlo da renovação do ar.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidification",
-              "title": "Humidificação",
-              "description": "Estudar a regulação da humidade e a distribuição de água.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-lighting",
-              "title": "Iluminação e ciclos",
-              "description": "Definir cenários de iluminação e temporização para ensaios.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-data",
-          "title": "Aquisição e tratamento de dados",
-          "description": "Transformar sinais medidos em séries temporais úteis e comparáveis.",
-          "children": [
-            {
-              "id": "iot-logging",
-              "title": "Registo contínuo",
-              "description": "Datilhar medições e conservar dados brutos com o respetivo contexto.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-dashboard",
-              "title": "Visualização e alertas",
-              "description": "Representar tendências, limites e desvios para facilitar o acompanhamento.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-quality",
-              "title": "Qualidade das medições",
-              "description": "Identificar deriva, valores em falta, calibração e incerteza.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-traceability-detail",
-          "title": "Rastreabilidade experimental",
-          "description": "Ligar cada medição a uma cultura, lote, protocolo e período de ensaio.",
-          "children": [
-            {
-              "id": "iot-batch-links",
-              "title": "Lotes e culturas",
-              "description": "Associar leituras aos identificadores dos lotes e às fases de cultivo.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-protocol-links",
-              "title": "Protocolos e eventos",
-              "description": "Registar alterações de parâmetros, intervenções e incidentes.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-comparison",
-              "title": "Histórico e comparações",
-              "description": "Comparar ciclos experimentais sem perder as condições iniciais.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
         }
       ],
       "notionParentId": "hub",
@@ -911,7 +781,7 @@
         },
         {
           "id": "pt-products-qr",
-          "title": "Guia de início por QR",
+          "title": "Guia de início por QR — Myco Start / Myco Plate",
           "notionId": "40173152f17181a6b4d7dbad1a72f900",
           "url": "https://app.notion.com/p/40173152f17181a6b4d7dbad1a72f900",
           "description": "Guia de início para os protótipos Myco Start e Myco Plate.",
@@ -934,7 +804,7 @@
             },
             {
               "id": "pt-products-pleurotus",
-              "title": "Pleurotus — espécies e recursos cultivados",
+              "title": "Cogumelos-ostra e recursos associados",
               "notionId": "40273152f17181f29a8efba7e0d87825",
               "url": "https://app.notion.com/p/40273152f17181f29a8efba7e0d87825",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -943,7 +813,7 @@
             },
             {
               "id": "pt-products-other-fungi",
-              "title": "Outros fungos estudados e cultivados",
+              "title": "Outros fungos",
               "notionId": "40273152f17181ec9770df8a5a662720",
               "url": "https://app.notion.com/p/40273152f17181ec9770df8a5a662720",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -961,7 +831,7 @@
             },
             {
               "id": "pt-products-mycorrhizae",
-              "title": "Micorrizas e interações biológicas",
+              "title": "Fungos associados às raízes das plantas",
               "notionId": "40173152f1718134a778d4c8d405ca62",
               "url": "https://app.notion.com/p/40173152f1718134a778d4c8d405ca62",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -1114,7 +984,7 @@
           "children": [
             {
               "id": "pt-products-solid-1",
-              "title": "WA — ágar-água",
+              "title": "WA — gélose à l’eau prête à l’emploi",
               "notionId": "3f473152f171812a814dd7b951786313",
               "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
               "description": "Page publique référencée dans la page Produits & ressources biologiques.",
@@ -1323,7 +1193,7 @@
       "children": [
         {
           "id": "evidence-resource-2",
-          "title": "Evidências e medição",
+          "title": "Medição e reprodutibilidade",
           "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
           "children": [],
           "kind": "reference",
