@@ -1,8 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "ar",
-  "coverage": "Main-branch hierarchy retained; verified evidence entry replaces synthetic root; public catalogue expanded from live Notion rows; duplicate canonical pages represented once",
+  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
   "domains": [
     {
       "id": "myco",
@@ -19,7 +19,7 @@
           "children": [
             {
               "id": "ar-pleurotus-cultivated",
-              "title": "Pleurotus — الأنواع والموارد المزروعة",
+              "title": "فطر المحار والموارد المرتبطة",
               "notionId": "40273152f1718104965acbf434612d39",
               "url": "https://app.notion.com/p/40273152f1718104965acbf434612d39",
               "description": "دليل لأنواع Pleurotus والموارد والسلالات المزروعة، مع روابط البطاقات المرتبطة بها.",
@@ -132,7 +132,7 @@
             },
             {
               "id": "ar-other-fungi",
-              "title": "فطريات أخرى مدروسة أو مزروعة",
+              "title": "فطريات أخرى",
               "notionId": "40273152f171817dafeae0d07ecb305f",
               "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
               "description": "مجموعة بطاقات لفطريات أخرى تدرسها BA Labs أو توثق مواردها، دون افتراض أن كل نوع متوفر كمزرعة موصوفة.",
@@ -231,7 +231,7 @@
         },
         {
           "id": "ar-mycorrhizae",
-          "title": "الفطريات الجذرية والتفاعلات البيولوجية",
+          "title": "الفطريات المرتبطة بجذور النباتات",
           "notionId": "40173152f17181c6b3baf6efc7bb60bc",
           "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
           "description": "العلاقات بين الفطريات والجذور والتفاعلات البيولوجية المرتبطة بها.",
@@ -681,136 +681,6 @@
           "url": "https://app.notion.com/p/40173152f1718101b2c1f56cd9b8c8c4",
           "description": "يربط بيانات الدفعات والملاحظات والظروف التجريبية لتسهيل المقارنة والتفسير.",
           "children": []
-        },
-        {
-          "id": "iot-environment",
-          "title": "مراقبة البيئة",
-          "description": "متابعة العوامل الفيزيائية اللي تأثر على الأنظمة البيولوجية.",
-          "children": [
-            {
-              "id": "iot-temperature",
-              "title": "درجة الحرارة",
-              "description": "متابعة التغيّرات والدورات واستقرار الحرارة في فضاءات الزراعة.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidity",
-              "title": "الرطوبة",
-              "description": "مراقبة رطوبة الهواء وظروف توفر الماء.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-gas",
-              "title": "تبادل الغازات والتهوية",
-              "description": "دراسة التهوية وتبادل الغازات داخل فضاءات الزراعة.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-instrumentation",
-          "title": "بنية أجهزة القياس",
-          "description": "ربط الحساسات والواجهات ووحدات التحكم حسب التجارب.",
-          "children": [
-            {
-              "id": "iot-sensors-types",
-              "title": "الحساسات والمجسّات",
-              "description": "مقارنة تقنيات القياس والمدى والدقة والحدود.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-microcontrollers",
-              "title": "المتحكمات الدقيقة",
-              "description": "استكشاف قراءة الإشارات والمداخل والمخارج والوحدات المدمجة.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-power",
-              "title": "التغذية والحماية",
-              "description": "توثيق التغذية الكهربائية والحماية وموثوقية التركيب.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-control",
-          "title": "التحكم في ظروف الزراعة",
-          "description": "دراسة التحكم التدريجي في ظروف الزراعة مع التمييز بين النموذج الأولي والنظام التشغيلي.",
-          "children": [
-            {
-              "id": "iot-airflow",
-              "title": "التهوية وتدفق الهواء",
-              "description": "تصميم متابعة وتجديد الهواء.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-humidification",
-              "title": "الترطيب",
-              "description": "دراسة تنظيم الرطوبة وتوزيع الماء.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-lighting",
-              "title": "الإضاءة والدورات",
-              "description": "تحديد سيناريوهات الإضاءة والتوقيت للتجارب.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-data",
-          "title": "جمع البيانات ومعالجتها",
-          "description": "تحويل القياسات إلى سلاسل زمنية قابلة للاستغلال والمقارنة.",
-          "children": [
-            {
-              "id": "iot-logging",
-              "title": "تسجيل مستمر",
-              "description": "تأريخ القياسات وحفظ البيانات الخام مع سياقها.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-dashboard",
-              "title": "العرض والتنبيهات",
-              "description": "عرض الاتجاهات والحدود والتغيرات لتسهيل المتابعة.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-quality",
-              "title": "جودة القياس",
-              "description": "كشف الانحراف والقيم الناقصة والمعايرة وعدم اليقين.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
-        },
-        {
-          "id": "iot-traceability-detail",
-          "title": "التتبّع التجريبي",
-          "description": "ربط كل قياس بالزراعة والدفعة والبروتوكول وفترة التجربة.",
-          "children": [
-            {
-              "id": "iot-batch-links",
-              "title": "الدفعات والزراعات",
-              "description": "ربط القراءات بمعرّفات الدفعات ومراحل الزراعة.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-protocol-links",
-              "title": "البروتوكولات والأحداث",
-              "description": "تسجيل تغييرات الإعدادات والتدخلات والحوادث.",
-              "kind": "label"
-            },
-            {
-              "id": "iot-comparison",
-              "title": "السجل والمقارنة",
-              "description": "مقارنة الدورات التجريبية مع الحفاظ على ظروفها الأصلية.",
-              "kind": "label"
-            }
-          ],
-          "kind": "section"
         }
       ],
       "description": "أجهزة القياس والحساسات والأتمتة: كيف نجمع بيانات المختبر والبيئة ونحوّلها إلى متابعة عملية.",
@@ -929,7 +799,7 @@
             },
             {
               "id": "ar-products-pleurotus",
-              "title": "Pleurotus — الأنواع والموارد المزروعة",
+              "title": "فطر المحار والموارد المرتبطة",
               "notionId": "40273152f1718104965acbf434612d39",
               "url": "https://app.notion.com/p/40273152f1718104965acbf434612d39",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -938,7 +808,7 @@
             },
             {
               "id": "ar-products-other-fungi",
-              "title": "فطريات أخرى مدروسة أو مزروعة",
+              "title": "فطريات أخرى",
               "notionId": "40273152f171817dafeae0d07ecb305f",
               "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -956,7 +826,7 @@
             },
             {
               "id": "ar-products-mycorrhizae",
-              "title": "الفطريات الجذرية والتفاعلات البيولوجية",
+              "title": "الفطريات المرتبطة بجذور النباتات",
               "notionId": "40173152f17181c6b3baf6efc7bb60bc",
               "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
               "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
@@ -1109,7 +979,7 @@
           "children": [
             {
               "id": "ar-products-solid-1",
-              "title": "WA — آغار الماء",
+              "title": "WA — gélose à l’eau prête à l’emploi",
               "notionId": "3f473152f171812a814dd7b951786313",
               "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
               "description": "Page publique référencée dans la page Produits & ressources biologiques.",
@@ -1332,7 +1202,7 @@
       "children": [
         {
           "id": "evidence-resource-1",
-          "title": "الأعمال الموثقة",
+          "title": "الأعمال والإنجازات الموثقة",
           "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
           "children": [],
           "kind": "reference",
