@@ -186,7 +186,7 @@
 .intro-wordmark>span{font:500 25px/1 var(--store-sans);letter-spacing:.24em}
 .intro-wordmark small{color:#9eafa4;font:8px var(--store-mono);letter-spacing:.2em}
 .intro-tagline{margin:19px 0 0;color:#d39a7e;font:8px var(--store-mono);letter-spacing:.16em;opacity:0;animation:intro-copy-appear .5s ease-out 1.2s forwards}
-.intro-skip{position:absolute;top:20px;right:22px;padding:10px 13px;border:1px solid #71877a88;background:#172522;color:#e8e9df;font:9px var(--store-mono);cursor:pointer}
+.intro-skip{position:absolute;z-index:2;top:20px;right:22px;padding:10px 13px;border:1px solid #71877a88;background:#172522;color:#e8e9df;font:9px var(--store-mono);cursor:pointer}
 .intro-skip:hover{border-color:#d39a7e;color:#f0c0a3}
 .intro-skip:focus-visible{outline:2px solid #e0a080;outline-offset:4px}
 body.intro-active{overflow:hidden}
