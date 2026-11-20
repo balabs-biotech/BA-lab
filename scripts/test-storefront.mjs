@@ -55,6 +55,7 @@ assert.ok(privacy.includes('appel depuis le navigateur reste désactivé') && pr
 assert.ok(cookies.includes('appel depuis le navigateur reste désactivé'), 'Cookie policy must disclose that no remote catalogue request is active');
 assert.ok(legalPages.every(page => /<meta name="robots" content="noindex, nofollow">/.test(page)), 'Unfinished legal and privacy drafts must stay out of search indexes until formally approved');
 assert.ok(css.includes('.legal-content') && css.includes('.store-hero') && css.includes('.product-card'), 'Storefront and legal page styling must be present');
+assert.ok(css.includes(':focus-visible') && css.includes('outline:2px solid #e0a080'), 'All storefront keyboard controls must expose a high-contrast visible focus indicator');
 assert.ok(workflow.includes('cp -R store/. _site/store/'), 'GitHub Pages workflow must publish the independent store directory');
 assert.ok(ecosystem.includes('href="../store/index.html"') && ecosystem.includes('navStore:"Boutique"') && ecosystem.includes('navStore:"Store"') && ecosystem.includes('navStore:"المتجر"') && ecosystem.includes('navStore:"Loja"'), 'The ecosystem navigation must link to the storefront in all four languages');
 console.log('Storefront regression checks passed: 32 references, four languages, availability gating, cart, custom enquiry workspace, Supabase-first intake gate, legal pages and reduced-motion support.');
