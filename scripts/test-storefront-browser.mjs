@@ -83,6 +83,24 @@ try {
   await page.locator("#cartOpen").click();
   assert.equal(await page.locator("#cartItems .quantity-control span").first().textContent(), "2", "Persisted numeric-string quantities must be normalized to integers");
   assert.deepEqual(pageErrors, [], "Storefront must not raise uncaught browser errors");
+  const unconfiguredPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await unconfiguredPage.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
+  await unconfiguredPage.route("**/store.js**", async route => {
+    const response = await route.fetch();
+    const source = (await response.text()).replace("const STORE_ORDER_ENABLED=false;", "const STORE_ORDER_ENABLED=true;");
+    await route.fulfill({ response, body: source });
+  });
+  await unconfiguredPage.goto(base, { waitUntil: "networkidle" });
+  assert.equal(await unconfiguredPage.locator("#submitOrder").isDisabled(), true, "Order submission must remain disabled when the Turnstile site key is missing");
+  await unconfiguredPage.locator("#productGrid .add-product").first().click();
+  await unconfiguredPage.locator("#cartOpen").click();
+  await unconfiguredPage.locator("#requestQuote").click();
+  await unconfiguredPage.locator("#requestModal.is-open").waitFor();
+  assert.match(await unconfiguredPage.locator(".request-description").textContent(), /pas encore activé/i, "Missing Turnstile configuration must not display active-intake privacy copy");
+  assert.match(await unconfiguredPage.locator("[data-i18n=integrationNote]").textContent(), /aucune coordonnée/i, "Missing Turnstile configuration must preserve the no-transmission disclosure");
+  assert.match(await unconfiguredPage.locator("#orderStatus").textContent(), /non activé/i, "Missing Turnstile configuration must display the inactive status");
+  assert.equal(await unconfiguredPage.locator("#turnstileWidget").isVisible(), false, "Turnstile must not render without its public site key");
+  await unconfiguredPage.close();
   const turnstilePage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await turnstilePage.addInitScript(() => {
     window.turnstile = {
