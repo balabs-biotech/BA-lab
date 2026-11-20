@@ -88,9 +88,9 @@ try {
       }
       await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
       await page.waitForFunction((index) => { const track=document.querySelector('#experienceTrack'); return !!track && Math.abs(track.scrollLeft-index*track.clientWidth)<3; }, index, { timeout: 10000 });
-      const gaugeState = await page.locator('body>.chapter-rail').evaluate(el => ({value:Number(el.getAttribute('aria-valuenow')),fill:getComputedStyle(el).getPropertyValue('--fill').trim()}));
-      assert.equal(gaugeState.value,index+1,'The liquid gauge must report the active chapter');
-      assert.ok(gaugeState.fill.endsWith('%'),'The liquid gauge must expose a percentage fill');
+      const activeNode = await page.locator('body>.chapter-rail .neural-node.is-active').count();
+      assert.equal(activeNode,1,'Exactly one neural chapter node must be active at a time');
+      assert.equal(await page.locator('body>.chapter-rail .neural-node').nth(index).getAttribute('aria-current'),'step','The active neural node must identify the current chapter');
       await page.waitForTimeout(650);
       if (viewport.name === 'mobile' && chapter === 'network') {
         const frame = await page.locator('#inlineExplorer').evaluate(root => {
@@ -188,7 +188,7 @@ try {
     await page.waitForFunction(() => {
       const track = document.querySelector('#experienceTrack');
       return Math.abs(track.scrollLeft - track.clientWidth * 3) < 3 &&
-        Number(document.querySelector('body>.chapter-rail')?.getAttribute('aria-valuenow')) === 4 &&
+        document.querySelectorAll('body>.chapter-rail .neural-node.is-active').length === 1 && document.querySelector('body>.chapter-rail .neural-node:nth-child(4)')?.getAttribute('aria-current') === 'step' &&
         document.querySelector('#chapter-catalogue')?.getAttribute('aria-current') === 'page';
     }, undefined, { timeout: 10000 });
     const allChapterImageAudits = chapterImageAudits.flatMap(audit => audit.images);
