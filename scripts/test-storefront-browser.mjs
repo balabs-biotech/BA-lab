@@ -72,7 +72,10 @@ try {
   if (await turnstilePage.locator("#consentNotice").isVisible()) await turnstilePage.locator("#consentAcknowledge").click();
   assert.equal(await turnstilePage.locator("#submitOrder").isDisabled(), true, "Order submission must start disabled until Turnstile validates");
   await turnstilePage.locator("#productGrid .add-product").first().click();
+  await turnstilePage.waitForFunction(() => document.querySelector("#cartCount")?.textContent?.trim() === "1");
   await turnstilePage.locator("#cartOpen").click();
+  await turnstilePage.locator("#cartItems .cart-line").first().waitFor();
+  await turnstilePage.locator("#drawerBottom").waitFor({ state: "visible" });
   await turnstilePage.locator("#requestQuote").click();
   await turnstilePage.locator("#requestModal.is-open").waitFor();
   await turnstilePage.waitForFunction(() => Boolean(window.__turnstileState));
