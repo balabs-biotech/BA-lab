@@ -1,8 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const ALLOWED_ORIGINS = new Set(["https://balabs-biotech.github.io"]);
-const DATA_SOURCE_ID = Deno.env.get("NOTION_STORE_DATA_SOURCE_ID") ?? "7a40b95b-e353-4eb9-a471-99c97c5904f5";
-const NOTION_VERSION = "2025-09-03";
 const MAX_BODY_BYTES = 16384;
 const MAX_ITEMS = 20;
 type Product = {
@@ -121,91 +119,6 @@ async function verifyTurnstile(token: string, secret: string): Promise<"valid" |
   } catch {
     return "unavailable";
   }
-}
-
-function rich(value: string) {
-  return { rich_text: value ? [{ type: "text", text: { content: value.slice(0, 1900) } }] : [] };
-}
-
-async function notionRequest(path: string, token: string, method: string, body?: unknown) {
-  const response = await fetch("https://api.notion.com/v1" + path, {
-    method,
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Notion-Version": NOTION_VERSION,
-      "Content-Type": "application/json"
-    },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) })
-  });
-  const data = await response.json().catch(() => null);
-  return { response, data };
-}
-
-async function syncToNotion(order: Record<string, any>, items: Array<Record<string, any>>, token: string) {
-  const title = "Boutique BA Labs — " + order.order_ref;
-  const lookup = await notionRequest("/data_sources/" + DATA_SOURCE_ID + "/query", token, "POST", {
-    filter: { property: "Demande", title: { equals: title } },
-    page_size: 1
-  });
-  if (!lookup.response.ok) {
-    const code = lookup.data && typeof lookup.data.code === "string" ? lookup.data.code : "lookup_failed";
-    throw new Error("notion_lookup_" + lookup.response.status + "_" + code);
-  }
-
-  const existing = Array.isArray(lookup.data?.results) ? lookup.data.results[0] : null;
-  if (existing?.id) return String(existing.id);
-
-  const families = new Set(items.map(item => String(item.product_family)));
-  const allCultureFamilies = [...families].every(family => family === "liquid" || family === "spawn");
-  const category = families.size === 1 && families.has("agar") ? "Géloses" : allCultureFamilies ? "Cultures" : "Autre";
-  const productText = items.map(item =>
-    Number(item.quantity) + " × " + String(item.product_title) + " [" + String(item.product_code) + "]"
-  ).join("\n");
-  const formatText = items.map(item =>
-    String(item.product_code) + " : " + Number(item.quantity) + " unité(s) — conditionnement à confirmer"
-  ).join("\n");
-
-  const message = [
-    order.customer_message ? String(order.customer_message) : "",
-    "Référence : " + String(order.order_ref),
-    "Prix, disponibilité, conditionnement et modalités à confirmer par BA Labs.",
-    "Aucun paiement effectué à ce stade."
-  ].filter(Boolean).join("\n");
-
-  const properties: Record<string, unknown> = {
-    "Demande": { title: [{ type: "text", text: { content: title } }] },
-    "Statut": { select: { name: "🆕 Nouvelle" } },
-    "Nom": rich(String(order.customer_name)),
-    "Téléphone": { phone_number: String(order.customer_phone) },
-    "Wilaya": rich(String(order.customer_wilaya ?? "")),
-    "Produit": rich(productText),
-    "Format": rich(formatText),
-    "Quantité": { number: Number(order.total_quantity) },
-    "Catégorie": { select: { name: category } },
-    "Mode de livraison": { select: { name: String(order.delivery_mode) } },
-    "Message": rich(message),
-    "Notes internes": rich([
-      "Origine : Boutique publique BA Labs",
-      "Référence : " + String(order.order_ref),
-      "Synchronisation : Supabase → Notion",
-      "ID Supabase : " + String(order.id)
-    ].join("\n"))
-  };
-  if (order.customer_email) properties["Email"] = { email: String(order.customer_email) };
-  if (order.customer_organization) properties["Organisation"] = rich(String(order.customer_organization));
-  if (order.estimated_total_dzd !== null && order.estimated_total_dzd !== undefined) {
-    properties["Prix estimé"] = { number: Number(order.estimated_total_dzd) };
-  }
-
-  const created = await notionRequest("/pages", token, "POST", {
-    parent: { type: "data_source_id", data_source_id: DATA_SOURCE_ID },
-    properties
-  });
-  if (!created.response.ok || !created.data?.id) {
-    const code = created.data && typeof created.data.code === "string" ? created.data.code : "create_failed";
-    throw new Error("notion_create_" + created.response.status + "_" + code);
-  }
-  return String(created.data.id);
 }
 
 Deno.serve(async (req: Request) => {
@@ -339,51 +252,11 @@ Deno.serve(async (req: Request) => {
     return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
   }
 
-  const orderId = String(createdOrder.id);
   const orderRef = String(createdOrder.order_ref);
-  const orderQuery = "store_orders?id=eq." + encodeURIComponent(orderId) + "&select=id,order_ref,customer_name,customer_phone,customer_email,customer_organization,customer_wilaya,delivery_mode,customer_message,total_quantity,estimated_total_dzd";
-  const itemQuery = "store_order_items?order_id=eq." + encodeURIComponent(orderId) + "&select=product_code,product_title,product_family,quantity&order=id.asc";
-  let notionPageId = "";
-  let syncError = "";
-
-  try {
-    const [orderResult, itemsResult] = await Promise.all([
-      supabaseRequest(orderQuery, secretKey, "GET"),
-      supabaseRequest(itemQuery, secretKey, "GET")
-    ]);
-    if (!orderResult.response.ok || !Array.isArray(orderResult.data) || !orderResult.data[0] ||
-        !itemsResult.response.ok || !Array.isArray(itemsResult.data)) {
-      throw new Error("stored_order_read_failed");
-    }
-    const notionToken = Deno.env.get("NOTION_STORE_API_KEY") ?? "";
-    if (!notionToken) throw new Error("notion_token_missing");
-    notionPageId = await syncToNotion(orderResult.data[0], itemsResult.data, notionToken);
-  } catch (error) {
-    syncError = error instanceof Error ? error.message.slice(0, 180) : "notion_sync_failed";
-    console.error("[create-store-order] Notion sync pending", syncError);
-  }
-
-  const patch = {
-    notion_sync_status: notionPageId ? "synced" : "pending",
-    notion_page_id: notionPageId || null,
-    notion_sync_attempts: 1,
-    notion_sync_error: notionPageId ? null : syncError,
-    notion_sync_next_attempt_at: notionPageId ? null : new Date(Date.now() + 60_000).toISOString(),
-    notion_sync_locked_until: null,
-    notion_sync_lock_token: null,
-    notion_synced_at: notionPageId ? new Date().toISOString() : null,
-    updated_at: new Date().toISOString()
-  };
-  try {
-    await supabaseRequest("store_orders?id=eq." + encodeURIComponent(orderId), secretKey, "PATCH", patch);
-  } catch (error) {
-    console.error("[create-store-order] Sync status update failed", error instanceof Error ? error.message : "unknown");
-  }
-
-  return json(notionPageId ? (createdOrder.duplicate ? 200 : 201) : 202, {
+  return json(202, {
     success: true,
     orderRef,
     duplicate: Boolean(createdOrder.duplicate),
-    notionSync: notionPageId ? "synced" : "pending"
+    notionSync: "pending"
   }, origin);
 });
