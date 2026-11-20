@@ -74,6 +74,9 @@ assert.ok(edge.includes('Deno.env.get("NOTION_STORE_API_KEY") ?? ""') && !edge.i
 assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|customer_phone|customer_message)/.test(edge), "Customer contact fields must never be written to application logs");
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
+const publicOrderHandler = edge.slice(edge.indexOf("Deno.serve"));
+assert.ok(!publicOrderHandler.includes("syncToNotion(") && !publicOrderHandler.includes('"store_orders?id=eq."'), "Public intake must not read customer rows or create Notion pages inline; the locked retry worker owns synchronization");
+assert.ok(publicOrderHandler.includes("return json(202,") && publicOrderHandler.includes('notionSync: "pending"'), "Public intake must acknowledge durable Supabase persistence and defer Notion synchronization to the worker");
 assert.ok(edge.includes('Deno.env.get("TURNSTILE_ENABLED") !== "true"'), "Order intake must fail closed unless server-side anti-bot verification is enabled");
 assert.ok(edge.includes("Object.hasOwn(PRODUCTS, code)"), "Product allowlist must reject inherited object-property names rather than accepting prototype keys");
 
