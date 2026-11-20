@@ -29,9 +29,9 @@
  const controls=document.createElement('div');controls.className='experience-controls';controls.setAttribute('role','group');controls.setAttribute('aria-label','Navigation entre les espaces');
  const prev=document.createElement('button'),count=document.createElement('span'),next=document.createElement('button');
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
- const rail=document.createElement('nav');rail.className='chapter-rail';rail.setAttribute('aria-label','Parcours des chapitres');
- rail.innerHTML='<svg class="chapter-filament" viewBox="0 0 64 500" aria-hidden="true"><path class="filament-base" d="M32 24 L32 476"/><path class="filament-progress" d="M32 24 L32 476"/><circle class="filament-signal" cx="32" cy="24" r="4"/><path class="filament-branch" d="M31 86 C20 82 14 70 9 59 M34 174 C46 168 51 156 56 145 M31 298 C19 291 13 281 8 270 M34 414 C46 407 51 395 57 384"/></svg><div class="chapter-rail-nodes"></div>';
- const railNodes=rail.querySelector('.chapter-rail-nodes');
+ const rail=document.createElement('div');rail.className='chapter-rail liquid-gauge';rail.setAttribute('role','progressbar');rail.setAttribute('aria-label','Progression dans les chapitres');rail.setAttribute('aria-valuemin','1');rail.setAttribute('aria-valuemax',String(pages.length));rail.setAttribute('aria-valuenow','1');rail.setAttribute('aria-valuetext','Chapitre 1 sur '+pages.length);
+ rail.innerHTML='<span class="liquid-glass" aria-hidden="true"><span class="liquid-fill"><i class="air-bubble bubble-one"></i><i class="air-bubble bubble-two"></i><i class="air-bubble bubble-three"></i></span><span class="liquid-glint"></span></span>';
+ const railNodes=document.createElement('div');railNodes.className='chapter-rail-nodes';
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-rail-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.innerHTML='<span class="chapter-rail-dot"></span><span class="chapter-rail-name"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  document.body.append(rail);
  // Scroll-led editorial typography: reveal only key section headings, not body copy.
@@ -126,8 +126,7 @@
   prev.disabled=idx===0;next.disabled=idx===pages.length-1;
   prev.setAttribute('aria-controls',pages[Math.max(0,idx-1)].id);next.setAttribute('aria-controls',pages[Math.min(pages.length-1,idx+1)].id);
   progress.firstElementChild.style.width=(rawProgress/Math.max(1,pages.length-1)*100)+'%';progress.setAttribute('aria-valuenow',String(idx+1));progress.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
-  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{b.classList.toggle('is-active',i===idx);b.classList.toggle('is-past',i<idx);b.setAttribute('aria-current',i===idx?'step':'false')});
-  rail.querySelectorAll('.chapter-rail-name').forEach((n,i)=>{n.textContent=groups[i].label[getLanguage()]||groups[i].label.fr});
+  rail.style.setProperty('--fill',(rawProgress/Math.max(1,pages.length-1)*100)+'%');rail.setAttribute('aria-valuenow',String(idx+1));rail.setAttribute('aria-valuetext',(groups[idx].label[getLanguage()]||groups[idx].label.fr)+' — '+(idx+1)+' / '+pages.length);
   if(filamentLength&&filamentStops.length===pages.length){
    const segment=Math.min(pages.length-2,Math.floor(rawProgress));
    const fraction=rawProgress>=pages.length-1?1:rawProgress-segment;
@@ -206,8 +205,7 @@
   prev.setAttribute('aria-label',({fr:'Espace précédent',en:'Previous space',ar:'المساحة السابقة',pt:'Espaço anterior'})[l]);
   next.setAttribute('aria-label',({fr:'Espace suivant',en:'Next space',ar:'المساحة التالية',pt:'Próximo espaço'})[l]);
   controls.setAttribute('aria-label',({fr:'Navigation entre les espaces',en:'Navigate between spaces',ar:'التنقل بين المساحات',pt:'Navegar entre espaços'})[l]);
-  rail.setAttribute('aria-label',({fr:'Parcours des chapitres',en:'Chapter navigation',ar:'التنقل بين الفصول',pt:'Navegação por capítulos'})[l]);
-  rail.querySelectorAll('.chapter-rail-node').forEach((b,i)=>{const label=groups[i].label[l]||groups[i].label.fr;b.setAttribute('aria-label',label);const name=b.querySelector('.chapter-rail-name');if(name)name.textContent=label;});
+  rail.setAttribute('aria-label',({fr:'Progression dans les chapitres',en:'Chapter progress',ar:'التقدم بين الفصول',pt:'Progresso dos capítulos'})[l]);
   update();
  };
  new MutationObserver(localize).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
