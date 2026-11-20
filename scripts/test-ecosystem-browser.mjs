@@ -184,10 +184,7 @@ try {
     await page.evaluate(() => {
       const track = document.querySelector('#experienceTrack');
       const chapter = document.querySelector('#chapter-catalogue');
-      const trackRect = track.getBoundingClientRect();
-      const chapterRect = chapter.getBoundingClientRect();
-      const target = track.scrollLeft + chapterRect.left - trackRect.left;
-      track.scrollTo({ left: target, behavior: 'instant' });
+      chapter.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'instant' });
     });
     await page.waitForFunction(() => {
       const track = document.querySelector('#experienceTrack');
