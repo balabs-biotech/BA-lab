@@ -105,11 +105,11 @@ try {
       return result;
     });
     assert.ok(blackPearl?.parentId && blackPearl.url, 'Black Pearl must have a canonical parent and Notion URL');
-    const parentButton = page.locator(`#accessibleNodes button[data-node-id="${blackPearl.parentId}"]`);
-    await parentButton.focus();
-    await parentButton.press('Enter');
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting the Black Pearl parent must not open Notion');
+    const leafButton = page.locator('#accessibleNodes button[data-node-id="myco-black-pearl"]');
+    await leafButton.focus();
+    await leafButton.press('Enter');
+    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.includes('Black Pearl'));
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting Black Pearl by keyboard must not open Notion');
     await page.waitForFunction(id => {
       const boxes = JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}');
       return Boolean(boxes[id]);
