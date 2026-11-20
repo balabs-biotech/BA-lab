@@ -1,9 +1,17 @@
 {
-  "version": 4,
+  "version": 5,
   "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
   "language": "ar",
-  "coverage": "Every interactive point resolves to its canonical Notion page; editorial product group headings are retained as non-interactive sections; synthetic instrumentation topic nodes without Notion pages are excluded.",
+  "coverage": "Every interactive point resolves to its canonical Notion page; includes the language landing page and collaboration proposal page.",
   "domains": [
+    {
+      "id": "ar-home",
+      "title": "BA Labs — التكنولوجيا الحيوية التطبيقية",
+      "notionId": "40173152f17181eaaffbeb758d7dc175",
+      "url": "https://app.notion.com/p/40173152f17181eaaffbeb758d7dc175",
+      "description": "الصفحة الرئيسية العامة باللغة العربية.",
+      "children": []
+    },
     {
       "id": "myco",
       "title": "علم الفطريات",
@@ -1229,7 +1237,16 @@
           "title": "التعاون مع BA Labs",
           "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
           "notionId": "40173152f17181598fc7f2f5a3e64e8a",
-          "children": []
+          "children": [
+            {
+              "id": "collaboration-proposal-ar",
+              "title": "إعداد مقترح مشروع",
+              "notionId": "40273152f17181dc97fdfeeca44a791c",
+              "url": "https://app.notion.com/p/40273152f17181dc97fdfeeca44a791c",
+              "description": "إرشادات إعداد مقترح تعاون مع BA Labs.",
+              "children": []
+            }
+          ]
         }
       ],
       "relations": []
