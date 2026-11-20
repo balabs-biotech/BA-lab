@@ -45,6 +45,12 @@ assert.ok(publicResponse.includes("orderRef") && publicResponse.includes("notion
 assert.ok(edge.includes('"Cache-Control": "no-store"'), "Customer enquiry responses must not be cached");
 
 assert.ok(edge.includes("isRateLimited(req, secretKey)") && edge.includes("MAX_BODY_BYTES"), "Public endpoint must apply persistent request throttling and body-size limits");
+assert.ok(edge.includes('Deno.env.get("TURNSTILE_ENABLED") === "true"'), "Turnstile must be controlled by an explicit server-side feature flag");
+assert.ok(edge.includes('Deno.env.get("TURNSTILE_SECRET_KEY")') && edge.includes('https://challenges.cloudflare.com/turnstile/v0/siteverify'), "Turnstile must be verified server-side with the private secret");
+assert.ok(edge.includes('result?.hostname === "balabs-biotech.github.io"') && edge.includes('result?.action === "store_order"'), "Turnstile verification must bind the token to the exact storefront hostname and action");
+assert.ok(edge.includes('challenge !== "valid"') && edge.indexOf('challenge !== "valid"') < edge.indexOf('rpc/create_store_order'), "Invalid or missing Turnstile tokens must be rejected before any customer record is written");
+assert.ok(edge.includes('challenge === "unavailable"') && edge.includes('return json(503'), "Turnstile outages must fail closed");
+
 assert.ok(edge.includes('new Set(["https://balabs-biotech.github.io"])') && !edge.includes("Access-Control-Allow-Origin: *"), "Order endpoint must use an exact storefront origin allowlist");
 assert.ok(edge.indexOf("if (clean(body.website, 200))") < edge.indexOf("const secretKey = getSecretKey()") && edge.includes("return json(200, { success: true }, origin)"), "Honeypot submissions must be silently discarded before database access");
 assert.ok(edge.indexOf("isRateLimited(req, secretKey)") < edge.indexOf('rpc/create_store_order'), "Rate limiting must run before any customer record is written");
