@@ -46,7 +46,8 @@ assert.equal((html.match(/<script\b[^>]*>/gi)||[]).filter(tag=>! /\bsrc=/.test(t
 assert.ok(html.includes('id="turnstileWidget"') && js.includes("const TURNSTILE_SITE_KEY=''"), 'Turnstile mount must exist while its unprovisioned public key stays blank');
 const requestOpener = js.match(/function openRequest\(\)\{[\s\S]*?(?=\nfunction closeRequest)/)?.[0] || '';
 assert.ok(requestOpener.includes('loadTurnstile()') && requestOpener.indexOf("classList.add('is-open')") < requestOpener.indexOf('loadTurnstile()'), 'Turnstile must initialize only after the request dialog becomes visible');
-const orderGate = js.slice(js.indexOf('if(STORE_ORDER_ENABLED){'), js.indexOf('\norderForm.addEventListener'));
+const orderGateStart = js.indexOf('if(STORE_ORDER_ENABLED){orderForm.querySelectorAll');
+const orderGate = js.slice(orderGateStart, js.indexOf('\norderForm.addEventListener', orderGateStart));
 assert.ok(!orderGate.includes('loadTurnstile()'), 'Turnstile must not render inside the initially hidden request dialog');
 assert.ok(js.includes('let turnstileToken=\'\',turnstileWidgetId=null,turnstileScriptLoading=false') && js.includes('if(turnstileScriptLoading)return;') && js.includes('turnstileScriptLoading=true;') && js.includes('turnstileScriptLoading=false;render();'), 'Turnstile script loading must be idempotent across repeated dialog openings');
 const turnstileRender = js.match(/const render=\(\)=>\{[\s\S]*?\n \};/)?.[0] || '';
