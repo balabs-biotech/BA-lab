@@ -82,19 +82,15 @@ try {
     // Audit real image decoding on every editorial chapter after navigation.
     const chapterImageAudits = [];
     for (const [index, chapter] of ['home','research','network','catalogue','about'].entries()) {
-      if (viewport.name === 'mobile') await page.locator('.chapter-rail-node').nth(index).tap();
-      else await page.locator('.chapter-rail-node').nth(index).click();
+      if (index > 0) {
+        const nextButton = page.locator('.experience-controls button').nth(1);
+        if (viewport.name === 'mobile') await nextButton.tap(); else await nextButton.click();
+      }
       await page.waitForFunction((id) => document.querySelector('#chapter-' + id)?.getAttribute('aria-current') === 'page', chapter, { timeout: 10000 });
       await page.waitForFunction((index) => { const track=document.querySelector('#experienceTrack'); return !!track && Math.abs(track.scrollLeft-index*track.clientWidth)<3; }, index, { timeout: 10000 });
-      assert.equal(await page.locator('.chapter-rail-node').nth(index).getAttribute('aria-current'),'step','The tapped chapter dot must remain the active navigation point');
-      const railAlignment = await page.evaluate((i) => {
-        const rail=document.querySelector('body>.chapter-rail');
-        const node=rail.querySelectorAll('.chapter-rail-node')[i];
-        const signal=rail.querySelector('.filament-signal');
-        const rr=rail.getBoundingClientRect(),nr=node.getBoundingClientRect();
-        return Math.hypot(Number(signal.getAttribute('cx'))-(nr.left+nr.width/2-rr.left),Number(signal.getAttribute('cy'))-(nr.top+nr.height/2-rr.top));
-      }, index);
-      assert.ok(railAlignment < 1.5, 'The filament signal must land on the exact centre of chapter point '+(index+1)+'; measured offset: '+railAlignment.toFixed(2)+'px');
+      const gaugeState = await page.locator('body>.chapter-rail').evaluate(el => ({value:Number(el.getAttribute('aria-valuenow')),fill:getComputedStyle(el).getPropertyValue('--fill').trim()}));
+      assert.equal(gaugeState.value,index+1,'The liquid gauge must report the active chapter');
+      assert.ok(gaugeState.fill.endsWith('%'),'The liquid gauge must expose a percentage fill');
       await page.waitForTimeout(650);
       if (viewport.name === 'mobile' && chapter === 'network') {
         const frame = await page.locator('#inlineExplorer').evaluate(root => {
@@ -192,7 +188,7 @@ try {
     await page.waitForFunction(() => {
       const track = document.querySelector('#experienceTrack');
       return Math.abs(track.scrollLeft - track.clientWidth * 3) < 3 &&
-        document.querySelectorAll('.chapter-rail-node')[3]?.getAttribute('aria-current') === 'step' &&
+        Number(document.querySelector('body>.chapter-rail')?.getAttribute('aria-valuenow')) === 4 &&
         document.querySelector('#chapter-catalogue')?.getAttribute('aria-current') === 'page';
     }, undefined, { timeout: 10000 });
     const allChapterImageAudits = chapterImageAudits.flatMap(audit => audit.images);
@@ -217,7 +213,8 @@ try {
       assert.ok(catalogueLayout.paragraphs.length > 0 && catalogueLayout.paragraphs.every(p => p.width > catalogueLayout.viewportWidth * .65 && p.writingMode === 'horizontal-tb'), 'Mobile catalogue copy must remain horizontal and readable, not stretched into a narrow vertical strip');
     }
     const originalUrl = page.url();
-    await page.locator('.chapter-rail-node').nth(2).click();
+    await page.locator('.experience-controls button').nth(0).click();
+    await page.locator('.experience-controls button').nth(0).click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
     await page.locator('#chapter-network a[data-domain-page="myco"]').click();
     await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === 'MYCOLOGIE', undefined, { timeout: 15000 });
