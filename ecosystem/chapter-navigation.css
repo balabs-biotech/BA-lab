@@ -669,3 +669,22 @@ body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!impor
   top:calc(50% + 88px)!important;
  }
 }
+
+
+/* FINAL STACKING FIX — the rail must never paint over navigation or copy. */
+body>.chapter-rail.neural-rail{
+ z-index:1!important;
+}
+.wrap.balabs-ui>.site-nav{
+ position:relative!important;
+ z-index:5!important;
+}
+.experience-page{
+ position:relative!important;
+ z-index:2!important;
+}
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail{z-index:0!important}
+ .wrap.balabs-ui>.site-nav{z-index:10!important}
+ .experience-page{z-index:2!important}
+}
