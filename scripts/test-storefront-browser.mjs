@@ -60,6 +60,7 @@ try {
       reset() { window.__turnstileReset = true; }
     };
   });
+  await turnstilePage.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
   await turnstilePage.route("**/store.js", async route => {
     const response = await route.fetch();
     let source = await response.text();
