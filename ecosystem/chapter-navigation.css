@@ -688,3 +688,9 @@ body>.chapter-rail.neural-rail{
  .wrap.balabs-ui>.site-nav{z-index:10!important}
  .experience-page{z-index:2!important}
 }
+
+
+/* MOBILE MYCELIUM TRANSPARENCY — keep the navigation artwork discreet behind the content. */
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail>.neural-network{opacity:.42!important}
+}
