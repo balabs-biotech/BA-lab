@@ -14,6 +14,15 @@
     <path d="M81 91 C73 98 68 106 67 116 M81 91 C91 96 96 104 99 113" stroke-width="1.05" opacity=".8"/>
     <path d="M60 61 C51 72 47 83 48 96 C49 106 44 113 36 118" stroke-width="1.8"/>
     <path d="M48 96 C38 93 29 95 20 101 M48 96 C45 106 40 112 36 118" stroke-width="1.05" opacity=".8"/>
+    <!-- Fine secondary hyphae: denser growth without visual crosshatching. -->
+    <path d="M31 24 C25 24 20 21 16 17 M31 24 C29 18 29 13 31 9" stroke-width=".9" opacity=".78"/>
+    <path d="M22 39 C17 38 13 35 10 31 M22 39 C19 44 15 47 10 48" stroke-width=".9" opacity=".78"/>
+    <path d="M43 43 C37 39 34 34 32 29 M43 43 C39 48 35 51 30 53" stroke-width=".9" opacity=".76"/>
+    <path d="M28 73 C24 68 23 63 24 58 M28 73 C21 73 16 76 12 81" stroke-width=".9" opacity=".76"/>
+    <path d="M87 35 C91 41 96 44 102 44 M87 35 C82 34 78 30 75 25" stroke-width=".9" opacity=".76"/>
+    <path d="M98 51 C102 56 108 58 114 58 M98 51 C94 57 94 63 96 68" stroke-width=".9" opacity=".76"/>
+    <path d="M81 91 C86 88 92 88 97 91 M81 91 C78 98 78 104 80 109" stroke-width=".9" opacity=".76"/>
+    <path d="M48 96 C53 91 55 86 55 80 M48 96 C41 94 35 96 30 100" stroke-width=".9" opacity=".76"/>
   </g>
   <g stroke="#b96b4d" stroke-width="1.2" fill="#111b1d">
     <path d="M60 52 C66 52 70 56 70 62 C70 68 66 72 60 72 C54 72 50 68 50 62 C50 56 54 52 60 52Z"/>
