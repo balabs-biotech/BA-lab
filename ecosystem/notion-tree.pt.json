@@ -5,14 +5,6 @@
   "coverage": "Every interactive point resolves to its canonical Notion page; includes the language landing page and collaboration proposal page.",
   "domains": [
     {
-      "id": "pt-home",
-      "title": "BA Labs — Biotecnologia aplicada",
-      "notionId": "40173152f171811ba1f0f58fd7dd239d",
-      "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
-      "description": "Página pública de entrada em português.",
-      "children": []
-    },
-    {
       "id": "myco",
       "title": "Micologia",
       "notionId": "40173152f171814dad1adcd7559c7823",
@@ -1141,6 +1133,15 @@
       "url": "https://app.notion.com/p/40173152f171810f95b9d36ac1b04533",
       "children": [
         {
+          "id": "pt-home",
+          "title": "BA Labs — Biotecnologia aplicada",
+          "notionId": "40173152f171811ba1f0f58fd7dd239d",
+          "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
+          "description": "Página pública de entrada em português.",
+          "children": [],
+          "kind": "page"
+        },
+        {
           "id": "pt-work-methodology",
           "title": "Metodologia de I&D",
           "notionId": "40273152f1718113a306fa764c01b62b",
@@ -1243,11 +1244,6 @@
       "relations": []
     }
   ],
-  "hub": {
-    "title": "BA Labs — Biotecnologia aplicada",
-    "notionId": "40173152f171811ba1f0f58fd7dd239d",
-    "url": "https://app.notion.com/p/40173152f171811ba1f0f58fd7dd239d",
-    "parentId": "language"
-  },
+  "hub": null,
   "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }
