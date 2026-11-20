@@ -194,8 +194,7 @@ try {
       const chapter = document.querySelector('#chapter-catalogue');
       const trackRect = track.getBoundingClientRect();
       const chapterRect = chapter.getBoundingClientRect();
-      const target = track.scrollLeft + chapterRect.left - trackRect.left;
-      return Math.abs(track.scrollLeft - target) < 3 &&
+      return Math.abs(chapterRect.left - trackRect.left) < 3 &&
         document.querySelectorAll('body>.chapter-rail .neural-node.is-active').length === 1 &&
         document.querySelector('body>.chapter-rail .neural-node:nth-child(4)')?.getAttribute('aria-current') === 'step' &&
         chapter?.getAttribute('aria-current') === 'page';
