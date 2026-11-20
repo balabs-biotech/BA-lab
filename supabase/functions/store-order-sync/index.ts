@@ -37,7 +37,8 @@ async function supabaseRequest(path: string, key: string, method: string, body?:
       "Content-Type": "application/json",
       ...(method === "PATCH" ? { "Prefer": "return=minimal" } : {})
     },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    signal: AbortSignal.timeout(20_000)
   });
   const data = await response.json().catch(() => null);
   return { response, data };
@@ -55,7 +56,8 @@ async function notionRequest(path: string, token: string, method: string, body?:
       "Notion-Version": NOTION_VERSION,
       "Content-Type": "application/json"
     },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    signal: AbortSignal.timeout(20_000)
   });
   const data = await response.json().catch(() => null);
   return { response, data };
