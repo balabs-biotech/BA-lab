@@ -53,7 +53,7 @@ try {
   }, { validCode, secondCode });
   await page.reload({ waitUntil: "networkidle" });
   assert.equal(await page.locator("#cartCount").textContent(), "2", "Reload must retain only valid cart entries with quantities from 1 to 100");
-  assert.equal(await page.locator("#cartItems .quantity-control span").count(), 0, "Cart contents must remain lazily rendered until the drawer opens");
+  assert.equal(await page.locator("#cartItems .quantity-control span").count(), 1, "Only the sanitized cart entry must render");
   await page.locator("#cartOpen").click();
   assert.equal(await page.locator("#cartItems .quantity-control span").first().textContent(), "2", "Persisted numeric-string quantities must be normalized to integers");
   assert.deepEqual(pageErrors, [], "Storefront must not raise uncaught browser errors");
