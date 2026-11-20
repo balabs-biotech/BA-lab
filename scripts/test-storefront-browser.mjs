@@ -77,6 +77,12 @@ try {
   assert.equal(await turnstilePage.evaluate(() => window.__turnstileState.visibleAtRender), true, "Turnstile must render only after the request dialog is visible");
   await turnstilePage.evaluate(() => window.__turnstileState.options.callback("mock-valid-token"));
   assert.equal(await turnstilePage.locator("#submitOrder").isDisabled(), false, "A valid Turnstile token must enable submission");
+  await turnstilePage.locator("#requestClose").click();
+  assert.equal(await turnstilePage.evaluate(() => window.__turnstileReset === true), true, "Closing the request dialog must reset the Turnstile widget");
+  await turnstilePage.locator("#cartOpen").click();
+  await turnstilePage.locator("#requestQuote").click();
+  await turnstilePage.locator("#requestModal.is-open").waitFor();
+  assert.equal(await turnstilePage.locator("#submitOrder").isDisabled(), true, "Reopening the request dialog must require a fresh Turnstile token");
   await turnstilePage.evaluate(() => window.__turnstileState.options["expired-callback"]());
   assert.equal(await turnstilePage.locator("#submitOrder").isDisabled(), true, "An expired Turnstile token must disable submission");
   await turnstilePage.evaluate(() => window.__turnstileState.options.callback("mock-valid-token"));
