@@ -734,15 +734,15 @@ body>.chapter-rail.neural-rail{
 
 
 
-/* v46 — measured mobile clearance: move the complete mycelial rail 44px below v45.
-   Keep its existing height and opacity; preserve the lower reading/control area. */
+/* v47 — second measured mobile shift: another 44px below v46.
+   Preserve the rail dimensions, stacking and transparency. */
 @media(max-width:760px){
  body>.chapter-rail.neural-rail{
-  top:calc(50% + 56px)!important;
+  top:calc(50% + 100px)!important;
   height:min(60vh,430px)!important;
   transform:translateY(-50%)!important;
  }
  html[dir="rtl"] body>.chapter-rail.neural-rail{
-  top:calc(50% + 56px)!important;
+  top:calc(50% + 100px)!important;
  }
 }
