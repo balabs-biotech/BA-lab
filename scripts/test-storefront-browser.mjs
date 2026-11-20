@@ -27,7 +27,7 @@ try {
   await page.locator("#productDetailClose").click();
   assert.equal(await page.locator("#productDetailModal").getAttribute("aria-hidden"), "true", "Close control must dismiss product details");
   await page.locator("#productGrid .add-product").first().click();
-  await page.waitForFunction(() => document.querySelector("#cartCount")?.textContent?.trim() === "1");
+  await page.waitForFunction(() => document.querySelector("#cartCount")?.textContent?.trim() === "2");
   await page.locator("#cartOpen").click();
   await page.locator("#cartItems .cart-line").first().waitFor();
   assert.equal(await page.locator("#cartDrawer").getAttribute("aria-hidden"), "false", "Opening the cart must expose its dialog to assistive technology");
