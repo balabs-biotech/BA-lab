@@ -141,3 +141,7 @@
 /* Keep the active request summary explicitly visible inside the modal. */
 #requestModal.is-open{visibility:visible;pointer-events:auto}
 #requestModal.is-open .request-summary{visibility:visible}
+
+/* High-contrast keyboard focus for the standalone storefront. */
+.store-page :where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid #e0a080;outline-offset:3px}
+.store-page .search-box input:focus-visible{outline:2px solid #e0a080;outline-offset:2px;border-radius:2px}
