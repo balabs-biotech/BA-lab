@@ -1,6 +1,6 @@
 -- Durable, concurrency-safe retries for the storefront's Notion mirror.
 alter table public.store_orders
-  add column if not exists notion_sync_next_attempt_at timestamptz not null default (now() + interval '10 minutes'),
+  add column if not exists notion_sync_next_attempt_at timestamptz default (now() + interval '10 minutes'),
   add column if not exists notion_sync_locked_until timestamptz,
   add column if not exists notion_sync_lock_token uuid;
 
