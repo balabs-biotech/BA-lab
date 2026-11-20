@@ -606,3 +606,26 @@ body>.chapter-rail.neural-rail{width:58px!important;height:min(68vh,520px)!impor
  .experience-page>.hero,.experience-page>.editorial-work,.experience-page>.scene,.experience-page>.universe-index,.experience-page>.product-catalogue,.experience-page>section{scroll-margin-top:8px}
  .chapter-rail .mycelium-unit{opacity:.82}
 }
+
+
+/* Phone layout: move the WHOLE chapter menu band away from the mycelium rail. */
+@media(max-width:760px){
+ .wrap.balabs-ui>.site-nav{
+  width:calc(100% - 62px)!important;
+  max-width:calc(100% - 62px)!important;
+  margin-inline-start:62px!important;
+  margin-inline-end:0!important;
+  padding-inline:7px!important;
+  box-sizing:border-box!important;
+  scroll-padding-inline-start:7px;
+ }
+ html[dir="rtl"] .wrap.balabs-ui>.site-nav{
+  margin-inline-start:62px!important;
+  margin-inline-end:0!important;
+ }
+ .chapter-rail .mycelium-unit{
+  opacity:.675!important;
+  filter:drop-shadow(0 0 2px #9aafa214);
+ }
+}
+.chapter-rail .mycelium-unit{opacity:.675!important}
