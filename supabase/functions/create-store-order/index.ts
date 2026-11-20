@@ -102,6 +102,27 @@ async function isRateLimited(req: Request, secretKey: string): Promise<boolean> 
   return !result.data;
 }
 
+async function verifyTurnstile(token: string, secret: string): Promise<"valid" | "invalid" | "unavailable"> {
+  if (!token || token.length > 2048) return "invalid";
+  try {
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret, response: token }),
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!response.ok) return "unavailable";
+    const result = await response.json().catch(() => null);
+    return result?.success === true &&
+      result?.hostname === "balabs-biotech.github.io" &&
+      result?.action === "store_order"
+      ? "valid"
+      : "invalid";
+  } catch {
+    return "unavailable";
+  }
+}
+
 function rich(value: string) {
   return { rich_text: value ? [{ type: "text", text: { content: value.slice(0, 1900) } }] : [] };
 }
@@ -217,6 +238,22 @@ Deno.serve(async (req: Request) => {
     return json(422, { success: false, error: "invalid_payload" }, origin);
   }
   if (clean(body.website, 200)) return json(200, { success: true }, origin);
+
+  if (Deno.env.get("TURNSTILE_ENABLED") === "true") {
+    const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY") ?? "";
+    if (!turnstileSecret) {
+      console.error("[create-store-order] Anti-bot verification is not configured");
+      return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
+    }
+    const challenge = await verifyTurnstile(clean(body.turnstileToken, 2048), turnstileSecret);
+    if (challenge === "unavailable") {
+      console.error("[create-store-order] Anti-bot verification service unavailable");
+      return json(503, { success: false, error: "store_temporarily_unavailable" }, origin);
+    }
+    if (challenge !== "valid") {
+      return json(403, { success: false, error: "anti_bot_verification_failed" }, origin);
+    }
+  }
 
   const customer = body.customer && typeof body.customer === "object" ? body.customer : {};
   const name = clean(customer.name, 120);
