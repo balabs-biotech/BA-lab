@@ -4,7 +4,7 @@ The store is a separate, static customer-facing application published under `/st
 
 ## Current release boundary
 
-The storefront is a catalogue and request-preparation interface. **Guest order submission remains disabled at both the browser and server layers**: `store/store.js` uses `STORE_ORDER_ENABLED=false`, and the Edge Function rejects every request unless its server-side `STORE_ORDER_ENABLED` environment variable is exactly `true`. The server flag is absent by default and must not be enabled until the launch gates below are complete. No public customer orders are being accepted through the site.
+The storefront is a catalogue and request-preparation interface. **Guest order submission remains disabled at both the browser and server layers**: `store/store.js` uses `STORE_ORDER_ENABLED=false`, and the Edge Function rejects every request unless both server-side `STORE_ORDER_ENABLED=true` and `TURNSTILE_ENABLED=true` are explicitly configured. A valid Turnstile token is verified server-side before any customer record is written. The server flag is absent by default and must not be enabled until the launch gates below are complete. No public customer orders are being accepted through the site.
 
 The request form has been redesigned as a two-column enquiry workspace: selected references on one side, customer details on the other. It is localized in FR / EN / AR / PT. The form remains disabled until the end-to-end intake and privacy checks are complete.
 
@@ -31,11 +31,16 @@ Supabase Edge Function: create-store-order
 Supabase: store_orders + store_order_items
         |
         v
+Private locked worker: store-order-sync
+        |
+        v
 Notion: 🛒 DEMANDES COMMERCIALES
 ```
 
 - **Supabase is the transactional source of truth** for guest enquiries and their item snapshots.
 - **Notion is the commercial follow-up workspace** populated after the Supabase write succeeds.
+- The public intake endpoint never reads customer rows back and never calls the Notion API. It returns HTTP 202 after durable Supabase persistence; only the service-role worker can claim an order and create or reconcile its Notion page.
+- Rate limiting uses an HMAC fingerprint of the Cloudflare `CF-Connecting-IP` header only. It does not store raw IP addresses or trust `X-Forwarded-For` / `X-Real-IP` fallbacks.
 - A Notion API outage does not discard the enquiry: the Supabase record remains stored with `notion_sync_status='pending'`. The private `store-order-sync` worker retries pending records with an atomic claim, an eight-attempt ceiling and bounded exponential backoff.
 - The storefront sync uses a dedicated server-side `NOTION_STORE_API_KEY`, separate from CultureOps. Its Notion integration must be shared only with the commercial orders data source, never with CultureOps databases.
 - The legacy direct-to-Notion endpoints `store-notion-order` and `notion-store-order` have been retired. Both now return HTTP 410 and require an authenticated JWT at the gateway. Only `create-store-order` remains the supported intake endpoint.
