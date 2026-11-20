@@ -76,7 +76,8 @@ try {
       const nativeOpen = window.open.bind(window);
       window.open = (...args) => { window.__openedNotionUrls.push(args[0]); return nativeOpen(...args); };
     });
-    await rootButton.click();
+    await rootButton.focus();
+    await rootButton.press('Enter');
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
     assert.equal((await page.evaluate(() => window.__openedNotionUrls[0])), rootExpectedUrl, 'Clicking a universe point must call window.open with its exact canonical Notion page');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
@@ -86,7 +87,8 @@ try {
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
     const childExpectedUrl = mappedTree.nodeUrls[childNodeId];
-    await firstChild.click();
+    await firstChild.focus();
+    await firstChild.press('Enter');
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 2);
     assert.equal((await page.evaluate(() => window.__openedNotionUrls[1])), childExpectedUrl, 'Clicking a child point must call window.open with its own canonical Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
