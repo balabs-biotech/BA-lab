@@ -137,10 +137,11 @@ function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){view
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
 function hit(x,y){
  let found=null,best=22;
+ const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
  const labelZoom=[0,.72,1.3,2.55,4.3];
  for(const n of nodes){
   const threshold=labelZoom[Math.min(n.level,labelZoom.length-1)]||0;
-  if(scale<threshold||levelOpacity(n.level)<.5)continue;
+  if(!visibleLabels.has(n.id)||scale<threshold||levelOpacity(n.level)<.5)continue;
   const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);
   if(d<limit){best=d;found=n;}
  }
