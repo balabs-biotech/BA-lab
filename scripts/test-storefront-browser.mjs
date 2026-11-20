@@ -3,7 +3,7 @@ import { chromium } from "playwright";
 
 const base = process.env.BALABS_STORE_URL || "http://127.0.0.1:8767/store/index.html";
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference" });
 const pageErrors = [];
 page.on("pageerror", error => pageErrors.push(error.message));
 
