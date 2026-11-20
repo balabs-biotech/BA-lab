@@ -12,6 +12,7 @@ const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
 
 assert.ok(publicExplorerJs.includes('selection-dock') && publicExplorerJs.includes('selection-open-link'), 'Selecting a 2D node must render a compact selection dock with its direct resource action');
 assert.ok(publicExplorerJs.includes('selected.data.url') && publicExplorerJs.includes('https:'), 'The selection action must use the verified Notion URL carried by the selected manifest node');
+assert.ok(publicExplorerJs.includes('function activateNode(n)') && publicExplorerJs.includes('window.open(url,"_blank","noopener,noreferrer")'), 'Clicking a visible 2D point must open that exact node page in Notion in a new tab while preserving the explorer');
 assert.ok(!html.includes('#selection{position:absolute!important;width:1px!important'), 'The public explorer must not clip the selected-node dock out of view');
 
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
@@ -21,7 +22,7 @@ assert.ok(previewExplorerHtml.includes('id="field"') && previewExplorerHtml.incl
 assert.ok(previewExplorerHtml.includes('./explorer-2d.js?v=pixijs-2') && !previewExplorerHtml.includes('engine-v2.js'), 'Preview entry must load Vernpixi 2D and never load the 3D engine');
 assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes('fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
 assert.ok(previewPixiJs.includes('pixijs-webgl') && previewPixiJs.includes('filaments'), 'Preview Vernpixi renderer must draw the biological filament network');
-assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && html.includes('src="./explorer-2d.js?v=selection-dock-1"'), 'Public homepage must mount Vernpixi 2D directly inside the existing universe section');
+assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && html.includes('src="./explorer-2d.js?v=notion-click-links-1"'), 'Public homepage must mount Vernpixi 2D directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
 assert.ok(publicPixiJs.includes('pixijs-webgl') && publicPixiJs.includes('filaments'), 'Public Vernpixi renderer must draw the biological filament network');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
@@ -140,6 +141,11 @@ for (const language of ['fr', 'en', 'ar', 'pt']) {
     for (const node of nodes) {
       assert.ok(node.id && !allIds.has(node.id), language + ' manifest node IDs must be present and unique');
       allIds.add(node.id);
+      if (node.kind === 'section') {
+        assert.ok(!node.url && !node.notionId && (node.children || []).length > 0, language + ' section headings must be non-interactive and contain real Notion pages');
+      } else {
+        assert.ok(node.url, language + ' every interactive Vernpixi point must resolve to a Notion page');
+      }
       if (node.url) {
         const match = node.url.match(/^https:\/\/app\.notion\.com\/p\/([a-f0-9]{32})$/);
         assert.ok(match, language + ' ' + node.id + ' must use a valid Notion page URL');
@@ -167,10 +173,10 @@ for (const [language, unavailablePhrase] of [['fr', 'non disponible à la vente'
   for (const prototype of prototypes) assert.ok((prototype.description || '').toLowerCase().includes(unavailablePhrase.toLowerCase()), language + ' ' + prototype.id + ' must clearly state that the prototype is not for sale');
 }
 const publicCatalogueLabels = {
-  fr: 'Catalogue public — Ressources publiables',
-  en: 'Public catalogue — publishable resources',
-  ar: 'الكتالوج العام — الموارد القابلة للنشر',
-  pt: 'Catálogo público — recursos publicáveis',
+  fr: 'CATALOGUE PUBLIC — Ressources publiables',
+  en: 'CATALOGUE PUBLIC — Ressources publiables',
+  ar: 'CATALOGUE PUBLIC — Ressources publiables',
+  pt: 'CATALOGUE PUBLIC — Ressources publiables',
 };
 for (const language of ['fr', 'en', 'ar', 'pt']) {
   const products = languageTrees[language].domains.find((domain) => domain.id === 'products');
