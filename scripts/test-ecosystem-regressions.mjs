@@ -23,7 +23,7 @@ assert.ok(previewExplorerHtml.includes('id="field"') && previewExplorerHtml.incl
 assert.ok(previewExplorerHtml.includes('./explorer-2d.js?v=pixijs-2') && !previewExplorerHtml.includes('engine-v2.js'), 'Preview entry must load Vernpixi 2D and never load the 3D engine');
 assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes('fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
 assert.ok(previewPixiJs.includes('pixijs-webgl') && previewPixiJs.includes('filaments'), 'Preview Vernpixi renderer must draw the biological filament network');
-assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && html.includes('src="./explorer-2d.js?v=notion-click-links-1"'), 'Public homepage must mount Vernpixi 2D directly inside the existing universe section');
+assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && /src="\.\/explorer-2d\.js\?v=[^"]+"/.test(html), 'Public homepage must mount a versioned Vernpixi 2D script directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
 assert.ok(publicPixiJs.includes('pixijs-webgl') && publicPixiJs.includes('filaments'), 'Public Vernpixi renderer must draw the biological filament network');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
