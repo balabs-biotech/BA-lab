@@ -137,10 +137,12 @@ try {
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
-    assert.equal(await page.locator('#selection').innerText(), selectedRoot, 'Back must restore the selected branch as well as the camera');
-    assert.equal(await page.locator('#back').isDisabled(), false, 'Back must retain the overview in the navigation history');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), await firstChild.innerText(), 'Back must restore the previously selected branch as well as the camera');
+    assert.equal(await page.locator('#back').isDisabled(), false, 'Back must retain earlier selections in the navigation history');
     await page.locator('#back').click();
-    assert.equal(await page.locator('#selection').innerText(), '', 'A second Back must return to the overview');
+    assert.equal(await page.locator('#selection').innerText(), selectedRoot, 'A second Back must restore the selected universe root');
+    await page.locator('#back').click();
+    assert.equal(await page.locator('#selection').innerText(), '', 'A third Back must return to the overview');
     assert.equal(await page.locator('#back').isDisabled(), true, 'Back must disable only when the full history is exhausted');
     const domainUrl = new URL(base);
     domainUrl.searchParams.set('domain', 'myco');
