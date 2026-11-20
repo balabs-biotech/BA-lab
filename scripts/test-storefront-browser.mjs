@@ -61,7 +61,7 @@ try {
     };
   });
   await turnstilePage.addInitScript(() => localStorage.setItem("balabs-privacy-notice-v1", "acknowledged"));
-  await turnstilePage.route("**/store.js", async route => {
+  await turnstilePage.route("**/store.js**", async route => {
     const response = await route.fetch();
     let source = await response.text();
     source = source.replace("const STORE_ORDER_ENABLED=false;", "const STORE_ORDER_ENABLED=true;");
