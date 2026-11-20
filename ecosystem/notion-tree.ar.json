@@ -1141,7 +1141,15 @@
           "notionId": "40173152f171811aaac8db82b1c7a9fe",
           "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
           "description": "مشاريع وأعمال موثقة مع عرض حدود النتائج المتاحة.",
-          "children": []
+          "children": [
+            {
+              "id": "ar-work-detailed-examples",
+              "title": "أمثلة مفصلة على المشاريع الموثقة",
+              "notionId": "40173152f17181c7ab4ad1cdeac8d075",
+              "url": "https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075",
+              "description": "أمثلة تفصيلية للأعمال التطبيقية والمشاريع التي يجري تتبعها."
+            }
+          ]
         },
         {
           "id": "ar-work-collaboration",
