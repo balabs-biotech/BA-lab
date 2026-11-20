@@ -31,7 +31,8 @@ L'asset Cloudinary a été comparé aux métadonnées du fichier original : dime
 ## État
 
 - Vérification des pages de licence : effectuée le 20 novembre 2026.
-- Vérification visuelle finale des trois fichiers : à refaire sur les fichiers téléchargés avant intégration ; ne pas présumer de l'absence de personnes à partir du seul nom ou de la description.
-- Hébergement local ou sur CDN contrôlé par BA Labs : en attente.
-- Intégration dans la boutique : non effectuée.
-- Contrôle des crédits visibles et test navigateur : en attente.
+- Vérification visuelle : la photo Tobi Kellner a été contrôlée via l'aperçu du fichier original ; aucune personne visible. Les deux autres candidates restent à inspecter.
+- Hébergement : une photo est hébergée dans le compte Cloudinary BA Labs, sous un identifiant dédié à la boutique.
+- Intégration : une illustration éditoriale intégrée à la section d'introduction, avec auteur, date, licence et source visibles en FR/EN/AR/PT.
+- Contrôle navigateur de l'image et des crédits : en attente du résultat CI/déploiement.
+- Les deux autres candidates restent non intégrées.
