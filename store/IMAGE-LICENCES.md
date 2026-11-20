@@ -15,7 +15,7 @@ Aucune image de cette liste n'est intégrée à la boutique tant que le fichier 
 
 | Emplacement | Fichier / auteur | Licence | Hébergement BA Labs | État |
 |---|---|---|---|---|
-| Illustration éditoriale de la section d'introduction | **Oyster mushroom (Pleurotus ostreatus) mycelium in petri dish on coffee grounds.JPG** — Tobi Kellner, 10 février 2012 | CC BY-SA 3.0 | Cloudinary BA Labs : `ba-labs-product-passport/pleurotus-mycelium-tobi-kellner.jpg` (1024 × 768, 194 292 octets) | Intégré avec attribution visible, lien source et licence |
+| Illustration éditoriale de la section d'introduction | **Oyster mushroom (Pleurotus ostreatus) mycelium in petri dish on coffee grounds.JPG** — Tobi Kellner, 10 février 2012 | CC BY-SA 3.0 | Cloudinary BA Labs : `ba-labs-store/editorial/pleurotus-mycelium-tobi-kellner.jpg` (1024 × 768, 194 292 octets) | Intégré avec attribution visible, lien source et licence |
 
 L'asset Cloudinary a été comparé aux métadonnées du fichier original : dimensions, poids, auteur et date concordent. Le JPEG original est conservé sans retouche de pixels ; la boutique ne l'utilise qu'en illustration éditoriale. Il ne représente pas un lot ou une culture BA Labs.
 
