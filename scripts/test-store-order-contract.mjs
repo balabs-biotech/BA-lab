@@ -11,7 +11,7 @@ const edge = readFileSync("supabase/functions/create-store-order/index.ts", "utf
 const readme = readFileSync("store/README.md", "utf8");
 const syncWorker = readFileSync("supabase/functions/store-order-sync/index.ts", "utf8");
 const legalPages = ["legal.html", "privacy.html", "terms.html", "shipping.html"].map(file => readFileSync("store/" + file, "utf8"));
-const legalPlaceholdersRemain = legalPages.some(page => /\\[[A-ZÀ-ÖØ-Þ0-9_ ,./-]+\\]/.test(page));
+const legalPlaceholdersRemain = legalPages.some(page => /\[[A-ZÀ-ÖØ-Þ0-9_ ,./-]+\]/.test(page));
 const legalDraftLanguageRemains = legalPages.some(page => /version de travail|projet de conditions|à compléter|à renseigner|non définitif|canevas de travail/i.test(page));
 
 
