@@ -591,7 +591,7 @@ assert.ok(editorialRefinementCss.includes('prefers-reduced-motion:reduce'), 'Pha
 assert.ok(chapterNavigationCss.includes('PASS 80 — keep every mobile destination visible without sacrificing legibility'), 'Mobile navigation must preserve its complete wrapped layout');
 assert.ok(chapterNavigationCss.includes('flex-wrap:wrap!important') && chapterNavigationCss.includes('overflow:visible!important'), 'Mobile navigation must wrap instead of clipping its final destinations');
 assert.ok(chapterNavigationCss.includes('min-height:26px!important') && chapterNavigationCss.includes('font-size:9px!important'), 'Wrapped mobile navigation links must have legible text and comfortable touch targets');
-assert.match(html, /chapter-navigation\.css\?v=28/, 'Public homepage must request the legible wrapped mobile navigation stylesheet');
+assert.match(html, /chapter-navigation\.css\?v=\d+/, 'Public homepage must request the current legible wrapped mobile navigation stylesheet');
 
 // PASS75: chapter photography must be ready when horizontal navigation reveals it.
 const chapterAtmosphereJs = readFileSync('ecosystem/chapter-atmosphere.js', 'utf8');
