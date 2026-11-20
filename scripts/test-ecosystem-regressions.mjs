@@ -40,8 +40,8 @@ const chapterNavigationCss = readFileSync('ecosystem/chapter-navigation.css', 'u
 assert.match(html, /chapter-navigation\.css\?v=\d+/, 'Public homepage must load the chapter navigation stylesheet');
 assert.match(html, /chapter-navigation\.js\?v=\d+/, 'Public homepage must load the chapter navigation script');
 assert.ok(!chapterNavigationJs.includes('lang()') && chapterNavigationJs.includes('document.documentElement.lang'), 'Chapter navigation must read the document language without calling an undefined global function');
-assert.ok(chapterNavigationJs.includes("rail.className='chapter-rail liquid-gauge'") && chapterNavigationJs.includes("document.body.append(rail)") && chapterNavigationJs.includes("rail.style.setProperty('--fill'"), 'Chapter navigation must expose the liquid progress gauge and update its fill from the active chapter');
-assert.ok(chapterNavigationCss.includes('.liquid-gauge') && chapterNavigationCss.includes('.liquid-fill') && chapterNavigationCss.includes('.air-bubble'), 'Chapter navigation must render the liquid gauge with air bubbles');
+assert.ok(chapterNavigationJs.includes("rail.className='chapter-rail neural-rail'") && chapterNavigationJs.includes("document.body.append(rail)") && chapterNavigationJs.includes("b.className='neural-node'"), 'Chapter navigation must expose clickable neural chapter nodes');
+assert.ok(chapterNavigationCss.includes('.neural-rail') && chapterNavigationCss.includes('.axon-progress') && chapterNavigationCss.includes('.neural-node.is-active'), 'Chapter navigation must render a connected neural rail with an active firing node');
 
 for (const section of ['hero', 'editorial-feature', 'editorial-about', 'editorial-work', 'universe-index', 'editorial-method']) {
   assert.ok(brandCss.includes('#app.balabs-ui > main > .' + section), 'Visual system must target the actual main landmark child: ' + section);
