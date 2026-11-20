@@ -9,6 +9,7 @@ const ecosystem = readFileSync('ecosystem/index.html', 'utf8');
 const privacy = readFileSync('store/privacy.html', 'utf8');
 const cookies = readFileSync('store/cookies.html', 'utf8');
 const legalPages = ['legal.html', 'privacy.html', 'terms.html', 'shipping.html', 'cookies.html'].map(page => readFileSync('store/' + page, 'utf8'));
+const orderFunction = readFileSync('supabase/functions/create-store-order/index.ts', 'utf8');
 const retiredStoreNotion = readFileSync('supabase/functions/store-notion-order/index.ts', 'utf8');
 const retiredNotionStore = readFileSync('supabase/functions/notion-store-order/index.ts', 'utf8');
 
@@ -31,6 +32,8 @@ assert.ok(js.includes('priceDzd:2000') && js.includes('product-price'), 'The ino
 assert.ok(!/priceDzd:100[,}]/.test(js) && js.includes('Water Agar — boîte non inoculée'), 'Water Agar must remain on request without an unconfirmed public price');
 const wheatSpawn = js.match(/\{code:'BAL-GRAIN-SPAWN-WHEAT-25-001',[\s\S]*?\},\n\{code:/)?.[0] || '';
 assert.ok(wheatSpawn.includes("status:'to_confirm'") && wheatSpawn.includes('grain spawn · 2,5 kg') && !wheatSpawn.includes('priceDzd:'), 'Wheat grain spawn must remain visible as to-confirm with no unconfirmed public price');
+const wheatServerProduct = orderFunction.match(/\"BAL-GRAIN-SPAWN-WHEAT-25-001\":\\s*\\{[^}]*\\}/)?.[0] || '';
+assert.ok(wheatServerProduct.includes('family: \"spawn\"') && !wheatServerProduct.includes('price:'), 'Server order intake must not assign an unconfirmed price to wheat grain spawn');
 assert.ok(js.includes('priceDzd:5000') && js.includes('Prix envisagé · à confirmer') && js.includes('price-qualifier'), 'Liquid culture syringe price must be clearly marked indicative');
 assert.ok(js.includes("family:'spawn'") && js.includes("filterSpawn:'Grain spawn'"), 'Grain spawn must have a distinct localized catalogue filter');
 assert.ok(html.includes('id="copyRequest"') && js.includes('navigator.clipboard.writeText(requestText)'), 'The guest selection must be copyable as a request without submitting personal data');
