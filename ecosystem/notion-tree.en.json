@@ -5,14 +5,6 @@
   "coverage": "Every interactive point resolves to its canonical Notion page; includes the English public landing page and additional collaboration, R&D and traceability pages.",
   "domains": [
     {
-      "id": "en-home",
-      "title": "BA Labs — Applied biotechnology",
-      "notionId": "40173152f171815f9f01ea5fd1add73f",
-      "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
-      "description": "English public landing page for BA Labs.",
-      "children": []
-    },
-    {
       "id": "myco",
       "title": "Mycology",
       "notionId": "40173152f17181019838de83de8173f3",
@@ -1149,6 +1141,15 @@
       "url": "https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52",
       "children": [
         {
+          "id": "en-home",
+          "title": "BA Labs — Applied biotechnology",
+          "notionId": "40173152f171815f9f01ea5fd1add73f",
+          "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
+          "description": "English public landing page for BA Labs.",
+          "children": [],
+          "kind": "page"
+        },
+        {
           "id": "en-work-methodology",
           "title": "R&D methodology",
           "notionId": "40273152f17181299be1d95c37976d9d",
@@ -1252,11 +1253,6 @@
       "relations": []
     }
   ],
-  "hub": {
-    "title": "BA Labs — Applied biotechnology",
-    "notionId": "40173152f171815f9f01ea5fd1add73f",
-    "url": "https://app.notion.com/p/40173152f171815f9f01ea5fd1add73f",
-    "parentId": "language"
-  },
+  "hub": null,
   "relationModel": "notion-crosslinks-and-documented-topics-v1"
 }
