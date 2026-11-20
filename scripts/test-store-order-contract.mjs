@@ -65,7 +65,7 @@ assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consu
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 
 assert.ok(readme.includes("Supabase is the transactional source of truth"), "Architecture documentation must match the implementation");
-assert.ok(readme.includes("Turnstile browser widget") && readme.includes("server-side verifier is already deployed"), "Launch gate must distinguish the deployed server verifier from the browser widget that is still pending");
+assert.ok(readme.includes("Turnstile browser integration scaffold") && readme.includes("server-side verifier is deployed"), "Launch gate must distinguish the deployed server verifier from the browser integration configuration that remains pending");
 
 assert.ok(syncWorker.includes('if (!orderId || !lockToken)') && syncWorker.includes('if (!items.length) throw new Error("claimed_order_has_no_items")'), "Claimed orders without items must enter the failure/retry path instead of remaining locked in processing");
 assert.ok(syncWorker.indexOf('if (!items.length) throw new Error("claimed_order_has_no_items")') < syncWorker.indexOf('const pageId = await syncToNotion(order, items, notionToken)'), "Invalid claimed orders must be rejected before any Notion request");
