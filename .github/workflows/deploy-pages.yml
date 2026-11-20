@@ -93,6 +93,31 @@ jobs:
 
       - name: Verify storefront publication
         run: curl --fail --silent --show-error --output /dev/null --write-out 'Storefront HTTP %{http_code} (%{content_type})\n' https://balabs-biotech.github.io/BA-lab/store/index.html
+
+      - name: Set up Node.js for ecosystem browser regression
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright for ecosystem browser regression
+        run: npm install --no-save --no-package-lock playwright
+
+      - name: Install Chromium for ecosystem browser regression
+        run: npx playwright install --with-deps chromium
+
+      - name: Run ecosystem browser regression on the published site
+        run: node scripts/test-ecosystem-browser.mjs
+        env:
+          BALABS_SITE_URL: https://balabs-biotech.github.io/BA-lab/ecosystem/index.html
+
+      - name: Upload ecosystem browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-browser-diagnostics
+          path: artifacts/vernpixi-primary/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Check out repository for published storefront test
         uses: actions/checkout@v4
 
