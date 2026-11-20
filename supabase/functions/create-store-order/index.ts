@@ -67,7 +67,8 @@ async function supabaseRequest(path: string, key: string, method: string, body?:
       "Content-Type": "application/json",
       ...(method === "PATCH" ? { "Prefer": "return=minimal" } : {})
     },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    signal: AbortSignal.timeout(20_000)
   });
   const data = await response.json().catch(() => null);
   return { response, data };
