@@ -610,3 +610,12 @@ assert.ok(overridesCss.includes('PASS78 — widen the mobile WebGL viewport with
 assert.ok(overridesCss.includes('width:122%!important') && overridesCss.includes('left:-11%!important'), 'Mobile WebGL stage must widen symmetrically to compensate for the chapter rail');
 assert.ok(overridesCss.includes('.webgl-stage .webgl-focus{left:9.5%!important}') && overridesCss.includes('.webgl-stage .webgl-controls{right:9.5%!important}'), 'Mobile overlays must stay aligned inside the visible viewport');
 assert.match(html, /site-overrides\.css\?v=9/, 'Public homepage must request the corrected mobile network viewport stylesheet');
+
+
+// PASS79: the public 2D explorer must size its mobile canvas to the chapter reading frame.
+assert.ok(editorialRefinementCss.includes('PASS79 — constrain the embedded mycelial explorer to the mobile reading column'), 'Mobile network framing must target the active public explorer, not the retired 3D container');
+assert.ok(editorialRefinementCss.includes('width:min(100%,calc(100vw - 84px))!important') && editorialRefinementCss.includes('>.inline-explorer-stage'), 'Mobile explorer and stage must stay within the chapter reading column');
+assert.ok(editorialRefinementCss.includes('#inlineExplorer #field') && editorialRefinementCss.includes('max-width:100%!important'), 'The live canvas must inherit the constrained stage width');
+assert.match(html, /editorial-refinement\.css\?v=36/, 'Public homepage must request the mobile network viewport refinement');
+const ecosystemBrowserTestSource = readFileSync('scripts/test-ecosystem-browser.mjs', 'utf8');
+assert.ok(ecosystemBrowserTestSource.includes('MOBILE_NETWORK_FRAME') && ecosystemBrowserTestSource.includes('Mobile network canvas must use the actual stage width'), 'Browser smoke must measure the mobile network frame and canvas bounds');
