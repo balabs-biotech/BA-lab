@@ -734,15 +734,14 @@ body>.chapter-rail.neural-rail{
 
 
 
-/* v48 — move the complete mobile mycelium another 44px down.
-   Keep rail size, stacking and transparency unchanged. */
+/* v49 — lower the complete mobile mycelium while keeping its full height inside the phone viewport. */
 @media(max-width:760px){
  body>.chapter-rail.neural-rail{
-  top:calc(50% + 144px)!important;
-  height:min(60vh,430px)!important;
+  top:calc(50% + 188px)!important;
+  height:min(46vh,370px)!important;
   transform:translateY(-50%)!important;
  }
  html[dir="rtl"] body>.chapter-rail.neural-rail{
-  top:calc(50% + 144px)!important;
+  top:calc(50% + 188px)!important;
  }
 }
