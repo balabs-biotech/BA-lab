@@ -1,0 +1,16 @@
+/* Shared BA Labs mycelium language: PixiJS hyphal growth under the navigation hit targets. */
+body>.chapter-rail.neural-rail{isolation:isolate}
+body>.chapter-rail.neural-rail>.mycelium-navigation-canvas{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ display:block!important;z-index:0!important;pointer-events:none!important;
+ opacity:.92;overflow:visible;
+}
+body>.chapter-rail.neural-rail>.neural-network{display:none!important}
+body>.chapter-rail.neural-rail>.neural-hitareas{position:absolute!important;inset:0!important;z-index:2!important}
+body>.chapter-rail.neural-rail .neural-node{z-index:2}
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail>.mycelium-navigation-canvas{opacity:.88}
+}
+@media(prefers-reduced-motion:reduce){
+ body>.chapter-rail.neural-rail>.mycelium-navigation-canvas{opacity:.82}
+}
