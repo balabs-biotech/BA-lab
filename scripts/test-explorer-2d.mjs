@@ -122,8 +122,13 @@ try {
     await page.mouse.click(labelPoint.x, labelPoint.y);
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.includes('Black Pearl'));
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'First click on Black Pearl must only select/focus it');
-    await page.waitForTimeout(500); // expire the first-click gesture before testing a deliberate double-click
-    await page.mouse.dblclick(labelPoint.x, labelPoint.y, { delay: 90 });
+    await page.waitForTimeout(600); // allow the focus zoom to settle and expire the first-click gesture
+    const focusedLabelPoint = await page.locator('#field').evaluate(el => {
+      const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')['myco-black-pearl'];
+      const rect = el.getBoundingClientRect();
+      return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
+    });
+    await page.mouse.dblclick(focusedLabelPoint.x, focusedLabelPoint.y, { delay: 90 });
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), blackPearl.url, 'Double-clicking the visible Black Pearl label must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
