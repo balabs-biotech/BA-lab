@@ -749,7 +749,7 @@
       "children": [
         {
           "id": "pt-public-catalogue",
-          "title": "Catálogo público — recursos publicáveis",
+          "title": "CATALOGUE PUBLIC — Ressources publiables",
           "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "description": "Catálogo público partilhado de recursos e produtos aprovados para publicação. Confirme o lote, a embalagem e a disponibilidade antes de qualquer fornecimento.",
@@ -1201,7 +1201,7 @@
         },
         {
           "id": "evidence-resource-3",
-          "title": "Catálogo público",
+          "title": "CATALOGUE PUBLIC — Ressources publiables",
           "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
           "children": [],
           "kind": "reference",
