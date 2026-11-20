@@ -76,6 +76,7 @@ Source: `supabase/functions/create-store-order/index.ts`
 - Uses a server-side Supabase secret/service-role key and the dedicated `NOTION_STORE_API_KEY`; neither credential is present in browser code.
 - Uses a request UUID to make retries idempotent.
 - Applies a persistent limit of five requests per ten minutes using an HMAC-SHA-256 fingerprint of the gateway-provided client IP. The raw IP is not stored.
+- Includes a server-side Cloudflare Turnstile verifier behind the explicit `TURNSTILE_ENABLED=true` flag. It checks the Siteverify result, exact hostname (`balabs-biotech.github.io`) and action (`store_order`); invalid tokens and verification outages fail closed before any customer record is written. The verifier is deployed, but the browser widget/site key is not yet integrated, so the flag must remain off.
 - Does not process payment or confirm stock, delivery fees, or lead times.
 
 The function is deployed as `create-store-order` with JWT verification disabled for guest requests; it performs its own origin, payload, idempotency and persistent rate-limit checks. The deployed function was exercised through the Supabase HTTP extension with a synthetic internal request. Supabase returned HTTP 201 and Notion confirmed the matching page. That test record was then marked cancelled in both systems. Before future deployments, confirm that the Edge Function environment contains either `SUPABASE_SECRET_KEYS` (with the `default` key) or `SUPABASE_SERVICE_ROLE_KEY`, plus `NOTION_STORE_API_KEY` (a separate Notion integration token with access limited to the commercial orders data source) and `NOTION_CATALOGUE_API_KEY` (a different read-only integration token with access limited to the public catalogue data source). The previous shared `NOTION_API_KEY` is deliberately no longer accepted by either storefront function.
@@ -113,7 +114,7 @@ Do not paste the JWT or Notion token into a chat, source file, SQL migration, or
 
 ## Before enabling customer submissions
 
-1. Add a server-verified anti-bot challenge (for example, Turnstile) with a server-side secret; the current controls are a honeypot and persistent rate limiting, not a CAPTCHA.
+1. Integrate the Turnstile browser widget using a site key restricted to `balabs-biotech.github.io`, add its token to the request body, and permit only the required Cloudflare challenge origins in the storefront CSP. The server-side verifier is already deployed but remains disabled until the widget is tested. Store `TURNSTILE_SECRET_KEY` only in Supabase Edge Function secrets; enable `TURNSTILE_ENABLED=true` only after a successful end-to-end challenge test.
 2. Test the failure path by making Notion temporarily unavailable and confirming the Supabase request remains intact with `notion_sync_status='pending'`.
 3. Configure and test the scheduled `store-order-sync` worker using a service-role JWT stored in Supabase Vault; confirm retries and duplicate prevention.
 4. Complete the privacy notice, legal identity, data-retention and cross-border processing review.
