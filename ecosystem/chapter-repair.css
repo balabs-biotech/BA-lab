@@ -1184,3 +1184,13 @@
   top:calc(50% + 134px)!important;
  }
 }
+
+
+/* MOBILE RAIL — align the third of five navigation points with the viewport center. */
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail{
+  top:50%!important;
+  bottom:auto!important;
+  transform:translateY(-50%)!important;
+ }
+}
