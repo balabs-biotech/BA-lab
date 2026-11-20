@@ -541,3 +541,16 @@ body>.chapter-rail.neural-rail{width:42px!important}
 .neural-network .axon-terminals circle{fill:#c87952;stroke:#e1c2a9;stroke-width:.8;filter:drop-shadow(0 0 3px #c87952)}
 .neural-network .neural-pulse{fill:#f2dfc5;filter:drop-shadow(0 0 5px #f2dfc5)}
 @media(max-width:760px){body>.chapter-rail.neural-rail{width:38px!important}}
+
+/* Organic 2D-field treatment: dense hyphal branches and anastomotic bridges */
+body>.chapter-rail.neural-rail{width:54px!important;height:min(72vh,560px)!important}
+.neural-network .network-anastomoses{fill:none;stroke:#7eaaa3;stroke-width:1.05;stroke-linecap:round;stroke-linejoin:round;opacity:.46}
+.neural-network .dendrites{stroke:#a9b9a6b8;stroke-width:1.05;stroke-linecap:round;stroke-linejoin:round;opacity:.92}
+.neural-network .axon-base{stroke:#9eb5a466;stroke-width:2.5}
+.neural-network .axon-progress{stroke:#c87952;stroke-width:2.5;stroke-dasharray:1 2}
+.neural-network .neuron-bodies circle{fill:#263b38;stroke:#d1d0c5;stroke-width:1.8}
+.neural-node{left:var(--node-x,50%)!important}
+@media(max-width:760px){
+ body>.chapter-rail.neural-rail{width:44px!important;height:min(64vh,480px)!important}
+ .neural-node{left:var(--node-x,50%)!important}
+}
