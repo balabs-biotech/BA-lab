@@ -73,6 +73,8 @@ assert.ok(edge.includes("rate_limit_service_unavailable") && edge.includes("retu
 assert.ok(!edge.includes("NOTION_STORE_API_KEY") && !edge.includes("NOTION_API_KEY"), "Notion credentials must exist only in the isolated retry worker");
 assert.ok(!/console\.(?:log|error)\([^\n]*(?:customer_name|customer_email|customer_phone|customer_message)/.test(edge), "Customer contact fields must never be written to application logs");
 assert.ok(edge.includes('crypto.subtle.sign("HMAC"') && edge.includes("rpc/consume_store_rate_limit"), "Rate limiting must use a non-reversible IP fingerprint stored in Supabase");
+const rateLimitSource = edge.slice(edge.indexOf("async function isRateLimited"), edge.indexOf("async function verifyTurnstile"));
+assert.ok(rateLimitSource.includes('req.headers.get("cf-connecting-ip")') && !rateLimitSource.includes("x-forwarded-for") && !rateLimitSource.includes("x-real-ip"), "Rate limiting must trust only the Cloudflare client-IP header, never caller-controlled forwarding fallbacks");
 assert.ok(edge.includes("request_id") && edge.includes("duplicate"), "Endpoint must support idempotent retries");
 const publicOrderHandler = edge.slice(edge.indexOf("Deno.serve"));
 assert.ok(!publicOrderHandler.includes("syncToNotion(") && !publicOrderHandler.includes('"store_orders?id=eq."'), "Public intake must not read customer rows or create Notion pages inline; the locked retry worker owns synchronization");
