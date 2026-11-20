@@ -78,8 +78,8 @@ try {
     });
     await rootButton.focus();
     await rootButton.press('Enter');
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
-    assert.equal((await page.evaluate(() => window.__openedNotionUrls[0])), rootExpectedUrl, 'Clicking a universe point must call window.open with its exact canonical Notion page');
+    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Single activation must select/focus only; it must not open Notion');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
@@ -89,8 +89,8 @@ try {
     const childExpectedUrl = mappedTree.nodeUrls[childNodeId];
     await firstChild.focus();
     await firstChild.press('Enter');
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 2);
-    assert.equal((await page.evaluate(() => window.__openedNotionUrls[1])), childExpectedUrl, 'Clicking a child point must call window.open with its own canonical Notion page');
+    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Keyboard selection must not open Notion on first activation');
 
     // Regression: clicking the visible text label (not only its tiny node
     // anchor) must open the exact Notion resource. Black Pearl is the fixture.
@@ -108,7 +108,8 @@ try {
     const parentButton = nav.locator(`button[data-node-id="${blackPearl.parentId}"]`);
     await parentButton.focus();
     await parentButton.press('Enter');
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 3);
+    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting the Black Pearl parent must not open Notion');
     await page.waitForFunction(id => {
       const boxes = JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}');
       return Boolean(boxes[id]);
@@ -119,8 +120,11 @@ try {
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
     });
     await page.mouse.click(labelPoint.x, labelPoint.y);
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 4);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls[3]), blackPearl.url, 'Clicking the visible Black Pearl label on the canvas must open its exact Notion page');
+    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.includes('Black Pearl'));
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'First click on Black Pearl must only select/focus it');
+    await page.mouse.dblclick(labelPoint.x, labelPoint.y, { delay: 90 });
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), blackPearl.url, 'Double-clicking the visible Black Pearl label must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
