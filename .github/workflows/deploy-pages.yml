@@ -31,6 +31,7 @@ jobs:
           cp -R ecosystem/. _site/ecosystem/
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           cp -R store/. _site/store/
+          sed -i "s/__BUILD_SHA__/${GITHUB_SHA}/g" _site/store/index.html
           node scripts/test-storefront.mjs
           node scripts/test-store-order-contract.mjs
           node scripts/test-store-catalogue-contract.mjs
@@ -92,3 +93,22 @@ jobs:
 
       - name: Verify storefront publication
         run: curl --fail --silent --show-error --output /dev/null --write-out 'Storefront HTTP %{http_code} (%{content_type})\n' https://balabs-biotech.github.io/BA-lab/store/index.html
+      - name: Check out repository for published storefront test
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js for published storefront test
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright for published storefront test
+        run: npm install --no-save --no-package-lock playwright
+
+      - name: Install Chromium for published storefront test
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser regression against the published storefront
+        run: node scripts/test-storefront-browser.mjs
+        env:
+          BALABS_STORE_URL: https://balabs-biotech.github.io/BA-lab/store/index.html
+
