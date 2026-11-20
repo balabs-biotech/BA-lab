@@ -74,10 +74,7 @@ async function supabaseRequest(path: string, key: string, method: string, body?:
 }
 
 async function isRateLimited(req: Request, secretKey: string): Promise<boolean> {
-  const ip = (req.headers.get("cf-connecting-ip") ??
-    req.headers.get("x-real-ip") ??
-    req.headers.get("x-forwarded-for")?.split(",").at(-1) ??
-    "").trim().slice(0, 100);
+  const ip = (req.headers.get("cf-connecting-ip") ?? "").trim();
   if (!ip) throw new Error("client_ip_unavailable");
 
   const hmacKey = await crypto.subtle.importKey(
