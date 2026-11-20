@@ -183,13 +183,22 @@ try {
     // Scroll the track independently of the rail and verify that the active point follows it.
     await page.evaluate(() => {
       const track = document.querySelector('#experienceTrack');
-      track.scrollTo({ left: track.clientWidth * 3, behavior: 'instant' });
+      const chapter = document.querySelector('#chapter-catalogue');
+      const trackRect = track.getBoundingClientRect();
+      const chapterRect = chapter.getBoundingClientRect();
+      const target = track.scrollLeft + chapterRect.left - trackRect.left;
+      track.scrollTo({ left: target, behavior: 'instant' });
     });
     await page.waitForFunction(() => {
       const track = document.querySelector('#experienceTrack');
-      return Math.abs(track.scrollLeft - track.clientWidth * 3) < 3 &&
-        document.querySelectorAll('body>.chapter-rail .neural-node.is-active').length === 1 && document.querySelector('body>.chapter-rail .neural-node:nth-child(4)')?.getAttribute('aria-current') === 'step' &&
-        document.querySelector('#chapter-catalogue')?.getAttribute('aria-current') === 'page';
+      const chapter = document.querySelector('#chapter-catalogue');
+      const trackRect = track.getBoundingClientRect();
+      const chapterRect = chapter.getBoundingClientRect();
+      const target = track.scrollLeft + chapterRect.left - trackRect.left;
+      return Math.abs(track.scrollLeft - target) < 3 &&
+        document.querySelectorAll('body>.chapter-rail .neural-node.is-active').length === 1 &&
+        document.querySelector('body>.chapter-rail .neural-node:nth-child(4)')?.getAttribute('aria-current') === 'step' &&
+        chapter?.getAttribute('aria-current') === 'page';
     }, undefined, { timeout: 10000 });
     const allChapterImageAudits = chapterImageAudits.flatMap(audit => audit.images);
     assert.ok(allChapterImageAudits.length > 0, 'Editorial chapters must contain real image elements');
