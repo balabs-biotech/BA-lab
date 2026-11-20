@@ -31,23 +31,23 @@
  prev.type=next.type='button';prev.innerHTML='←';next.innerHTML='→';prev.setAttribute('aria-label','Espace précédent');next.setAttribute('aria-label','Espace suivant');count.className='experience-count';count.setAttribute('aria-live','polite');count.setAttribute('aria-atomic','true');controls.append(prev,count,next);main.append(controls);
  const rail=document.createElement('div');rail.className='chapter-rail neural-rail';rail.setAttribute('role','navigation');rail.setAttribute('aria-label','Navigation neuronale des chapitres');
  const svgNS='http://www.w3.org/2000/svg';
- const somaPoints=[{x:112,y:42},{x:139,y:170},{x:91,y:300},{x:132,y:430},{x:106,y:558}];
- const axonPath='M112 42 C68 87 178 121 139 170 S55 251 91 300 S181 383 132 430 S60 516 106 558';
+ const somaPoints=[{x:40,y:42},{x:46,y:170},{x:34,y:300},{x:44,y:430},{x:38,y:558}];
+ const axonPath='M40 42 C17 87 63 121 46 170 S18 251 34 300 S62 383 44 430 S22 516 38 558';
  let dendritePaths='';
  const rng=seed=>()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
  // Five distinct colonisation centres. Each emits a small number of tapered,
  // irregular hyphae; only a few tips fork. No decorative cross-hatching.
  somaPoints.forEach((p,i)=>{
-  const rand=rng(1907+i*313),rays=7;
+  const rand=rng(1907+i*313),rays=6;
   for(let k=0;k<rays;k++){
    const angle=Math.PI*2*k/rays+(rand()-.5)*.38;
-   const reach=25+rand()*17;
+   const reach=34+rand()*14;
    const bend=(rand()-.5)*15;
    const mx=p.x+Math.cos(angle)*reach*.55-Math.sin(angle)*bend;
    const my=p.y+Math.sin(angle)*reach*.55+Math.cos(angle)*bend;
    const ex=p.x+Math.cos(angle)*reach,ey=p.y+Math.sin(angle)*reach;
    dendritePaths+='<path d="M'+p.x+' '+p.y+' Q'+mx.toFixed(1)+' '+my.toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'"/>';
-   if(k%2===0){
+   if(k%3===0){
     const fork=reach*.68,fx=p.x+Math.cos(angle)*fork,fy=p.y+Math.sin(angle)*fork;
     [-1,1].forEach(side=>{
      const a=angle+side*(.38+rand()*.22),len=12+rand()*10;
@@ -59,7 +59,7 @@
   }
  });
  const myelin=somaPoints.slice(0,-1).map((p,i)=>{const q=somaPoints[i+1],x=(p.x+q.x)/2,y=(p.y+q.y)/2;return '<path d="M'+(x-4)+' '+(y-6)+'q6 6 8 12"/>';}).join('');
- rail.innerHTML='<svg class="neural-network" viewBox="0 0 240 600" preserveAspectRatio="none" aria-hidden="true"><g class="dendrites">'+dendritePaths+'</g><path id="neural-axon" class="axon-base" d="'+axonPath+'"/><path class="axon-progress" d="'+axonPath+'"/><g class="myelin">'+myelin+'</g><g class="neuron-bodies">'+somaPoints.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="5.5"/>').join('')+'</g><g class="axon-terminals">'+somaPoints.slice(1).map(p=>'<circle cx="'+p.x+'" cy="'+(p.y-12)+'" r="2.2"/>').join('')+'</g><circle class="neural-pulse" r="2.5"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#neural-axon"/></animateMotion></circle></svg>';
+ rail.innerHTML='<svg class="neural-network" viewBox="0 0 80 600" preserveAspectRatio="none" aria-hidden="true"><g class="dendrites">'+dendritePaths+'</g><path id="neural-axon" class="axon-base" d="'+axonPath+'"/><path class="axon-progress" d="'+axonPath+'"/><g class="myelin">'+myelin+'</g><g class="neuron-bodies">'+somaPoints.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="4.8"/>').join('')+'</g><g class="axon-terminals">'+somaPoints.slice(1).map(p=>'<circle cx="'+p.x+'" cy="'+(p.y-12)+'" r="2.2"/>').join('')+'</g><circle class="neural-pulse" r="2.5"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#neural-axon"/></animateMotion></circle></svg>';
  const railNodes=document.createElement('div');railNodes.className='neural-hitareas';
  groups.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.className='neural-node';b.dataset.index=String(i);b.setAttribute('aria-controls','chapter-'+g.id);b.setAttribute('aria-label',(g.label.fr||g.id)+' — '+(i+1));b.style.setProperty('--node-y',[7,28.3,50,71.7,93][i]+'%');b.style.setProperty('--node-x',[46.7,57.9,37.9,55,44.2][i]+'%');b.innerHTML='<span class="neural-node-core"></span>';b.addEventListener('click',()=>go(i));railNodes.append(b)});
  rail.append(railNodes);document.body.append(rail);
