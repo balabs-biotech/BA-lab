@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const DATA_SOURCE_ID = Deno.env.get("NOTION_STORE_DATA_SOURCE_ID") ?? "7a40b95b-e353-4eb9-a471-99c97c5904f5";
 const NOTION_VERSION = "2025-09-03";
-const MAX_BATCH = 10;
+const MAX_BATCH = 3;
 
 function getSecretKey(): string {
   const packed = Deno.env.get("SUPABASE_SECRET_KEYS");
