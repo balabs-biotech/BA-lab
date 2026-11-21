@@ -1,0 +1,858 @@
+{
+  "version": 1,
+  "source": "Localized BA Labs Notion pages; canonical links reused without duplicating content",
+  "language": "en",
+  "coverage": "Mycology at the center plus eight peripheral scientific universes; transversal access remains separate in portals.",
+  "hub": {
+    "notionId": "41f73152f17181e2aeb8cae5271fdd13",
+    "url": "https://app.notion.com/p/41f73152f17181e2aeb8cae5271fdd13"
+  },
+  "relationModel": "mycology-core-eight-universes-v1",
+  "domains": [
+    {
+      "id": "myco",
+      "title": "Mycology",
+      "notionId": "40173152f17181019838de83de8173f3",
+      "url": "https://app.notion.com/p/40173152f17181019838de83de8173f3",
+      "description": "Fungi, cultivation supports, biological interactions and documented applications.",
+      "notionParentId": "hub",
+      "children": [
+        {
+          "id": "en-myco-fungal-resources",
+          "title": "Fungal resources",
+          "notionId": "40173152f1718111a73ced2825985454",
+          "url": "https://app.notion.com/p/40173152f1718111a73ced2825985454",
+          "children": [
+            {
+              "id": "en-myco-pleurotus-library",
+              "title": "Oyster mushrooms and related resources",
+              "notionId": "40273152f17181eba1bbcaf1b1d491d6",
+              "description": "A guide separating general species profiles from working culture designations, with clear limits on identity and availability.",
+              "url": "https://app.notion.com/p/40273152f17181eba1bbcaf1b1d491d6",
+              "children": [
+                {
+                  "id": "en-myco-black-pearl",
+                  "title": "Black Pearl — Pleurotus resource profile",
+                  "notionId": "40273152f171816b8f27de982a5465bb",
+                  "url": "https://app.notion.com/p/40273152f171816b8f27de982a5465bb",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-pearl",
+                  "title": "Pearl — Pleurotus resource profile",
+                  "notionId": "40273152f1718115ba8ac3f20c54c9e1",
+                  "url": "https://app.notion.com/p/40273152f1718115ba8ac3f20c54c9e1",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-kryos",
+                  "title": "KRYOS — fungal resource profile",
+                  "notionId": "40273152f1718122a4ffe38cdf1f5070",
+                  "url": "https://app.notion.com/p/40273152f1718122a4ffe38cdf1f5070",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-g8",
+                  "title": "G8 — fungal resource profile",
+                  "notionId": "40273152f171817493cfd58b6c68c3ab",
+                  "url": "https://app.notion.com/p/40273152f171817493cfd58b6c68c3ab",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-blue-oyster",
+                  "title": "Blue Oyster — fungal resource profile",
+                  "notionId": "40273152f1718189959bf206778c5aa8",
+                  "url": "https://app.notion.com/p/40273152f1718189959bf206778c5aa8",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-gris-americain",
+                  "title": "Gris américain — fungal resource profile",
+                  "notionId": "40273152f17181ecb48fd5c53d52e73e",
+                  "url": "https://app.notion.com/p/40273152f17181ecb48fd5c53d52e73e",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-djamor",
+                  "title": "Pleurotus djamor — organism profile",
+                  "notionId": "40173152f17181fc9e5ff9eedfc03e5a",
+                  "url": "https://app.notion.com/p/40173152f17181fc9e5ff9eedfc03e5a",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-citrinopileatus",
+                  "title": "Pleurotus citrinopileatus — organism profile",
+                  "notionId": "40173152f17181529b77e0a789852bdb",
+                  "url": "https://app.notion.com/p/40173152f17181529b77e0a789852bdb",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-ostreatus",
+                  "title": "Pleurotus ostreatus — species profile",
+                  "notionId": "40173152f17181a09927dbfa42313fb1",
+                  "url": "https://app.notion.com/p/40173152f17181a09927dbfa42313fb1",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-eryngii",
+                  "title": "Pleurotus eryngii and hybrids — group profile",
+                  "notionId": "40173152f17181cf84ebf5cec4d862b5",
+                  "url": "https://app.notion.com/p/40173152f17181cf84ebf5cec4d862b5",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-hk35",
+                  "title": "HK35 — strain and resource profile",
+                  "notionId": "40173152f17181c0b7e5d16be113aac8",
+                  "url": "https://app.notion.com/p/40173152f17181c0b7e5d16be113aac8",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-p80",
+                  "title": "P80 — strain and resource profile",
+                  "notionId": "40173152f171819da739f5a7c5a9c5dc",
+                  "url": "https://app.notion.com/p/40173152f171819da739f5a7c5a9c5dc",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-pulmonarius",
+                  "title": "Pleurotus pulmonarius — species and cultivation profile",
+                  "notionId": "40273152f171811fa874e6b3a698e462",
+                  "url": "https://app.notion.com/p/40273152f171811fa874e6b3a698e462",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "en-myco-other-fungi",
+              "title": "Other fungi",
+              "notionId": "40273152f171812aad80e9a88edf1be6",
+              "url": "https://app.notion.com/p/40273152f171812aad80e9a88edf1be6",
+              "description": "Sous-page publique de ressources fongiques, relevée dans la page parente.",
+              "children": [
+                {
+                  "id": "en-myco-cyclocybe",
+                  "title": "Cyclocybe aegerita — pioppino",
+                  "notionId": "40273152f17181819b2bf666639beafd",
+                  "url": "https://app.notion.com/p/40273152f17181819b2bf666639beafd",
+                  "description": "Página filha verificada na estrutura pública do Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-calocybe",
+                  "title": "Calocybe indica — organism profile",
+                  "notionId": "40173152f17181849109f54544cab02e",
+                  "url": "https://app.notion.com/p/40173152f17181849109f54544cab02e",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-ganoderma",
+                  "title": "Ganoderma lucidum — organism profile",
+                  "notionId": "40173152f17181c4b39ae27901d04d36",
+                  "url": "https://app.notion.com/p/40173152f17181c4b39ae27901d04d36",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-hericium",
+                  "title": "Hericium erinaceus — organism profile",
+                  "notionId": "40173152f17181ff9794c5dec3d4d002",
+                  "url": "https://app.notion.com/p/40173152f17181ff9794c5dec3d4d002",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-cordyceps",
+                  "title": "Cordyceps militaris — organism profile",
+                  "notionId": "40173152f171813da4f3e1dc287ee91a",
+                  "url": "https://app.notion.com/p/40173152f171813da4f3e1dc287ee91a",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-lentinula",
+                  "title": "Lentinula edodes — organism profile",
+                  "notionId": "40173152f1718146bb43e975d85f2dfa",
+                  "url": "https://app.notion.com/p/40173152f1718146bb43e975d85f2dfa",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-pholiota",
+                  "title": "Pholiota adiposa — organism profile",
+                  "notionId": "40173152f17181b7b351dc05b274a6f0",
+                  "url": "https://app.notion.com/p/40173152f17181b7b351dc05b274a6f0",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-trametes",
+                  "title": "Trametes versicolor — organism profile",
+                  "notionId": "40173152f171816098cdd2477a5b970c",
+                  "url": "https://app.notion.com/p/40173152f171816098cdd2477a5b970c",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-hypsizygus-ulmarius",
+                  "title": "Hypsizygus ulmarius — organism profile",
+                  "notionId": "40173152f17181db803af24eb2e753e0",
+                  "url": "https://app.notion.com/p/40173152f17181db803af24eb2e753e0",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-hypsizygus-marmoreus",
+                  "title": "Hypsizygus marmoreus — organism profile",
+                  "notionId": "40173152f17181e2b898ddd9686d5e38",
+                  "url": "https://app.notion.com/p/40173152f17181e2b898ddd9686d5e38",
+                  "description": "Fiche publique de ressource biologique référencée dans la page parente.",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "en-myco-culture-propagation",
+          "title": "Culture and propagation",
+          "notionId": "40173152f17181478c7bd4091e648053",
+          "url": "https://app.notion.com/p/40173152f17181478c7bd4091e648053",
+          "description": "Support preparation, inoculation, incubation and culture monitoring.",
+          "children": []
+        },
+        {
+          "id": "en-myco-mycorrhizae",
+          "title": "Fungi associated with plant roots",
+          "notionId": "40173152f1718101965cc766e3d7e27f",
+          "url": "https://app.notion.com/p/40173152f1718101965cc766e3d7e27f",
+          "description": "Biological relationships among fungi, plants and other organisms.",
+          "children": [
+            {
+              "id": "en-myco-arbuscular",
+              "title": "Arbuscular mycorrhizae — resources and functions",
+              "notionId": "40273152f171810d92ffe6dfe8330a17",
+              "url": "https://app.notion.com/p/40273152f171810d92ffe6dfe8330a17",
+              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+              "children": [
+                {
+                  "id": "en-myco-glomus-aggregatum",
+                  "title": "Glomus aggregatum — organism profile",
+                  "notionId": "40173152f171819bbb4ad4228587c985",
+                  "url": "https://app.notion.com/p/40173152f171819bbb4ad4228587c985",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-glomus-brasilianum",
+                  "title": "Glomus brasilianum — organism profile",
+                  "notionId": "40173152f171816eac93cd00f0450047",
+                  "url": "https://app.notion.com/p/40173152f171816eac93cd00f0450047",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-rhizophagus-clarus",
+                  "title": "Rhizophagus clarus (Glomus clarum) — organism profile",
+                  "notionId": "40173152f1718167bc04d6a36e0c2802",
+                  "url": "https://app.notion.com/p/40173152f1718167bc04d6a36e0c2802",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-glomus-deserticola",
+                  "title": "Glomus deserticola — organism profile",
+                  "notionId": "40173152f17181f9a2fcd3594708e9e9",
+                  "url": "https://app.notion.com/p/40173152f17181f9a2fcd3594708e9e9",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-rhizophagus-irregularis",
+                  "title": "Rhizophagus irregularis (Glomus intraradices) — organism profile",
+                  "notionId": "40173152f17181a7bcd1e4d69f31ea96",
+                  "url": "https://app.notion.com/p/40173152f17181a7bcd1e4d69f31ea96",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-glomus-monosporus",
+                  "title": "Glomus monosporus — organism profile",
+                  "notionId": "40173152f171810296caef43036c77ec",
+                  "url": "https://app.notion.com/p/40173152f171810296caef43036c77ec",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-funneliformis",
+                  "title": "Funneliformis mosseae (Glomus mosseae) — organism profile",
+                  "notionId": "40173152f171819a87acdc9dff6133da",
+                  "url": "https://app.notion.com/p/40173152f171819a87acdc9dff6133da",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-gigaspora",
+                  "title": "Gigaspora margarita — organism profile",
+                  "notionId": "40173152f171811c9d91ca85d7d6f89f",
+                  "url": "https://app.notion.com/p/40173152f171811c9d91ca85d7d6f89f",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "en-myco-ectomycorrhizae",
+              "title": "Ectomycorrhizae — resources and plant interactions",
+              "notionId": "40273152f17181a4aa7ccbe56cf01500",
+              "url": "https://app.notion.com/p/40273152f17181a4aa7ccbe56cf01500",
+              "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+              "children": [
+                {
+                  "id": "en-myco-rhizopogon",
+                  "title": "Rhizopogon spp. — ectomycorrhizal group profile",
+                  "notionId": "40273152f171810e8544ed23af43d1ac",
+                  "url": "https://app.notion.com/p/40273152f171810e8544ed23af43d1ac",
+                  "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-scleroderma",
+                  "title": "Scleroderma spp. — ectomycorrhizal group profile",
+                  "notionId": "40273152f171819a9502cb49b4793a0b",
+                  "url": "https://app.notion.com/p/40273152f171819a9502cb49b4793a0b",
+                  "description": "Sous-page publique de ressources mycorhiziennes, relevée dans la page de ressources fongiques.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-laccaria",
+                  "title": "Laccaria laccata — organism profile",
+                  "notionId": "40173152f171811ca07df731eed807fe",
+                  "url": "https://app.notion.com/p/40173152f171811ca07df731eed807fe",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                },
+                {
+                  "id": "en-myco-pisolithus",
+                  "title": "Pisolithus tinctorius — organism profile",
+                  "notionId": "40173152f171815f9edcca973aa6968a",
+                  "url": "https://app.notion.com/p/40173152f171815f9edcca973aa6968a",
+                  "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "en-myco-applications",
+          "title": "Mycological applications",
+          "notionId": "40173152f17181969ca9ec1b3dfe5435",
+          "url": "https://app.notion.com/p/40173152f17181969ca9ec1b3dfe5435",
+          "description": "Scientific fields where fungi and their functions are studied.",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "microbiology",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "plants",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "soil",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "bioprocess",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "biomaterials",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "instrumentation",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "digital",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        },
+        {
+          "target": "physical",
+          "basis": "page-content",
+          "label": "Connection to the mycology core",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "microbiology",
+      "title": "Microbiology & Cellular Sciences",
+      "notionId": "41f73152f17181129686ced284bc5de8",
+      "url": "https://app.notion.com/p/41f73152f17181129686ced284bc5de8",
+      "description": "Bacteria, yeasts, microorganisms, cells and microbial interactions.",
+      "children": [
+        {
+          "id": "en-bio-microbes",
+          "title": "Agricultural microorganisms",
+          "notionId": "40173152f171817e918cc9c278aeca0d",
+          "url": "https://app.notion.com/p/40173152f171817e918cc9c278aeca0d",
+          "description": "Explore microorganisms associated with agricultural systems, including their roles and limits of current evidence.",
+          "children": [
+            {
+              "id": "en-bio-trichoderma-harzianum",
+              "title": "Trichoderma harzianum — organism profile",
+              "notionId": "40173152f17181d7ac44ef9a249eadc7",
+              "url": "https://app.notion.com/p/40173152f17181d7ac44ef9a249eadc7",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "en-bio-trichoderma-reesei",
+              "title": "Trichoderma reesei — organism profile",
+              "notionId": "40173152f171818ba78ef2028d5f05ee",
+              "url": "https://app.notion.com/p/40173152f171818ba78ef2028d5f05ee",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "en-bio-trichoderma-hamatum",
+              "title": "Trichoderma hamatum — organism profile",
+              "notionId": "40173152f17181e08c0ee7eea5842caf",
+              "url": "https://app.notion.com/p/40173152f17181e08c0ee7eea5842caf",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "en-bio-trichoderma-koningii",
+              "title": "Trichoderma koningii — organism profile",
+              "notionId": "40173152f17181b38251df2cae51e2c4",
+              "url": "https://app.notion.com/p/40173152f17181b38251df2cae51e2c4",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "en-bio-trichoderma-longibrachiatum",
+              "title": "Trichoderma longibrachiatum — organism profile",
+              "notionId": "40173152f17181e7876cf8919257e0fa",
+              "url": "https://app.notion.com/p/40173152f17181e7876cf8919257e0fa",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            },
+            {
+              "id": "en-bio-bacillus",
+              "title": "Bacillus — bacterial group of agricultural interest",
+              "notionId": "40273152f17181c4b968f2476c0b6679",
+              "url": "https://app.notion.com/p/40273152f17181c4b968f2476c0b6679",
+              "description": "Page de groupe Bacillus ; les fiches d’espèces sont rattachées ici pour refléter l’organisation taxonomique visible dans la rubrique.",
+              "children": [
+                {
+                  "id": "en-bacillus-subtilis",
+                  "title": "Bacillus subtilis",
+                  "notionId": "40173152f17181208f61ff2a36170d25",
+                  "url": "https://app.notion.com/p/40173152f17181208f61ff2a36170d25",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-bacillus-amyloliquefaciens",
+                  "title": "Bacillus amyloliquefaciens",
+                  "notionId": "40173152f171815188dad807b1d45973",
+                  "url": "https://app.notion.com/p/40173152f171815188dad807b1d45973",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-bacillus-licheniformis",
+                  "title": "Bacillus licheniformis",
+                  "notionId": "40173152f1718133ac83e2af140828a7",
+                  "url": "https://app.notion.com/p/40173152f1718133ac83e2af140828a7",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-bacillus-mycoides",
+                  "title": "Bacillus mycoides",
+                  "notionId": "40173152f1718182b807d5a6182cc097",
+                  "url": "https://app.notion.com/p/40173152f1718182b807d5a6182cc097",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-brevibacillus-brevis",
+                  "title": "Brevibacillus brevis",
+                  "notionId": "40173152f1718170ad53cac18633c7e7",
+                  "url": "https://app.notion.com/p/40173152f1718170ad53cac18633c7e7",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-paenibacillus-polymyxa",
+                  "title": "Paenibacillus polymyxa",
+                  "notionId": "40173152f1718116a861c3de9d19bda7",
+                  "url": "https://app.notion.com/p/40173152f1718116a861c3de9d19bda7",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-sporosarcina-pasteurii",
+                  "title": "Sporosarcina pasteurii",
+                  "notionId": "40173152f1718164960bf418b89a46f7",
+                  "url": "https://app.notion.com/p/40173152f1718164960bf418b89a46f7",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-niallia-circulans",
+                  "title": "Niallia circulans (formerly Bacillus circulans)",
+                  "notionId": "40173152f17181c1b1f0da7dddb27aca",
+                  "url": "https://app.notion.com/p/40173152f17181c1b1f0da7dddb27aca",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-cytobacillus-firmus",
+                  "title": "Cytobacillus firmus (formerly Bacillus firmus)",
+                  "notionId": "40173152f1718133b778fbb9eac22b61",
+                  "url": "https://app.notion.com/p/40173152f1718133b778fbb9eac22b61",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-priestia-megaterium",
+                  "title": "Priestia megaterium (formerly Bacillus megaterium)",
+                  "notionId": "40173152f17181aabb89f476513379e3",
+                  "url": "https://app.notion.com/p/40173152f17181aabb89f476513379e3",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-weizmannia-coagulans",
+                  "title": "Weizmannia coagulans (formerly Bacillus coagulans)",
+                  "notionId": "40173152f1718123a8c4ec1ab55812c2",
+                  "url": "https://app.notion.com/p/40173152f1718123a8c4ec1ab55812c2",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-brevibacillus-laterosporus",
+                  "title": "Brevibacillus laterosporus (formerly Bacillus laterosporus)",
+                  "notionId": "40173152f171813b87bcf8fa7c7a145e",
+                  "url": "https://app.notion.com/p/40173152f171813b87bcf8fa7c7a145e",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                },
+                {
+                  "id": "en-virgibacillus-halodenitrificans",
+                  "title": "Virgibacillus halodenitrificans (formerly Bacillus halodenitrificans)",
+                  "notionId": "40173152f171816f95c4dced8d66e65b",
+                  "url": "https://app.notion.com/p/40173152f171816f95c4dced8d66e65b",
+                  "description": "Fiche d’espèce bactérienne listée dans la rubrique Bacillus de Notion.",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "en-bio-pgpr",
+              "title": "PGPR — root-associated bacteria and agronomic potential",
+              "notionId": "40273152f17181b087d9dd5adad64ada",
+              "url": "https://app.notion.com/p/40273152f17181b087d9dd5adad64ada",
+              "description": "Fiche publique d’organisme référencée dans la rubrique Microorganismes d’intérêt agricole.",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "en-bio-biostimulants",
+          "title": "Biostimulants and biological solutions",
+          "notionId": "40173152f17181cab354dd2c11933208",
+          "url": "https://app.notion.com/p/40173152f17181cab354dd2c11933208",
+          "description": "Biological solutions and biostimulant approaches under study.",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "bioprocess",
+          "basis": "page-content",
+          "label": "Microbiology and bioconversion",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "title": "Plant Sciences & Agronomy",
+      "notionId": "41f73152f17181d99104ca04dd66d0b5",
+      "url": "https://app.notion.com/p/41f73152f17181d99104ca04dd66d0b5",
+      "description": "Plant physiology, propagation, nurseries and cultivation systems.",
+      "children": [
+        {
+          "id": "en-bio-plant-micropropagation",
+          "title": "Plant micropropagation",
+          "notionId": "40173152f17181e1aa6eebe9f6c26c46",
+          "url": "https://app.notion.com/p/40173152f17181e1aa6eebe9f6c26c46",
+          "description": "Experimental plant micropropagation and controlled plant-culture systems.",
+          "children": []
+        },
+        {
+          "id": "en-lab-plant-experimentation",
+          "title": "Plant experimentation",
+          "notionId": "40173152f171817baccbf47fd8616785",
+          "description": "Greenhouse trials exploring plant responses to growing matrices, water availability and experimental interventions.",
+          "url": "https://app.notion.com/p/40173152f171817baccbf47fd8616785",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "en-myco-mycorrhizae",
+          "basis": "page-content",
+          "label": "Plant–soil interactions",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "soil",
+      "title": "Soils, Ecosystems & Environment",
+      "notionId": "41f73152f17181edaa7fe423fe6efa68",
+      "url": "https://app.notion.com/p/41f73152f17181edaa7fe423fe6efa68",
+      "description": "Soils, ecosystems, water, biodiversity and material cycles.",
+      "children": [
+        {
+          "id": "en-soil-substrate-preparation",
+          "title": "Substrate preparation",
+          "notionId": "40173152f171818daed1d22deb38a624",
+          "url": "https://app.notion.com/p/40173152f171818daed1d22deb38a624",
+          "description": "Preparation of biological supports with attention to structure, moisture and treatment.",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "en-myco-mycorrhizae",
+          "basis": "page-content",
+          "label": "Plant–soil interactions",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "bioprocess",
+      "title": "Bioprocesses & Bioconversion",
+      "notionId": "41f73152f1718104a3d5e5863fd10a58",
+      "url": "https://app.notion.com/p/41f73152f1718104a3d5e5863fd10a58",
+      "description": "Fermentation, bioconversion and biological biomass processing.",
+      "children": [
+        {
+          "id": "en-bio-fermentation",
+          "title": "Biological fermentation",
+          "notionId": "40173152f17181e999cfc4e456ec0f6d",
+          "url": "https://app.notion.com/p/40173152f17181e999cfc4e456ec0f6d",
+          "description": "Biological fermentation processes and their operating principles.",
+          "children": []
+        },
+        {
+          "id": "en-soil-fermenters",
+          "title": "Fermenters and pilot processes",
+          "notionId": "40173152f171818bbe4adc44550b7913",
+          "url": "https://app.notion.com/p/40173152f171818bbe4adc44550b7913",
+          "description": "Modular fermentation systems and pilot-scale process development.",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "biomaterials",
+          "basis": "page-content",
+          "label": "Processes and biomaterials",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "biomaterials",
+      "title": "Biomaterials & Biofabrication",
+      "notionId": "41f73152f1718122992cc99b0609aab3",
+      "url": "https://app.notion.com/p/41f73152f1718122992cc99b0609aab3",
+      "description": "Biological materials, composites, properties and biofabrication.",
+      "children": [
+        {
+          "id": "en-bio-substrates",
+          "title": "Biological substrates and carriers",
+          "notionId": "40173152f1718163b121c3693da2b15d",
+          "url": "https://app.notion.com/p/40173152f1718163b121c3693da2b15d",
+          "description": "Materials and carriers used in biological systems and experiments.",
+          "children": []
+        },
+        {
+          "id": "en-soil-prototyping",
+          "title": "Prototyping and fabrication",
+          "notionId": "40173152f171813da2e3dafa7265dc6a",
+          "url": "https://app.notion.com/p/40173152f171813da2e3dafa7265dc6a",
+          "description": "Design, fabrication and testing of devices for research and development.",
+          "children": []
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "instrumentation",
+      "title": "Instrumentation, Engineering & Automation",
+      "notionId": "41f73152f17181b1a27ce32ef73cb66b",
+      "url": "https://app.notion.com/p/41f73152f17181b1a27ce32ef73cb66b",
+      "description": "Sensors, electronics, mechanics, instrumentation and automation.",
+      "children": [
+        {
+          "id": "en-iot-sensors",
+          "title": "Instrumentation and sensors",
+          "notionId": "40173152f17181aa843ace690303e7c8",
+          "url": "https://app.notion.com/p/40173152f17181aa843ace690303e7c8",
+          "description": "An introduction to the sensors and measurement tools used to observe biological and cultivation systems.",
+          "children": []
+        },
+        {
+          "id": "en-iot-culture-automation",
+          "title": "Culture automation",
+          "notionId": "40173152f17181e1a740df2496d50736",
+          "url": "https://app.notion.com/p/40173152f17181e1a740df2496d50736",
+          "description": "Automation concepts for monitoring and managing cultivation systems.",
+          "children": []
+        },
+        {
+          "id": "en-soil-equipment",
+          "title": "Experimental equipment",
+          "notionId": "40173152f17181c0955ef6b706891bfa",
+          "url": "https://app.notion.com/p/40173152f17181c0955ef6b706891bfa",
+          "description": "Equipment concepts and devices for research, experimentation and biological processes.",
+          "children": []
+        },
+        {
+          "id": "en-soil-integrated-instrumentation",
+          "title": "Integrated instrumentation",
+          "notionId": "40173152f17181ce95cfcc669321cc1d",
+          "url": "https://app.notion.com/p/40173152f17181ce95cfcc669321cc1d",
+          "description": "Integration of sensors and control systems to observe biological processes.",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "digital",
+          "basis": "page-content",
+          "label": "Instrumentation and data",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "digital",
+      "title": "Digital Intelligence & Data",
+      "notionId": "41f73152f1718127a894c85bc7af01af",
+      "url": "https://app.notion.com/p/41f73152f1718127a894c85bc7af01af",
+      "description": "Software, traceability, databases, AI and data visualization.",
+      "children": [
+        {
+          "id": "iot-traceability-data",
+          "title": "Traceability and data",
+          "notionId": "40173152f171811189c3ca46beeea37f",
+          "url": "https://app.notion.com/p/40173152f171811189c3ca46beeea37f",
+          "description": "Traceability systems, biological data and their structured management.",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "physical",
+          "basis": "page-content",
+          "label": "Data and metrology",
+          "evidence": "BA Labs public scientific map"
+        }
+      ]
+    },
+    {
+      "id": "physical",
+      "title": "Physical, Chemical Sciences & Modelling",
+      "notionId": "41f73152f17181358e32ce72c1846326",
+      "url": "https://app.notion.com/p/41f73152f17181358e32ce72c1846326",
+      "description": "Chemistry, physics, metrology, statistics and modelling.",
+      "children": [
+        {
+          "id": "en-iot-measurement",
+          "title": "Measurement and reproducibility",
+          "notionId": "40273152f17181f896c7c040f4402212",
+          "url": "https://app.notion.com/p/40273152f17181f896c7c040f4402212",
+          "description": "Measurement practices that support repeatable observations.",
+          "children": []
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "portals": [
+    {
+      "id": "products",
+      "title": "Catalogue",
+      "notionId": "40173152f171812f813cf1b792d83281",
+      "url": "https://app.notion.com/p/40173152f171812f813cf1b792d83281"
+    },
+    {
+      "id": "work",
+      "title": "R&D & projects",
+      "notionId": "40173152f1718173ae6bc8cce9f0ba52",
+      "url": "https://app.notion.com/p/40173152f1718173ae6bc8cce9f0ba52"
+    },
+    {
+      "id": "evidence",
+      "title": "Evidence & results",
+      "notionId": "40173152f17181e99831c9e40fb8e614",
+      "url": "https://app.notion.com/p/40173152f17181e99831c9e40fb8e614"
+    },
+    {
+      "id": "lab",
+      "title": "Laboratory",
+      "notionId": "40173152f1718119b5dffffaa2245f27",
+      "url": "https://app.notion.com/p/40173152f1718119b5dffffaa2245f27"
+    },
+    {
+      "id": "collaboration",
+      "title": "Collaborate",
+      "notionId": "40173152f1718118ac1ad58358720ae4",
+      "url": "https://app.notion.com/p/40173152f1718118ac1ad58358720ae4"
+    }
+  ]
+}
