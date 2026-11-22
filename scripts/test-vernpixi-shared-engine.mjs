@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createVernpixiNetwork } from '../ecosystem-core/explorer-2d-network.js';
 
-const canonicalRoots = ['myco', 'bio', 'iot', 'soil', 'lab', 'products', 'work', 'evidence'];
+const canonicalRoots = ['myco', 'bio', 'iot', 'soil', 'lab', 'products', 'work', 'learn'];
 const academyTree = JSON.parse(await readFile('ecosystem-preview/notion-tree.fr.json', 'utf8')).domains;
 const publicTree = JSON.parse(await readFile('ecosystem/notion-tree.fr.json', 'utf8')).domains;
 assert.equal(academyTree.length, 8, 'Academy must expose eight universes');
