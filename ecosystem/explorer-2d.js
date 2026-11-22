@@ -104,6 +104,7 @@ function buildNetwork(){
   }
  });
  canvas.dataset.localAnastomoses=String(localAnastomoses);
+ canvas.dataset.layout="eight-around-mycology";
  canvas.dataset.universeCount=String(tree.length);
  canvas.dataset.nodeCount=String(nodes.length);
  canvas.dataset.edgeCount=String(edges.length);
