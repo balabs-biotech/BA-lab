@@ -6,7 +6,7 @@
 (()=>{try{const saved=localStorage.getItem('balabs-language');if(['fr','en','ar','pt'].includes(saved)){document.documentElement.lang=saved;document.documentElement.dir=saved==='ar'?'rtl':'ltr'}}catch(_){}})();
 </script>
 <script>
-(()=>{try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!sessionStorage.getItem('balabs-intro-seen')&&!location.hash&&!new URLSearchParams(location.search).has('domain'))document.documentElement.classList.add('balabs-intro-pending')}catch(_){} })();
+(()=>{try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!sessionStorage.getItem('balabs-intro-seen')&&!location.hash&&!new URLSearchParams(location.search).has('domain')){document.documentElement.classList.add('balabs-intro-pending');window.setTimeout(()=>document.documentElement.classList.remove('balabs-intro-pending'),6000)}}catch(_){} })();
 </script>
 <meta name="theme-color" content="#111B1D">
 <meta name="description" id="pageDescription" content="Explorez les huit univers BA Labs : microbiologie, sciences végétales, sols et environnement, bioprocédés, biomatières, instrumentation, numérique et sciences physiques.">
@@ -185,7 +185,7 @@ html[dir="rtl"] body > .chapter-rail{left:auto!important;right:max(0px,env(safe-
    <path class="hypha" pathLength="1" d="M58 16 C50 9 43 5 32 4 M70 65 C56 70 47 80 42 93 M78 128 C62 118 50 116 37 120 M126 188 C128 207 122 219 111 228 M298 17 C309 7 323 5 337 8 M287 60 C301 67 312 78 317 92 M294 120 C309 107 324 105 340 108 M246 202 C242 218 249 226 263 230"/>
    <circle class="seed" cx="180" cy="118" r="4"/>
   </svg>
-  <div class="balabs-intro-wordmark"><strong>BA LABS</strong><span>Applied biology</span></div>
+  <div class="balabs-intro-wordmark"><strong>BA LABS</strong><span data-intro-subtitle>Biologie appliquée</span></div>
   <div class="balabs-intro-caption" data-intro-caption>Biologie appliquée · Recherche · Ingénierie</div>
   <div class="balabs-intro-rule"></div>
  </div>
