@@ -238,6 +238,18 @@ function updateSelection(){
  const levelLabel=selected.level===0?t("root"):selected.level===1?t("branch"):t("leaf");
  const context=el("p","selection-context",root&&root.id!==selected.id?root.title+" · "+levelLabel:levelLabel);
  dock.append(title,context);
+ // Keep the complete hierarchy visible inside the selection panel, including
+ // on phones where the desktop breadcrumb bar is intentionally hidden.
+ const ancestry=[];let ancestor=selected.parent?byId.get(selected.parent):null;
+ while(ancestor){ancestry.unshift(ancestor);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
+ if(ancestry.length){
+  const pathNav=el("nav","selection-path");pathNav.setAttribute("aria-label",lang==="fr"?"Chemin de navigation":lang==="ar"?"مسار التنقل":lang==="pt"?"Caminho de navegação":"Navigation path");
+  ancestry.forEach((node,index)=>{
+   const button=el("button","selection-path-link",node.title);button.type="button";button.title=node.title;button.onclick=()=>focusNode(node);pathNav.append(button);
+   const separator=el("span","selection-path-separator", "›");separator.setAttribute("aria-hidden","true");pathNav.append(separator);
+  });
+  const current=el("span","selection-path-current",selected.title);current.title=selected.title;current.setAttribute("aria-current","page");pathNav.append(current);dock.append(pathNav);
+ }
  if(selected.data.description){
   const description=el("p","selection-description",selected.data.description);
   dock.append(description);
