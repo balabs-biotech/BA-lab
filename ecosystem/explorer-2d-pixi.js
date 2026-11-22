@@ -24,7 +24,7 @@ export async function createPixiRenderer(canvas){
   // Every depth contributes to the global mycelium silhouette; each zoom
   // progressively resolves another layer into visible branches and junctions.
   const trace=.022*Math.pow(.78,Math.max(0,level-1));
-  return clamp(trace+smooth(t*1.3,t*2.4,revealScale)*.88,0,1);
+  return clamp(trace+smooth(t*.65,t*1.5,revealScale)*.88,0,1);
  };
  let cameraScale=1,focusedView=false;
  function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core,radialRings=[]}){
