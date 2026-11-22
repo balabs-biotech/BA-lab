@@ -90,6 +90,11 @@ try {
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
+    await page.waitForFunction(() => document.querySelector('#field')?.dataset.layout === 'eight-around-mycology');
+    assert.equal(await page.locator('#field').getAttribute('data-layout'), 'eight-around-mycology',
+      'The eight universes must orbit a distinct central Mycology hub');
+    const maxBranchLength = Number(await page.locator('#field').getAttribute('data-max-branch-length') || 0);
+    assert.ok(maxBranchLength <= 140, `Primary and nested hyphae must stay compact (max segment: ${maxBranchLength})`);
     const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
     assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
     const initialUrl = page.url();
