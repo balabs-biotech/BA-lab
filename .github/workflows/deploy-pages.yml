@@ -25,10 +25,11 @@ jobs:
 
       - name: Prepare static site
         run: |
-          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-preview _site/store
+          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-core _site/ecosystem-preview _site/store
           cp index.html _site/index.html
           cp -R batch-tracker/. _site/batch-tracker/
           cp -R ecosystem/. _site/ecosystem/
+          cp -R ecosystem-core/. _site/ecosystem-core/
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           cp -R store/. _site/store/
           sed -i "s/__BUILD_SHA__/${GITHUB_SHA}/g" _site/store/index.html
@@ -90,6 +91,10 @@ jobs:
           verify_asset "assets/universe-products.jpg" "image/jpeg"
           verify_asset "assets/editorial-penicillium.png" "image/png"
           verify_asset "explorer-2d.js?v=hierarchy-path-3" "javascript"
+          for path in explorer-2d-pixi.js explorer-2d-network.js; do
+            curl --fail --silent --show-error --output /dev/null "https://balabs-biotech.github.io/BA-lab/ecosystem-core/$path"
+            echo "✓ ecosystem-core/$path"
+          done
 
       - name: Verify storefront publication
         run: curl --fail --silent --show-error --output /dev/null --write-out 'Storefront HTTP %{http_code} (%{content_type})\n' https://balabs-biotech.github.io/BA-lab/store/index.html
