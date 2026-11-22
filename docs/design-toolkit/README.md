@@ -83,6 +83,26 @@ These names were supplied but the exact product/repository is not yet confirmed.
 
 Add each only after verifying its canonical domain/repository, purpose, framework compatibility, license and installation method.
 
+
+## Motion, animation systems and 3D
+
+| Resource | Type | Best use | Adoption rule |
+|---|---|---|---|
+| [Animate Anything](https://github.com/wjlgatech/animate-anything) | Curated animation-tool map + agent-readable registry | Discover the right motion tool by layer: CSS, JS timelines, UI motion, vector, 3D/WebGL and video | Research/index resource, not a single runtime dependency. Check the selected tool's own docs, activity and license before adoption. |
+| [Motion](https://motion.dev/) | JavaScript animation library (formerly Framer Motion) | UI transitions, gestures, spring/layout motion, scroll-linked effects, SVG and JS objects | Install `motion` only in compatible JS/React apps. Can animate Three.js objects too; do not add it just for decorative page-load fades. |
+| [Three.js](https://threejs.org/) | 3D / WebGL engine | Scientific 3D visualization, spatial scenes, interactive models, particles and immersive brand experiences | Use for a real 3D requirement; evaluate bundle size, GPU load, mobile fallback, accessibility and reduced-motion. For React, consider React Three Fiber only if the app already uses React. |
+
+### Motion tool selection
+
+- **Interface state, gestures and layout transitions:** Motion.
+- **Complex sequenced timeline or scroll choreography:** consider GSAP after comparing the task with Motion.
+- **2D canvas, particles and fast sprite scenes:** existing PixiJS ecosystem; do not replace it with Three.js by default.
+- **3D geometry, lighting, shaders and spatial data:** Three.js.
+- **Tool discovery and learning:** Animate Anything registry.
+- **Quality review:** Emil Kowalski motion skills + Playwright visual checks.
+
+Motion is a design material, not a decoration layer. Prefer transform/opacity when appropriate, keep interaction feedback quick, avoid animating high-frequency events, and honor `prefers-reduced-motion`. A 3D canvas must have a meaningful static/2D fallback and must not block access to essential content.
+
 ## BA Labs visual principles
 
 - Scientific credibility without institutional coldness.
