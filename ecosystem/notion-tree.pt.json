@@ -6,7 +6,8 @@
   "domains": [
     {
       "id": "microbiology",
-      "title": "🧫 Microbiologia & Ciências Celulares",
+      "academyUniverseId": "myco",
+      "title": "Micologia",
       "notionId": "41f73152f17181edb2cee71226bc9b95",
       "url": "https://app.notion.com/p/41f73152f17181edb2cee71226bc9b95",
       "children": [
@@ -330,7 +331,8 @@
     },
     {
       "id": "plants",
-      "title": "🌱 Ciências Vegetais & Agronomia",
+      "academyUniverseId": "bio",
+      "title": "Biotecnologia",
       "notionId": "41f73152f1718151b56bf6ad98617c22",
       "url": "https://app.notion.com/p/41f73152f1718151b56bf6ad98617c22",
       "children": [
@@ -617,7 +619,8 @@
     },
     {
       "id": "ecology",
-      "title": "🌍 Solos, Ecossistemas & Ambiente",
+      "academyUniverseId": "soil",
+      "title": "Agrotecnologia",
       "notionId": "41f73152f17181658b77c14bcbff5940",
       "url": "https://app.notion.com/p/41f73152f17181658b77c14bcbff5940",
       "children": [
@@ -791,7 +794,8 @@
     },
     {
       "id": "bioprocesses",
-      "title": "♻️ Bioprocessos & Bioconversão",
+      "academyUniverseId": "iot",
+      "title": "Instrumentação e automação",
       "notionId": "41f73152f17181488f9eff06d48d9379",
       "url": "https://app.notion.com/p/41f73152f17181488f9eff06d48d9379",
       "children": [
@@ -878,7 +882,8 @@
     },
     {
       "id": "biomaterials",
-      "title": "🧱 Biomateriais & Biofabricação",
+      "academyUniverseId": "lab",
+      "title": "O laboratório",
       "notionId": "41f73152f17181babafbd221031866b4",
       "url": "https://app.notion.com/p/41f73152f17181babafbd221031866b4",
       "children": [
@@ -959,7 +964,8 @@
     },
     {
       "id": "instrumentation",
-      "title": "⚙️ Instrumentação, Engenharia & Automação",
+      "academyUniverseId": "products",
+      "title": "Produtos e recursos biológicos",
       "notionId": "41f73152f17181049050c327f2b0df92",
       "url": "https://app.notion.com/p/41f73152f17181049050c327f2b0df92",
       "children": [
@@ -1034,7 +1040,8 @@
     },
     {
       "id": "digital",
-      "title": "💻 Inteligência Digital & Dados",
+      "academyUniverseId": "work",
+      "title": "Investigação e desenvolvimento",
       "notionId": "41f73152f17181a1aba9d5b91d32a153",
       "url": "https://app.notion.com/p/41f73152f17181a1aba9d5b91d32a153",
       "children": [
@@ -1103,7 +1110,8 @@
     },
     {
       "id": "physical",
-      "title": "⚗️ Ciências Físicas, Químicas & Modelação",
+      "academyUniverseId": "learn",
+      "title": "Recursos e transmissão",
       "notionId": "41f73152f1718146a959f08cd87ea17b",
       "url": "https://app.notion.com/p/41f73152f1718146a959f08cd87ea17b",
       "children": [
