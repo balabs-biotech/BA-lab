@@ -6,9 +6,9 @@ const html = readFileSync('ecosystem/index.html', 'utf8');
 const previewHtml = readFileSync('ecosystem-preview/legacy-3d-preview.html', 'utf8');
 const previewExplorerHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const previewExplorerJs = readFileSync('ecosystem-preview/explorer-2d.js', 'utf8');
-const previewPixiJs = readFileSync('ecosystem-preview/explorer-2d-pixi.js', 'utf8');
+const sharedPixiJs = readFileSync('ecosystem-core/explorer-2d-pixi.js', 'utf8');
+const sharedNetworkJs = readFileSync('ecosystem-core/explorer-2d-network.js', 'utf8');
 const publicExplorerJs = readFileSync('ecosystem/explorer-2d.js', 'utf8');
-const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
 
 assert.ok(publicExplorerJs.includes('selection-dock') && publicExplorerJs.includes('selection-open-link'), 'Selecting a 2D node must render a compact selection dock with its direct resource action');
 assert.ok(publicExplorerJs.includes('selected.data.url') && publicExplorerJs.includes('https:'), 'The selection action must use the verified Notion URL carried by the selected manifest node');
@@ -22,10 +22,13 @@ const expectedDomains = ['bio', 'myco', 'soil', 'lab', 'products', 'iot', 'work'
 assert.ok(previewExplorerHtml.includes('id="field"') && previewExplorerHtml.includes('pixi.js@8.23.0'), 'Preview entry must mount the PixiJS 2D canvas, not the retired 3D scene');
 assert.ok(previewExplorerHtml.includes('./explorer-2d.js?v=pixijs-2') && !previewExplorerHtml.includes('engine-v2.js'), 'Preview entry must load Vernpixi 2D and never load the 3D engine');
 assert.ok(previewExplorerJs.includes('createPixiRenderer') && previewExplorerJs.includes('fetch("./notion-tree."+lang+".json"'), 'Preview Vernpixi must render from the active-language Notion tree');
-assert.ok(previewPixiJs.includes('pixijs-webgl') && previewPixiJs.includes('filaments'), 'Preview Vernpixi renderer must draw the biological filament network');
+assert.ok(previewExplorerJs.includes('../ecosystem-core/explorer-2d-pixi.js') && previewExplorerJs.includes('../ecosystem-core/explorer-2d-network.js'), 'Academy must import the common renderer and graph geometry');
+assert.ok(sharedPixiJs.includes('pixijs-webgl') && sharedPixiJs.includes('filaments'), 'Shared Vernpixi renderer must draw the biological filament network');
+assert.ok(sharedNetworkJs.includes('createVernpixiNetwork') && sharedNetworkJs.includes('const anchors='), 'Shared Vernpixi graph builder must own the eight organic anchors and branching geometry');
 assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && /src="\.\/explorer-2d\.js\?v=[^"]+"/.test(html), 'Public homepage must mount a versioned Vernpixi 2D script directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
-assert.ok(publicPixiJs.includes('pixijs-webgl') && publicPixiJs.includes('filaments'), 'Public Vernpixi renderer must draw the biological filament network');
+assert.ok(publicExplorerJs.includes('../ecosystem-core/explorer-2d-pixi.js') && publicExplorerJs.includes('../ecosystem-core/explorer-2d-network.js'), 'Public Vernpixi must import the exact same renderer and graph geometry as Academy');
+assert.ok(publicExplorerJs.includes('rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]'), 'Public universes must reuse the Academy anchor identity and ordering');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
 
 
@@ -79,8 +82,8 @@ for (const language of ['fr','en','ar','pt']) {
 }
 const explorer = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 assert.ok(explorer.includes('createPixiRenderer') && explorer.includes('fetch("./notion-tree."+lang+".json"'), 'The existing PixiJS 2D engine must load the active language manifest');
-assert.ok(explorer.includes('Expected 8 universes') && explorer.includes('function buildNetwork()'), 'The 2D engine must build the eight-universe network from the live manifest');
-assert.ok(explorer.includes('microbiology:') && explorer.includes('instrumentation:') && explorer.includes('physical:'), 'The 2D engine must register the new universe identifiers');
+assert.ok(explorer.includes('Expected 8 universes') && explorer.includes('function buildNetwork()') && explorer.includes('createVernpixiNetwork'), 'The 2D engine must build the eight-universe network through the shared graph engine');
+assert.ok(explorer.includes('microbiology:') && explorer.includes('instrumentation:') && explorer.includes('physical:'), 'The public 2D engine must retain its canonical Notion universe identifiers');
 assert.ok(explorer.includes('function activateNode(n)') && explorer.includes('window.open(url,"_blank","noopener,noreferrer")'), 'A double-clicked point must open its exact Notion destination');
 assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('window.addEventListener("click"') && explorer.includes('e.detail<2'), 'Point activation must preserve single-click selection and double-click opening');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
