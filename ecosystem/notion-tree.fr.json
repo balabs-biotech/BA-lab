@@ -559,7 +559,7 @@
           "children": []
         },
         {
-          "id": "ref-3ff73152f17181cf8346d696db59ae79",
+          "id": "ref-plants-plants-12-3ff73152f17181cf8346d696db59ae79",
           "title": "PGPR — Bactéries associées aux racines et potentiel agronomique",
           "kind": "reference",
           "notionId": "3ff73152f17181cf8346d696db59ae79",
@@ -567,7 +567,7 @@
           "children": []
         },
         {
-          "id": "ref-3ff73152f17181b299aad9ea7a7f8f37",
+          "id": "ref-plants-plants-13-3ff73152f17181b299aad9ea7a7f8f37",
           "title": "Bacillus — fiche de groupe bactérien d’intérêt agricole",
           "kind": "reference",
           "notionId": "3ff73152f17181b299aad9ea7a7f8f37",
@@ -660,7 +660,7 @@
           "children": []
         },
         {
-          "id": "ref-3e973152f171816781fbf56674cfe55c",
+          "id": "ref-ecology-ecology-4-3e973152f171816781fbf56674cfe55c",
           "title": "Ce qui est effectivement démontré",
           "kind": "reference",
           "notionId": "3e973152f171816781fbf56674cfe55c",
@@ -668,7 +668,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f17181c88bbbe98171594535",
+          "id": "ref-ecology-ecology-5-3e273152f17181c88bbbe98171594535",
           "title": "Champignons associés aux racines",
           "kind": "reference",
           "notionId": "3e273152f17181c88bbbe98171594535",
@@ -690,7 +690,7 @@
           "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
           "children": [
             {
-              "id": "ref-3e973152f171816781fbf56674cfe55c",
+              "id": "ref-ecology-work-documented-0-3e973152f171816781fbf56674cfe55c",
               "title": "Ce qui est effectivement démontré",
               "kind": "reference",
               "notionId": "3e973152f171816781fbf56674cfe55c",
@@ -709,7 +709,7 @@
           "description": "Panorama des travaux appliqués documentés par BA Labs, avec distinction entre observations, réalisations et validations. Les limites et niveaux de preuve sont centralisés dans la page de référence dédiée."
         },
         {
-          "id": "ref-3e273152f17181ab88bfe456f838b011",
+          "id": "ref-ecology-ecology-8-3e273152f17181ab88bfe456f838b011",
           "title": "Méthodologie R&D",
           "kind": "reference",
           "notionId": "3e273152f17181ab88bfe456f838b011",
@@ -717,7 +717,7 @@
           "children": []
         },
         {
-          "id": "ref-3ff73152f17181eba5aed2b6ce33e4bc",
+          "id": "ref-ecology-ecology-9-3ff73152f17181eba5aed2b6ce33e4bc",
           "title": "Mycorhizes arbusculaires — ressources et fonctions",
           "kind": "reference",
           "notionId": "3ff73152f17181eba5aed2b6ce33e4bc",
@@ -725,7 +725,7 @@
           "children": []
         },
         {
-          "id": "ref-3ff73152f17181159f8dfd6c430fba1d",
+          "id": "ref-ecology-ecology-10-3ff73152f17181159f8dfd6c430fba1d",
           "title": "Ectomycorhizes — ressources et interactions avec les plantes",
           "kind": "reference",
           "notionId": "3ff73152f17181159f8dfd6c430fba1d",
@@ -733,7 +733,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f171814187cbd78d7b0a4a94",
+          "id": "ref-ecology-ecology-11-3e273152f171814187cbd78d7b0a4a94",
           "title": "Microorganismes d'intérêt agricole",
           "kind": "reference",
           "notionId": "3e273152f171814187cbd78d7b0a4a94",
@@ -741,7 +741,7 @@
           "children": []
         },
         {
-          "id": "ref-3ff73152f17181cf8346d696db59ae79",
+          "id": "ref-ecology-ecology-12-3ff73152f17181cf8346d696db59ae79",
           "title": "PGPR — Bactéries associées aux racines et potentiel agronomique",
           "kind": "reference",
           "notionId": "3ff73152f17181cf8346d696db59ae79",
@@ -820,7 +820,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f171812e9dd5f9df0b269046",
+          "id": "ref-bioprocesses-bioprocesses-4-3e273152f171812e9dd5f9df0b269046",
           "title": "Préparation des substrats",
           "kind": "reference",
           "notionId": "3e273152f171812e9dd5f9df0b269046",
@@ -844,7 +844,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f17181ab88bfe456f838b011",
+          "id": "ref-bioprocesses-bioprocesses-7-3e273152f17181ab88bfe456f838b011",
           "title": "Méthodologie R&D",
           "kind": "reference",
           "notionId": "3e273152f17181ab88bfe456f838b011",
@@ -860,7 +860,7 @@
           "notionId": "3e273152f17181b1a786db5143e19f53"
         },
         {
-          "id": "ref-3ff73152f1718184bcacee1fac9f6aba",
+          "id": "ref-bioprocesses-bioprocesses-9-3ff73152f1718184bcacee1fac9f6aba",
           "title": "Trichoderma reesei — fiche d’organisme",
           "kind": "reference",
           "notionId": "3ff73152f1718184bcacee1fac9f6aba",
@@ -868,7 +868,7 @@
           "children": []
         },
         {
-          "id": "ref-3ff73152f17181598282ef83b40dbf7a",
+          "id": "ref-bioprocesses-bioprocesses-10-3ff73152f17181598282ef83b40dbf7a",
           "title": "Trichoderma longibrachiatum — fiche d’organisme",
           "kind": "reference",
           "notionId": "3ff73152f17181598282ef83b40dbf7a",
@@ -925,7 +925,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f17181e7ab61c84b44557e9c",
+          "id": "ref-biomaterials-biomaterials-2-3e273152f17181e7ab61c84b44557e9c",
           "title": "Substrats & supports biologiques",
           "kind": "reference",
           "notionId": "3e273152f17181e7ab61c84b44557e9c",
@@ -941,7 +941,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f171812e9dd5f9df0b269046",
+          "id": "ref-biomaterials-biomaterials-4-3e273152f171812e9dd5f9df0b269046",
           "title": "Préparation des substrats",
           "kind": "reference",
           "notionId": "3e273152f171812e9dd5f9df0b269046",
@@ -1056,7 +1056,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f17181ffa96cee6f70fb11e3",
+          "id": "ref-instrumentation-instrumentation-7-3e273152f17181ffa96cee6f70fb11e3",
           "title": "Prototypage & fabrication",
           "kind": "reference",
           "notionId": "3e273152f17181ffa96cee6f70fb11e3",
@@ -1155,7 +1155,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f171818bae74c015daa192cd",
+          "id": "ref-digital-digital-5-3e273152f171818bae74c015daa192cd",
           "title": "Instrumentation intégrée",
           "kind": "reference",
           "notionId": "3e273152f171818bae74c015daa192cd",
@@ -1163,7 +1163,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f1718167be9fc11cf0b00386",
+          "id": "ref-digital-digital-6-3e273152f1718167be9fc11cf0b00386",
           "title": "Équipements expérimentaux",
           "kind": "reference",
           "notionId": "3e273152f1718167be9fc11cf0b00386",
@@ -1171,7 +1171,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f17181ab88bfe456f838b011",
+          "id": "ref-digital-digital-7-3e273152f17181ab88bfe456f838b011",
           "title": "Méthodologie R&D",
           "kind": "reference",
           "notionId": "3e273152f17181ab88bfe456f838b011",
@@ -1216,7 +1216,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f1718119b0f7eeeb897f206a",
+          "id": "ref-physical-physical-2-3e273152f1718119b0f7eeeb897f206a",
           "title": "Mesure & reproductibilité",
           "kind": "reference",
           "notionId": "3e273152f1718119b0f7eeeb897f206a",
@@ -1224,7 +1224,7 @@
           "children": []
         },
         {
-          "id": "ref-3e273152f17181e7ab61c84b44557e9c",
+          "id": "ref-physical-physical-3-3e273152f17181e7ab61c84b44557e9c",
           "title": "Substrats & supports biologiques",
           "kind": "reference",
           "notionId": "3e273152f17181e7ab61c84b44557e9c",
