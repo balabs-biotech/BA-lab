@@ -5,9 +5,6 @@
 <script>
 (()=>{try{const saved=localStorage.getItem('balabs-language');if(['fr','en','ar','pt'].includes(saved)){document.documentElement.lang=saved;document.documentElement.dir=saved==='ar'?'rtl':'ltr'}}catch(_){}})();
 </script>
-<script>
-(()=>{try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!sessionStorage.getItem('balabs-intro-seen')&&!location.hash&&!new URLSearchParams(location.search).has('domain')){document.documentElement.classList.add('balabs-intro-pending');window.setTimeout(()=>document.documentElement.classList.remove('balabs-intro-pending'),6000)}}catch(_){} })();
-</script>
 <meta name="theme-color" content="#111B1D">
 <meta name="description" id="pageDescription" content="Explorez les huit univers BA Labs : microbiologie, sciences végétales, sols et environnement, bioprocédés, biomatières, instrumentation, numérique et sciences physiques.">
 <title>BALabs — Réseau vivant</title>
@@ -24,10 +21,7 @@
 <link rel="stylesheet" href="./visual-continuity.css?v=3">
 <link rel="stylesheet" href="./chapter-repair.css?v=36">
 <link rel="stylesheet" href="./chromatic-direction.css?v=5">
-<link rel="stylesheet" href="./desktop-home-refinement.css?v=11">
-<link rel="stylesheet" href="./motion-director.css?v=1">
-<link rel="stylesheet" href="./opening-experience.css?v=1">
-<style>
+<link rel="stylesheet" href="./desktop-home-refinement.css?v=11"><style>
 #mainView,#miniView,.cluster-key{display:none!important}
 .scene{min-height:0;padding-bottom:clamp(34px,5vw,72px)}
 .scenehead{min-height:88px}
@@ -177,20 +171,6 @@ html[dir="rtl"] body > .chapter-rail{left:auto!important;right:max(0px,env(safe-
 </style>
 </head>
 <body>
-<div class="balabs-intro" id="balabsIntro" aria-label="BA Labs — séquence d'ouverture" aria-live="off">
- <div class="balabs-intro-inner">
-  <svg class="balabs-intro-art" viewBox="0 0 360 230" role="img" aria-label="Réseau de filaments mycéliens en croissance">
-   <path class="hypha" pathLength="1" d="M180 118 C156 102 140 79 119 48 C104 27 83 19 58 16 M119 48 C124 24 139 12 158 5 M145 89 C115 91 91 82 70 65 C51 50 34 51 17 59 M145 89 C130 113 104 126 78 128 C51 130 35 145 23 163 M157 104 C142 139 143 166 126 188 C113 205 94 213 69 218 M180 118 C203 93 217 64 235 38 C248 20 271 13 298 17 M235 38 C230 17 236 8 252 3 M213 88 C242 91 266 79 287 60 C305 43 327 42 345 50 M215 113 C243 126 270 128 294 120 C320 112 337 126 350 145 M203 133 C222 158 226 183 246 202 C260 216 280 220 304 216"/>
-   <path class="hypha copper" pathLength="1" d="M180 118 C165 135 164 155 177 171 C188 185 188 204 180 226 M180 118 C194 132 201 146 198 163 C195 181 207 193 222 202"/>
-   <path class="hypha" pathLength="1" d="M58 16 C50 9 43 5 32 4 M70 65 C56 70 47 80 42 93 M78 128 C62 118 50 116 37 120 M126 188 C128 207 122 219 111 228 M298 17 C309 7 323 5 337 8 M287 60 C301 67 312 78 317 92 M294 120 C309 107 324 105 340 108 M246 202 C242 218 249 226 263 230"/>
-   <circle class="seed" cx="180" cy="118" r="4"/>
-  </svg>
-  <div class="balabs-intro-wordmark"><strong>BA LABS</strong><span data-intro-subtitle>Biologie appliquée</span></div>
-  <div class="balabs-intro-caption" data-intro-caption>Biologie appliquée · Recherche · Ingénierie</div>
-  <div class="balabs-intro-rule"></div>
- </div>
- <button class="balabs-intro-skip" type="button" data-intro-skip>Passer</button>
-</div>
 <div class="wrap balabs-ui" id="app" dir="ltr">
 <a class="skip-link" href="#main-content">Aller au contenu principal</a>
 <header class="top"><div class="brand"><div><strong>BALABS</strong><small id="brandSubtitle">Applied biotechnology · Sétif</small></div></div><div class="tools" role="group" aria-label="Choisir la langue"><button class="lang" lang="fr" aria-label="Français" data-lang="fr" aria-pressed="true">🇫🇷 FR</button><button class="lang" lang="en" aria-label="English" data-lang="en" aria-pressed="false">🇬🇧 EN</button><button class="lang" lang="ar" aria-label="العربية" data-lang="ar" aria-pressed="false">🇩🇿 العربية</button><button class="lang" lang="pt" aria-label="Português" data-lang="pt" aria-pressed="false">🇵🇹 PT</button></div></header><nav class="site-nav" id="siteNavigation" aria-label="Navigation principale"><a href="#accueil" data-i18n="navHome">Accueil</a><a href="#a-la-une" data-i18n="navFeatured">À la une</a><a href="#a-propos" data-i18n="navAbout">À propos</a><a href="#chantiers" data-i18n="navWork">Chantiers</a><a href="#demarche" data-i18n="navMethod">Méthode</a><a href="#product-catalogue" data-i18n="navCatalogue">Catalogue</a><a href="../store/index.html" data-i18n="navStore">Boutique</a>
@@ -700,8 +680,6 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script type="importmap">{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}</script>
 <script type="module" src="./explorer-2d.js?v=scientific-universes-1"></script>
 <script src="./motion-system.js?v=14" defer></script>
-<script src="./motion-director.js?v=1" defer></script>
-<script src="./opening-experience.js?v=1" defer></script>
 
 
 <script>
