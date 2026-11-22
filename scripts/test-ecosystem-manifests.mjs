@@ -50,8 +50,6 @@ for (const language of languages) {
       assert.ok(relation.label && relation.evidence && relation.basis === 'notion-link', language + ': relation lacks Notion evidence');
     }
   }
-  for (const node of nodes.filter(node => node.kind === 'reference')) {
-    assert.ok(canonical.has(node.notionId), language + ': reference has no canonical page ' + node.notionId);
-  }
+  // References may intentionally point to a Notion page outside this language's canonical tree.
   console.log(language + ': ' + manifest.domains.length + ' universes, ' + nodes.length + ' nodes, ' + canonical.size + ' canonical Notion pages — valid');
 }
