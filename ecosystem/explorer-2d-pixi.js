@@ -132,7 +132,7 @@ export async function createPixiRenderer(canvas){
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
    // Wrap long names to the available phone width before positioning the label.
    label.style.wordWrap=true;label.style.breakWords=true;label.style.align="center";
-   label.style.wordWrapWidth=Math.max(145,Math.min(width*.62,270));
+   label.style.wordWrapWidth=Math.max(120,Math.min(width*.62,205));
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
    const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
