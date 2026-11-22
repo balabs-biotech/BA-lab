@@ -15,7 +15,16 @@ export async function createPixiRenderer(canvas){
  const style=new TextStyle({fontFamily:"Inter, system-ui, sans-serif",fontSize:12,fill:0xf2f1e9,fontWeight:"600",stroke:{color:0x07100f,width:4.5},align:"center"});
  let lastWidth=0,lastHeight=0;
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
- const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
+ const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+ const alphaFor=level=>{
+  if(level===0)return 1;
+  const thresholds=[0,.52,.92,1.42,2.05,2.85,3.85,5.1,6.6,8.4];
+  const t=thresholds[Math.min(level,thresholds.length-1)];
+  // Every depth contributes to the global mycelium silhouette; each zoom
+  // progressively resolves another layer into visible branches and junctions.
+  const trace=.022*Math.pow(.78,Math.max(0,level-1));
+  return clamp(trace+smooth(t*.72,t*1.48,cameraScale)*.88,0,1);
+ };
  let cameraScale=1;
  function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core,radialRings=[]}){
   cameraScale=scale;
@@ -60,7 +69,7 @@ export async function createPixiRenderer(canvas){
    while(grew){grew=false;for(const n of nodes){if(n.parent&&activeBranch.has(n.parent)&&!activeBranch.has(n.id)){activeBranch.add(n.id);grew=true;}}}
   }
   for(const e of edges){
-   if(!selected&&!e.verified)continue;
+   if(!selected&&!e.cross&&!e.verified){/* canonical tree filament: keep it in the global silhouette */}
    if(selected&&(e.a.rootId!==selected.rootId||e.b.rootId!==selected.rootId))continue;
    const depth=Math.max(e.a.level,e.b.level);let alpha=alphaFor(depth);if(alpha<.015)continue;
    if(selected&&!e.verified)alpha*=activeBranch.has(e.a.id)&&activeBranch.has(e.b.id)?1:.16;
@@ -80,7 +89,7 @@ export async function createPixiRenderer(canvas){
    if(!reduced&&!e.cross&&alpha>.2){const particleCount=depth<=2&&len>150?3:depth<=2&&len>72?2:1;for(let particle=0;particle<particleCount;particle++){const phase=time*.00012+(seed%100)*.013+particle/particleCount,q=(phase*(depth===1?.7:.48))%1,u=1-q,x=u*u*a.x+2*u*q*cx+q*q*b.x,y=u*u*a.y+2*u*q*cy+q*q*b.y;filaments.circle(x,y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:particleCount===1?.82:.68});}}
   }
   for(const n of nodes){
-   if(!selected&&n.level!==0)continue;
+   
    if(selected&&n.rootId!==selected.rootId)continue;
    let alpha=alphaFor(n.level);if(alpha<.015)continue;
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.34;
@@ -109,19 +118,19 @@ export async function createPixiRenderer(canvas){
   if(coreText.visible)live.add("__mycology-core");
   const candidates=[];
   for(const n of nodes){
-   if(!selected&&n.level!==0)continue;
+   
    if(selected&&n.rootId!==selected.rootId)continue;
    let alpha=alphaFor(n.level);if(alpha<.015)continue;
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
-   const threshold=n.level===0?0:n.level===1?.5:n.level===2?1.55:n.level===3?2.65:4.1;
-   const show=n.level===0||(alpha>.5&&scale>threshold)||lineage.has(n.id);
+   const thresholds=[0,.72,1.35,2.15,3.15,4.45,5.9,7.5,9.2];const threshold=thresholds[Math.min(n.level,thresholds.length-1)]||0;
+   const show=n.level===0||(alpha>.38&&scale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
   const rootCount=candidates.filter(c=>c.n.level===0).length;
-  const labelBudget=rootCount+Math.min(52,Math.max(12,Math.round(14+scale*6)));
+  const labelBudget=rootCount+Math.min(96,Math.max(10,Math.round(10+scale*8)));
   const occupied=[];const hitBoxes={};let drawn=0;
   for(const {n,alpha} of candidates){
    if(n.level!==0&&drawn>=labelBudget)continue;
