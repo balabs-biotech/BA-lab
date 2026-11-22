@@ -124,8 +124,7 @@ function renderUniverseRail(){
 }
 function syncUniverseRail(n){
  const root=n?(n.level===0?n.id:n.rootId):null;
- // The public rail calls the evidence universe "learn" for visitors.
- const active=root==="evidence"?"learn":root;
+ const active=root;
  document.querySelectorAll(".universe-rail [data-universe]").forEach(b=>{
   const on=b.dataset.universe===active;
   if(on){b.setAttribute("aria-current","location");b.classList.add("is-active");}
