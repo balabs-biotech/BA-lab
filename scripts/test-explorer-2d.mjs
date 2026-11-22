@@ -117,17 +117,25 @@ try {
       const rect = el.getBoundingClientRect();
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
     }, leafFixture.id);
-    await page.mouse.click(labelPoint.x, labelPoint.y);
-    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'First click on a leaf must only select/focus it');
-    await page.waitForTimeout(600);
-    const focusedLabelPoint = await page.locator('#field').evaluate((el,id) => {
+    // Move selection away first so this click must genuinely hit the target leaf.
+    await rootButton.focus();
+    await rootButton.press('Enter');
+    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), mappedTree.roots[0].title);
+    const pointForLeaf = async () => page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
+      if (!box) return null;
       const rect = el.getBoundingClientRect();
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
     }, leafFixture.id);
-    await page.mouse.dblclick(focusedLabelPoint.x, focusedLabelPoint.y, { delay: 80 });
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
+    const firstLeafPoint = await pointForLeaf();
+    assert.ok(firstLeafPoint, 'Leaf label must be visible before pointer activation');
+    await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y);
+    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'First click on a leaf must only select/focus it');
+    const secondLeafPoint = await pointForLeaf();
+    assert.ok(secondLeafPoint, 'Leaf label must remain visible after selection');
+    await page.mouse.click(secondLeafPoint.x, secondLeafPoint.y, { delay: 70 });
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
     assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
