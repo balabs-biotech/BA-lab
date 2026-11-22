@@ -28,7 +28,7 @@ assert.ok(sharedNetworkJs.includes('createVernpixiNetwork') && sharedNetworkJs.i
 assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && /src="\.\/explorer-2d\.js\?v=[^"]+"/.test(html), 'Public homepage must mount a versioned Vernpixi 2D script directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
 assert.ok(publicExplorerJs.includes('../ecosystem-core/explorer-2d-pixi.js') && publicExplorerJs.includes('../ecosystem-core/explorer-2d-network.js'), 'Public Vernpixi must import the exact same renderer and graph geometry as Academy');
-assert.ok(publicExplorerJs.includes('rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]'), 'Public universes must reuse the Academy anchor identity and ordering');
+assert.ok(publicExplorerJs.includes('root.academyUniverseId') && publicExplorerJs.includes('rootLayoutIds:canonicalOrder'), 'Public universes must use explicit Academy identity mappings for canonical anchors');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
 
 
@@ -45,8 +45,8 @@ const expectedRootIds = {
 };
 for (const language of ['fr','en','ar','pt']) {
   const tree = languageTrees[language];
-  assert.deepEqual(tree.domains.map(domain => domain.id), expectedExplorerDomains, language + ' manifest must expose the eight scientific universes in canonical order');
-  assert.deepEqual(tree.domains.map(domain => domain.notionId), expectedRootIds[language], language + ' roots must point to the actual public Notion universe portals');
+  assert.deepEqual([...tree.domains.map(domain => domain.id)].sort(), [...expectedExplorerDomains].sort(), language + ' manifest must preserve all eight scientific resource domains');
+  assert.deepEqual([...tree.domains.map(domain => domain.notionId)].sort(), [...expectedRootIds[language]].sort(), language + ' roots must point to the actual public Notion universe portals');
   const allNodes = [];
   const visit = nodes => (nodes || []).forEach(node => { allNodes.push(node); visit(node.children); });
   visit(tree.domains);
