@@ -25,10 +25,11 @@ jobs:
 
       - name: Prepare static site
         run: |
-          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-preview _site/store
+          mkdir -p _site/batch-tracker _site/ecosystem _site/ecosystem-core _site/ecosystem-preview _site/store
           cp index.html _site/index.html
           cp -R batch-tracker/. _site/batch-tracker/
           cp -R ecosystem/. _site/ecosystem/
+          cp -R ecosystem-core/. _site/ecosystem-core/
           cp -R ecosystem-preview/. _site/ecosystem-preview/
           cp -R store/. _site/store/
           sed -i "s/__BUILD_SHA__/${GITHUB_SHA}/g" _site/store/index.html
