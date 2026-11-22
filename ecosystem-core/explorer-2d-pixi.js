@@ -74,7 +74,7 @@ export async function createPixiRenderer(canvas){
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
   const rootCount=candidates.filter(c=>c.n.level===0).length;
   const labelBudget=rootCount+Math.min(34,Math.max(8,Math.round(10+scale*5)));
-  const occupied=[];let drawn=0;
+  const occupied=[];const hitBoxes={};let drawn=0;
   for(const {n,alpha} of candidates){
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
@@ -90,7 +90,7 @@ export async function createPixiRenderer(canvas){
    const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
-   occupied.push(box);live.add(n.id);drawn++;
+   occupied.push(box);hitBoxes[n.id]=box;live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
   app.render();
