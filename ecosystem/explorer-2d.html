@@ -27,12 +27,6 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
 @media(max-width:700px){.topbar{gap:7px;min-height:56px;padding:8px 10px}.brand{min-width:auto}.brand-copy small{display:none}.brand-mark{width:28px;height:28px}.crumbs{display:none}.actions{margin-left:auto}.actions .btn{min-height:33px;height:33px}.stage-title{top:14px;left:13px;max-width:calc(100% - 112px)}.stage-title p{font-size:10px}.controls{top:13px;right:12px}.controls .btn{width:34px;height:34px;min-height:34px}.hint{display:none}#selection{bottom:12px;left:12px;width:calc(100% - 24px);max-height:46%;overflow-y:auto;overscroll-behavior:contain}#selection .card-body{padding:12px;gap:9px}#selection .card-title{font-size:14px;line-height:1.3;overflow-wrap:anywhere}.child-branches{max-height:30vh;gap:7px;padding-top:7px}.child-branches .btn{min-height:40px;padding:8px 10px;font-size:12px;line-height:1.3;flex:1 1 calc(50% - 7px);text-align:start;overflow-wrap:anywhere}.breadcrumb-link{min-height:34px;padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-/* Compact eight-point universe rail: direct access without a drawer. */
-.universe-rail{position:absolute;z-index:3;left:clamp(10px,1.5vw,20px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:8px;border:1px solid #8da4942c;border-radius:14px;background:rgba(17,27,29,.78);backdrop-filter:blur(12px);max-width:190px}
-.universe-point{width:172px;min-height:32px;height:auto;display:block;padding:6px 9px;border:1px solid #91a79a35;border-radius:8px;background:transparent;color:#aebdb3;font:500 9px/1.25 Inter,system-ui,sans-serif;letter-spacing:0;text-align:left;white-space:normal;cursor:pointer;transition:background .25s,border-color .25s,color .25s,transform .25s}
-.universe-point:hover{border-color:#b96b4d;color:#f0eee3;transform:scale(1.08)}
-.universe-point.is-active{background:#263b38;border-color:#b96b4d;color:#f0eee3;box-shadow:0 0 0 3px #b96b4d20}
-@media(max-width:700px){.universe-rail{left:9px;right:9px;top:auto;bottom:12px;transform:none;flex-direction:row;gap:4px;padding:5px;max-width:calc(100% - 18px);overflow-x:auto;border-radius:11px}.universe-point{width:max-content;min-width:max-content;max-width:170px;min-height:29px;padding:5px 8px;font-size:8px;line-height:1.2}#selection{left:9px;bottom:58px;width:min(300px,calc(100% - 18px))}}
 </style>
 </head>
 <body>
@@ -48,7 +42,6 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
 <main class="stage">
  <canvas id="field" aria-label="Réseau mycélien continu et explorable des huit univers BA Labs"></canvas>
  <div class="stage-title"><div class="eyebrow" id="kicker">EXPLORATION / 2D</div><h1 id="heading">Un seul réseau vivant.</h1><p id="description">Zoome dans les ramifications et sélectionne chaque branche.</p></div>
- <nav class="universe-rail" id="universeRail" aria-label="Accès direct aux huit univers"></nav>
  <div class="controls" aria-label="Contrôles de la carte"><button class="btn btn-square btn-sm" id="zoomIn" aria-label="Zoom avant">+</button><button class="btn btn-square btn-sm" id="zoomOut" aria-label="Zoom arrière">−</button><button class="btn btn-square btn-sm" id="reset" aria-label="Recentrer">⌖</button><button class="btn btn-square btn-sm" id="back" aria-label="Retour" disabled>↶</button></div>
  <section id="selection" aria-live="polite"></section>
  <div class="hint" id="hint">GLISSER · PINCER POUR ZOOMER · SÉLECTIONNER UN NŒUD</div>
