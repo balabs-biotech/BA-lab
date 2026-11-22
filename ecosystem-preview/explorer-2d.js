@@ -1,4 +1,4 @@
-import { createPixiRenderer } from "./explorer-2d-pixi.js";
+import { createPixiRenderer } from "../ecosystem-core/explorer-2d-pixi.js";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={bio:"#79a991",myco:"#b18fc2",soil:"#c19b73",lab:"#80aeb8",products:"#c88773",iot:"#7eaaa3",work:"#aa9cbb",evidence:"#b5b58d"};
 const COPY={
