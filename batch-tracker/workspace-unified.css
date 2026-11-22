@@ -3,7 +3,7 @@
 @import url("./styles/mycology-workspace.css?v=20261117-pixi-graph-controls-159");
 @import url("./styles/laboratory-workspace.css?v=20261117-analytics-1");
 @import url("./styles/greentech-workspace.css?v=20261117-ndvi-chart-1");
-@import url("./styles/motion.css?v=20261117-sector-motion-156");
+@import url("./styles/motion.css?v=20261119-domain-hero-3");
 @import url("./styles/responsive.css?v=20261116-interior-pass-1");
 
 /* Existing navigation refinements are retained while the shared component
@@ -583,5 +583,93 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
 @media(prefers-reduced-motion:reduce) {
   html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observation-details) :is(input,select,textarea) {
     transition:none !important;
+  }
+}
+
+
+/* Mobile module navigation: keep the full tab labels and move horizontally. */
+@media(max-width:760px) {
+  html body[data-domain].workspace-authenticated .section-nav {
+    display:flex !important;
+    flex:1 1 100% !important;
+    width:100% !important;
+    min-width:0 !important;
+    justify-content:flex-start !important;
+    align-items:center !important;
+    gap:6px !important;
+    padding:0 2px 5px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    overscroll-behavior-x:contain !important;
+    scroll-snap-type:x proximity !important;
+    scrollbar-width:thin !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  html body[data-domain].workspace-authenticated .section-nav a {
+    display:inline-flex !important;
+    flex:0 0 auto !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:7px !important;
+    width:auto !important;
+    min-width:max-content !important;
+    min-height:40px !important;
+    padding:7px 11px !important;
+    font-size:10px !important;
+    line-height:1.2 !important;
+    white-space:nowrap !important;
+    overflow-wrap:normal !important;
+    text-align:center !important;
+    scroll-snap-align:start !important;
+  }
+  html body[data-domain].workspace-authenticated .section-nav .nav-number {
+    display:inline-grid !important;
+    flex:0 0 auto !important;
+    min-width:18px !important;
+    width:18px !important;
+    height:17px !important;
+    font-size:7px !important;
+  }
+}
+@media(max-width:390px) {
+  html body[data-domain].workspace-authenticated .section-nav a {
+    min-height:38px !important;
+    padding:6px 9px !important;
+    font-size:9px !important;
+  }
+}
+
+
+/* The HTML hidden state must win over the shared flex navigation rule.
+   Otherwise the unauthenticated toolbar renders all module tabs and pushes
+   the sign-in action below the first mobile viewport. */
+html body[data-domain] .section-nav[hidden] {
+  display:none !important;
+}
+
+
+/* Signed-out entry: a short, readable introduction keeps the primary action
+   within the first viewport on compact phones. */
+html body[data-domain] #authCard .auth-intro {
+  margin:0 !important;
+  max-width:46rem !important;
+  font-size:12px !important;
+  line-height:1.4 !important;
+}
+@media(max-width:390px) {
+  html body[data-domain] #authCard {
+    gap:7px !important;
+    padding:14px !important;
+  }
+  html body[data-domain] #authCard > label {
+    margin-top:4px !important;
+  }
+  html body[data-domain] #authCard .auth-actions {
+    gap:8px !important;
+    margin-top:4px !important;
+  }
+  html body[data-domain] #authCard .auth-actions button {
+    min-height:40px !important;
   }
 }

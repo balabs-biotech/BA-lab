@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#11191a">
   <title>BA Labs CultureOps — Green Tech</title>
   <link rel="stylesheet" href="../tracker.css?v=20261116-ba-unified-110">
-  <link rel="stylesheet" href="../workspace-unified.css?v=20261117-form-fields-157">
+  <link rel="stylesheet" href="../workspace-unified.css?v=20261119-compact-auth-8">
   <link rel="stylesheet" href="../styles/greentech-climate-signature.css?v=20261117-climate-signature-162">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
@@ -18,7 +18,7 @@
       document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
     } else {
       window.BA_LABS_DOMAIN = "agronomy";
-    fetch("../workspace.html?v=20261117-sector-interaction-160")
+    fetch("../workspace.html?v=20261119-domain-hero-2")
       .then(response => {
         if (!response.ok) throw new Error("Impossible de charger l’interface commune.");
         return response.text();
@@ -26,7 +26,7 @@
       .then(markup => {
         document.getElementById("workspace-root").innerHTML = markup;
         const visualRuntime = document.createElement("script");
-        visualRuntime.src = "../workspace-visuals.js?v=20261117-sector-interaction-160";
+        visualRuntime.src = "../workspace-visuals.js?v=20261119-botanical-plate-1";
         visualRuntime.onerror = () => console.info("BA Labs: effets visuels optionnels indisponibles.");
         document.body.appendChild(visualRuntime);
         const interactionRuntime = document.createElement("script");
@@ -34,10 +34,10 @@
         interactionRuntime.onerror = () => console.info("BA Labs: interactions réactives désactivées.");
         document.body.appendChild(interactionRuntime);
         const i18nScript = document.createElement("script");
-        i18nScript.src = "../i18n.js?v=20261026-core-refresh-1";
+        i18nScript.src = "../i18n.js?v=20261119-hero-spacing-8";
         i18nScript.onload = () => {
           const script = document.createElement("script");
-          script.src = "../tracker.js?v=20261115-ui-refinement-39";
+          script.src = "../tracker.js?v=20261119-keyboard-nav-9";
           script.onerror = () => {
             document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
           };

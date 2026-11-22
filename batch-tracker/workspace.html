@@ -23,18 +23,14 @@
 
   <a class="universe-home-link" href="../../" aria-label="Retour au choix des univers">← Tous les univers</a><header class="app-hero">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> BA LABS <span class="eyebrow-separator">/</span> LABORATOIRE & PRODUCTION</div>
-      <h1>Culture <span>&amp;</span><br>traçabilité biologique</h1>
-      <p class="hero-description">
-        Du suivi des cultures à la libération des lots : un espace unique pour documenter,
-        piloter et contrôler chaque étape.
-      </p>
-      <div class="hero-tags" aria-label="Fonctions de l’application">
-        <span><span aria-hidden="true">✳</span> Cultures</span>
-        <span><span aria-hidden="true">↗</span> Lots de production</span>
-        <span><span aria-hidden="true">✓</span> Contrôle qualité</span>
-      </div>
-    </div>
+      <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> BA LABS <span class="eyebrow-separator">/</span> <span id="heroEyebrowLabel">LABORATOIRE &amp; BIOPROCÉDÉS</span></div>
+      <h1><span id="heroTitlePrimary">Production biologique</span> <span aria-hidden="true">&amp;</span><br><span id="heroTitleSecondary">traçabilité expérimentale</span></h1>
+      <p class="hero-description" id="heroDescription">Des milieux de culture aux lots de production : documentez les procédés, suivez les étapes et reliez chaque résultat à son historique expérimental.</p>
+      <div class="hero-tags" id="heroTags" aria-label="Fonctions de l’application">
+        <span><span aria-hidden="true">✳</span> <span id="heroTagOne">Milieux &amp; cultures</span></span>
+        <span><span aria-hidden="true">↗</span> <span id="heroTagTwo">Lots de production</span></span>
+        <span><span aria-hidden="true">✓</span> <span id="heroTagThree">Contrôle qualité</span></span>
+      </div>   </div>
     <div class="hero-art" aria-hidden="true"></div>
   </header>
 
@@ -95,11 +91,7 @@
     <div class="section-kicker"><span>MODULE 01</span><span class="kicker-line"></span><span>IDENTITÉ &amp; SESSION</span></div>
     <h2>Accès BA Labs</h2>
 
-    <div class="muted">
-      Connectez-vous avec le compte BA Labs.
-      Le rattachement à l'organisation BA-LABS est effectué
-      automatiquement après authentification.
-    </div>
+    <p class="muted auth-intro">Connexion sécurisée à l’espace BA Labs.</p>
 
     <label for="authEmail">
       Email
