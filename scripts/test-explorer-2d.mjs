@@ -126,6 +126,11 @@ try {
     await firstChild.focus();
     await firstChild.press('Enter');
     await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), await firstChild.innerText());
+    // Focus the exact canonical leaf before reading its animated canvas hitbox.
+    await leafButton.focus();
+    await leafButton.press('Enter');
+    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
+    await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const pointForLeaf = async () => page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
       if (!box) return null;
