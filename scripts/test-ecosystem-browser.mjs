@@ -250,7 +250,7 @@ try {
   }
   const route = await browser.newPage();
   await route.goto(base + 'universe.html?domain=physical&lang=pt', { waitUntil: 'domcontentloaded' });
-  await route.waitForURL(/explorer-2d\.html\?domain=physical&lang=pt|explorer-2d\.html\?lang=pt&domain=soil/, { timeout: 10000 });
+  await route.waitForURL(/explorer-2d\.html\?domain=physical&lang=pt|explorer-2d\.html\?lang=pt&domain=physical/, { timeout: 10000 });
   console.log(JSON.stringify({ vernpixiEmbeddedHomepage: 'PASS', results, universeRouteRedirect: true }, null, 2));
   await route.close();
 } finally {
