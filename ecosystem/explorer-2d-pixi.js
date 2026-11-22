@@ -17,7 +17,7 @@ export async function createPixiRenderer(canvas){
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
  const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
  let cameraScale=1;
- function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core}){
+ function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core,radialRings=[]}){
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
@@ -31,20 +31,24 @@ export async function createPixiRenderer(canvas){
   }
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
-  // Eight restrained hyphal spokes converge on the central Mycology hub.
-  const roots=nodes.filter(n=>n.level===0);
-  for(const root of roots){
-   const dx=root.x,dy=root.y,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
-   filaments.moveTo(0,0).quadraticCurveTo(dx*.48+nx*18,dy*.48+ny*18,root.x,root.y)
-    .stroke({color:0x78958a,alpha:.24,width:1.15,cap:"round"});
-   if(!reduced){const q=(time*.000075+(hash(root.id)%100)*.009)%1,u=1-q,x=2*u*q*(dx*.48+nx*18)+q*q*root.x,y=2*u*q*(dy*.48+ny*18)+q*q*root.y;filaments.circle(x,y,1.25).fill({color:0xdce5d9,alpha:.72});}
+  // Overview: eight universes orbit the transversal Mycology hub.
+  if(!selected){
+   const roots=nodes.filter(n=>n.level===0);
+   for(const root of roots){
+    const dx=root.x,dy=root.y,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
+    filaments.moveTo(0,0).quadraticCurveTo(dx*.48+nx*18,dy*.48+ny*18,root.x,root.y)
+     .stroke({color:0x78958a,alpha:.24,width:1.15,cap:"round"});
+    if(!reduced){const q=(time*.000075+(hash(root.id)%100)*.009)%1,u=1-q,x=2*u*q*(dx*.48+nx*18)+q*q*root.x,y=2*u*q*(dy*.48+ny*18)+q*q*root.y;filaments.circle(x,y,1.25).fill({color:0xdce5d9,alpha:.72});}
+   }
+   junctions.circle(0,0,34).fill({color:0xb96b4d,alpha:.075});
+   junctions.circle(0,0,25).stroke({color:0xb96b4d,alpha:.78,width:1.6});
+   junctions.circle(0,0,16).stroke({color:0xd1d0c5,alpha:.62,width:1});
+   junctions.circle(0,0,5.5).fill({color:0xb96b4d,alpha:.95});
+   for(let k=0;k<8;k++){const a=k*Math.PI/4;junctions.circle(Math.cos(a)*29,Math.sin(a)*29,1.8).fill({color:0x91a99b,alpha:.8});}
+  }else{
+   // A focused universe unfolds as concentric, evenly spaced hierarchy rings.
+   for(const radius of radialRings)filaments.circle(0,0,radius).stroke({color:0x78958a,alpha:.13,width:1.15/scale});
   }
-  // Central visual anchor: Mycology is transversal, not a ninth navigable universe.
-  junctions.circle(0,0,34).fill({color:0xb96b4d,alpha:.075});
-  junctions.circle(0,0,25).stroke({color:0xb96b4d,alpha:.78,width:1.6});
-  junctions.circle(0,0,16).stroke({color:0xd1d0c5,alpha:.62,width:1});
-  junctions.circle(0,0,5.5).fill({color:0xb96b4d,alpha:.95});
-  for(let k=0;k<8;k++){const a=k*Math.PI/4; junctions.circle(Math.cos(a)*29,Math.sin(a)*29,1.8).fill({color:0x91a99b,alpha:.8});}
 
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
@@ -56,6 +60,8 @@ export async function createPixiRenderer(canvas){
    while(grew){grew=false;for(const n of nodes){if(n.parent&&activeBranch.has(n.parent)&&!activeBranch.has(n.id)){activeBranch.add(n.id);grew=true;}}}
   }
   for(const e of edges){
+   if(!selected&&!e.verified)continue;
+   if(selected&&(e.a.rootId!==selected.rootId||e.b.rootId!==selected.rootId))continue;
    const depth=Math.max(e.a.level,e.b.level);let alpha=alphaFor(depth);if(alpha<.015)continue;
    if(selected&&!e.verified)alpha*=activeBranch.has(e.a.id)&&activeBranch.has(e.b.id)?1:.16;
    const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
@@ -74,6 +80,8 @@ export async function createPixiRenderer(canvas){
    if(!reduced&&!e.cross&&alpha>.2){const particleCount=depth<=2&&len>150?3:depth<=2&&len>72?2:1;for(let particle=0;particle<particleCount;particle++){const phase=time*.00012+(seed%100)*.013+particle/particleCount,q=(phase*(depth===1?.7:.48))%1,u=1-q,x=u*u*a.x+2*u*q*cx+q*q*b.x,y=u*u*a.y+2*u*q*cy+q*q*b.y;filaments.circle(x,y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:particleCount===1?.82:.68});}}
   }
   for(const n of nodes){
+   if(!selected&&n.level!==0)continue;
+   if(selected&&n.rootId!==selected.rootId)continue;
    let alpha=alphaFor(n.level);if(alpha<.015)continue;
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.34;
    const r=Math.max(1.25,n.r),color=PALETTE[n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
@@ -101,11 +109,13 @@ export async function createPixiRenderer(canvas){
   if(coreText.visible)live.add("__mycology-core");
   const candidates=[];
   for(const n of nodes){
+   if(!selected&&n.level!==0)continue;
+   if(selected&&n.rootId!==selected.rootId)continue;
    let alpha=alphaFor(n.level);if(alpha<.015)continue;
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
-   const threshold=n.level===0?0:n.level===1?.72:n.level===2?1.3:n.level===3?2.55:4.3;
+   const threshold=n.level===0?0:n.level===1?.72:n.level===2?.95:n.level===3?1.9:3.1;
    const show=n.level===0||(alpha>.5&&scale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
