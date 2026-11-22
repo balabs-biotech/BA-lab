@@ -29,7 +29,8 @@ try {
       nodes: Number(el.dataset.nodeCount || 0),
       edges: Number(el.dataset.edgeCount || 0),
       verifiedRelations: Number(el.dataset.verifiedRelations || 0),
-      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0)
+      crossUniverseConnections: Number(el.dataset.crossUniverseConnections || 0),
+      visualInterUniverseAnastomoses: Number(el.dataset.interUniverseAnastomoses || 0)
     }));
     assert.equal(topology.universes, 8, 'The graph must retain all eight universes');
     assert.ok(topology.verifiedRelations >= 10, 'Cross-universe filaments must come from documented Notion relationships, not spatial proximity');
