@@ -13,7 +13,7 @@ try {
   const graph = await page.locator('#field').evaluate(el => ({ universes: Number(el.dataset.universeCount), nodes: Number(el.dataset.nodeCount), edges: Number(el.dataset.edgeCount) }));
   assert.equal(graph.universes, 8, 'Academy must display all eight universes');
   assert.ok(graph.nodes > 8 && graph.edges >= graph.nodes - 8, 'Academy graph must render the hierarchical network');
-  const root = page.locator('#accessibleNodes button[data-level="0"]').first();
+  const root = page.locator('#accessibleNodes button').first();
   await root.focus();
   await root.press('Enter');
   await page.waitForFunction(() => Boolean(document.querySelector('#selection')?.textContent?.trim()));
