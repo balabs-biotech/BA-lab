@@ -1,6 +1,6 @@
 import { createPixiRenderer } from "./explorer-2d-pixi.js?v=zoom-label-gating-1";
 const LANGS=["fr","en","ar","pt"];
-const PALETTE={bio:"#79a991",myco:"#b18fc2",soil:"#c19b73",lab:"#80aeb8",products:"#c88773",iot:"#7eaaa3",work:"#aa9cbb",evidence:"#b5b58d"};
+const PALETTE={microbiology:"#79a991",plants:"#8fb58c",ecology:"#c19b73",bioprocesses:"#b58d73",biomaterials:"#c88773",instrumentation:"#7eaaa3",digital:"#aa9cbb",physical:"#b5b58d"};
 const COPY={
 fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · 1 CLIC POUR SÉLECTIONNER · DOUBLE-CLIC POUR OUVRIR NOTION",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
 en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · CLICK TO SELECT · DOUBLE-CLICK TO OPEN NOTION",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
@@ -118,7 +118,7 @@ function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width
 function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function renderUniverseRail(){
  const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
- const names={fr:{bio:"BIO",myco:"MYCO",soil:"SOL",lab:"R&D",products:"OBJ",iot:"IoT",work:"PROJ",evidence:"DOC"},en:{bio:"BIO",myco:"MYCO",soil:"SOIL",lab:"R&D",products:"KIT",iot:"IoT",work:"WORK",evidence:"LOG"},ar:{bio:"حيوي",myco:"فطر",soil:"تربة",lab:"بحث",products:"عدة",iot:"IoT",work:"عمل",evidence:"توثيق"},pt:{bio:"BIO",myco:"MICO",soil:"SOLO",lab:"I&D",products:"KIT",iot:"IoT",work:"PROJ",evidence:"DOC"}};
+ const names={fr:{microbiology:"MICRO",plants:"PLANTES",ecology:"ÉCO",bioprocesses:"PROCÉDÉS",biomaterials:"MATIÈRES",instrumentation:"INGÉ",digital:"NUM",physical:"PHYS"},en:{microbiology:"MICRO",plants:"PLANTS",ecology:"ECO",bioprocesses:"PROCESS",biomaterials:"MATERIALS",instrumentation:"ENG",digital:"DATA",physical:"PHYS"},ar:{microbiology:"أحياء",plants:"نبات",ecology:"بيئة",bioprocesses:"عمليات",biomaterials:"مواد",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},pt:{microbiology:"MICRO",plants:"PLANTAS",ecology:"ECO",bioprocesses:"PROCESSOS",biomaterials:"MATERIAIS",instrumentation:"ENG",digital:"DADOS",physical:"FÍS"}};
  tree.forEach(root=>{const b=el("button","universe-point",(names[lang]||names.fr)[root.id]||root.title.slice(0,4));b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)focusNode(n);};rail.append(b);});
  syncUniverseRail(selected);
 }
@@ -213,7 +213,7 @@ canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("poin
 canvas.addEventListener("wheel",e=>{e.preventDefault();const r=canvas.getBoundingClientRect();zoom(e.deltaY<0?1.16:.86,e.clientX-r.left,e.clientY-r.top);},{passive:false});
 $("zoomIn").onclick=()=>zoom(1.25);$("zoomOut").onclick=()=>zoom(.8);$("reset").onclick=()=>{fitOverview();selected=null;syncUniverseRail(null);viewHistory=[];updateSelection();if(reduced){scale=targetScale;offset={...targetOffset};}draw();};$("back").onclick=()=>{if(viewHistory.length){const previousView=viewHistory.pop();targetScale=previousView.scale;targetOffset={...previousView.offset};selected=previousView.selected||null;syncUniverseRail(selected);if(reduced){scale=targetScale;offset={...targetOffset};draw();}updateSelection();}else{$("reset").click();}};
 $("language").onchange=e=>{const l=e.target.value;if(!LANGS.includes(l))return;lang=l;$("loading").hidden=false;try{localStorage.setItem("balabs-language",l);}catch(_){}loadTree();};
-window.addEventListener("balabs:focus-domain",event=>{const requested=event.detail?.domain,target=requested==="learn"?"evidence":requested;const root=nodes.find(n=>n.level===0&&n.id===target);if(root)focusNode(root);});
+window.addEventListener("balabs:focus-domain",event=>{const target=event.detail?.domain;const root=nodes.find(n=>n.level===0&&n.id===target);if(root)focusNode(root);});
 document.querySelectorAll("[data-lang]").forEach(button=>button.addEventListener("click",()=>{const next=button.dataset.lang;if(!LANGS.includes(next)||next===lang)return;lang=next;$("language").value=lang;updateUI();$("loading").hidden=false;loadTree();}));
 window.addEventListener("resize",resize,{passive:true});
 function animate(){if(!reduced){scale+=(targetScale-scale)*.12;offset.x+=(targetOffset.x-offset.x)*.12;offset.y+=(targetOffset.y-offset.y)*.12;draw();}raf=requestAnimationFrame(animate);}
