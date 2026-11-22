@@ -142,7 +142,6 @@ export async function createPixiRenderer(canvas){
    const y=clamp(rawY,56+anchorY*label.height,height-14-(1-anchorY)*label.height);
    label.position.set(x,y);label.alpha=Math.max(alpha,selected?0.76:0.88);label.visible=true;
    const box={left:x-anchorX*label.width,right:x+(1-anchorX)*label.width,top:y-anchorY*label.height,bottom:y+(1-anchorY)*label.height};
-   hitBoxes[n.id]=box;
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
    occupied.push(box);hitBoxes[n.id]=box;live.add(n.id);drawn++;
