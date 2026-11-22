@@ -15,45 +15,46 @@ function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresh
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
- const roots=tree.length;
- // Uneven biological field anchors: deliberately not an eight-spoke radial layout.
- // Stable per-universe jitter keeps positions deterministic across reloads.
- const anchors=[[-.62,-.34],[-.17,-.62],[.39,-.48],[.68,.08],[.24,.53],[-.34,.57],[-.70,.19],[.02,-.02]];
+ // Eight evenly spaced universes orbit a central, transversal Mycology hub.
+ // The hub is visual only: the navigable Notion tree remains eight universes.
+ const orbitRadius=286;
  tree.forEach((root,i)=>{
-  const anchor=anchors[i%anchors.length],seed=hash(root.id);
-  const rx=anchor[0]*510+((seed&255)/255-.5)*58;
-  const ry=anchor[1]*430+(((seed>>>8)&255)/255-.5)*54;
-  const angle=Math.atan2(ry,rx)+(((seed>>>16)&255)/255-.5)*.34;
-  const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,parent:null,angle};
+  const angle=-Math.PI/2+i*Math.PI/4;
+  const seed=hash(root.id);
+  const rx=Math.cos(angle)*orbitRadius+((seed&255)/255-.5)*8;
+  const ry=Math.sin(angle)*orbitRadius+(((seed>>>8)&255)/255-.5)*8;
+  const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:13,level:0,data:root,rootId:root.id,parent:null,angle};
   nodes.push(rootNode);byId.set(root.id,rootNode);
-  const walk=(data,parent,depth,branchAngle,path)=>{
+  const walk=(data,parent,depth,branchAngle)=>{
    const expandSections=items=>items.flatMap(item=>item.kind==="section"?expandSections(item.children||[]):[item]);
    const kids=expandSections(data.children||[]);if(!kids.length)return;
-   const spread=Math.min(2.45,1.05+Math.log2(kids.length+1)*.42);
-   const dist=depth===1?195+Math.sqrt(kids.length)*12:depth===2?160+Math.sqrt(kids.length)*28:depth===3?86+Math.sqrt(kids.length)*16:Math.max(29,47-depth*2);
+   const spreadCap=depth===1?2.25:depth===2?1.8:depth===3?1.48:1.25;
+   const spread=Math.min(spreadCap,.92+Math.log2(kids.length+1)*.34);
+   const dist=depth===1?Math.min(126,98+Math.sqrt(kids.length)*3.5):
+    depth===2?Math.min(91,68+Math.sqrt(kids.length)*4):
+    depth===3?Math.min(63,47+Math.sqrt(kids.length)*2.5):
+    depth===4?35:Math.max(22,31-(depth-5)*3);
    kids.forEach((child,j)=>{
     const hsh=hash(child.id),fraction=kids.length===1?0:(j/(kids.length-1)-.5);
-    const jitter=((hsh%1000)/1000-.5)*.3;
-    // A smooth, position-dependent curl field bends neighbouring hyphae in related,
-    // but not identical, directions. This avoids a repeated starburst at every node.
-    const fieldX=Math.sin(parent.x*.0021+parent.y*.0013+depth*.73);
-    const fieldY=Math.cos(parent.y*.0018-parent.x*.0011-depth*.51);
-    const curl=Math.atan2(fieldY,fieldX)*.22;
+    const jitter=((hsh%1000)/1000-.5)*.16;
+    const fieldX=Math.sin(parent.x*.0015+parent.y*.0011+depth*.61);
+    const fieldY=Math.cos(parent.y*.0013-parent.x*.001+depth*.43);
+    const curl=Math.atan2(fieldY,fieldX)*.105;
     const a=branchAngle+curl+fraction*spread+jitter;
-    const bend=dist*(.72+((hsh>>>8)%56)/100);
+    const bend=dist*(.92+((hsh>>>8)%17)/100);
     const lateral=((hsh>>>17)&255)/255-.5;
-    const sway=depth>1?lateral*Math.min(22,dist*.16):0;
-    const x=parent.x+Math.cos(a)*bend-Math.sin(a)*sway,y=parent.y+Math.sin(a)*bend+Math.cos(a)*sway;
+    const sway=depth>1?lateral*Math.min(10,dist*.09):0;
+    const x=parent.x+Math.cos(a)*bend-Math.sin(a)*sway;
+    const y=parent.y+Math.sin(a)*bend+Math.cos(a)*sway;
     const n={id:child.id,title:child.title,x,y,r:Math.max(2.1,8-depth*1.25),level:depth,data:child,rootId:root.id,parent:parent.id,angle:a};
     nodes.push(n);byId.set(n.id,n);edges.push({a:parent,b:n,depth,seed:hsh});
-    const nextDrift=Math.sin((n.x+n.y)*.0017+hsh*.000001)*.16;
-    walk(child,n,depth+1,a+(fraction*.22)+jitter*.45+nextDrift,path.concat(child.id));
+    const nextDrift=Math.sin((n.x+n.y)*.0012+hsh*.000001)*.075;
+    walk(child,n,depth+1,a+fraction*.12+jitter*.3+nextDrift);
    });
   };
-  walk(root,rootNode,1,angle,[]);
+  walk(root,rootNode,1,angle);
  });
  // Cross-universe connections come only from the Notion relation manifest.
- // page-content links are explicitly distinguished from direct Notion hyperlinks.
  relationIndex=new Map();const relationPairs=new Set();
  let verifiedRelationCount=0,explicitRelationCount=0,contentRelationCount=0;
  const addRelationIndex=(id,entry)=>{if(!relationIndex.has(id))relationIndex.set(id,[]);relationIndex.get(id).push(entry);};
@@ -71,34 +72,28 @@ function buildNetwork(){
    addRelationIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
   }
  });
- const crossUniverseConnections=relationPairs.size;
  canvas.dataset.verifiedRelations=String(verifiedRelationCount);
  canvas.dataset.explicitRelations=String(explicitRelationCount);
  canvas.dataset.contentRelations=String(contentRelationCount);
- canvas.dataset.crossUniverseConnections=String(crossUniverseConnections);
- // Local anastomoses follow spatial proximity, not array order. Each hypha can
- // form one restrained side-connection at its depth, creating irregular meshes
- // while avoiding long chords and the visual regularity of a grid.
+ canvas.dataset.crossUniverseConnections=String(relationPairs.size);
+ // Short, local anastomoses keep neighbouring hyphae connected without long chords.
  const levels=new Map();
  nodes.filter(n=>n.level>0).forEach(n=>{const k=n.rootId+":"+n.level;if(!levels.has(k))levels.set(k,[]);levels.get(k).push(n)});
  let localAnastomoses=0;
  levels.forEach(group=>{
   if(group.length<4)return;
-  const candidates=[];
-  const nearestDistances=[];
+  const candidates=[],nearestDistances=[];
   group.forEach((a,i)=>{
-   const nearby=group.filter((b,j)=>j!==i)
-    .map(b=>({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)}))
-    .sort((x,y)=>x.d-y.d).slice(0,3);
+   const nearby=group.filter((b,j)=>j!==i).map(b=>({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)})).sort((x,y)=>x.d-y.d).slice(0,3);
    if(nearby.length)nearestDistances.push(nearby[0].d);
    nearby.forEach(pair=>candidates.push(pair));
   });
   nearestDistances.sort((a,b)=>a-b);
-  const median=nearestDistances[Math.floor(nearestDistances.length/2)]||60;
-  const maxDistance=clamp(median*2.8,48,175);
+  const median=nearestDistances[Math.floor(nearestDistances.length/2)]||48;
+  const maxDistance=clamp(median*2.3,42,120);
   candidates.sort((a,b)=>a.d-b.d);
   const degree=new Map(),existing=new Set();
-  for(const edge of edges){if(!edge.cross)continue;existing.add([edge.a.id,edge.b.id].sort().join("|"));}
+  for(const edge of edges)if(edge.cross)existing.add([edge.a.id,edge.b.id].sort().join("|"));
   for(const pair of candidates){
    if(pair.d>maxDistance)break;
    if((degree.get(pair.a.id)||0)>=1||(degree.get(pair.b.id)||0)>=1)continue;
@@ -109,13 +104,15 @@ function buildNetwork(){
   }
  });
  canvas.dataset.localAnastomoses=String(localAnastomoses);
- canvas.dataset.universeCount=String(roots);
+ canvas.dataset.universeCount=String(tree.length);
  canvas.dataset.nodeCount=String(nodes.length);
  canvas.dataset.edgeCount=String(edges.length);
+ const branchLengths=edges.filter(e=>!e.cross).map(e=>Math.hypot(e.b.x-e.a.x,e.b.y-e.a.y));
+ canvas.dataset.maxBranchLength=String(Math.max(0,...branchLengths).toFixed(1));
 }
-function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
+function fitOverview(){const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y),pad=Math.min(104,Math.max(38,Math.min(w,h)*.09)),spanX=Math.max(...xs)-Math.min(...xs)+110,spanY=Math.max(...ys)-Math.min(...ys)+110;targetScale=clamp(Math.min((w-pad*2)/spanX,(h-pad*2)/spanY),.22,.68);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
-function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
+function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now(),core:{x:0,y:0,title:{fr:'MYCOLOGIE',en:'MYCOLOGY',ar:'علم الفطريات',pt:'MICOLOGIA'}[lang]}});}
 function renderUniverseRail(){
  const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
  const names={fr:{microbiology:"MICRO",plants:"PLANTES",ecology:"ÉCO",bioprocesses:"PROCÉDÉS",biomaterials:"MATIÈRES",instrumentation:"INGÉ",digital:"NUM",physical:"PHYS"},en:{microbiology:"MICRO",plants:"PLANTS",ecology:"ECO",bioprocesses:"PROCESS",biomaterials:"MATERIALS",instrumentation:"ENG",digital:"DATA",physical:"PHYS"},ar:{microbiology:"أحياء",plants:"نبات",ecology:"بيئة",bioprocesses:"عمليات",biomaterials:"مواد",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},pt:{microbiology:"MICRO",plants:"PLANTAS",ecology:"ECO",bioprocesses:"PROCESSOS",biomaterials:"MATERIAIS",instrumentation:"ENG",digital:"DADOS",physical:"FÍS"}};
