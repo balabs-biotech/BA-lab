@@ -109,7 +109,7 @@ try {
     const leafButton = page.locator('#accessibleNodes button[data-node-id="' + leafFixture.id + '"]');
     await leafButton.focus();
     await leafButton.press('Enter');
-    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf by keyboard must not open Notion');
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
@@ -125,7 +125,7 @@ try {
     await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), mappedTree.roots[0].title);
     await firstChild.focus();
     await firstChild.press('Enter');
-    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), await firstChild.innerText());
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, await firstChild.innerText());
     // Focus the exact canonical leaf before reading its animated canvas hitbox.
     await leafButton.focus();
     await leafButton.press('Enter');
