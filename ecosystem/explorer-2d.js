@@ -16,7 +16,9 @@ function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresh
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  canvas.dataset.engine="vernpixi-shared";
- const graph=createVernpixiNetwork(tree,{rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]});
+ const canonicalOrder=tree.map(root=>root.academyUniverseId);
+  if(canonicalOrder.length!==8||canonicalOrder.some(id=>!id)||new Set(canonicalOrder).size!==8)throw new Error("Public universe mapping must contain eight unique Academy identities");
+  const graph=createVernpixiNetwork(tree,{rootLayoutIds:canonicalOrder});
  nodes=graph.nodes;edges=graph.edges;byId=graph.byId;relationIndex=graph.relationIndex;
  for(const [key,value] of Object.entries(graph.stats))canvas.dataset[key]=String(value);
  canvas.dataset.universeCount=String(graph.stats.universeCount);
