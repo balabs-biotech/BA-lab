@@ -7,7 +7,7 @@ en:{title:"Living network",desc:"Eight interconnected universes in one living sp
 ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · نقرة للاختيار · نقرتان لفتح Notion",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
 pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · CLIQUE PARA SELECIONAR · DUPLO CLIQUE PARA ABRIR NOTION",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
 const $=id=>document.getElementById(id),canvas=$("field"),reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-let pixiRenderer=null,relationIndex=new Map();
+let pixiRenderer=null,relationIndex=new Map(),overviewPositions=new Map(),radialLayoutRoot=null;
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
 const t=k=>COPY[lang][k]||COPY.fr[k],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
@@ -110,10 +110,45 @@ function buildNetwork(){
  canvas.dataset.edgeCount=String(edges.length);
  const branchLengths=edges.filter(e=>!e.cross).map(e=>Math.hypot(e.b.x-e.a.x,e.b.y-e.a.y));
  canvas.dataset.maxBranchLength=String(Math.max(0,...branchLengths).toFixed(1));
+ overviewPositions=new Map(nodes.map(n=>[n.id,{x:n.x,y:n.y,angle:n.angle}]));radialLayoutRoot=null;
 }
-function fitOverview(){const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y),pad=Math.min(104,Math.max(38,Math.min(w,h)*.09)),spanX=Math.max(...xs)-Math.min(...xs)+110,spanY=Math.max(...ys)-Math.min(...ys)+110;targetScale=clamp(Math.min((w-pad*2)/spanX,(h-pad*2)/spanY),.22,.68);targetOffset={x:0,y:0};}
-function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
-function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now(),core:{x:0,y:0,title:{fr:'MYCOLOGIE',en:'MYCOLOGY',ar:'علم الفطريات',pt:'MICOLOGIA'}[lang]}});}
+function restoreOverviewLayout(){
+ for(const n of nodes){const p=overviewPositions.get(n.id);if(p){n.x=p.x;n.y=p.y;n.angle=p.angle;}}
+ radialLayoutRoot=null;canvas.dataset.radialRoot="";canvas.dataset.radialRingRadii="[]";canvas.dataset.radialLevelCounts="{}";
+}
+function applyRadialLayout(root){
+ if(!root)return;
+ const scoped=nodes.filter(n=>n.rootId===root.id),children=new Map();
+ scoped.forEach(n=>{if(n.parent){if(!children.has(n.parent))children.set(n.parent,[]);children.get(n.parent).push(n);}});
+ const leafMemo=new Map();
+ const leaves=n=>{if(leafMemo.has(n.id))return leafMemo.get(n.id);const kids=children.get(n.id)||[];const count=kids.length?kids.reduce((sum,k)=>sum+leaves(k),0):1;leafMemo.set(n.id,count);return count;};
+ const start=-Math.PI/2,end=start+Math.PI*2;
+ root.x=0;root.y=0;root.angle=-Math.PI/2;root.sectorStart=start;root.sectorEnd=end;
+ const parents=[root],radii=[],counts={};let depth=1,previousRadius=0;
+ while(parents.length){
+  const parentData=parents.map(parent=>({parent,kids:children.get(parent.id)||[],span:Math.max(.001,parent.sectorEnd-parent.sectorStart)})).filter(x=>x.kids.length);
+  if(!parentData.length)break;
+  const required=Math.max(...parentData.map(x=>x.kids.length*38/x.span));
+  const radius=Math.max(220+(depth-1)*220,previousRadius+190,required);
+  radii.push(Math.round(radius));counts[depth]=parentData.reduce((sum,x)=>sum+x.kids.length,0);
+  const next=[];
+  for(const {parent,kids,span} of parentData){
+   const weights=kids.map(child=>1+Math.sqrt(leaves(child))),total=weights.reduce((a,b)=>a+b,0);let cursor=parent.sectorStart;
+   kids.forEach((child,index)=>{
+    const width=span*weights[index]/total,lo=cursor,hi=cursor+width,angle=(lo+hi)/2;
+    child.sectorStart=lo;child.sectorEnd=hi;child.angle=angle;child.x=Math.cos(angle)*radius;child.y=Math.sin(angle)*radius;cursor=hi;next.push(child);
+   });
+  }
+  parents.splice(0,parents.length,...next);previousRadius=radius;depth++;
+ }
+ radialLayoutRoot=root.id;canvas.dataset.radialRoot=root.id;canvas.dataset.radialRingRadii=JSON.stringify(radii);canvas.dataset.radialLevelCounts=JSON.stringify(counts);
+ const minGaps=[];
+ for(let level=1;level<depth;level++){const group=scoped.filter(n=>n.level===level);let min=Infinity;for(let i=0;i<group.length;i++)for(let k=i+1;k<group.length;k++)min=Math.min(min,Math.hypot(group[i].x-group[k].x,group[i].y-group[k].y));if(Number.isFinite(min))minGaps.push(min);}
+ canvas.dataset.radialMinNodeGap=minGaps.length?Math.min(...minGaps).toFixed(1):"0";
+}
+function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(104,Math.max(38,Math.min(w,h)*.09)),spanX=Math.max(...xs)-Math.min(...xs)+130,spanY=Math.max(...ys)-Math.min(...ys)+130;targetScale=clamp(Math.min((w-pad*2)/spanX,(h-pad*2)/spanY),.22,.78);targetOffset={x:0,y:0};}
+function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){if(!selected)fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
+function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now(),radialRings:JSON.parse(canvas.dataset.radialRingRadii||"[]"),core:{x:0,y:0,title:{fr:'MYCOLOGIE',en:'MYCOLOGY',ar:'علم الفطريات',pt:'MICOLOGIA'}[lang]}});}
 function renderUniverseRail(){
  const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
  const names={fr:{microbiology:"MICRO",plants:"PLANTES",ecology:"ÉCO",bioprocesses:"PROCÉDÉS",biomaterials:"MATIÈRES",instrumentation:"INGÉ",digital:"NUM",physical:"PHYS"},en:{microbiology:"MICRO",plants:"PLANTS",ecology:"ECO",bioprocesses:"PROCESS",biomaterials:"MATERIALS",instrumentation:"ENG",digital:"DATA",physical:"PHYS"},ar:{microbiology:"أحياء",plants:"نبات",ecology:"بيئة",bioprocesses:"عمليات",biomaterials:"مواد",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},pt:{microbiology:"MICRO",plants:"PLANTAS",ecology:"ECO",bioprocesses:"PROCESSOS",biomaterials:"MATERIAIS",instrumentation:"ENG",digital:"DADOS",physical:"FÍS"}};
@@ -130,7 +165,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=active||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const z=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
@@ -210,12 +245,12 @@ canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("poin
 window.addEventListener("click",e=>{if(e.detail<2)return;const target=e.target;if(target!==canvas&&!target.closest?.("#selection"))return;if(selected)activateNode(selected);},true);
 
 canvas.addEventListener("wheel",e=>{e.preventDefault();const r=canvas.getBoundingClientRect();zoom(e.deltaY<0?1.16:.86,e.clientX-r.left,e.clientY-r.top);},{passive:false});
-$("zoomIn").onclick=()=>zoom(1.25);$("zoomOut").onclick=()=>zoom(.8);$("reset").onclick=()=>{fitOverview();selected=null;syncUniverseRail(null);viewHistory=[];updateSelection();if(reduced){scale=targetScale;offset={...targetOffset};}draw();};$("back").onclick=()=>{if(viewHistory.length){const previous=viewHistory.pop();selected=previous.selected||null;targetScale=previous.scale;targetOffset={...previous.offset};syncUniverseRail(selected);if(reduced){scale=targetScale;offset={...targetOffset};draw();}updateSelection();}else{$("reset").click();}};
+$("zoomIn").onclick=()=>zoom(1.25);$("zoomOut").onclick=()=>zoom(.8);$("reset").onclick=()=>{restoreOverviewLayout();selected=null;fitOverview();syncUniverseRail(null);viewHistory=[];updateSelection();if(reduced){scale=targetScale;offset={...targetOffset};}draw();};$("back").onclick=()=>{if(viewHistory.length){const previous=viewHistory.pop();selected=previous.selected||null;if(selected){const root=selected.level===0?selected:byId.get(selected.rootId);if(root)applyRadialLayout(root);}else restoreOverviewLayout();targetScale=previous.scale;targetOffset={...previous.offset};syncUniverseRail(selected);if(reduced){scale=targetScale;offset={...targetOffset};draw();}updateSelection();}else{$("reset").click();}};
 $("language").onchange=e=>{const l=e.target.value;if(!LANGS.includes(l))return;lang=l;$("loading").hidden=false;try{localStorage.setItem("balabs-language",l);}catch(_){}loadTree();};
 window.addEventListener("balabs:focus-domain",event=>{const target=event.detail?.domain;const root=nodes.find(n=>n.level===0&&n.id===target);if(root)focusNode(root);});
 document.querySelectorAll("[data-lang]").forEach(button=>button.addEventListener("click",()=>{const next=button.dataset.lang;if(!LANGS.includes(next)||next===lang)return;lang=next;$("language").value=lang;updateUI();$("loading").hidden=false;loadTree();}));
 window.addEventListener("resize",resize,{passive:true});
 function animate(){if(!reduced){scale+=(targetScale-scale)*.12;offset.x+=(targetOffset.x-offset.x)*.12;offset.y+=(targetOffset.y-offset.y)*.12;draw();}raf=requestAnimationFrame(animate);}
-async function loadTree(){try{const res=await fetch("./notion-tree."+lang+".json",{cache:"no-cache"});if(!res.ok)throw Error("Tree HTTP "+res.status);const data=await res.json();tree=data.domains||[];if(tree.length!==8)throw Error("Expected 8 universes; received "+tree.length);viewHistory=[];buildNetwork();fitOverview();scale=targetScale;offset={...targetOffset};selected=null;syncUniverseRail(null);updateUI();updateSelection();draw();const requestedDomain=new URLSearchParams(location.search).get("domain");const requestedRoot=nodes.find(n=>n.level===0&&n.id===requestedDomain);if(requestedRoot)focusNode(requestedRoot);$("loading").hidden=true;}catch(e){console.error(e);$("loading").querySelector("p").textContent=t("error");}}
+async function loadTree(){try{const res=await fetch("./notion-tree."+lang+".json",{cache:"no-cache"});if(!res.ok)throw Error("Tree HTTP "+res.status);const data=await res.json();tree=data.domains||[];if(tree.length!==8)throw Error("Expected 8 universes; received "+tree.length);viewHistory=[];buildNetwork();restoreOverviewLayout();fitOverview();scale=targetScale;offset={...targetOffset};selected=null;syncUniverseRail(null);updateUI();updateSelection();draw();const requestedDomain=new URLSearchParams(location.search).get("domain");const requestedRoot=nodes.find(n=>n.level===0&&n.id===requestedDomain);if(requestedRoot)focusNode(requestedRoot);$("loading").hidden=true;}catch(e){console.error(e);$("loading").querySelector("p").textContent=t("error");}}
 async function init(){pixiRenderer=await createPixiRenderer(canvas);let l=new URLSearchParams(location.search).get("lang");try{if(!LANGS.includes(l))l=localStorage.getItem("balabs-language");}catch(_){}lang=LANGS.includes(l)?l:"fr";resize();await loadTree();if(!reduced)raf=requestAnimationFrame(animate);}
 init().catch(error=>{console.error("PixiJS initialization failed",error);const loading=$("loading");loading.querySelector("p").textContent="Le moteur graphique WebGL n’a pas pu démarrer. Rechargez la page ou essayez un navigateur compatible.";});
