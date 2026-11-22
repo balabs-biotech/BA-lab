@@ -1,4 +1,4 @@
-import { createPixiRenderer } from "./explorer-2d-pixi.js?v=radial-mycology-2";
+import { createPixiRenderer } from "./explorer-2d-pixi.js?v=radial-rings-4";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={microbiology:"#79a991",plants:"#8fb58c",ecology:"#c19b73",bioprocesses:"#b58d73",biomaterials:"#c88773",instrumentation:"#7eaaa3",digital:"#aa9cbb",physical:"#b5b58d"};
 const COPY={
@@ -128,8 +128,10 @@ function applyRadialLayout(root){
  while(parents.length){
   const parentData=parents.map(parent=>({parent,kids:children.get(parent.id)||[],span:Math.max(.001,parent.sectorEnd-parent.sectorStart)})).filter(x=>x.kids.length);
   if(!parentData.length)break;
-  const required=Math.max(...parentData.map(x=>x.kids.length*38/x.span));
-  const radius=Math.max(220+(depth-1)*220,previousRadius+190,required);
+  const required=Math.max(...parentData.map(x=>x.kids.length*150/x.span));
+  // Long canonical Notion titles need real screen-space room, especially
+  // the twelve direct microbiology resources around the selected universe.
+  const radius=Math.max(470+(depth-1)*330,previousRadius+300,required);
   radii.push(Math.round(radius));counts[depth]=parentData.reduce((sum,x)=>sum+x.kids.length,0);
   const next=[];
   for(const {parent,kids,span} of parentData){
@@ -151,8 +153,7 @@ function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width
 function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now(),radialRings:JSON.parse(canvas.dataset.radialRingRadii||"[]"),core:{x:0,y:0,title:{fr:'MYCOLOGIE',en:'MYCOLOGY',ar:'علم الفطريات',pt:'MICOLOGIA'}[lang]}});}
 function renderUniverseRail(){
  const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
- const names={fr:{microbiology:"MICRO",plants:"PLANTES",ecology:"ÉCO",bioprocesses:"PROCÉDÉS",biomaterials:"MATIÈRES",instrumentation:"INGÉ",digital:"NUM",physical:"PHYS"},en:{microbiology:"MICRO",plants:"PLANTS",ecology:"ECO",bioprocesses:"PROCESS",biomaterials:"MATERIALS",instrumentation:"ENG",digital:"DATA",physical:"PHYS"},ar:{microbiology:"أحياء",plants:"نبات",ecology:"بيئة",bioprocesses:"عمليات",biomaterials:"مواد",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},pt:{microbiology:"MICRO",plants:"PLANTAS",ecology:"ECO",bioprocesses:"PROCESSOS",biomaterials:"MATERIAIS",instrumentation:"ENG",digital:"DADOS",physical:"FÍS"}};
- tree.forEach(root=>{const b=el("button","universe-point",(names[lang]||names.fr)[root.id]||root.title.slice(0,4));b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)focusNode(n);};rail.append(b);});
+ tree.forEach(root=>{const b=el("button","universe-point",root.title);b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)focusNode(n);};rail.append(b);});
  syncUniverseRail(selected);
 }
 function syncUniverseRail(n){
@@ -224,7 +225,7 @@ function updateSelection(){
  box.append(dock);box.hidden=false;
  renderAccessible();
 }
-function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.forEach(n=>{const b=el("button","",n.title);b.type="button";b.dataset.nodeId=n.id;b.dataset.level=String(n.level);b.setAttribute("aria-label",n.title+" · niveau "+n.level);b.onclick=()=>focusNode(n);nav.append(b);});}
+function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.forEach(n=>{const b=el("button","",n.title);b.type="button";b.dataset.nodeId=n.id;b.dataset.notionTitle=n.title;b.dataset.level=String(n.level);b.setAttribute("aria-label",n.title+" · niveau "+n.level);b.onclick=()=>focusNode(n);nav.append(b);});}
 function updateUI(){
  document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
  $("heading").textContent=t("title");$("description").textContent=t("desc");$("hint").textContent=t("hint");$("kicker").textContent=t("home");$("language").value=lang;
