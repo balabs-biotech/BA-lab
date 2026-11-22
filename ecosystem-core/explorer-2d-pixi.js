@@ -54,10 +54,10 @@ export async function createPixiRenderer(canvas){
   junctions.position.copyFrom(filaments.position);junctions.scale.set(scale);
   const live=new Set();
   const shortRoots={
-   fr:{bio:"BIOTECH",myco:"MYCO",soil:"TECHNOSOIL",lab:"LABO",products:"PRODUITS",iot:"IOT",work:"R&D",evidence:"PREUVES"},
-   en:{bio:"BIOTECH",myco:"MYCOLOGY",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUCTS",iot:"IOT",work:"PROJECTS",evidence:"EVIDENCE"},
-   ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",evidence:"الأدلة"},
-   pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS"}
+   fr:{bio:"BIOTECH",myco:"MYCO",soil:"TECHNOSOIL",lab:"LABO",products:"PRODUITS",iot:"IOT",work:"R&D",evidence:"PREUVES",microbiology:"MICROBIO",plants:"PLANTES",ecology:"ÉCO",bioprocesses:"PROCÉDÉS",biomaterials:"MATIÈRES",instrumentation:"INGÉ",digital:"NUMÉRIQUE",physical:"PHYSIQUE"},
+   en:{bio:"BIOTECH",myco:"MYCOLOGY",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUCTS",iot:"IOT",work:"PROJECTS",evidence:"EVIDENCE",microbiology:"MICROBIO",plants:"PLANTS",ecology:"ECOLOGY",bioprocesses:"BIOPROCESS",biomaterials:"BIOMATERIALS",instrumentation:"ENGINEERING",digital:"DIGITAL",physical:"PHYSICS"},
+   ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",evidence:"الأدلة",microbiology:"أحياء دقيقة",plants:"نباتات",ecology:"بيئة",bioprocesses:"عمليات حيوية",biomaterials:"مواد حيوية",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},
+   pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS",microbiology:"MICROBIO",plants:"PLANTAS",ecology:"ECOLOGIA",bioprocesses:"BIOPROCESSOS",biomaterials:"BIOMATERIAIS",instrumentation:"ENGENHARIA",digital:"DIGITAL",physical:"FÍSICA"}
   };
   const candidates=[];
   const byId=new Map(nodes.map(n=>[n.id,n]));
