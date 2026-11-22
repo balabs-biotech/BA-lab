@@ -4,6 +4,95 @@
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
 
+
+/**
+ * Organic territory packing + local collision relaxation.
+ * The knowledge graph is immutable here: only visual coordinates are adjusted.
+ */
+function packRootTerritories(nodes,tree){
+ const roots=nodes.filter(n=>n.level===0);
+ if(roots.length<2)return;
+ const original=new Map(roots.map(r=>[r.id,{x:r.x,y:r.y}]));
+ const mass=new Map(tree.map(root=>[root.id,countTree(root)]));
+ const radius=r=>92+Math.sqrt(mass.get(r.id)||1)*8.5;
+ for(let pass=0;pass<34;pass++){
+  const shifts=new Map(roots.map(r=>[r.id,{x:0,y:0}]));
+  for(let i=0;i<roots.length;i++)for(let j=i+1;j<roots.length;j++){
+   const a=roots[i],b=roots[j],dx=b.x-a.x,dy=b.y-a.y;
+   let d=Math.hypot(dx,dy);
+   const min=radius(a)+radius(b)+34;
+   if(d>=min)continue;
+   if(d<.001){const h=hash(a.id+"|"+b.id);d=1;const angle=(h%6283)/1000;const ux=Math.cos(angle),uy=Math.sin(angle);shifts.get(a.id).x-=ux*8;shifts.get(a.id).y-=uy*8;shifts.get(b.id).x+=ux*8;shifts.get(b.id).y+=uy*8;continue;}
+   const force=Math.min(8,(min-d)*.17),ux=dx/d,uy=dy/d;
+   shifts.get(a.id).x-=ux*force;shifts.get(a.id).y-=uy*force;
+   shifts.get(b.id).x+=ux*force;shifts.get(b.id).y+=uy*force;
+  }
+  for(const root of roots){
+   const s=shifts.get(root.id),base=original.get(root.id);
+   root.x+=s.x+(base.x-root.x)*.035;
+   root.y+=s.y+(base.y-root.y)*.035;
+  }
+ }
+ for(const root of roots){
+  const dx=root.x-original.get(root.id).x,dy=root.y-original.get(root.id).y;
+  for(const n of nodes)if(n.rootId===root.id){n.x+=dx;n.y+=dy;}
+ }
+}
+function countTree(node){return 1+(node.children||[]).reduce((sum,child)=>sum+countTree(child),0);}
+function relaxBiologicalMorphology(nodes,edges){
+ const parentPairs=new Set(edges.filter(e=>!e.cross).map(e=>[e.a.id,e.b.id].sort().join("|")));
+ const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
+ const leaves=nodes.filter(n=>n.level>0&&!branchParents.has(n.id));
+ const leafIds=new Set(leaves.map(n=>n.id));
+ const cellSize=96;
+ for(let pass=0;pass<22;pass++){
+  const grid=new Map();
+  for(const n of nodes){
+   const key=Math.floor(n.x/cellSize)+":"+Math.floor(n.y/cellSize);
+   if(!grid.has(key))grid.set(key,[]);
+   grid.get(key).push(n);
+  }
+  const delta=new Map(nodes.map(n=>[n.id,{x:0,y:0,count:0}]));
+  for(const a of nodes){
+   const gx=Math.floor(a.x/cellSize),gy=Math.floor(a.y/cellSize);
+   for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+    const bucket=grid.get((gx+ox)+":"+(gy+oy));if(!bucket)continue;
+    for(const b of bucket){
+     if(a.id>=b.id||a.rootId!==b.rootId)continue;
+     if(parentPairs.has([a.id,b.id].sort().join("|")))continue;
+     const dx=b.x-a.x,dy=b.y-a.y;
+     let d=Math.hypot(dx,dy);
+     const bothTerminal=leafIds.has(a.id)&&leafIds.has(b.id);
+     const min=bothTerminal?82:Math.max(23,a.r+b.r+13);
+     if(d>=min)continue;
+     if(d<.001){const h=hash(a.id+"|"+b.id),angle=(h%6283)/1000;d=1;
+      const ux=Math.cos(angle),uy=Math.sin(angle),f=bothTerminal?4:2;
+      const da=delta.get(a.id),db=delta.get(b.id);
+      if(a.level>0){da.x-=ux*f;da.y-=uy*f;da.count++;}
+      if(b.level>0){db.x+=ux*f;db.y+=uy*f;db.count++;}
+      continue;
+     }
+     const force=Math.min(bothTerminal?7:3.2,(min-d)*(bothTerminal?.24:.16));
+     const ux=dx/d,uy=dy/d;
+     const wa=a.level===0?0:leafIds.has(a.id)?.78:.42;
+     const wb=b.level===0?0:leafIds.has(b.id)?.78:.42;
+     const total=wa+wb;if(!total)continue;
+     const da=delta.get(a.id),db=delta.get(b.id);
+     da.x-=ux*force*wa/total;da.y-=uy*force*wa/total;da.count++;
+     db.x+=ux*force*wb/total;db.y+=uy*force*wb/total;db.count++;
+    }
+   }
+  }
+  for(const n of nodes){
+   if(n.level===0)continue;
+   const d=delta.get(n.id),length=Math.hypot(d.x,d.y);
+   if(!length)continue;
+   const cap=leafIds.has(n.id)?5.5:2.8,scale=Math.min(1,cap/length);
+   n.x+=d.x*scale;n.y+=d.y*scale;
+  }
+ }
+}
+
 export function createVernpixiNetwork(tree,options={}){
  let nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
   nodes=[];edges=[];byId.clear();
@@ -44,6 +133,10 @@ export function createVernpixiNetwork(tree,options={}){
    };
    walk(root,rootNode,1,angle,[]);
   });
+  // Rebalance root territories, then relax local crowding. Leaf tips stay present
+  // in the topology but receive a stronger minimum separation in visual space.
+  packRootTerritories(nodes,tree);
+  relaxBiologicalMorphology(nodes,edges);
   // Cross-universe connections come only from the Notion relation manifest.
   // page-content links are explicitly distinguished from direct Notion hyperlinks.
   relationIndex=new Map();const relationPairs=new Set();
