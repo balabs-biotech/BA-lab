@@ -3,6 +3,9 @@
 ## Principe directeur
 L’Academy est la référence de l’identité spatiale et taxonomique : centre BA Labs, huit univers canoniques, ordre localisé, ancres, palette et géométrie. L’explorateur public reprend ces identifiants et ces positions à l’identique. Sa différence se limite au contenu des ramifications : fiches scientifiques publiques plutôt que modules pédagogiques.
 
+## Dépendance à la géométrie canonique Academy
+Le code Academy actuellement présent sur la branche de référence expose les huit racines et le moteur partagé, mais ne publie pas encore un nœud central BA Labs distinct des huit univers. La géométrie du noyau partagé comporte actuellement huit ancres, dont une proche du centre. Cette PR ne fabrique donc pas un centre concurrent et ne modifie pas le moteur partagé. La dernière étape de parité spatiale (un centre BA Labs indépendant entouré des huit univers) sera raccordée depuis la définition Academy dès qu'elle sera disponible dans le dépôt.
+
 ## Architecture technique
 - **PixiJS v8 / WebGL** : rendu du champ biologique dans `../ecosystem-core/explorer-2d-pixi.js`, partagé par Academy et public.
 - **Graphe Vernpixi** : `../ecosystem-core/explorer-2d-network.js` construit les huit univers, les ramifications hiérarchiques, les liens documentés et les anastomoses.
