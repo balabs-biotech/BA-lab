@@ -115,7 +115,7 @@ export async function createPixiRenderer(canvas){
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
-   const threshold=n.level===0?0:n.level===1?.72:n.level===2?.95:n.level===3?1.9:3.1;
+   const threshold=n.level===0?0:n.level===1?.78:n.level===2?1.55:n.level===3?2.65:4.1;
    const show=n.level===0||(alpha>.5&&scale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
@@ -127,12 +127,12 @@ export async function createPixiRenderer(canvas){
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
-   const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
+   const title=n.title;
    let fontSize=n.level===0?clamp(11.5+Math.log2(Math.max(.5,scale))*1.25,10.5,15):clamp(10.2+Math.log2(Math.max(.7,scale))*.92,9.5,13.5);if(selected&&activeBranch.has(n.id))fontSize+=.7;if(selected?.id===n.id)fontSize+=1;
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
    // Wrap long names to the available phone width before positioning the label.
    label.style.wordWrap=true;label.style.breakWords=true;label.style.align="center";
-   label.style.wordWrapWidth=Math.max(100,Math.min(width*.46,220));
+   label.style.wordWrapWidth=Math.max(145,Math.min(width*.62,270));
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
    const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
@@ -145,7 +145,7 @@ export async function createPixiRenderer(canvas){
    hitBoxes[n.id]=box;
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
-   occupied.push(box);live.add(n.id);drawn++;
+   occupied.push(box);hitBoxes[n.id]=box;live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
   canvas.dataset.visibleNodeIds=JSON.stringify([...live]);
