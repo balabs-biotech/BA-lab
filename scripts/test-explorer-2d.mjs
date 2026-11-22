@@ -132,9 +132,9 @@ try {
     await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y);
     await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'First click on a leaf must only select/focus it');
-    const secondLeafPoint = await pointForLeaf();
-    assert.ok(secondLeafPoint, 'Leaf label must remain visible after selection');
-    await page.mouse.click(secondLeafPoint.x, secondLeafPoint.y, { delay: 70 });
+    // A true double-click uses the same screen coordinate; the engine must
+    // retain the first target while its focus animation moves the scene.
+    await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
     assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
