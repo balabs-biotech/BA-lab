@@ -125,7 +125,7 @@ export async function createPixiRenderer(canvas){
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
-   const thresholds=[0,.45,1.1,2.0,3.0,4.2,5.5,7.0,8.6];const threshold=thresholds[Math.min(n.level,thresholds.length-1)]||0;
+   const thresholds=[0,.3,.9,1.65,2.6,3.7,4.9,6.2,7.6];const threshold=thresholds[Math.min(n.level,thresholds.length-1)]||0;
    const revealScale=scale*(selected?1.45:1);const show=n.level===0||(alpha>.38&&revealScale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
