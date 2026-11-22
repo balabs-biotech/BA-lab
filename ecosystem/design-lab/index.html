@@ -4,140 +4,168 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111b1d">
-<title>BA Labs — Design lab / trois directions</title>
+<meta name="description" content="Comparaison de trois directions artistiques BA Labs, à contenu et visuels identiques.">
+<title>BA Labs — Comparaison des directions</title>
 <style>
-:root{font-family:'DM Sans',Arial,sans-serif;color:#e9e8df;background:#101817;font-synthesis:none;--ease:cubic-bezier(.2,.75,.25,1)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh}a{color:inherit;text-decoration:none}button{font:inherit}
-.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px clamp(18px,4vw,60px);background:#101817ed;border-bottom:1px solid #ffffff20;backdrop-filter:blur(14px)}
-.brand{font-size:11px;font-weight:700;letter-spacing:.19em}.brand small{display:block;margin-top:4px;font:8px 'DM Mono',monospace;letter-spacing:.13em;color:#9eaaa0}
-.switcher{display:flex;gap:5px;flex-wrap:wrap}.switcher button{border:1px solid #ffffff35;background:transparent;color:#c3cbc1;padding:9px 13px;font:9px 'DM Mono',monospace;letter-spacing:.06em;cursor:pointer;transition:background .2s,border-color .2s,color .2s}.switcher button[aria-pressed=true]{background:#e9e8df;color:#15201d;border-color:#e9e8df}
-.intro{padding:20px clamp(18px,4vw,60px);display:flex;justify-content:space-between;align-items:center;gap:24px;background:#18221f;border-bottom:1px solid #ffffff1c}.intro p{max-width:760px;margin:0;color:#aeb9af;font-size:12px;line-height:1.6}.intro strong{color:#f0eee4}.intro .status{font:9px 'DM Mono',monospace;color:#c58a6c;white-space:nowrap}
-.prototype{display:none;min-height:calc(100vh - 105px);animation:enter .5s var(--ease) both}.prototype.active{display:block}@keyframes enter{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:none}}
-.kicker{font:9px 'DM Mono',monospace;letter-spacing:.17em;text-transform:uppercase}
-.btn{display:inline-flex;align-items:center;gap:14px;padding:13px 17px;font:9px 'DM Mono',monospace;letter-spacing:.11em;text-transform:uppercase}
-.pill{display:inline-flex;align-items:center;gap:8px;font:9px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
-.pill:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-
-/* Direction 01 — Living systems / editorial */
-#living{background:#111b1d;color:#efede3}.living-wrap{max-width:1500px;margin:auto;padding:0 clamp(20px,5.2vw,82px)}
-.living-nav{height:74px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff25}.living-nav nav{display:flex;gap:25px;color:#b8c3b8;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
-.living-hero{min-height:670px;display:grid;grid-template-columns:1.03fr .97fr;gap:5vw;align-items:center;padding:75px 0 68px}
-.living-copy{position:relative;z-index:2}.living-copy .kicker{color:#c58a6c}.living-copy h1{font:clamp(60px,8vw,118px)/.88 'Playfair Display',Georgia,serif;font-weight:500;letter-spacing:-.065em;margin:27px 0 28px}.living-copy h1 em{color:#c58a6c;font-weight:500}.living-copy p{max-width:480px;color:#bac4b9;font-size:15px;line-height:1.8}.living-actions{display:flex;gap:22px;align-items:center;margin-top:35px;flex-wrap:wrap}.living-actions .btn{background:#c58a6c;color:#17211e}.text-link{font:9px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #c58a6c;padding:12px 0}
-.living-visual{position:relative;min-height:530px;display:grid;place-items:center}.living-photo{position:absolute;inset:4% 0 4% 8%;overflow:hidden;border:1px solid #7f8f8066}.living-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.72) contrast(1.08);transition:opacity .35s,transform .7s var(--ease)}.living-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#101817aa,transparent 52%),linear-gradient(90deg,#111b1d30,transparent)}
-.photo-note{position:absolute;left:0;bottom:0;z-index:2;background:#1d2a26;border-left:2px solid #c58a6c;padding:16px 18px;max-width:245px}.photo-note b{display:block;font:italic 19px 'Playfair Display',Georgia,serif;font-weight:500}.photo-note small{display:block;margin-top:8px;color:#9eaaa0;font:8px 'DM Mono',monospace;letter-spacing:.1em}
-.scale-switch{position:absolute;right:0;top:0;z-index:3;display:grid;gap:5px}.scale-switch button{width:124px;text-align:left;padding:10px 12px;border:1px solid #ffffff38;background:#111b1ddd;color:#c6d0c6;font:8px 'DM Mono',monospace;letter-spacing:.08em;cursor:pointer}.scale-switch button[aria-pressed=true]{background:#d9c6ad;color:#19231f;border-color:#d9c6ad}
-.living-index{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #ffffff30;border-bottom:1px solid #ffffff30}.living-index a{padding:23px 18px 25px 0;border-right:1px solid #ffffff25}.living-index a+a{padding-left:20px}.living-index a:last-child{border:0}.living-index small{font:9px 'DM Mono',monospace;color:#c58a6c}.living-index b{display:block;margin-top:12px;font:20px 'Playfair Display',Georgia,serif;font-weight:500}.living-index span{display:block;margin-top:6px;color:#9daaa0;font-size:10px;line-height:1.5}
-.living-foot{display:flex;justify-content:space-between;gap:20px;padding:18px 0;color:#8e9c92;font:8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
-
-/* Direction 02 — Field journal / real-world systems */
-#field{background:#e9e6da;color:#27342b}.field-wrap{max-width:1500px;margin:auto;padding:0 clamp(20px,5.2vw,82px)}
-.field-nav{height:74px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #b9b9aa}.field-nav .brand small{color:#718071}.field-nav nav{display:flex;gap:22px;color:#4c5b4d;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
-.field-hero{display:grid;grid-template-columns:.92fr 1.08fr;gap:6vw;align-items:center;min-height:650px;padding:72px 0 58px}
-.field-copy .kicker{color:#8a694d}.field-copy h1{font:clamp(56px,7vw,100px)/.91 'Playfair Display',Georgia,serif;font-weight:500;letter-spacing:-.06em;margin:24px 0}.field-copy h1 em{color:#72835d}.field-copy p{max-width:450px;color:#5c685c;font-size:14px;line-height:1.8}.field-copy .btn{margin-top:27px;background:#354d3d;color:#f0eee4}
-.field-board{position:relative;min-height:520px;background:#d1d3c5;overflow:hidden}.field-board img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.62) contrast(.94)}.field-board:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#15251caa,transparent 60%),linear-gradient(90deg,#15251c30,transparent)}
-.field-stamp{position:absolute;top:20px;left:20px;z-index:2;background:#eeeadee8;padding:12px 14px;color:#3b4a3c;font:8px 'DM Mono',monospace;letter-spacing:.1em;line-height:1.7}
-.field-caption{position:absolute;z-index:3;bottom:22px;left:22px;color:#f2eee1}.field-caption b{display:block;font:italic 30px 'Playfair Display',Georgia,serif;font-weight:500}.field-caption span{display:block;margin-top:7px;font:8px 'DM Mono',monospace;letter-spacing:.1em}
-.field-layer{position:absolute;z-index:4;right:18px;top:18px;display:flex;gap:5px;flex-direction:column}.field-layer button{background:#f0eee4e8;border:1px solid #43534350;color:#425241;padding:9px 11px;text-align:left;font:8px 'DM Mono',monospace;cursor:pointer}.field-layer button[aria-pressed=true]{background:#354d3d;color:#f0eee4}
-.field-ledger{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid #aeb5a7;border-bottom:1px solid #aeb5a7}.ledger-item{padding:22px 20px 24px 0;border-right:1px solid #b8bdae}.ledger-item+.ledger-item{padding-left:20px}.ledger-item:last-child{border:0}.ledger-item small{font:9px 'DM Mono',monospace;color:#8b6c4d}.ledger-item b{display:block;margin:10px 0;font:22px 'Playfair Display',Georgia,serif;font-weight:500}.ledger-item p{margin:0;color:#637064;font-size:11px;line-height:1.6}
-.field-note{padding:28px 0 55px;display:flex;justify-content:space-between;gap:30px;color:#687466;font-size:11px;line-height:1.6}.field-note strong{color:#354d3d}
-
-/* Direction 03 — Technical atlas / instrument systems */
-#atlas{background:#dfe7e4;color:#1c3030}.atlas-wrap{max-width:1500px;margin:auto;padding:0 clamp(20px,5.2vw,82px)}
-.atlas-nav{height:74px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #aab9b4}.atlas-nav nav{display:flex;gap:22px;color:#3d5957;font:9px 'DM Mono',monospace;letter-spacing:.08em}
-.atlas-hero{display:grid;grid-template-columns:.82fr 1.18fr;gap:5vw;align-items:center;min-height:670px;padding:70px 0 58px}
-.atlas-copy .kicker{color:#2f7771}.atlas-copy h1{font:clamp(56px,7vw,96px)/.91 'Playfair Display',Georgia,serif;font-weight:500;letter-spacing:-.06em;margin:23px 0}.atlas-copy h1 em{color:#43817a}.atlas-copy p{max-width:430px;color:#536966;font-size:14px;line-height:1.8}.atlas-copy .btn{margin-top:26px;background:#1d4140;color:#eff3ed}
-.system{position:relative;min-height:520px;background:#edf1ed;border:1px solid #a9bbb5;overflow:hidden;padding:26px}
-.system-head{display:flex;justify-content:space-between;gap:12px;color:#57716d;font:8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
-.system-svg{width:100%;height:390px;display:block;margin-top:18px}.system-svg .line{fill:none;stroke:#477c75;stroke-width:2}.system-svg .fine{fill:none;stroke:#a0b5ae;stroke-width:1;stroke-dasharray:4 5}.system-svg .node{fill:#edf1ed;stroke:#477c75;stroke-width:2}.system-svg .active{fill:#d6e8df;stroke:#1d4140;stroke-width:2.5}.system-svg text{font:10px 'DM Mono',monospace;fill:#375753;letter-spacing:.03em}.system-svg .tiny{font-size:8px;fill:#708984}
-.atlas-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:12px}.atlas-steps button{padding:10px 8px;border:1px solid #a9bbb5;background:transparent;color:#45605b;text-align:left;font:8px 'DM Mono',monospace;cursor:pointer}.atlas-steps button[aria-pressed=true]{background:#1d4140;color:#f0f3ec;border-color:#1d4140}
-.atlas-data{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #aab9b4;border-bottom:1px solid #aab9b4}.atlas-data div{padding:18px 12px 20px 0;border-right:1px solid #aab9b4}.atlas-data div+div{padding-left:14px}.atlas-data div:last-child{border:0}.atlas-data small{font:8px 'DM Mono',monospace;color:#468079}.atlas-data b{display:block;margin-top:9px;font:19px 'Playfair Display',Georgia,serif;font-weight:500}.atlas-data span{display:block;margin-top:5px;color:#657a75;font-size:9px}
-.atlas-note{padding:22px 0 50px;color:#5b706b;font-size:10px;line-height:1.6}
-
-/* responsive and motion */
-@media(max-width:850px){.living-hero,.field-hero,.atlas-hero{grid-template-columns:1fr;gap:28px;padding-top:50px}.living-visual,.field-board,.system{min-height:430px}.living-index{grid-template-columns:repeat(2,1fr)}.living-index a:nth-child(2){border-right:0}.living-index a:nth-child(n+3){border-top:1px solid #ffffff25}.field-ledger{grid-template-columns:1fr}.ledger-item,.ledger-item+.ledger-item{padding:18px 0;border-right:0;border-bottom:1px solid #b8bdae}.ledger-item:last-child{border-bottom:0}.atlas-data{grid-template-columns:repeat(2,1fr)}.atlas-data div:nth-child(2){border-right:0}.atlas-data div:nth-child(n+3){border-top:1px solid #aab9b4}.atlas-data div:nth-child(3){padding-left:0}}
-@media(max-width:560px){.top{align-items:flex-start;flex-direction:column}.switcher{width:100%}.switcher button{flex:1;padding:9px 7px;font-size:8px}.intro{align-items:flex-start;flex-direction:column}.living-nav nav,.field-nav nav,.atlas-nav nav{display:none}.living-hero,.field-hero,.atlas-hero{min-height:0;padding:45px 0}.living-copy h1,.field-copy h1,.atlas-copy h1{font-size:clamp(54px,15vw,76px)}.living-visual,.field-board,.system{min-height:350px}.scale-switch button{width:105px}.living-index{font-size:10px}.living-index a{padding:16px 8px 18px 0}.living-index a+a{padding-left:12px}.living-index b{font-size:17px}.living-foot,.field-note{flex-direction:column;gap:8px}.system{padding:14px}.system-svg{height:310px}.atlas-steps{grid-template-columns:repeat(2,1fr)}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+:root{color-scheme:dark;--ink:#eae9df;--muted:#aeb9af;--line:#ffffff28;--accent:#c58a6c;--ease:cubic-bezier(.2,.75,.25,1);font-family:Arial,Helvetica,sans-serif;font-synthesis:none}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#0e1514;color:var(--ink)}a{color:inherit;text-decoration:none}button{font:inherit}
+.topbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:13px clamp(18px,4vw,58px);background:#101816f2;border-bottom:1px solid #ffffff20;backdrop-filter:blur(14px)}
+.brand{font-size:11px;font-weight:700;letter-spacing:.2em}.brand small{display:block;margin-top:4px;color:#9aa79c;font:8px/1.2 ui-monospace,monospace;letter-spacing:.14em}
+.switcher{display:flex;gap:5px;flex-wrap:wrap}.switcher button{border:1px solid #ffffff3b;background:transparent;color:#c7cec5;padding:9px 13px;font:9px ui-monospace,monospace;letter-spacing:.07em;cursor:pointer}.switcher button[aria-pressed=true]{background:#eae9df;color:#15201c;border-color:#eae9df}
+.prototype{display:none;min-height:calc(100vh - 58px)}.prototype.active{display:block;animation:appear .35s var(--ease) both}@keyframes appear{from{opacity:.5}to{opacity:1}}
+.wrap{width:min(1440px,100%);margin:auto;padding:0 clamp(20px,5vw,76px)}
+.eyebrow{font:9px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}
+.hero-title{font-size:clamp(52px,7.1vw,104px);line-height:.91;letter-spacing:-.065em;margin:22px 0 20px;font-weight:500}
+.lede{max-width:460px;font-size:14px;line-height:1.8}
+.photo{position:relative;overflow:hidden}.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.78) contrast(1.04);transition:opacity .22s,transform .7s var(--ease)}.photo:hover img{transform:scale(1.025)}
+.photo:after{content:"";position:absolute;inset:0;pointer-events:none}
+.photo-caption{position:absolute;z-index:2;left:18px;bottom:18px;max-width:70%;color:#f2eee3}
+.photo-caption b{display:block;font:italic 22px Georgia,serif;font-weight:400}.photo-caption small{display:block;margin-top:7px;font:8px ui-monospace,monospace;letter-spacing:.12em}
+.photo-controls{display:flex;flex-wrap:wrap;gap:6px}.photo-controls button{cursor:pointer}
+.photo-controls button[aria-pressed=true]{outline:1px solid currentColor;outline-offset:2px}
+.domains{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.domain{padding:18px 18px 20px 0;border-right:1px solid var(--line)}.domain+.domain{padding-left:18px}.domain:last-child{border:0}
+.domain small{font:8px ui-monospace,monospace;letter-spacing:.12em}.domain b{display:block;margin:9px 0 6px;font:20px Georgia,serif;font-weight:400}.domain span{font-size:10px;line-height:1.5}
+.cta{display:inline-flex;align-items:center;gap:18px;padding:13px 16px;font:9px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
+.bottomline{display:flex;justify-content:space-between;gap:20px;padding:16px 0 30px;font:8px ui-monospace,monospace;letter-spacing:.09em;text-transform:uppercase}
+.scale-switch{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px}.scale-switch button{padding:8px 10px;border:1px solid currentColor;background:transparent;font:8px ui-monospace,monospace;letter-spacing:.07em;cursor:pointer}
+.scale-switch button[aria-pressed=true]{background:currentColor}.scale-switch button[aria-pressed=true] span{mix-blend-mode:difference;color:white}
+ /* 01 — Living Systems: immersive, editorial, photographic */
+#living{background:#111b1d;color:#eeece2;--line:#ffffff2b}
+#living .mast{height:72px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+#living .mast nav{display:flex;gap:23px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#b7c2b7}
+#living .hero{display:grid;grid-template-columns:.94fr 1.06fr;gap:5vw;align-items:center;padding:62px 0 55px;min-height:620px}
+#living .eyebrow{color:#c58a6c}#living .hero-title{font-family:Georgia,serif}#living .hero-title em{color:#c58a6c;font-weight:400}
+#living .lede{color:#bac4b9}#living .cta{margin-top:25px;background:#c58a6c;color:#18221e}
+#living .visual{min-height:485px;position:relative;padding:24px 0 0 34px}
+#living .visual .photo{height:455px;border:1px solid #91a09577}
+#living .visual .photo:after{background:linear-gradient(0deg,#101817b5,transparent 55%),linear-gradient(90deg,#111b1d35,transparent)}
+#living .visual .photo-caption{border-left:2px solid #c58a6c;padding-left:12px}
+#living .scale-switch{position:absolute;right:-10px;top:0;z-index:3;display:grid;justify-items:start;background:#111b1de8;padding:8px;border:1px solid #ffffff2c}
+#living .scale-switch button{color:#c6d0c6;border-color:#ffffff44}.scale-switch button[aria-pressed=true]{color:#d6b49a;background:#d6b49a}
+#living .domains{margin-top:4px}.domain small{color:#c58a6c}.domain span{color:#aeb9af}
+#living .bottomline{color:#8f9d92}
+ /* 02 — Field Journal: documentary, tactile, field notes */
+#field{background:#e8e5d9;color:#28352c;--line:#aeb7a8}
+#field .mast{height:72px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #aeb7a8}
+#field .brand small{color:#718071}#field .mast nav{display:flex;gap:22px;color:#506050;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+#field .hero{display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center;padding:62px 0 55px;min-height:620px}
+#field .eyebrow{color:#8a694d}#field .hero-title{font-family:Georgia,serif}#field .hero-title em{color:#72835d;font-weight:400}
+#field .lede{color:#5c685c}#field .cta{margin-top:25px;background:#354d3d;color:#f0eee4}
+#field .visual{position:relative;min-height:485px;padding:18px 18px 35px 0}
+#field .visual .photo{height:445px;background:#ccd1c3}
+#field .visual .photo:after{background:linear-gradient(0deg,#18261cb5,transparent 55%)}
+#field .visual .photo-caption{left:20px;bottom:20px}
+#field .visual .photo-caption b{font-size:25px}
+#field .visual .stamp{position:absolute;z-index:3;left:-16px;top:0;background:#f3f0e5;border:1px solid #b8b8a8;padding:10px 12px;font:8px/1.7 ui-monospace,monospace;letter-spacing:.08em}
+#field .scale-switch{position:absolute;right:0;bottom:0;z-index:4;max-width:90%;padding:8px;background:#e8e5d9;border:1px solid #b8b8a8}
+#field .scale-switch button{color:#445444;border-color:#8c9a89}#field .scale-switch button[aria-pressed=true]{color:#e8e5d9;background:#354d3d}
+#field .domains{border-color:#aeb7a8}.domain small{color:#8a694d}.domain span{color:#5f6b60}
+#field .bottomline{color:#6d796d}
+ /* 03 — Technical Atlas: structured, measured, data-led */
+#atlas{background:#dce6e2;color:#1c3030;--line:#9eb1aa}
+#atlas .mast{height:72px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #aab9b4}
+#atlas .brand small{color:#5f7972}#atlas .mast nav{display:flex;gap:22px;color:#3d5957;font:9px ui-monospace,monospace;letter-spacing:.08em}
+#atlas .hero{display:grid;grid-template-columns:.82fr 1.18fr;gap:4vw;align-items:center;padding:62px 0 55px;min-height:620px}
+#atlas .eyebrow{color:#2f7771}#atlas .hero-title{font-family:Georgia,serif}#atlas .hero-title em{color:#43817a;font-weight:400}
+#atlas .lede{color:#536966}#atlas .cta{margin-top:25px;background:#1d4140;color:#eff3ed}
+#atlas .visual{position:relative;min-height:485px;padding:35px 0 0 28px}
+#atlas .visual .photo{height:440px;border:1px solid #91aaa1;background:#c7d4ce}
+#atlas .visual .photo:after{background:linear-gradient(0deg,#152a29b0,transparent 50%)}
+#atlas .visual .frame{position:absolute;z-index:3;inset:15px -12px 0 12px;border:1px solid #4c7770;pointer-events:none}
+#atlas .visual .frame:before,#atlas .visual .frame:after{content:"";position:absolute;width:28px;height:28px;border-color:#2f7771;border-style:solid}
+#atlas .visual .frame:before{left:-1px;top:-1px;border-width:2px 0 0 2px}#atlas .visual .frame:after{right:-1px;bottom:-1px;border-width:0 2px 2px 0}
+#atlas .visual .photo-caption{font-family:ui-monospace,monospace}.photo-caption b{font:15px ui-monospace,monospace;font-weight:600;letter-spacing:.04em}
+#atlas .visual .photo-caption small{color:#d0e2dc}
+#atlas .scale-switch{position:absolute;z-index:4;right:0;top:0;display:grid;justify-items:stretch;min-width:140px;padding:8px;background:#dce6e2f0;border:1px solid #9eb1aa}
+#atlas .scale-switch button{color:#42635d;border-color:#9eb1aa;text-align:left}
+#atlas .scale-switch button[aria-pressed=true]{background:#1d4140;color:#eff3ed}
+#atlas .domains{border-color:#9eb1aa}.domain small{color:#2f7771}.domain span{color:#536966}
+#atlas .bottomline{color:#5d7770}
+@media(max-width:760px){
+ .topbar{align-items:flex-start;flex-direction:column;gap:11px}.switcher{width:100%}.switcher button{flex:1;padding:9px 6px;font-size:8px}
+ .wrap{padding-inline:18px}.mast nav{display:none!important}.hero{grid-template-columns:1fr!important;gap:22px!important;padding:38px 0 35px!important;min-height:0!important}
+ .hero-title{font-size:clamp(52px,15vw,78px)}.lede{font-size:13px}
+ .visual{min-height:390px!important;padding:18px 0 22px 12px!important}.visual .photo{height:360px!important}
+ #living .scale-switch{right:0;top:0;grid-template-columns:1fr 1fr;max-width:170px}
+ #field .stamp{left:-3px;top:0}#field .scale-switch{right:0;bottom:0}
+ #atlas .scale-switch{right:0;top:0;min-width:120px}
+ .domains{grid-template-columns:1fr 1fr}.domain{padding:15px 10px 16px 0}.domain+.domain{padding-left:12px}.domain:nth-child(2){border-right:0}.domain:nth-child(3){border-top:1px solid var(--line)}.domain:nth-child(4){border-top:1px solid var(--line)}
+ .domain b{font-size:18px}.bottomline{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<header class="top"><a class="brand" href="../">BA LABS <small>DESIGN LAB · PROTOTYPES ISOLÉS</small></a><nav class="switcher" aria-label="Comparer les directions"><button data-view="living" aria-pressed="true">01 · LIVING</button><button data-view="field" aria-pressed="false">02 · FIELD</button><button data-view="atlas" aria-pressed="false">03 · ATLAS</button></nav></header>
-<div class="intro"><p><strong>Trois pistes de direction artistique.</strong> Ce banc d'essai n'est pas la vitrine publique. Chaque piste propose une composition complète, un rapport différent à la science et une interaction utile. Aucun écran d'ouverture forcé, aucune bibliothèque d'animation.</p><span class="status">ÉTAT : EXPLORATION / NON VALIDÉ</span></div>
-
+<header class="topbar">
+<a class="brand" href="../">BA LABS <small>DESIGN STUDY / 22.11.2026</small></a>
+<nav class="switcher" aria-label="Comparer les directions">
+<button type="button" data-view="living" aria-pressed="true">01 · LIVING SYSTEMS</button>
+<button type="button" data-view="field" aria-pressed="false">02 · FIELD JOURNAL</button>
+<button type="button" data-view="atlas" aria-pressed="false">03 · TECHNICAL ATLAS</button>
+</nav>
+</header>
 <main>
 <section class="prototype active" id="living" aria-label="Direction Living Systems">
-<div class="living-wrap">
-<header class="living-nav"><a class="brand" href="#">BA LABS <small>APPLIED BIOLOGY / SÉTIF</small></a><nav><a href="#living-domains">DOMAINES</a><a href="#living-domains">RECHERCHE</a><a href="#living-domains">MÉTHODE</a></nav><span class="kicker">01 — Living systems</span></header>
-<div class="living-hero">
-<div class="living-copy"><div class="kicker">Observer les systèmes vivants · Du microscopique au terrain</div><h1>Le vivant<br>en <em>relation.</em></h1><p>Comprendre les organismes, les matériaux et les milieux. Relier la recherche biologique à des procédés concrets, documentés et adaptés aux réalités du terrain.</p><div class="living-actions"><a class="btn" href="#living-domains">Explorer BA Labs <span>↗</span></a><a class="text-link" href="#living-domains">Voir les domaines</a></div></div>
-<div class="living-visual"><figure class="living-photo"><img id="living-image" src="../assets/home-hyphae.jpg" alt="Réseau fongique observé en microscopie"><figcaption class="photo-note"><b id="living-caption">Réseaux fongiques</b><small id="living-subcaption">MICROSCOPIE · STRUCTURES VIVANTES</small></figcaption></figure><div class="scale-switch" aria-label="Changer d'échelle"><button data-scale="fungi" aria-pressed="true">01 / MYCOLOGIE</button><button data-scale="micro" aria-pressed="false">02 / MICROBIOLOGIE</button><button data-scale="soil" aria-pressed="false">03 / SOL & RACINES</button><button data-scale="crop" aria-pressed="false">04 / CULTURE</button></div></div>
+<div class="wrap">
+<header class="mast"><span class="eyebrow">BA Labs / recherche appliquée</span><nav><span>Recherche</span><span>Domaines</span><span>Approche</span></nav><span class="eyebrow">Sétif · DZ</span></header>
+<div class="hero">
+<div><div class="eyebrow">Biologie · Ingénierie · Environnement</div><h1 class="hero-title">Du vivant<br>à l’<em>application.</em></h1><p class="lede">Nous étudions les organismes, les matières et les milieux pour concevoir des solutions biologiques et technologiques adaptées aux réalités du terrain.</p><a class="cta" href="#domains-living">Découvrir nos domaines <span>↗</span></a></div>
+<div class="visual"><div class="photo"><img id="living-image" src="../assets/home-hyphae.jpg" alt="Réseau d'hyphes fongiques observé en gros plan"><div class="photo-caption"><b id="living-caption">Réseaux fongiques</b><small id="living-subcaption">MYCOLOGIE · STRUCTURES VIVANTES</small></div></div><div class="scale-switch" aria-label="Changer d'échelle"><button type="button" data-photo="fungi" aria-pressed="true">01 / MYCOLOGIE</button><button type="button" data-photo="micro" aria-pressed="false">02 / MICROBIO</button><button type="button" data-photo="soil" aria-pressed="false">03 / SOL & RACINES</button><button type="button" data-photo="culture" aria-pressed="false">04 / CULTURE</button></div></div>
 </div>
-<div class="living-index" id="living-domains"><a href="#"><small>01 / ORGANISMES</small><b>Mycologie</b><span>Culture, morphologie, fonctions fongiques.</span></a><a href="#"><small>02 / INTERACTIONS</small><b>Microbiologie</b><span>Microorganismes, cultures et milieux.</span></a><a href="#"><small>03 / MILIEUX</small><b>Sol & environnement</b><span>Ressources, eau, substrats et vivant.</span></a><a href="#"><small>04 / PROCÉDÉS</small><b>Biotechnologies</b><span>Du protocole au procédé reproductible.</span></a></div>
-<div class="living-foot"><span>Recherche appliquée · Sétif, Algérie</span><span>La matière vivante comme point de départ</span><span>Prototype A / 01</span></div>
-</div>
-</section>
-
+<div class="domains" id="domains-living"><div class="domain"><small>01 / BIOLOGIE</small><b>Microbiologie</b><span>Organismes, cultures et interactions biologiques.</span></div><div class="domain"><small>02 / MYCOLOGIE</small><b>Sciences fongiques</b><span>Mycélium, bioprocédés et valorisation des matières.</span></div><div class="domain"><small>03 / ÉCOLOGIE</small><b>Sols & environnement</b><span>Ressources, régénération et remédiation.</span></div><div class="domain"><small>04 / INGÉNIERIE</small><b>Technologies appliquées</b><span>Instrumentation, automatisation et données.</span></div></div>
+<div class="bottomline"><span>Recherche appliquée · Ingénierie frugale</span><span>Direction 01 / 03</span></div>
+</div></section>
 <section class="prototype" id="field" aria-label="Direction Field Journal">
-<div class="field-wrap">
-<header class="field-nav"><a class="brand" href="#">BA LABS <small>LABORATOIRE & TERRAIN · SÉTIF</small></a><nav><a href="#field-ledger">CARNET</a><a href="#field-ledger">MILIEUX</a><a href="#field-ledger">EXPÉRIENCES</a></nav><span class="kicker">02 — Field journal</span></header>
-<div class="field-hero">
-<div class="field-copy"><div class="kicker">Carnet de recherche · Algérie</div><h1>Du labo<br>au <em>terrain.</em></h1><p>Une recherche ancrée dans les matières, les organismes et les conditions réelles. Des observations, des essais et des applications présentés sans confondre hypothèse et résultat.</p><a class="btn" href="#field-ledger">Parcourir le carnet <span>↗</span></a></div>
-<figure class="field-board"><img id="field-image" src="../assets/editorial-soil.jpg" alt="Micrographie de la structure d'un sol"><figcaption class="field-stamp">BA LABS / FIELD RECORD<br>ÉCHANTILLON : SOL & MATIÈRE<br>DOCUMENTATION VISUELLE</figcaption><div class="field-layer"><button data-layer="soil" aria-pressed="true">01 · SOL</button><button data-layer="fungi" aria-pressed="false">02 · FONGIQUE</button><button data-layer="substrate" aria-pressed="false">03 · SUBSTRAT</button></div><div class="field-caption"><b id="field-caption">Observer le milieu.</b><span id="field-subcaption">STRUCTURE · MATIÈRE · INTERACTIONS</span></div></figure>
+<div class="wrap">
+<header class="mast"><span class="eyebrow">BA Labs / carnet de recherche</span><nav><span>Observations</span><span>Domaines</span><span>Méthodes</span></nav><span class="eyebrow">Sétif · DZ</span></header>
+<div class="hero">
+<div><div class="eyebrow">Biologie · Ingénierie · Environnement</div><h1 class="hero-title">Du vivant<br>à l’<em>application.</em></h1><p class="lede">Nous étudions les organismes, les matières et les milieux pour concevoir des solutions biologiques et technologiques adaptées aux réalités du terrain.</p><a class="cta" href="#domains-field">Découvrir nos domaines <span>↗</span></a></div>
+<div class="visual"><div class="stamp">CARNET 001<br>OBSERVATION / TERRAIN<br>ALGÉRIE · 2026</div><div class="photo"><img id="field-image" src="../assets/home-hyphae.jpg" alt="Réseau d'hyphes fongiques observé en gros plan"><div class="photo-caption"><b id="field-caption">Réseaux fongiques</b><small id="field-subcaption">MYCOLOGIE · STRUCTURES VIVANTES</small></div></div><div class="scale-switch" aria-label="Changer d'observation"><button type="button" data-photo="fungi" aria-pressed="true">01 · MYCOLOGIE</button><button type="button" data-photo="micro" aria-pressed="false">02 · MICROBIO</button><button type="button" data-photo="soil" aria-pressed="false">03 · SOL & RACINES</button><button type="button" data-photo="culture" aria-pressed="false">04 · CULTURE</button></div></div>
 </div>
-<div class="field-ledger" id="field-ledger"><article class="ledger-item"><small>NOTE 001 / OBSERVER</small><b>Décrire avant d'agir.</b><p>Documenter les organismes, les matières et les conditions expérimentales.</p></article><article class="ledger-item"><small>NOTE 002 / EXPÉRIMENTER</small><b>Mesurer les écarts.</b><p>Comparer les protocoles, suivre les paramètres et conserver les limites observées.</p></article><article class="ledger-item"><small>NOTE 003 / APPLIQUER</small><b>Revenir au terrain.</b><p>Relier les résultats aux usages agricoles, environnementaux et industriels.</p></article></div>
-<div class="field-note"><span><strong>Une démarche située.</strong> Sétif, Algérie — recherche appliquée et ingénierie frugale.</span><span>Prototype B / 02</span></div>
-</div>
-</section>
-
+<div class="domains" id="domains-field"><div class="domain"><small>01 / BIOLOGIE</small><b>Microbiologie</b><span>Organismes, cultures et interactions biologiques.</span></div><div class="domain"><small>02 / MYCOLOGIE</small><b>Sciences fongiques</b><span>Mycélium, bioprocédés et valorisation des matières.</span></div><div class="domain"><small>03 / ÉCOLOGIE</small><b>Sols & environnement</b><span>Ressources, régénération et remédiation.</span></div><div class="domain"><small>04 / INGÉNIERIE</small><b>Technologies appliquées</b><span>Instrumentation, automatisation et données.</span></div></div>
+<div class="bottomline"><span>Recherche appliquée · Ingénierie frugale</span><span>Direction 02 / 03</span></div>
+</div></section>
 <section class="prototype" id="atlas" aria-label="Direction Technical Atlas">
-<div class="atlas-wrap">
-<header class="atlas-nav"><a class="brand" href="#">BA LABS <small>RESEARCH SYSTEMS / DZ</small></a><nav><a href="#atlas-data">PLATFORM</a><a href="#atlas-data">METHODS</a><a href="#atlas-data">DATA</a></nav><span class="kicker">03 — Technical atlas</span></header>
-<div class="atlas-hero">
-<div class="atlas-copy"><div class="kicker">Applied biology / Frugal engineering</div><h1>Science,<br>mise en <em>œuvre.</em></h1><p>Des systèmes biologiques aux procédés expérimentaux. Une plateforme de recherche qui relie observation, instrumentation, données et applications.</p><a class="btn" href="#atlas-data">Explorer les systèmes <span>↗</span></a></div>
-<div class="system"><div class="system-head"><span>Architecture de principe / cycle expérimental</span><span>Schéma 001</span></div>
-<svg class="system-svg" viewBox="0 0 720 390" role="img" aria-label="Schéma de principe d'un cycle expérimental : matière, culture, contrôle et observation">
-<path class="fine" d="M24 195H696M360 16V374"/>
-<path class="line" d="M120 190H250M470 190H600M360 100V150M360 230V290"/>
-<path class="line" d="M236 182l14 8-14 8M586 182l14 8-14 8M352 136l8 14 8-14M352 276l8 14 8-14"/>
-<rect x="32" y="130" width="190" height="120" rx="2" fill="#e3ece7" stroke="#7c9d92"/>
-<rect x="250" y="130" width="220" height="120" rx="2" fill="#d7e8df" stroke="#477c75" stroke-width="2"/>
-<rect x="498" y="130" width="190" height="120" rx="2" fill="#e3ece7" stroke="#7c9d92"/>
-<circle class="node" cx="360" cy="76" r="24"/><circle class="active" cx="360" cy="314" r="24"/>
-<text x="127" y="166" text-anchor="middle">01 / MATIÈRE</text><text class="tiny" x="127" y="190" text-anchor="middle">substrat · eau · milieu</text><text class="tiny" x="127" y="208" text-anchor="middle">préparation & traçabilité</text>
-<text x="360" y="166" text-anchor="middle">02 / CULTURE</text><text class="tiny" x="360" y="190" text-anchor="middle">organismes · conditions</text><text class="tiny" x="360" y="208" text-anchor="middle">croissance & transformation</text>
-<text x="593" y="166" text-anchor="middle">03 / CONTRÔLE</text><text class="tiny" x="593" y="190" text-anchor="middle">capteurs · mesures</text><text class="tiny" x="593" y="208" text-anchor="middle">suivi des paramètres</text>
-<text x="360" y="42" text-anchor="middle">OBSERVATION</text><text class="tiny" x="360" y="80" text-anchor="middle">analyse</text><text x="360" y="354" text-anchor="middle">ITÉRATION</text><text class="tiny" x="360" y="374" text-anchor="middle">documentation</text>
-</svg>
-<div class="atlas-steps"><button data-step="0" aria-pressed="true">01 / MATIÈRE</button><button data-step="1" aria-pressed="false">02 / CULTURE</button><button data-step="2" aria-pressed="false">03 / CONTRÔLE</button><button data-step="3" aria-pressed="false">04 / ANALYSE</button></div></div>
+<div class="wrap">
+<header class="mast"><span class="eyebrow">BA Labs / système de recherche</span><nav><span>Protocoles</span><span>Domaines</span><span>Mesures</span></nav><span class="eyebrow">Sétif · DZ</span></header>
+<div class="hero">
+<div><div class="eyebrow">Biologie · Ingénierie · Environnement</div><h1 class="hero-title">Du vivant<br>à l’<em>application.</em></h1><p class="lede">Nous étudions les organismes, les matières et les milieux pour concevoir des solutions biologiques et technologiques adaptées aux réalités du terrain.</p><a class="cta" href="#domains-atlas">Découvrir nos domaines <span>↗</span></a></div>
+<div class="visual"><div class="photo"><img id="atlas-image" src="../assets/home-hyphae.jpg" alt="Réseau d'hyphes fongiques observé en gros plan"><div class="photo-caption"><b id="atlas-caption">RÉSEAUX FONGIQUES</b><small id="atlas-subcaption">MYCOLOGIE / STRUCTURES VIVANTES</small></div></div><div class="frame"></div><div class="scale-switch" aria-label="Sélectionner une couche"><button type="button" data-photo="fungi" aria-pressed="true">LAYER 01 / MYCOLOGIE</button><button type="button" data-photo="micro" aria-pressed="false">LAYER 02 / MICROBIO</button><button type="button" data-photo="soil" aria-pressed="false">LAYER 03 / SOL & RACINES</button><button type="button" data-photo="culture" aria-pressed="false">LAYER 04 / CULTURE</button></div></div>
 </div>
-<div class="atlas-data" id="atlas-data"><div><small>SYS.01</small><b>Microbiologie</b><span>Organismes & interactions</span></div><div><small>SYS.02</small><b>Bioprocédés</b><span>Cultures & transformations</span></div><div><small>SYS.03</small><b>Instrumentation</b><span>Mesure & contrôle</span></div><div><small>SYS.04</small><b>Environnement</b><span>Sol, eau & ressources</span></div></div>
-<div class="atlas-note"><strong>Note :</strong> schéma conceptuel destiné à illustrer la démarche de recherche. Il ne représente pas un équipement commercialisé ni un procédé validé.</div>
-</div>
-</section>
+<div class="domains" id="domains-atlas"><div class="domain"><small>SYS.01 / BIOLOGIE</small><b>Microbiologie</b><span>Organismes, cultures et interactions biologiques.</span></div><div class="domain"><small>SYS.02 / MYCOLOGIE</small><b>Sciences fongiques</b><span>Mycélium, bioprocédés et valorisation des matières.</span></div><div class="domain"><small>SYS.03 / ÉCOLOGIE</small><b>Sols & environnement</b><span>Ressources, régénération et remédiation.</span></div><div class="domain"><small>SYS.04 / INGÉNIERIE</small><b>Technologies appliquées</b><span>Instrumentation, automatisation et données.</span></div></div>
+<div class="bottomline"><span>Recherche appliquée · Ingénierie frugale</span><span>Direction 03 / 03</span></div>
+</div></section>
 </main>
 <script>
 (()=>{
-const buttons=[...document.querySelectorAll('[data-view]')],sections=[...document.querySelectorAll('.prototype')];
-buttons.forEach(b=>b.addEventListener('click',()=>{buttons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));sections.forEach(s=>s.classList.toggle('active',s.id===b.dataset.view));window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}));
-const scales={
- fungi:['../assets/home-hyphae.jpg','Réseaux fongiques','MICROSCOPIE · STRUCTURES VIVANTES'],
+const views=[...document.querySelectorAll('[data-view]')],sections=[...document.querySelectorAll('.prototype')];
+views.forEach(button=>button.addEventListener('click',()=>{
+ views.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+ sections.forEach(section=>section.classList.toggle('active',section.id===button.dataset.view));
+ window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}));
+const photos={
+ fungi:['../assets/home-hyphae.jpg','Réseaux fongiques','MYCOLOGIE · STRUCTURES VIVANTES'],
  micro:['../assets/home-penicillium.jpg','Morphologies microbiennes','MICROBIOLOGIE · CULTURES'],
  soil:['../assets/editorial-soil.jpg','Interfaces sol–racines','SOL · MINÉRAUX · INTERACTIONS'],
- crop:['../assets/home-substrate.jpg','Matière & culture','SUBSTRAT · CROISSANCE · APPLICATION']
+ culture:['../assets/home-substrate.jpg','Matière & culture','SUBSTRAT · CROISSANCE · APPLICATION']
 };
-document.querySelectorAll('[data-scale]').forEach(b=>b.addEventListener('click',()=>{const d=scales[b.dataset.scale];const img=document.getElementById('living-image');img.style.opacity='.2';setTimeout(()=>{img.src=d[0];img.alt=d[1];document.getElementById('living-caption').textContent=d[1];document.getElementById('living-subcaption').textContent=d[2];img.style.opacity='1'},160);document.querySelectorAll('[data-scale]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
-const layers={
- soil:['../assets/editorial-soil.jpg','Observer le milieu.','STRUCTURE · MATIÈRE · INTERACTIONS'],
- fungi:['../assets/home-hyphae.jpg','Suivre les organismes.','MORPHOLOGIE · RÉSEAUX · CROISSANCE'],
- substrate:['../assets/home-substrate.jpg','Étudier les supports.','SUBSTRAT · HUMIDITÉ · TRANSFORMATION']
-};
-document.querySelectorAll('[data-layer]').forEach(b=>b.addEventListener('click',()=>{const d=layers[b.dataset.layer];const img=document.getElementById('field-image');img.style.opacity='.25';setTimeout(()=>{img.src=d[0];img.alt=d[1];document.getElementById('field-caption').textContent=d[1];document.getElementById('field-subcaption').textContent=d[2];img.style.opacity='1'},160);document.querySelectorAll('[data-layer]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
-const stepCopy=[
-'01 / MATIÈRE — Préparer, identifier et tracer les matières premières et les milieux.',
-'02 / CULTURE — Définir les organismes et documenter les conditions de culture.',
-'03 / CONTRÔLE — Suivre les paramètres utiles avec une instrumentation adaptée.',
-'04 / ANALYSE — Comparer les essais, consigner les résultats et améliorer le protocole.'
-];
-document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-step]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));const n=Number(b.dataset.step);const svg=document.querySelector('.system-svg');svg.style.opacity='.55';setTimeout(()=>{svg.style.opacity='1';svg.setAttribute('aria-label',stepCopy[n]);},120);let note=document.querySelector('.atlas-note');note.innerHTML='<strong>Étape sélectionnée :</strong> '+stepCopy[n]+' <span style="color:#718984">— schéma conceptuel, non équipement réel.</span>';}));
+document.querySelectorAll('.prototype').forEach(section=>{
+ const prefix=section.id;
+ section.querySelectorAll('[data-photo]').forEach(button=>button.addEventListener('click',()=>{
+  const data=photos[button.dataset.photo];
+  const img=section.querySelector('#'+prefix+'-image');
+  img.style.opacity='.18';
+  window.setTimeout(()=>{
+   img.src=data[0];img.alt=data[1];
+   section.querySelector('#'+prefix+'-caption').textContent=prefix==='atlas'?data[1].toUpperCase():data[1];
+   section.querySelector('#'+prefix+'-subcaption').textContent=prefix==='atlas'?data[2].replace(' · ',' / '):data[2];
+   img.style.opacity='1';
+  },120);
+  section.querySelectorAll('[data-photo]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+ }));
+});
 })();
 </script>
 </body>
