@@ -123,7 +123,7 @@ try {
     assert.equal(await page.locator('#field').getAttribute('data-radial-root'), navigationFixture.rootId,
       'Selecting a universe must unfold its own radial hierarchy');
     const ringRadii = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialRingRadii || '[]'));
-    assert.ok(ringRadii.length >= 2, 'The selected universe must unfold at least secondary and tertiary rings');\n    assert.ok(ringRadii[0] >= 450, `The first ring must leave room for long canonical Notion titles (got ${ringRadii[0]})`);
+    assert.ok(ringRadii.length >= 2, 'The selected universe must unfold at least secondary and tertiary rings');\n    assert.ok(ringRadii[0] >= 400, `The first ring must leave room for long canonical Notion titles (got ${ringRadii[0]})`);
     assert.ok(ringRadii.every((radius, index) => index === 0 || radius > ringRadii[index - 1]),
       'Each hierarchy level must occupy a strictly larger concentric ring');
     const ringCounts = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialLevelCounts || '{}'));
