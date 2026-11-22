@@ -86,6 +86,10 @@ assert.ok(explorer.includes('Expected 8 universes') && explorer.includes('functi
 assert.ok(explorer.includes('root.academyUniverseId') && explorer.includes('rootLayoutIds:canonicalOrder'), 'The public 2D engine must map scientific Notion roots onto explicit Academy universe identities');
 assert.ok(explorer.includes('function activateNode(n)') && explorer.includes('window.open(url,"_blank","noopener,noreferrer")'), 'A double-clicked point must open its exact Notion destination');
 assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('window.addEventListener("click"') && explorer.includes('e.detail<2'), 'Point activation must preserve single-click selection and double-click opening');
+const railMarkup = html.match(/<nav class="universe-rail"[\\s\\S]*?<\\/nav>/)?.[0] || '';
+const canonicalRailOrder = ['microbiology','bioprocesses','instrumentation','plants','physical','biomaterials','digital','ecology'];
+assert.deepEqual([...railMarkup.matchAll(/data-universe="([^"]+)"/g)].map(match => match[1]), canonicalRailOrder, 'The public navigation rail must follow the Academy canonical universe order');
+assert.ok(canonicalRailOrder.every(id => html.includes(`button[data-universe="\${id}"]{--dot:`)), 'Each public universe rail marker must use its Academy-matched palette color');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
 for (const id of expectedExplorerDomains) assert.ok(universeEntry.includes("'" + id + "'"), 'Direct universe routing must allow ' + id);
 for (const id of expectedExplorerDomains) {
