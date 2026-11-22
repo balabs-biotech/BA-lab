@@ -20,14 +20,15 @@ export async function createPixiRenderer(canvas){
   if(level===0)return 1;
   const thresholds=[0,.65,1.15,1.8,2.6,3.6,4.8,6.2,7.8,9.6];
   const t=thresholds[Math.min(level,thresholds.length-1)];
+  const revealScale=cameraScale*(focusedView?1.45:1);
   // Every depth contributes to the global mycelium silhouette; each zoom
   // progressively resolves another layer into visible branches and junctions.
   const trace=.022*Math.pow(.78,Math.max(0,level-1));
-  return clamp(trace+smooth(t*1.3,t*2.4,cameraScale)*.88,0,1);
+  return clamp(trace+smooth(t*1.3,t*2.4,revealScale)*.88,0,1);
  };
- let cameraScale=1;
+ let cameraScale=1,focusedView=false;
  function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core,radialRings=[]}){
-  cameraScale=scale;
+  cameraScale=scale;focusedView=Boolean(selected);
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
   const biome=selected?(PALETTE[selected.rootId]||0x78958a):0x78958a;
@@ -125,7 +126,7 @@ export async function createPixiRenderer(canvas){
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
    const thresholds=[0,1.2,2.0,3.0,4.2,5.5,7.0,8.6,10.2];const threshold=thresholds[Math.min(n.level,thresholds.length-1)]||0;
-   const show=n.level===0||(alpha>.38&&scale>threshold)||lineage.has(n.id);
+   const revealScale=scale*(selected?1.45:1);const show=n.level===0||(alpha>.38&&revealScale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
