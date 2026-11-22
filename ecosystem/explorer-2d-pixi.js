@@ -105,7 +105,7 @@ export async function createPixiRenderer(canvas){
   if(!coreText){coreText=new Text({text:"MYCOLOGY",style:style.clone()});labelPool.set("__mycology-core",coreText);labels.addChild(coreText);}
   coreText.text=core?.title||"MYCOLOGY";coreText.style.fontSize=12.5;coreText.style.fontWeight="700";coreText.anchor.set(.5,0);
   coreText.position.set(coreScreen.x,coreScreen.y+39);coreText.alpha=.96;
-  coreText.visible=coreScreen.x>-100&&coreScreen.x<width+100&&coreScreen.y>-70&&coreScreen.y<height+70;
+  coreText.visible=!selected&&coreScreen.x>-100&&coreScreen.x<width+100&&coreScreen.y>-70&&coreScreen.y<height+70;
   if(coreText.visible)live.add("__mycology-core");
   const candidates=[];
   for(const n of nodes){
