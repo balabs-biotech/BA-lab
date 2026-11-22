@@ -143,7 +143,7 @@ try {
     await page.mouse.dblclick(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
     assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
-    await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
