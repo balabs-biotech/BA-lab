@@ -214,10 +214,11 @@ try {
       assert.ok(catalogueLayout.paragraphs.length > 0 && catalogueLayout.paragraphs.every(p => p.width > catalogueLayout.viewportWidth * .65 && p.writingMode === 'horizontal-tb'), 'Mobile catalogue copy must remain horizontal and readable, not stretched into a narrow vertical strip');
     }
     const originalUrl = page.url();
-    const nextChapter = page.locator('.experience-controls button').nth(1);
-    await nextChapter.click();
+    const researchChapter = page.locator('.neural-node[data-index="1"]');
+    await researchChapter.click();
     await page.waitForFunction(() => document.querySelector('#chapter-research')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
-    await nextChapter.click();
+    const networkChapter = page.locator('.neural-node[data-index="2"]');
+    await networkChapter.click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
     await page.locator('#chapter-network a[data-domain-page="microbiology"]').click();
     await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === '🧫 Microbiologie & sciences cellulaires', undefined, { timeout: 15000 });
