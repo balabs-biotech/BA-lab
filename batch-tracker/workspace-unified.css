@@ -1,5 +1,6 @@
 @import url("./styles/design-tokens.css?v=20261116-interior-pass-1");
 @import url("./styles/workspace-components.css?v=20261117-global-visual-system-1");
+@import url("./styles/workspace-spatial-navigation.css?v=20261117-spatial-navigation-1");
 @import url("./styles/mycology-workspace.css?v=20261117-pixi-graph-controls-159");
 @import url("./styles/laboratory-workspace.css?v=20261117-analytics-1");
 @import url("./styles/greentech-workspace.css?v=20261117-ndvi-chart-1");

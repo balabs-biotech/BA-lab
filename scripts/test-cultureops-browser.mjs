@@ -91,6 +91,69 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: workspace shell or authentication panel did not render`);
       }
 
+      // Exercise the four-direction module navigator with synthetic visible
+      // panels; no real Supabase session or tenant data is required.
+      await page.locator(".ba-spatial-dock").waitFor({ state: "attached", timeout: 15000 }).catch(() => {
+        failures.push(`${workspace.slug}/${viewport.name}: spatial navigation dock was not created`);
+      });
+      if (await page.locator(".ba-spatial-dock").count()) {
+        const navigationResult = await page.evaluate(async () => {
+          const dock = document.querySelector(".ba-spatial-dock");
+          const domain = document.body.dataset.domain;
+          const map = {
+            agronomy: { primary: ["overviewCard", "plantCard"], secondary: ["measurementCard", "statisticsCard"] },
+            mycology: { primary: ["overviewCard", "trackerCard"], secondary: ["measurementCard", "statisticsCard"] },
+            laboratory: { primary: ["overviewCard", "trackerCard", "batchCard"], secondary: ["measurementCard", "statisticsCard"] }
+          }[domain];
+          if (!dock || !map || typeof window.activateWorkspaceModule !== "function") {
+            return { ready: false, reason: "dock, domain map or module activation function missing" };
+          }
+          const ids = [...map.primary, ...map.secondary];
+          const originalClasses = new Map(ids.map(id => [id, document.getElementById(id)?.className || ""]));
+          document.body.classList.add("workspace-authenticated");
+          ids.forEach(id => document.getElementById(id)?.classList.remove("hidden"));
+          const pause = () => new Promise(resolve => setTimeout(resolve, 40));
+          const active = () => ids.find(id => {
+            const panel = document.getElementById(id);
+            return panel && !panel.classList.contains("workspace-inactive") && !panel.classList.contains("hidden");
+          });
+          const steps = [];
+          const move = async direction => {
+            const button = dock.querySelector(`[data-ba-direction="${direction}"]`);
+            if (!button || button.disabled) {
+              steps.push({ direction, disabled: true, active: active() });
+              return;
+            }
+            button.click();
+            await pause();
+            steps.push({ direction, active: active(), title: dock.querySelector("#baSpatialTitle")?.textContent?.trim() });
+          };
+          window.activateWorkspaceModule(map.primary[0]);
+          await pause();
+          for (const direction of domain === "laboratory"
+            ? ["right", "right", "down", "up", "left", "left"]
+            : ["right", "down", "up", "left"]) await move(direction);
+          const expected = domain === "agronomy"
+            ? ["plantCard", "statisticsCard", "plantCard", "overviewCard"]
+            : domain === "mycology"
+              ? ["trackerCard", "statisticsCard", "trackerCard", "overviewCard"]
+              : ["trackerCard", "batchCard", "statisticsCard", "batchCard", "trackerCard", "overviewCard"];
+          const actual = steps.map(step => step.active);
+          const passed = steps.length === expected.length && actual.every((id, index) => id === expected[index]);
+          ids.forEach(id => {
+            const panel = document.getElementById(id);
+            if (panel) panel.className = originalClasses.get(id);
+          });
+          document.body.classList.remove("workspace-authenticated");
+          window.scrollTo(0, 0);
+          await pause();
+          return { ready: true, passed, expected, actual, steps };
+        });
+        if (!navigationResult.ready || !navigationResult.passed) {
+          failures.push(`${workspace.slug}/${viewport.name}: spatial navigation sequence failed ${JSON.stringify(navigationResult)}`);
+        }
+      }
+
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
