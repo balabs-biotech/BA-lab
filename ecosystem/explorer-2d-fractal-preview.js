@@ -25,7 +25,7 @@ function draw(){
  const b=geometry.bounds,gw=Math.max(1,b.maxX-b.minX),gh=Math.max(1,b.maxY-b.minY);
  const fit=Math.min((w-100)/gw,(h-100)/gh,1.8);
  const s=fit*scale,ox=w/2-(b.minX+b.maxX)/2*s+offset.x,oy=h/2-(b.minY+b.maxY)/2*s+offset.y;
- drawing.position.set(ox,oy);drawing.scale.set(s);labels.position.set(ox,oy);labels.scale.set(s);
+ drawing.position.set(ox,oy);drawing.scale.set(s);labels.position.set(0,0);labels.scale.set(1);
  // Fine biological background texture.
  for(let i=0;i<30;i++){const x=((i*7919)%997)/997*gw+b.minX,y=((i*3571)%991)/991*gh+b.minY;drawing.circle(x,y,0.65/s).fill({color:0x78958a,alpha:.16});}
  // Branches are continuous Bezier hyphae, not links between independent dots.
@@ -60,11 +60,11 @@ function draw(){
   drawing.circle(terminal.x,terminal.y,tip*.72).fill({color:0xb96b4d,alpha:.78});
  }
  const title=new Text({text:treeNode.title||"Branche",style:labelStyle});
- title.anchor.set(.5,1);title.position.set(geometry.origin.x,geometry.origin.y-18);labels.addChild(title);
+ title.anchor.set(.5,1);title.position.set(ox+geometry.origin.x*s,oy+(geometry.origin.y-18)*s);labels.addChild(title);
  const labelCandidates=geometry.terminals.filter((_,i)=>i%Math.max(1,Math.ceil(geometry.terminals.length/18))===0);
  for(const leaf of labelCandidates){
   const text=new Text({text:leaf.title,style:labelStyle.clone()});
-  text.style.fontSize=10;text.anchor.set(.5,0);text.position.set(leaf.x,leaf.y+5);labels.addChild(text);
+  text.style.fontSize=10;text.anchor.set(.5,0);text.position.set(ox+leaf.x*s,oy+(leaf.y+5)*s);labels.addChild(text);
  }
 }
 const response=await fetch("./notion-tree.fr.json");
