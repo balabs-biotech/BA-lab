@@ -224,6 +224,15 @@ try {
       assert.equal(await page.locator('#language').inputValue(), language);
       const languageNodeCount = Number(await page.locator('#field').getAttribute('data-node-count') || 0);
       assert.ok(languageNodeCount >= 100, `The ${language} tree must retain at least 100 mapped Notion nodes (got ${languageNodeCount})`);
+      // Verify that the in-panel hierarchy path is generated from the active
+      // language's canonical tree, not only from the French fixture.
+      const localizedBranch = page.locator('#accessibleNodes button[data-level="1"]').first();
+      await localizedBranch.focus();
+      await localizedBranch.press('Enter');
+      await page.waitForFunction(() => Boolean(document.querySelector('#selection .selection-path')));
+      const localizedPath = await page.locator('#selection .selection-path').innerText();
+      assert.ok(localizedPath.includes(await localizedBranch.getAttribute('data-notion-title')),
+        `The ${language} selection path must include the canonical selected branch title`);
     }
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(consoleErrors, [], 'No browser console errors');
