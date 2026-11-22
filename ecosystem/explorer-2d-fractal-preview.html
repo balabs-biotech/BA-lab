@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111b1d">
+<title>BA Labs — Prototype de croissance fractale</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111b1d;color:#d1d0c5;font-family:Inter,system-ui,sans-serif}
+main{height:100%;display:grid;grid-template-rows:auto 1fr}.bar{padding:14px 18px;border-bottom:1px solid #78958a33;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#111b1dee;z-index:2}.bar strong{font-size:12px;letter-spacing:.18em}.bar small{display:block;color:#91a79a;font-size:10px;margin-top:4px}.bar a{color:#b96b4d;font-size:11px}#view{position:relative;min-height:0}canvas{display:block;width:100%;height:100%;touch-action:none}.note{position:absolute;left:16px;bottom:14px;max-width:min(420px,calc(100% - 32px));font-size:10px;line-height:1.5;color:#9bada2;background:#111b1dcc;padding:9px 12px;border:1px solid #78958a33;border-radius:8px;pointer-events:none}.status{position:absolute;right:16px;bottom:14px;font-size:10px;color:#d1d0c5;background:#111b1dcc;padding:9px 12px;border-radius:8px;pointer-events:none}
+</style>
+</head>
+<body><main><header class="bar"><div><strong>BA LABS / FRACTAL GROWTH</strong><small>Prototype isolé · une branche réelle du catalogue Notion</small></div><a href="./explorer-2d.html">Retour à l’Atlas 2D ↗</a></header><section id="view"><div class="note" id="note">Chargement de la branche…</div><div class="status" id="status">PIX IJS · TEST GÉOMÉTRIQUE</div></section></main>
+<script type="importmap">{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}</script>
+<script type="module" src="./explorer-2d-fractal-preview.js"></script>
+</body></html>
