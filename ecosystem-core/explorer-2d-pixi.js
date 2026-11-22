@@ -31,7 +31,7 @@ export async function createPixiRenderer(canvas){
    const bend=Math.min(58,len*.19)*side*(.62+((seed>>>5)&63)/100);
    const drift=(((seed>>>12)&255)/255-.5)*Math.min(24,len*.09);
    const cx=(a.x+b.x)/2-dy/len*bend+dx/len*drift,cy=(a.y+b.y)/2+dx/len*bend+dy/len*drift;
-   const color=PALETTE[e.a.rootId]||0x91a99b,widthBase=e.verified?1.2:e.cross?.55:Math.max(.45,(e.depth===1?1.5:e.depth===2?1.15:.85));
+   const color=PALETTE[e.a.colorKey||e.a.rootId]||0x91a99b,widthBase=e.verified?1.2:e.cross?.55:Math.max(.45,(e.depth===1?1.5:e.depth===2?1.15:.85));
    if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color,alpha:alpha*.12,width:widthBase*3.1,cap:"round"});
    filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color,alpha:alpha*(e.verified?.82:e.cross?.34:depth>=3?.42:depth===2?.62:.78),width:widthBase,cap:"round"});
    if(e.verified)junctions.circle(cx,cy,Math.max(1.25,1.8/Math.sqrt(scale))).fill({color:e.basis==="notion-link"?0xb96b4d:0x7eaaa3,alpha:.9});
@@ -43,7 +43,7 @@ export async function createPixiRenderer(canvas){
   }
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
-   const r=Math.max(1.25,n.r),color=PALETTE[n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
+   const r=Math.max(1.25,n.r),color=PALETTE[n.colorKey||n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
    if(n.level<=1)junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
    const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
    junctions.poly(polygon).fill({color:0x111b1d,alpha}).stroke({color,alpha:alpha*(n.level===0?.88:n.level===1?.68:.42),width:n.level===0?1.6:.9});
@@ -54,10 +54,10 @@ export async function createPixiRenderer(canvas){
   junctions.position.copyFrom(filaments.position);junctions.scale.set(scale);
   const live=new Set();
   const shortRoots={
-   fr:{bio:"BIOTECH",myco:"MYCO",soil:"TECHNOSOIL",lab:"LABO",products:"PRODUITS",iot:"IOT",work:"R&D",evidence:"PREUVES"},
-   en:{bio:"BIOTECH",myco:"MYCOLOGY",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUCTS",iot:"IOT",work:"PROJECTS",evidence:"EVIDENCE"},
-   ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",evidence:"الأدلة"},
-   pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS"}
+   fr:{bio:"BIOTECH",myco:"MYCO",soil:"TECHNOSOIL",lab:"LABO",products:"PRODUITS",iot:"IOT",work:"R&D",evidence:"PREUVES",microbiology:"MICROBIO",plants:"PLANTES",ecology:"ÉCO",bioprocesses:"PROCÉDÉS",biomaterials:"MATIÈRES",instrumentation:"INGÉ",digital:"NUMÉRIQUE",physical:"PHYSIQUE"},
+   en:{bio:"BIOTECH",myco:"MYCOLOGY",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUCTS",iot:"IOT",work:"PROJECTS",evidence:"EVIDENCE",microbiology:"MICROBIO",plants:"PLANTS",ecology:"ECOLOGY",bioprocesses:"BIOPROCESS",biomaterials:"BIOMATERIALS",instrumentation:"ENGINEERING",digital:"DIGITAL",physical:"PHYSICS"},
+   ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",evidence:"الأدلة",microbiology:"أحياء دقيقة",plants:"نباتات",ecology:"بيئة",bioprocesses:"عمليات حيوية",biomaterials:"مواد حيوية",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},
+   pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS",microbiology:"MICROBIO",plants:"PLANTAS",ecology:"ECOLOGIA",bioprocesses:"BIOPROCESSOS",biomaterials:"BIOMATERIAIS",instrumentation:"ENGENHARIA",digital:"DIGITAL",physical:"FÍSICA"}
   };
   const candidates=[];
   const byId=new Map(nodes.map(n=>[n.id,n]));
@@ -67,14 +67,14 @@ export async function createPixiRenderer(canvas){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
-   const threshold=n.level===0?0:n.level===1?.72:n.level===2?1.3:n.level===3?2.55:4.3;
+   const threshold=n.level===0?0:n.level===1?.6:n.level===2?1.3:n.level===3?2.55:4.3;
    const show=n.level===0||(alpha>.5&&scale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
   const rootCount=candidates.filter(c=>c.n.level===0).length;
   const labelBudget=rootCount+Math.min(34,Math.max(8,Math.round(10+scale*5)));
-  const occupied=[];let drawn=0;
+  const occupied=[];const hitBoxes={};let drawn=0;
   for(const {n,alpha} of candidates){
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
@@ -90,9 +90,16 @@ export async function createPixiRenderer(canvas){
    const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
    if(collides&&selected?.id!==n.id&&n.level!==0){label.visible=false;continue;}
-   occupied.push(box);live.add(n.id);drawn++;
+   occupied.push(box);hitBoxes[n.id]=box;live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
+  canvas.dataset.visibleNodeIds=JSON.stringify([...live]);
+  canvas.dataset.visibleNodeHitBoxes=JSON.stringify(hitBoxes);
+  canvas.dataset.labelCandidateCount=String(candidates.length);
+  canvas.dataset.labelLiveCount=String(live.size);
+  canvas.dataset.rootCandidateCount=String(rootCount);
+  canvas.dataset.viewportWidth=String(width);
+  canvas.dataset.viewportHeight=String(height);
   app.render();
  }
  return{render,resize,destroy:()=>app.destroy({removeView:false,children:true})};

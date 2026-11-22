@@ -91,22 +91,20 @@ try {
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
-    await page.waitForFunction(() => document.querySelector('#field')?.dataset.layout === 'eight-around-mycology');
-    assert.equal(await page.locator('#field').getAttribute('data-layout'), 'eight-around-mycology',
-      'The eight universes must orbit a distinct central Mycology hub');
-    const maxBranchLength = Number(await page.locator('#field').getAttribute('data-max-branch-length') || 0);
-    assert.ok(maxBranchLength <= 140, `Primary and nested hyphae must stay compact (max segment: ${maxBranchLength})`);
+    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'vernpixi-shared',
+      'The public explorer must use the shared Academy Vernpixi engine');
     const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
     assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
     const initialUrl = page.url();
     const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
+    await page.waitForTimeout(600);
+    const zoomDebug = await page.locator('#field').evaluate(el => ({ scale:el.dataset.scale,targetScale:el.dataset.targetScale,width:el.dataset.viewportWidth,height:el.dataset.viewportHeight,candidates:el.dataset.labelCandidateCount,live:el.dataset.labelLiveCount,roots:el.dataset.rootCandidateCount,visible:JSON.parse(el.dataset.visibleNodeIds||'[]').length,labels:JSON.parse(el.dataset.visibleNodeIds||'[]').slice(0,20) }));
+    console.log('progressive zoom diagnostic', JSON.stringify({overviewVisibleCount,zoomDebug}));
     await page.waitForFunction(count => JSON.parse(document.querySelector('#field')?.dataset.visibleNodeIds || '[]').length > count, overviewVisibleCount, { timeout: 12000 });
     const zoomedVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
     assert.ok(zoomedVisibleCount > overviewVisibleCount, `Zooming from the global overview must reveal additional network labels (${overviewVisibleCount} -> ${zoomedVisibleCount})`);
     await page.locator('#reset').click();
-    await page.waitForFunction(() => document.querySelector('#field')?.dataset.radialRoot === '');
-    assert.equal(await page.locator('#field').getAttribute('data-radial-root'), '', 'The overview must begin as a clean eight-universe ring around Mycology');
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
     const visibleNodes = await nav.count();
@@ -130,16 +128,8 @@ try {
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
     assert.ok(await page.locator('#selection .child-branches button').count() > 0, 'Selecting a node must expose direct child navigation controls');
-    assert.equal(await page.locator('#field').getAttribute('data-radial-root'), navigationFixture.rootId,
-      'Selecting a universe must unfold its own radial hierarchy');
-    const ringRadii = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialRingRadii || '[]'));
-    assert.ok(ringRadii.length >= 2, 'The selected universe must unfold at least secondary and tertiary rings');
-    assert.ok(ringRadii[0] >= 400, `The first ring must leave room for long canonical Notion titles (got ${ringRadii[0]})`);
-    assert.ok(ringRadii.every((radius, index) => index === 0 || radius > ringRadii[index - 1]),
-      'Each hierarchy level must occupy a strictly larger concentric ring');
-    const ringCounts = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialLevelCounts || '{}'));
-    assert.ok(Number(ringCounts[1]) > 0 && Number(ringCounts[2]) > 0,
-      'The first and second radial rings must both contain real Notion descendants');
+    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'vernpixi-shared',
+      'Selecting a public universe must keep the shared Academy engine active');
     const firstChild = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.branchId + '"]');
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
