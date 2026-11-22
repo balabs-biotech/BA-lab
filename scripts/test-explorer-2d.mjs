@@ -96,11 +96,11 @@ try {
     const leafFixture = await page.evaluate(async () => {
       const data = await (await fetch('./notion-tree.fr.json')).json();
       let result = null;
-      const visit = (items, parent = null) => (items || []).forEach(node => {
-        if (!result && node.notionId && node.url && node.kind !== 'reference' && !(node.children || []).length && parent) {
-          result = { id: node.id, parentId: parent.id, url: node.url, title: node.title };
+      const visit = (items, visibleParent = null) => (items || []).forEach(node => {
+        if (!result && node.notionId && node.url && node.kind !== 'reference' && !(node.children || []).length && visibleParent) {
+          result = { id: node.id, parentId: visibleParent.id, parentTitle: visibleParent.title, url: node.url, title: node.title };
         }
-        visit(node.children, node);
+        visit(node.children, node.kind === 'section' ? visibleParent : node);
       });
       visit(data.domains);
       return result;
@@ -147,7 +147,7 @@ try {
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
-    assert.equal(await page.locator('#selection .selection-title').textContent(), await firstChild.innerText(), 'Back must restore the previously selected branch as well as the camera');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), leafFixture.parentTitle, 'Back must restore the visible parent branch of the selected leaf as well as the camera');
     assert.equal(await page.locator('#back').isDisabled(), false, 'Back must retain earlier selections in the navigation history');
     await page.locator('#back').click();
     assert.equal(await page.locator('#selection').innerText(), selectedRoot, 'A second Back must restore the selected universe root');
