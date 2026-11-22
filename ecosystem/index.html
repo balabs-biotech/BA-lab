@@ -5,9 +5,7 @@
 <script>
 (()=>{try{const saved=localStorage.getItem('balabs-language');if(['fr','en','ar','pt'].includes(saved)){document.documentElement.lang=saved;document.documentElement.dir=saved==='ar'?'rtl':'ltr'}}catch(_){}})();
 </script>
-<script>
-(()=>{try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!sessionStorage.getItem('balabs-intro-seen')&&!location.hash&&!new URLSearchParams(location.search).has('domain')){document.documentElement.classList.add('balabs-intro-pending');window.setTimeout(()=>document.documentElement.classList.remove('balabs-intro-pending'),5000)}}catch(_){}})();
-</script>
+
 <meta name="theme-color" content="#111B1D">
 <meta name="description" id="pageDescription" content="Explorez les huit univers BA Labs : microbiologie, sciences végétales, sols et environnement, bioprocédés, biomatières, instrumentation, numérique et sciences physiques.">
 <title>BALabs — Réseau vivant</title>
@@ -24,7 +22,7 @@
 <link rel="stylesheet" href="./visual-continuity.css?v=3">
 <link rel="stylesheet" href="./chapter-repair.css?v=36">
 <link rel="stylesheet" href="./chromatic-direction.css?v=5">
-<link rel="stylesheet" href="./desktop-home-refinement.css?v=11">\n<link rel="stylesheet" href="./petri-opening.css?v=1"><style>
+<link rel="stylesheet" href="./desktop-home-refinement.css?v=11">\n<style>
 #mainView,#miniView,.cluster-key{display:none!important}
 .scene{min-height:0;padding-bottom:clamp(34px,5vw,72px)}
 .scenehead{min-height:88px}
@@ -174,47 +172,7 @@ html[dir="rtl"] body > .chapter-rail{left:auto!important;right:max(0px,env(safe-
 </style>
 </head>
 <body>
-<div class="balabs-intro" id="balabsIntro" aria-label="BA Labs — ouverture" aria-live="off">
- <div class="balabs-intro-inner">
-  <svg class="balabs-petri" viewBox="0 0 760 500" role="img" aria-label="Boîte de Pétri en vue éclatée, colonie mycélienne">
-   <defs>
-    <radialGradient id="petriAgar" cx="50%" cy="38%" r="70%"><stop stop-color="#d7b77d" stop-opacity=".68"/><stop offset=".72" stop-color="#a96c3d" stop-opacity=".86"/><stop offset="1" stop-color="#70482f" stop-opacity=".96"/></radialGradient>
-    <linearGradient id="petriGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e4d6b0" stop-opacity=".52"/><stop offset=".25" stop-color="#8da99a" stop-opacity=".08"/><stop offset=".58" stop-color="#e7bd83" stop-opacity=".5"/><stop offset="1" stop-color="#dce8d7" stop-opacity=".16"/></linearGradient>
-    <filter id="petriGlow"><feGaussianBlur stdDeviation="5"/></filter>
-    <clipPath id="petriDisc"><ellipse cx="380" cy="255" rx="255" ry="75"/></clipPath>
-   </defs>
-   <g class="petri-lid">
-    <ellipse cx="380" cy="103" rx="263" ry="73" fill="#9eb8a5" fill-opacity=".035" stroke="#e5d7b5" stroke-opacity=".7" stroke-width="5"/>
-    <ellipse cx="380" cy="103" rx="249" ry="61" fill="url(#petriGlass)" stroke="#b9cbb8" stroke-opacity=".4" stroke-width="2"/>
-    <ellipse cx="380" cy="103" rx="263" ry="73" fill="none" stroke="#e4b47c" stroke-opacity=".5" stroke-width="2" filter="url(#petriGlow)"/>
-    <path d="M144 88 Q380 5 616 88" fill="none" stroke="#f2e7cb" stroke-opacity=".55" stroke-width="3"/>
-    <g fill="#e8d9b8" opacity=".55"><circle cx="180" cy="78" r="3"/><circle cx="236" cy="53" r="2"/><circle cx="554" cy="69" r="3"/><circle cx="600" cy="92" r="2"/></g>
-   </g>
-   <g class="petri-agar">
-    <ellipse cx="380" cy="255" rx="255" ry="75" fill="#d18a4b" opacity=".18" filter="url(#petriGlow)"/>
-    <ellipse cx="380" cy="248" rx="255" ry="75" fill="url(#petriAgar)" stroke="#e4b27a" stroke-width="3"/>
-    <ellipse cx="380" cy="235" rx="255" ry="75" fill="none" stroke="#f1c68e" stroke-opacity=".5" stroke-width="2"/>
-    <g clip-path="url(#petriDisc)" fill="none" stroke="#f4e7c8" stroke-linecap="round" stroke-linejoin="round">
-     <g class="petri-hyphae" pathLength="1" stroke-width="2.1" opacity=".88">
-      <path d="M380 250 C340 230 325 195 286 177 S225 159 184 128 M286 177 Q273 143 244 124 M286 177 Q252 185 220 211 M340 225 Q316 260 288 279 M380 250 Q411 206 438 177 T510 137 M438 177 Q456 145 490 120 M438 177 Q484 188 520 166 M410 235 Q450 265 486 280 M380 250 Q373 290 342 315 M380 250 Q405 292 433 322 M340 225 Q309 209 278 218 M410 235 Q444 213 475 224 M310 203 Q285 190 265 164 M470 193 Q500 197 526 216 M350 270 Q325 293 300 299 M420 270 Q448 298 470 311"/>
-      <path d="M184 128 Q160 112 141 116 M244 124 Q231 99 210 90 M220 211 Q194 218 177 241 M288 279 Q273 302 250 311 M510 137 Q535 114 560 118 M490 120 Q500 94 522 82 M520 166 Q548 170 567 190 M486 280 Q512 300 537 302 M342 315 Q324 337 300 343 M433 322 Q450 344 476 349 M278 218 Q251 226 234 249 M475 224 Q502 231 522 252"/>
-     </g>
-    </g>
-    <circle cx="380" cy="250" r="12" fill="#fff1d5" opacity=".72" filter="url(#petriGlow)"/>
-    <circle cx="380" cy="250" r="5" fill="#fff0d4"/>
-   </g>
-   <g class="petri-base">
-    <ellipse cx="380" cy="399" rx="263" ry="73" fill="#0a1210" fill-opacity=".35" stroke="#d8d9c0" stroke-opacity=".72" stroke-width="5"/>
-    <ellipse cx="380" cy="389" rx="249" ry="61" fill="url(#petriGlass)" stroke="#d5cba9" stroke-opacity=".46" stroke-width="2"/>
-    <path d="M120 398 Q380 475 640 398" fill="none" stroke="#dba66e" stroke-opacity=".72" stroke-width="3"/>
-    <path d="M139 414 Q380 486 621 414" fill="none" stroke="#a9bfae" stroke-opacity=".38" stroke-width="2"/>
-   </g>
-   <g fill="#d9a56e" opacity=".7"><circle cx="126" cy="246" r="2"/><circle cx="627" cy="236" r="2"/><circle cx="160" cy="326" r="1.5"/><circle cx="601" cy="318" r="1.5"/></g>
-  </svg>
-  <div class="balabs-intro-copy"><strong>BA LABS</strong><span>Biologie appliquée · Recherche · Ingénierie</span><div class="balabs-intro-line"></div></div>
- </div>
- <button class="balabs-intro-skip" type="button" data-intro-skip>Passer</button>
-</div>
+
 <div class="wrap balabs-ui" id="app" dir="ltr">
 <a class="skip-link" href="#main-content">Aller au contenu principal</a>
 <header class="top"><div class="brand"><div><strong>BALABS</strong><small id="brandSubtitle">Applied biotechnology · Sétif</small></div></div><div class="tools" role="group" aria-label="Choisir la langue"><button class="lang" lang="fr" aria-label="Français" data-lang="fr" aria-pressed="true">🇫🇷 FR</button><button class="lang" lang="en" aria-label="English" data-lang="en" aria-pressed="false">🇬🇧 EN</button><button class="lang" lang="ar" aria-label="العربية" data-lang="ar" aria-pressed="false">🇩🇿 العربية</button><button class="lang" lang="pt" aria-label="Português" data-lang="pt" aria-pressed="false">🇵🇹 PT</button></div></header><nav class="site-nav" id="siteNavigation" aria-label="Navigation principale"><a href="#accueil" data-i18n="navHome">Accueil</a><a href="#a-la-une" data-i18n="navFeatured">À la une</a><a href="#a-propos" data-i18n="navAbout">À propos</a><a href="#chantiers" data-i18n="navWork">Chantiers</a><a href="#demarche" data-i18n="navMethod">Méthode</a><a href="#product-catalogue" data-i18n="navCatalogue">Catalogue</a><a href="../store/index.html" data-i18n="navStore">Boutique</a>
@@ -723,7 +681,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script src="./vengeance-adaptation.js?v=3"></script>
 <script type="importmap">{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}</script>
 <script type="module" src="./explorer-2d.js?v=scientific-universes-1"></script>
-<script src="./motion-system.js?v=14" defer></script>\n<script src="./petri-opening.js?v=1" defer></script>
+<script src="./motion-system.js?v=14" defer></script>\n
 
 
 <script>
