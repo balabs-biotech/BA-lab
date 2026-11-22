@@ -98,6 +98,9 @@ try {
     const initialUrl = page.url();
     const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
+    await page.waitForTimeout(600);
+    const zoomDebug = await page.locator('#field').evaluate(el => ({ scale:el.dataset.scale,targetScale:el.dataset.targetScale,visible:JSON.parse(el.dataset.visibleNodeIds||'[]').length,labels:JSON.parse(el.dataset.visibleNodeIds||'[]').slice(0,20) }));
+    console.log('progressive zoom diagnostic', JSON.stringify({overviewVisibleCount,zoomDebug}));
     await page.waitForFunction(count => JSON.parse(document.querySelector('#field')?.dataset.visibleNodeIds || '[]').length > count, overviewVisibleCount, { timeout: 12000 });
     const zoomedVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
     assert.ok(zoomedVisibleCount > overviewVisibleCount, `Zooming from the global overview must reveal additional network labels (${overviewVisibleCount} -> ${zoomedVisibleCount})`);
