@@ -17,7 +17,7 @@ export async function createPixiRenderer(canvas){
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
  const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
  let cameraScale=1;
- function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now()}){
+ function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core}){
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
@@ -31,6 +31,21 @@ export async function createPixiRenderer(canvas){
   }
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
+  // Eight restrained hyphal spokes converge on the central Mycology hub.
+  const roots=nodes.filter(n=>n.level===0);
+  for(const root of roots){
+   const dx=root.x,dy=root.y,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
+   filaments.moveTo(0,0).quadraticCurveTo(dx*.48+nx*18,dy*.48+ny*18,root.x,root.y)
+    .stroke({color:0x78958a,alpha:.24,width:1.15,cap:"round"});
+   if(!reduced){const q=(time*.000075+(hash(root.id)%100)*.009)%1,u=1-q,x=2*u*q*(dx*.48+nx*18)+q*q*root.x,y=2*u*q*(dy*.48+ny*18)+q*q*root.y;filaments.circle(x,y,1.25).fill({color:0xdce5d9,alpha:.72});}
+  }
+  // Central visual anchor: Mycology is transversal, not a ninth navigable universe.
+  junctions.circle(0,0,34).fill({color:0xb96b4d,alpha:.075});
+  junctions.circle(0,0,25).stroke({color:0xb96b4d,alpha:.78,width:1.6});
+  junctions.circle(0,0,16).stroke({color:0xd1d0c5,alpha:.62,width:1});
+  junctions.circle(0,0,5.5).fill({color:0xb96b4d,alpha:.95});
+  for(let k=0;k<8;k++){const a=k*Math.PI/4; junctions.circle(Math.cos(a)*29,Math.sin(a)*29,1.8).fill({color:0x91a99b,alpha:.8});}
+
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
   while(ancestor){lineage.add(ancestor.id);ancestor=ancestor.parent?byId.get(ancestor.parent):null;}
@@ -77,6 +92,12 @@ export async function createPixiRenderer(canvas){
    ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",evidence:"الأدلة"},
    pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS"}
   };
+  const coreScreen={x:width/2+offset.x,y:height/2+offset.y};
+  let coreText=labelPool.get("__mycology-core");
+  if(!coreText){coreText=new Text({text:"MYCOLOGY",style:style.clone()});labelPool.set("__mycology-core",coreText);labels.addChild(coreText);}
+  coreText.text=core?.title||"MYCOLOGY";coreText.style.fontSize=12.5;coreText.style.fontWeight="700";coreText.anchor.set(.5,0);
+  coreText.position.set(coreScreen.x,coreScreen.y+39);coreText.alpha=.96;
+  coreText.visible=coreScreen.x>-100&&coreScreen.x<width+100&&coreScreen.y>-70&&coreScreen.y<height+70;
   const candidates=[];
   for(const n of nodes){
    let alpha=alphaFor(n.level);if(alpha<.015)continue;
