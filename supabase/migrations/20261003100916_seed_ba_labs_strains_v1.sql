@@ -27,3 +27,4 @@ begin
    where s.organization_id=org and s.strain_code=v.code
  );
 end $$;
+;

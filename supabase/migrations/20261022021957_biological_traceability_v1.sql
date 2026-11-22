@@ -91,3 +91,4 @@ end;
 $function$;
 revoke all on function public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[]) from public, anon;
 grant execute on function public.record_biological_operation(uuid,uuid,text,timestamptz,text,jsonb,text[]) to authenticated;
+;

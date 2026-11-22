@@ -16,3 +16,4 @@ begin
     execute format('create index if not exists %I on %s (%s)', idx, r.conrelid::regclass, r.cols);
   end loop;
 end $$;
+;

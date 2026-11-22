@@ -175,3 +175,4 @@ grant execute on function public.create_batch_with_stages(uuid,text,text,text,uu
 
 revoke all on function public.advance_batch_stage(uuid,text) from public;
 grant execute on function public.advance_batch_stage(uuid,text) to authenticated;
+;

@@ -1,0 +1,1 @@
+create index if not exists domain_variable_catalog_variable_code_idx on public.domain_variable_catalog(variable_code);

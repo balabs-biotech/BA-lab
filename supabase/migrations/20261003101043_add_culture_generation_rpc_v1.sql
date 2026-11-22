@@ -135,3 +135,4 @@ grant execute on function public.create_culture_with_generation(
 revoke execute on function public.create_culture_with_generation(
   uuid,text,text,uuid,uuid,uuid,uuid,uuid,uuid,timestamptz,jsonb
 ) from anon;
+;

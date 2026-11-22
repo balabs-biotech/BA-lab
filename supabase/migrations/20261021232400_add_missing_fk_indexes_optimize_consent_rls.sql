@@ -1,5 +1,47 @@
--- Reconciliation marker for production migration version 20261021232400.
--- The canonical migration 20261021120000 already applies the index and consent-RLS changes.
--- Production recorded a second execution under this version; keep its timestamp represented
--- without repeating DDL during a clean replay.
-select 1;
+-- Performance follow-up: indexes for foreign keys and efficient consent RLS predicates.
+begin;
+
+create index if not exists batch_qc_checks_unit_code_idx
+  on public.batch_qc_checks (unit_code);
+
+create index if not exists batch_qc_templates_default_unit_code_idx
+  on public.batch_qc_templates (default_unit_code);
+
+create index if not exists culture_data_consents_user_id_idx
+  on public.culture_data_consents (user_id);
+
+drop policy if exists culture_data_consents_select_own
+  on public.culture_data_consents;
+create policy culture_data_consents_select_own
+  on public.culture_data_consents
+  for select to authenticated
+  using (
+    user_id = (select auth.uid())
+    and private.is_org_member(organization_id)
+  );
+
+drop policy if exists culture_data_consents_insert_own
+  on public.culture_data_consents;
+create policy culture_data_consents_insert_own
+  on public.culture_data_consents
+  for insert to authenticated
+  with check (
+    user_id = (select auth.uid())
+    and private.is_org_member(organization_id)
+  );
+
+drop policy if exists culture_data_consents_update_own
+  on public.culture_data_consents;
+create policy culture_data_consents_update_own
+  on public.culture_data_consents
+  for update to authenticated
+  using (
+    user_id = (select auth.uid())
+    and private.is_org_member(organization_id)
+  )
+  with check (
+    user_id = (select auth.uid())
+    and private.is_org_member(organization_id)
+  );
+
+commit;

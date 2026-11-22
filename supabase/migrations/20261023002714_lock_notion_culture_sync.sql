@@ -78,3 +78,4 @@ revoke all on function public.acquire_culture_notion_sync_lock(uuid, uuid, uuid,
 revoke all on function public.release_culture_notion_sync_lock(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.acquire_culture_notion_sync_lock(uuid, uuid, uuid, integer) to service_role;
 grant execute on function public.release_culture_notion_sync_lock(uuid, uuid) to service_role;
+;

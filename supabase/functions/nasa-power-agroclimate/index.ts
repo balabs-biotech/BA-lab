@@ -39,12 +39,12 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "method_not_allowed" });
 
-  const authorization = req.headers.get("authorization");
+  const authorization = req.headers.get("authorization") ?? "";
   if (!authorization) return json(401, { error: "authentication_required" });
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY");
-  const serviceKey = Deno.env.get("SUPABASE_SECRET_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SECRET_KEY");
   if (!supabaseUrl || !publishableKey || !serviceKey) {
     console.error("[nasa-power-agroclimate] Supabase server configuration is incomplete");
     return json(500, { error: "server_configuration_error" });
@@ -59,8 +59,36 @@ Deno.serve(async (req: Request) => {
   });
 
   try {
-    const { data: authData, error: authError } = await userClient.auth.getUser();
-    if (authError || !authData.user) return json(401, { error: "invalid_session" });
+    const internalJobId = req.headers.get("x-ba-engine-job-id");
+    const internalEngineCode = req.headers.get("x-ba-engine-code");
+    const bearer = authorization.replace(/^Bearer\\s+/i, "");
+    const isInternalWorker = bearer === serviceKey && Boolean(internalJobId) &&
+      internalEngineCode === "environmental.nasapower.dailyimport";
+
+    let internalOrganizationId: string | null = null;
+    let userId: string | null = null;
+    if (isInternalWorker) {
+      const { data: job, error: jobError } = await adminClient
+        .from("engine_jobs")
+        .select("id,organization_id,status")
+        .eq("id", internalJobId)
+        .eq("status", "running")
+        .maybeSingle();
+      if (jobError || !job) return json(403, { error: "internal_job_not_active" });
+      const { data: engine, error: engineError } = await adminClient
+        .from("engine_registry")
+        .select("engine_code,entrypoint,status")
+        .eq("engine_code", internalEngineCode)
+        .maybeSingle();
+      if (engineError || !engine || engine.status !== "active" || engine.entrypoint !== "nasa-power-agroclimate") {
+        return json(403, { error: "internal_engine_not_authorized" });
+      }
+      internalOrganizationId = job.organization_id;
+    } else {
+      const { data: authData, error: authError } = await userClient.auth.getUser();
+      if (authError || !authData.user) return json(401, { error: "invalid_session" });
+      userId = authData.user.id;
+    }
 
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object" || Array.isArray(body)) return json(400, { error: "invalid_json_body" });
@@ -79,26 +107,35 @@ Deno.serve(async (req: Request) => {
     if (dayCount > MAX_DAYS) return json(422, { error: "date_range_exceeds_366_days" });
     if (endMs > Date.now() + DAY_MS) return json(422, { error: "end_date_too_far_in_future" });
 
-    // The user-scoped query verifies that this location belongs to an organization
-    // the caller can access before the service role is used.
-    const { data: location, error: locationError } = await userClient
-      .from("locations")
-      .select("id, organization_id, name, latitude, longitude, coordinate_accuracy_m, coordinate_source")
-      .eq("id", locationId)
-      .maybeSingle();
-    if (locationError || !location) return json(404, { error: "location_not_found_or_access_denied" });
-
-    // This endpoint persists observations through the service role. Require an
-    // explicit writer membership; location visibility by itself is read access.
-    const { data: membership, error: membershipError } = await userClient
-      .from("organization_members")
-      .select("role")
-      .eq("organization_id", location.organization_id)
-      .eq("user_id", authData.user.id)
-      .maybeSingle();
-    if (membershipError || !membership ||
-        !["owner", "admin", "member"].includes(String(membership.role))) {
-      return json(403, { error: "write_permission_required" });
+    let location: any = null;
+    if (isInternalWorker && internalOrganizationId) {
+      const { data, error } = await adminClient
+        .from("locations")
+        .select("id, organization_id, name, latitude, longitude, coordinate_accuracy_m, coordinate_source")
+        .eq("id", locationId)
+        .eq("organization_id", internalOrganizationId)
+        .maybeSingle();
+      if (error || !data) return json(404, { error: "location_not_found_for_job_organization" });
+      location = data;
+    } else {
+      // User-scoped lookup and writer membership preserve the public API authorization path.
+      const { data, error } = await userClient
+        .from("locations")
+        .select("id, organization_id, name, latitude, longitude, coordinate_accuracy_m, coordinate_source")
+        .eq("id", locationId)
+        .maybeSingle();
+      if (error || !data) return json(404, { error: "location_not_found_or_access_denied" });
+      location = data;
+      const { data: membership, error: membershipError } = await userClient
+        .from("organization_members")
+        .select("role")
+        .eq("organization_id", location.organization_id)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (membershipError || !membership ||
+          !["owner", "admin", "member"].includes(String(membership.role))) {
+        return json(403, { error: "write_permission_required" });
+      }
     }
 
     if (typeof location.latitude !== "number" || typeof location.longitude !== "number") {

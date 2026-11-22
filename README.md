@@ -22,7 +22,7 @@ Each kind of content has **one** source of truth. This repository is not a copy 
 
 | Content | Source of truth | In this repository? |
 | :--- | :--- | :--- |
-| Live data, authentication, access rules and deployed Edge Functions | **Supabase** (project `BALabs`) | Runtime lives in Supabase; versioned migrations, tests and function source are maintained under `supabase/` |
+| Live data, authentication, access rules and deployed Edge Functions | **Supabase** (project `BALabs`) | Runtime lives in Supabase. All 10 deployed Edge Function source snapshots are now versioned under `supabase/functions/` and their remote versions/security modes are documented. The complete migration history and `supabase/config.toml` are not yet synchronized; do not treat Git as a fully reproducible Supabase deployment yet. |
 | Experiments, strains, reference protocols, field notebook | **Notion** | **No**, except technical sheets needed to build or run equipment |
 | Firmware, IoT configuration, hardware plans, technical SOPs, tests, CI | **GitHub** (this repository) | **Yes** |
 | Batch Tracker web interface (`batch-tracker/`) | This repository | **Yes** — see [`batch-tracker/README.md`](batch-tracker/README.md) |

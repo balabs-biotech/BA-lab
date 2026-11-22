@@ -36,7 +36,6 @@ begin
   return new;
 end
 $$;
-
 drop trigger if exists cultures_protect_notion_cols on public.cultures;
 create trigger cultures_protect_notion_cols
   before insert or update on public.cultures

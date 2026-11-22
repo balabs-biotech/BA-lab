@@ -95,3 +95,4 @@ $$;
 
 revoke all on function public.release_batch(uuid) from public;
 grant execute on function public.release_batch(uuid) to authenticated;
+;

@@ -28,3 +28,4 @@ begin
    select 1 from public.media m where m.organization_id=org and m.code=f.code
  );
 end $$;
+;

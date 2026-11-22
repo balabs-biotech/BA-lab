@@ -164,3 +164,4 @@ begin
   return v_batch;
 end;
 $$;
+;

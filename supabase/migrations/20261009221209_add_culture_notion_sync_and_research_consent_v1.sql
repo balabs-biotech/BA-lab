@@ -39,3 +39,4 @@ create policy culture_data_consents_update_own on public.culture_data_consents
   with check (user_id = auth.uid() and private.is_org_member(organization_id));
 
 grant select, insert, update on public.culture_data_consents to authenticated;
+;
