@@ -17,7 +17,7 @@ export async function createPixiRenderer(canvas){
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
  const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
  let cameraScale=1;
- function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now()}){
+ function render({nodes,edges,selected,hovered=null,scale,offset,width,height,reduced,lang="fr",time=performance.now()}){
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
@@ -34,10 +34,11 @@ export async function createPixiRenderer(canvas){
    const bend=Math.min(58,len*.19)*side*(.62+((seed>>>5)&63)/100);
    const drift=(((seed>>>12)&255)/255-.5)*Math.min(24,len*.09);
    const cx=(a.x+b.x)/2-dy/len*bend+dx/len*drift,cy=(a.y+b.y)/2+dx/len*bend+dy/len*drift;
-   const color=PALETTE[e.a.colorKey||e.a.rootId]||0x91a99b,widthBase=e.verified?1.2:e.cross?.55:Math.max(.45,(e.depth===1?1.5:e.depth===2?1.15:.85));
+   const color=PALETTE[e.a.colorKey||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.2:e.cross?.55:Math.max(.45,(e.depth===1?1.5:e.depth===2?1.15:.85)))*(hot?1.55:1);
    const terminalTip=!e.cross&&terminalIds.has(e.b.id);
-   const strokeColor=e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
-   const strokeAlpha=alpha*(e.verified?.82:e.cross?.34:depth>=3?.42:depth===2?.62:.78);
+   const strokeColor=hot?0xe4e7dd:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
+   const strokeAlpha=hot?Math.max(.88,alpha):alpha*(e.verified?.82:e.cross?.34:depth>=3?.42:depth===2?.62:.78);
+   if(hot)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:0xb96b4d,alpha:.16,width:widthBase*4.2,cap:"round"});
    if(terminalTip){
     // Taper the final hypha progressively; no terminal bead is drawn.
     const cuts=[0,.48,.72,.88,1],widths=[widthBase,widthBase*.82,widthBase*.58,widthBase*.30,.06];
@@ -63,6 +64,7 @@ export async function createPixiRenderer(canvas){
    if(n.level<=1)junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
    const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
    junctions.poly(polygon).fill({color:0x111b1d,alpha}).stroke({color,alpha:alpha*(n.level===0?.88:n.level===1?.68:.42),width:n.level===0?1.6:.9});
+   if(hovered?.id===n.id){junctions.circle(n.x,n.y,r+10/scale).fill({color,alpha:.18});junctions.circle(n.x,n.y,r+7/scale).stroke({color:0xe4e7dd,alpha:.96,width:1.35/scale});}
    if(selected?.id===n.id)junctions.circle(n.x,n.y,r+7/scale+5/scale).stroke({color:0xe4e7dd,alpha:.9,width:1/scale});
   }
   // One camera transform controls all biological geometry; labels remain screen-readable.
