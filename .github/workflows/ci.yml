@@ -280,6 +280,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Test fractal growth geometry and reserved daughter sectors
+        run: node --experimental-default-type=module scripts/test-explorer-2d-fractal.mjs
       - name: Install Playwright
         run: npm install --no-save --no-package-lock playwright
       - name: Install Chromium
