@@ -103,7 +103,34 @@ function buildNetwork(){
   }
  });
  canvas.dataset.localAnastomoses=String(localAnastomoses);
+ // Visual-only anastomoses connect nearby branches belonging to different
+ // universes. They express network continuity, never a Notion/content claim.
+ let interUniverseAnastomoses=0;
+ [1,2].forEach(depth=>{
+  const group=nodes.filter(n=>n.level===depth);
+  const candidates=[];
+  group.forEach(a=>{
+   const nearest=group.filter(b=>b.rootId!==a.rootId)
+    .map(b=>({a,b,d:Math.hypot(a.x-b.x,a.y-b.y)}))
+    .sort((x,y)=>x.d-y.d).slice(0,2);
+   nearest.forEach(pair=>candidates.push(pair));
+  });
+  candidates.sort((a,b)=>a.d-b.d);
+  const degree=new Map(),existing=new Set();
+  for(const edge of edges)if(edge.cross)existing.add([edge.a.id,edge.b.id].sort().join("|"));
+  const maxDistance=depth===1?520:430;
+  for(const pair of candidates){
+   if(pair.d>maxDistance)break;
+   if((degree.get(pair.a.id)||0)>=1||(degree.get(pair.b.id)||0)>=1)continue;
+   const key=[pair.a.id,pair.b.id].sort().join("|");
+   if(existing.has(key))continue;
+   edges.push({a:pair.a,b:pair.b,depth,cross:true,visualOnly:true,seed:hash("visual:"+key)});
+   existing.add(key);degree.set(pair.a.id,1);degree.set(pair.b.id,1);interUniverseAnastomoses++;
+  }
+ });
+ canvas.dataset.interUniverseAnastomoses=String(interUniverseAnastomoses);
  canvas.dataset.layout="eight-around-mycology";
+"eight-around-mycology";
  canvas.dataset.universeCount=String(tree.length);
  canvas.dataset.nodeCount=String(nodes.length);
  canvas.dataset.edgeCount=String(edges.length);
