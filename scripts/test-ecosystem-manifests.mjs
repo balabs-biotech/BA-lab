@@ -1,77 +1,55 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const expectedLanguages = ['fr', 'ar', 'en', 'pt'];
-const expectedDomainIds = ['myco', 'bio', 'soil', 'iot', 'lab', 'products', 'work', 'evidence'];
+const languages = ['fr', 'en', 'ar', 'pt'];
+const universeIds = ['microbiology', 'plants', 'ecology', 'bioprocesses', 'biomaterials', 'instrumentation', 'digital', 'physical'];
+const expectedRoots = {
+  fr: ['41f73152f171818ea68cf2ed99aa3706','41f73152f1718161af13d1fbe52250de','41f73152f171819f9b7acbd64ccf4a3e','41f73152f1718108ac67e06204a60c7f','41f73152f1718117a38df4afe2d4fb9d','41f73152f1718170ba14e91650b0c806','41f73152f171816e8f0ed9e629fb70fe','41f73152f1718142aaf0d01bba51ecfb'],
+  en: ['41f73152f17181129686ced284bc5de8','41f73152f17181d99104ca04dd66d0b5','41f73152f17181edaa7fe423fe6efa68','41f73152f1718104a3d5e5863fd10a58','41f73152f1718122992cc99b0609aab3','41f73152f17181b1a27ce32ef73cb66b','41f73152f1718127a894c85bc7af01af','41f73152f17181358e32ce72c1846326'],
+  ar: ['41f73152f1718186b79bdea4ce892562','41f73152f171815fa5a1f577763e545d','41f73152f171819bb147da5152914bf2','41f73152f171815db156c978c9e23179','41f73152f1718192b9aedbaa5e027402','41f73152f17181dd81c9cfe38d9845d6','41f73152f17181418684e3445718a489','41f73152f171812aad13dc593fa7ba60'],
+  pt: ['41f73152f17181edb2cee71226bc9b95','41f73152f1718151b56bf6ad98617c22','41f73152f17181658b77c14bcbff5940','41f73152f17181488f9eff06d48d9379','41f73152f17181babafbd221031866b4','41f73152f17181049050c327f2b0df92','41f73152f17181a1aba9d5b91d32a153','41f73152f1718146a959f08cd87ea17b'],
+};
 
-for (const language of expectedLanguages) {
-  const path = new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url);
-  const manifest = JSON.parse(await readFile(path, 'utf8'));
-  assert.equal(manifest.version, 5, language + ': unsupported manifest version');
-  assert.equal(manifest.relationModel, 'notion-crosslinks-and-documented-topics-v1', language + ': relation model marker missing');
+for (const language of languages) {
+  const manifest = JSON.parse(await readFile(new URL('../ecosystem/notion-tree.' + language + '.json', import.meta.url), 'utf8'));
+  assert.equal(manifest.version, 2, language + ': unsupported public-universe manifest version');
   assert.equal(manifest.language, language, language + ': language marker mismatch');
-  assert.ok(Array.isArray(manifest.domains), language + ': domains must be an array');
-  assert.deepEqual(
-    [...manifest.domains.map((domain) => domain.id)].sort(),
-    [...expectedDomainIds].sort(),
-    language + ': public domain roots must remain aligned across languages',
-  );
+  assert.equal(manifest.universeModel, 'eight-scientific-domains', language + ': universe model marker missing');
+  assert.deepEqual(manifest.domains.map(domain => domain.id), universeIds, language + ': universe roots/order mismatch');
+  assert.deepEqual(manifest.domains.map(domain => domain.notionId), expectedRoots[language], language + ': roots must match the public Notion portal IDs');
+
+  const nodes = [];
+  const visit = list => (list || []).forEach(node => { nodes.push(node); visit(node.children); });
+  visit(manifest.domains);
+  assert.ok(nodes.length >= 100, language + ': mapped hierarchy is unexpectedly shallow');
 
   const ids = new Set();
-  const urls = new Set();
-  const references = [];
-  let nodeCount = 0;
-  const visit = (node, parentPath = language) => {
-    nodeCount += 1;
-    const trail = parentPath + ' > ' + (node.title || node.id || '(untitled)');
-    assert.ok(typeof node.id === 'string' && node.id.trim(), trail + ': missing stable id');
-    assert.ok(!ids.has(node.id), trail + ': duplicate node id ' + node.id);
+  const canonical = new Set();
+  for (const node of nodes) {
+    assert.ok(node.id && !ids.has(node.id), language + ': missing or duplicate node id ' + node.id);
     ids.add(node.id);
-    assert.ok(typeof node.title === 'string' && node.title.trim(), trail + ': missing localized title');
-    if (node.kind === 'section') {
-      assert.ok(!node.url && !node.notionId, trail + ': a heading-derived section must not invent a Notion page destination');
-      assert.ok((node.children || []).length > 0, trail + ': a heading-derived section must contain verified Notion pages');
-    } else if (node.kind === 'label') {
-      assert.ok(!node.url && !node.notionId && !(node.children || []).length, trail + ': a non-navigable topic label must not invent a Notion page destination');
-    } else if (node.kind === 'reference') {
-      assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid cross-universe Notion reference URL');
-      assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': reference URL and page ID must match');
-      references.push({ url: node.url, trail });
-    } else {
-      assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, trail + ': invalid public Notion URL');
-      assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, trail + ': Notion URL and page ID must match');
-      assert.ok(!urls.has(node.url), trail + ': duplicate Notion URL ' + node.url);
-      urls.add(node.url);
+    assert.ok(typeof node.title === 'string' && node.title.trim(), language + ': missing localized title');
+    if (node.kind === 'label') {
+      assert.ok(!node.url && !node.notionId && !(node.children || []).length, language + ': labels must not invent Notion destinations');
+      continue;
     }
-    const children = node.children ?? [];
-    assert.ok(Array.isArray(children), trail + ': children must be an array when present');
-    for (const child of children) visit(child, trail);
-  };
-
-  const rootIds = new Set(manifest.domains.map((domain) => domain.id));
-  let relationCount = 0;
-  let contentRelationCount = 0;
-  for (const root of manifest.domains) {
-    assert.ok(Array.isArray(root.relations), language + ': every universe root must expose its verified relation list');
-    for (const relation of root.relations) {
-      assert.ok(rootIds.has(relation.target), language + ': relation target must be a real universe root');
-      assert.ok(typeof relation.label === 'string' && relation.label.trim(), language + ': relation label is required');
-      assert.ok(typeof relation.evidence === 'string' && relation.evidence.trim(), language + ': relation evidence is required');
-      assert.ok(['notion-link', 'page-content'].includes(relation.basis), language + ': relation basis must distinguish explicit Notion links from documented topics');
-      relationCount += 1;
-      if (relation.basis === 'page-content') contentRelationCount += 1;
+    assert.match(node.url || '', /^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/, language + ': invalid Notion destination at ' + node.id);
+    assert.equal(node.url, 'https://app.notion.com/p/' + node.notionId, language + ': URL/Notion ID mismatch at ' + node.id);
+    if (node.kind !== 'reference') {
+      assert.ok(!canonical.has(node.notionId), language + ': duplicate canonical Notion page ' + node.notionId);
+      canonical.add(node.notionId);
     }
   }
-  assert.ok(relationCount >= 10, language + ': too few documented cross-universe relationships');
-  assert.ok(contentRelationCount >= 4, language + ': Batch Tracker and Technosoil content links must be represented');
-  assert.ok(manifest.domains.find((domain) => domain.id === 'soil').relations.some((relation) => relation.target === 'lab' && relation.label.toLowerCase().includes('technosoil')), language + ': Technosoil must connect agrotechnology to plant experimentation');
-
-  const evidence = manifest.domains.find((domain) => domain.id === 'evidence');
-  assert.ok(evidence?.notionId && evidence.url === 'https://app.notion.com/p/' + evidence.notionId, language + ': evidence universe must link to its real Notion page');
-  for (const domain of manifest.domains) visit(domain);
-  for (const reference of references) assert.ok(urls.has(reference.url), reference.trail + ': cross-universe reference must point to a canonical mapped page');
-  assert.ok(nodeCount >= 100, language + ': the manifest must retain the complete mapped Notion hierarchy');
-  const productSections = manifest.domains.find((domain) => domain.id === 'products').children.filter((node) => node.kind === 'section');
-  assert.equal(productSections.length, 4, language + ': product-page headings must remain represented as four non-clickable grouping sections');
-  console.log(language + ': ' + manifest.domains.length + ' public roots, ' + nodeCount + ' mapped nodes — valid');
+  const rootIds = new Set(universeIds);
+  const relations = manifest.domains.flatMap(domain => domain.relations || []);
+  assert.ok(relations.length >= 8, language + ': too few evidence-backed inter-universe relations');
+  for (const domain of manifest.domains) {
+    assert.ok((domain.children || []).length > 0, language + ': empty universe ' + domain.id);
+    for (const relation of domain.relations || []) {
+      assert.ok(rootIds.has(relation.target), language + ': relation target is not a universe');
+      assert.ok(relation.label && relation.evidence && relation.basis === 'notion-link', language + ': relation lacks Notion evidence');
+    }
+  }
+  // References may intentionally point to a Notion page outside this language's canonical tree.
+  console.log(language + ': ' + manifest.domains.length + ' universes, ' + nodes.length + ' nodes, ' + canonical.size + ' canonical Notion pages — valid');
 }

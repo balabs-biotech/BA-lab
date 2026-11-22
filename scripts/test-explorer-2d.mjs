@@ -46,7 +46,7 @@ try {
         unmapped: nodes.filter(node => node.kind !== 'label' && (!node.notionId || !node.url) && !(node.kind === 'section' && (node.children || []).length > 0)).map(node => node.title),
         uniquePages: new Set(nodes.filter(node => node.notionId && node.kind !== 'reference').map(node => node.notionId)).size,
         canonicalPages: nodes.filter(node => node.notionId && node.kind !== 'reference').length,
-        catalogueRecords: (() => { const product = tree.domains.find(node => node.id === 'products'); const records = []; const visit = list => (list || []).forEach(node => { if (node.notionId && node.kind !== 'reference') records.push(node); visit(node.children); }); visit(product?.children); return records.length; })(),
+        mappedPages: nodes.filter(node => node.notionId && node.kind !== 'reference').length,
         nodeUrls: Object.fromEntries(nodes.filter(node => node.notionId && node.kind !== 'section' && node.kind !== 'label').map(node => [node.id, node.url]))
       };
     });
@@ -54,7 +54,38 @@ try {
     assert.ok(mappedTree.roots.every(root => root.notionId && root.url), 'Every universe root must link to a real Notion page');
     assert.deepEqual(mappedTree.unmapped, [], 'No synthetic folders or unlinked placeholder nodes');
     assert.equal(mappedTree.uniquePages, mappedTree.canonicalPages, 'Canonical Notion pages must not be duplicated; explicit reference links are allowed');
-    assert.ok(mappedTree.catalogueRecords >= 25, 'The live Notion catalogue records must be mapped into the explorer');
+    assert.ok(mappedTree.roots.every(root => root.url && root.notionId), 'All eight public Notion universe roots must be directly mapped');
+    // Pick a real root -> branch -> leaf path. A leaf elsewhere in the tree
+    // cannot be used to assert the Back behavior of this selected branch.
+    const navigationFixture = await page.evaluate(async () => {
+      const data = await (await fetch('./notion-tree.fr.json')).json();
+      const flatten = items => (items || []).flatMap(item => item.kind === 'section' ? flatten(item.children) : [item]);
+      const findLeaf = (items, parent) => {
+        for (const node of flatten(items)) {
+          if (node.notionId && node.url && node.kind !== 'reference' && !(node.children || []).length) {
+            return { node, parent };
+          }
+          const nested = findLeaf(node.children, node);
+          if (nested) return nested;
+        }
+        return null;
+      };
+      for (const root of data.domains || []) {
+        for (const branch of flatten(root.children)) {
+          const found = findLeaf(branch.children, branch);
+          if (found) return {
+            rootId: root.id, rootTitle: root.title,
+            branchId: branch.id, branchTitle: branch.title,
+            leafId: found.node.id, leafTitle: found.node.title,
+            leafUrl: found.node.url, leafParentId: found.parent.id,
+            leafParentTitle: found.parent.title
+          };
+        }
+      }
+      return null;
+    });
+    assert.ok(navigationFixture?.rootId && navigationFixture?.branchId && navigationFixture?.leafId,
+      'The manifest must expose one complete canonical root -> branch -> leaf path');
 
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
@@ -68,7 +99,7 @@ try {
     assert.ok(visibleNodes >= 8, 'At least the eight universe roots must be available');
     // A real point activation must preserve the explorer and open the exact
     // canonical Notion page in a separate tab. Use trusted Playwright clicks.
-    const rootButton = nav.first();
+    const rootButton = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.rootId + '"]');
     const rootNodeId = await rootButton.getAttribute('data-node-id');
     const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
     await page.evaluate(() => {
@@ -83,7 +114,7 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
-    const firstChild = page.locator('#accessibleNodes button[data-level="1"]').first();
+    const firstChild = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.branchId + '"]');
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
     const childExpectedUrl = mappedTree.nodeUrls[childNodeId];
@@ -92,50 +123,56 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Keyboard selection must not open Notion on first activation');
 
-    // Regression: clicking the visible text label (not only its tiny node
-    // anchor) must open the exact Notion resource. Black Pearl is the fixture.
-    const blackPearl = await page.evaluate(async () => {
-      const data = await (await fetch('./notion-tree.fr.json')).json();
-      let result = null;
-      const visit = (items, parent = null) => (items || []).forEach(node => {
-        if (node.id === 'myco-black-pearl') result = { parentId: parent?.id || null, url: node.url, title: node.title };
-        visit(node.children, node);
-      });
-      visit(data.domains);
-      return result;
-    });
-    assert.ok(blackPearl?.parentId && blackPearl.url, 'Black Pearl must have a canonical parent and Notion URL');
-    const leafButton = page.locator('#accessibleNodes button[data-node-id="myco-black-pearl"]');
+    // Regression: clicking any verified leaf label must open its exact Notion destination.
+    const leafFixture = {
+      id: navigationFixture.leafId,
+      parentId: navigationFixture.leafParentId,
+      parentTitle: navigationFixture.leafParentTitle,
+      url: navigationFixture.leafUrl,
+      title: navigationFixture.leafTitle
+    };
+    const leafButton = page.locator('#accessibleNodes button[data-node-id="' + leafFixture.id + '"]');
     await leafButton.focus();
     await leafButton.press('Enter');
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.includes('Black Pearl'));
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting Black Pearl by keyboard must not open Notion');
-    await page.waitForFunction(id => {
-      const boxes = JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}');
-      return Boolean(boxes[id]);
-    }, 'myco-black-pearl', { timeout: 15000 });
-    const labelPoint = await page.locator('#field').evaluate(el => {
-      const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')['myco-black-pearl'];
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf by keyboard must not open Notion');
+    await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
+    const labelPoint = await page.locator('#field').evaluate((el,id) => {
+      const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
       const rect = el.getBoundingClientRect();
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
-    });
-    await page.mouse.click(labelPoint.x, labelPoint.y);
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.includes('Black Pearl'));
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'First click on Black Pearl must only select/focus it');
-    await page.waitForTimeout(600); // allow the focus zoom to settle and expire the first-click gesture
-    const focusedLabelPoint = await page.locator('#field').evaluate(el => {
-      const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')['myco-black-pearl'];
+    }, leafFixture.id);
+    // Start a clean history: overview -> universe -> branch -> leaf.
+    // This makes Back assertions deterministic and tests each navigation level.
+    await page.locator('#reset').click();
+    await rootButton.focus();
+    await rootButton.press('Enter');
+    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), mappedTree.roots[0].title);
+    await firstChild.focus();
+    await firstChild.press('Enter');
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, await firstChild.innerText());
+    // Focus the exact canonical leaf before reading its animated canvas hitbox.
+    await leafButton.focus();
+    await leafButton.press('Enter');
+    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
+    await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
+    const pointForLeaf = async () => page.locator('#field').evaluate((el,id) => {
+      const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
+      if (!box) return null;
       const rect = el.getBoundingClientRect();
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
-    });
-    await page.mouse.dblclick(focusedLabelPoint.x, focusedLabelPoint.y, { delay: 80 });
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), blackPearl.url, 'Double-clicking the visible Black Pearl label must open its exact Notion page');
-    await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
+    }, leafFixture.id);
+    const firstLeafPoint = await pointForLeaf();
+    assert.ok(firstLeafPoint, 'Leaf label must be visible before pointer activation');
+    // Send a trusted native double-click sequence, including click detail=2.
+    await page.mouse.dblclick(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
     await page.locator('#back').click();
-    assert.equal(await page.locator('#selection .selection-title').textContent(), await firstChild.innerText(), 'Back must restore the previously selected branch as well as the camera');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), leafFixture.parentTitle, 'Back must restore the visible parent branch of the selected leaf as well as the camera');
     assert.equal(await page.locator('#back').isDisabled(), false, 'Back must retain earlier selections in the navigation history');
     await page.locator('#back').click();
     assert.equal(await page.locator('#selection').innerText(), selectedRoot, 'A second Back must restore the selected universe root');
@@ -143,12 +180,12 @@ try {
     assert.equal(await page.locator('#selection').innerText(), '', 'A third Back must return to the overview');
     assert.equal(await page.locator('#back').isDisabled(), true, 'Back must disable only when the full history is exhausted');
     const domainUrl = new URL(base);
-    domainUrl.searchParams.set('domain', 'myco');
+    domainUrl.searchParams.set('domain', 'microbiology');
     domainUrl.searchParams.set('lang', 'fr');
     await page.goto(domainUrl.toString(), { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 30000 });
-    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent === 'MYCOLOGIE');
-    assert.equal(await page.locator('#selection .selection-title').textContent(), 'MYCOLOGIE', 'Direct domain URL must focus the requested universe');
+    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent === '🧫 Microbiologie & sciences cellulaires');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), '🧫 Microbiologie & sciences cellulaires', 'Direct domain URL must focus the requested universe');
     assert.equal(page.url(), domainUrl.toString(), 'Direct domain entry must remain inside the same explorer route');
     await page.locator('#zoomIn').click();
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');

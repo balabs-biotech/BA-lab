@@ -1,388 +1,22 @@
 {
-  "version": 5,
-  "source": "Notion public language pages and verified catalogue data source; canonical page IDs and URLs mapped directly",
+  "version": 2,
+  "source": "BA Labs public Notion universe portals",
   "language": "ar",
-  "coverage": "Every interactive point resolves to its canonical Notion page; includes the language landing page and collaboration proposal page.",
+  "universeModel": "eight-scientific-domains",
   "domains": [
     {
-      "id": "myco",
-      "title": "علم الفطريات",
-      "notionId": "40173152f171813ba690d5064844f54a",
-      "url": "https://app.notion.com/p/40173152f171813ba690d5064844f54a",
+      "id": "microbiology",
+      "title": "🧫 علم الأحياء الدقيقة والعلوم الخلوية",
+      "notionId": "41f73152f1718186b79bdea4ce892562",
+      "url": "https://app.notion.com/p/41f73152f1718186b79bdea4ce892562",
       "children": [
         {
-          "id": "ar-myco-resources",
-          "title": "الموارد الفطرية",
-          "notionId": "40173152f171814b88a0dbb38a75acdd",
-          "url": "https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd",
-          "description": "صفحات مرجعية عن الموارد الفطرية والكائنات المزروعة والمدروسة.",
-          "children": [
-            {
-              "id": "ar-pleurotus-cultivated",
-              "title": "فطر المحار والموارد المرتبطة",
-              "notionId": "40273152f1718104965acbf434612d39",
-              "url": "https://app.notion.com/p/40273152f1718104965acbf434612d39",
-              "description": "دليل لأنواع Pleurotus والموارد والسلالات المزروعة، مع روابط البطاقات المرتبطة بها.",
-              "children": [
-                {
-                  "id": "ar-kryos",
-                  "title": "KRYOS — بطاقة مورد فطري",
-                  "notionId": "40273152f17181b7a8e4d792b6abc95b",
-                  "url": "https://app.notion.com/p/40273152f17181b7a8e4d792b6abc95b",
-                  "description": "بطاقة مورد فطري مرتبط بموارد Pleurotus المزروعة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-gris-americain",
-                  "title": "Gris américain — بطاقة مورد فطري",
-                  "notionId": "40273152f171816fa456d1aa82646617",
-                  "url": "https://app.notion.com/p/40273152f171816fa456d1aa82646617",
-                  "description": "بطاقة مورد فطري من مجموعة موارد Pleurotus المزروعة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-black-pearl",
-                  "title": "Black Pearl — بطاقة مورد من Pleurotus",
-                  "notionId": "40273152f171810d88b2cd58d26b5374",
-                  "url": "https://app.notion.com/p/40273152f171810d88b2cd58d26b5374",
-                  "description": "بطاقة مورد من مجموعة Pleurotus؛ يُحفظ اسم Black Pearl كما ورد في صفحة Notion دون افتراض تصنيف إضافي.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pearl-strain",
-                  "title": "Pearl — بطاقة مورد من Pleurotus",
-                  "notionId": "40273152f171811a8404f8443efc81d8",
-                  "url": "https://app.notion.com/p/40273152f171811a8404f8443efc81d8",
-                  "description": "بطاقة مورد محدد من Pleurotus؛ يُحفظ اسم المورد كما ورد في صفحة Notion.",
-                  "children": []
-                },
-                {
-                  "id": "ar-g8-strain",
-                  "title": "G8 — بطاقة مورد فطري",
-                  "notionId": "40273152f17181aab889f0631ab0cc98",
-                  "url": "https://app.notion.com/p/40273152f17181aab889f0631ab0cc98",
-                  "description": "بطاقة مورد فطري محدد؛ يُحفظ الرمز G8 للتتبع دون افتراض هوية تصنيفية إضافية.",
-                  "children": []
-                },
-                {
-                  "id": "ar-blue-oyster-strain",
-                  "title": "Blue Oyster — بطاقة مورد فطري",
-                  "notionId": "40273152f1718145ae5dd1c02fbcd786",
-                  "url": "https://app.notion.com/p/40273152f1718145ae5dd1c02fbcd786",
-                  "description": "بطاقة مورد فطري مرتبط بفرع Pleurotus؛ الاسم هنا تسمية المورد كما وثقتها الصفحة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pleurotus-pulmonarius",
-                  "title": "Pleurotus pulmonarius — بطاقة النوع والزراعة",
-                  "notionId": "40273152f17181c48525e7bb8ab81f2a",
-                  "url": "https://app.notion.com/p/40273152f17181c48525e7bb8ab81f2a",
-                  "description": "فطر محاري قريب من Pleurotus ostreatus، ويُعرف بقدرته على الإثمار في ظروف أدفأ نسبيًا؛ تعرض البطاقة بيانات المورد والزراعة المتاحة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pleurotus-citrinopileatus",
-                  "title": "Pleurotus citrinopileatus — بطاقة الكائن",
-                  "notionId": "40173152f171816cbdbff911ab858ee1",
-                  "url": "https://app.notion.com/p/40173152f171816cbdbff911ab858ee1",
-                  "description": "فطر المحار الأصفر، يتميز بعناقيد ذات قبعات صفراء زاهية؛ تعرض البطاقة خصائص النوع ومتطلبات زراعته الموثقة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pleurotus-eryngii",
-                  "title": "Pleurotus eryngii والهجن — بطاقة المجموعة",
-                  "notionId": "40173152f17181759edbf2beb5b2ba78",
-                  "url": "https://app.notion.com/p/40173152f17181759edbf2beb5b2ba78",
-                  "description": "فطر المحار الملكي، يتميز بساق سميكة وقبعة صغيرة نسبيًا؛ تجمع البطاقة النوع والهجن المرتبطة به دون افتراض تطابق خصائصها.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pleurotus-djamor",
-                  "title": "Pleurotus djamor — بطاقة الكائن",
-                  "notionId": "40173152f171810da539ceb498a4bbf2",
-                  "url": "https://app.notion.com/p/40173152f171810da539ceb498a4bbf2",
-                  "description": "فطر المحار الوردي، معروف بلونه الوردي وظهوره في عناقيد؛ تتناول البطاقة خصائص النوع وسياق زراعته.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pleurotus-ostreatus",
-                  "title": "Pleurotus ostreatus — بطاقة النوع",
-                  "notionId": "40173152f1718183a105f3b9cafc055c",
-                  "url": "https://app.notion.com/p/40173152f1718183a105f3b9cafc055c",
-                  "description": "فطر المحار الشائع، يحلل المواد الخشبية ويمكن زراعته على ركائز لجنوسليلوزية؛ تعرض البطاقة تعريف النوع وموارد زراعته.",
-                  "children": []
-                },
-                {
-                  "id": "ar-hk35",
-                  "title": "HK35 — بطاقة السلالة والمورد",
-                  "notionId": "40173152f1718112be87f6224579ad30",
-                  "url": "https://app.notion.com/p/40173152f1718112be87f6224579ad30",
-                  "description": "بطاقة سلالة ومورد فطري ضمن الموارد المزروعة الموثقة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-p80",
-                  "title": "P80 — بطاقة السلالة والمورد",
-                  "notionId": "40173152f17181d985eff110663e2bda",
-                  "url": "https://app.notion.com/p/40173152f17181d985eff110663e2bda",
-                  "description": "بطاقة سلالة ومورد فطري، مع ربطها بموارد الزراعة.",
-                  "children": []
-                }
-              ]
-            },
-            {
-              "id": "ar-other-fungi",
-              "title": "فطريات أخرى",
-              "notionId": "40273152f171817dafeae0d07ecb305f",
-              "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
-              "description": "مجموعة بطاقات لفطريات أخرى تدرسها BA Labs أو توثق مواردها، دون افتراض أن كل نوع متوفر كمزرعة موصوفة.",
-              "children": [
-                {
-                  "id": "ar-cyclocybe-aegerita",
-                  "title": "Cyclocybe aegerita — البيوبينو",
-                  "notionId": "40273152f17181679ee3c313d3e1e1bf",
-                  "url": "https://app.notion.com/p/40273152f17181679ee3c313d3e1e1bf",
-                  "description": "فطر البيوبينو، نوع خشبي يرتبط غالبًا بأشجار الحور؛ تعرض البطاقة تعريفه وخصائصه البيولوجية.",
-                  "children": []
-                },
-                {
-                  "id": "ar-calocybe-indica",
-                  "title": "Calocybe indica — بطاقة الكائن",
-                  "notionId": "40173152f17181ecb154ec8a8bf3b894",
-                  "url": "https://app.notion.com/p/40173152f17181ecb154ec8a8bf3b894",
-                  "description": "نوع فطري استوائي يُعرف باسم فطر الحليب؛ تعرض البطاقة هويته وخصائصه المعروفة دون افتراض توفره كمنتج.",
-                  "children": []
-                },
-                {
-                  "id": "ar-cordyceps-militaris",
-                  "title": "Cordyceps militaris — بطاقة الكائن",
-                  "notionId": "40173152f171818da055d9119d4b49d7",
-                  "url": "https://app.notion.com/p/40173152f171818da055d9119d4b49d7",
-                  "description": "فطر حشريّ التطفل في الطبيعة، ويكوّن أجسامًا ثمرية برتقالية؛ تعرض البطاقة النوع ضمن الموارد المدروسة لا بوصفه ادعاءً علاجيًا.",
-                  "children": []
-                },
-                {
-                  "id": "ar-hericium-erinaceus",
-                  "title": "Hericium erinaceus — بطاقة الكائن",
-                  "notionId": "40173152f17181eca3b4d7110a5cb836",
-                  "url": "https://app.notion.com/p/40173152f17181eca3b4d7110a5cb836",
-                  "description": "فطر عرف الأسد، يتميز بأشواك بيضاء متدلية بدل الصفائح الظاهرة في كثير من الفطريات؛ تعرض البطاقة هويته وخصائصه.",
-                  "children": []
-                },
-                {
-                  "id": "ar-trametes-versicolor",
-                  "title": "Trametes versicolor — بطاقة الكائن",
-                  "notionId": "40173152f17181f0a7ded106c63b48fc",
-                  "url": "https://app.notion.com/p/40173152f17181f0a7ded106c63b48fc",
-                  "description": "فطر ذيليّ الديك الرومي، ينمو على الخشب ويُظهر حلقات لونية متباينة على سطح القبعة؛ تعرض البطاقة تعريفه البيولوجي.",
-                  "children": []
-                },
-                {
-                  "id": "ar-lentinula-edodes",
-                  "title": "Lentinula edodes — بطاقة الكائن",
-                  "notionId": "40173152f1718129828cc0b8303cc4dc",
-                  "url": "https://app.notion.com/p/40173152f1718129828cc0b8303cc4dc",
-                  "description": "فطر الشيتاكي، نوع خشبي معروف يُزرع على جذوع أو ركائز خشبية مناسبة؛ تعرض البطاقة معلومات النوع دون تعميم طريقة إنتاج واحدة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-ganoderma-lucidum",
-                  "title": "Ganoderma lucidum — بطاقة الكائن",
-                  "notionId": "40173152f171819ba9b7ce4edbfafe23",
-                  "url": "https://app.notion.com/p/40173152f171819ba9b7ce4edbfafe23",
-                  "description": "فطر خشبي من مجموعة Ganoderma، يشكل أجسامًا ثمرية صلبة ذات سطح لامع غالبًا؛ البطاقة تعريفية ولا تتضمن ادعاءات صحية.",
-                  "children": []
-                },
-                {
-                  "id": "ar-pholiota-adiposa",
-                  "title": "Pholiota adiposa — بطاقة الكائن",
-                  "notionId": "40173152f1718189b816f33b7d7b2b4f",
-                  "url": "https://app.notion.com/p/40173152f1718189b816f33b7d7b2b4f",
-                  "description": "فطر Pholiota adiposa، المعروف أحيانًا بفطر الكستناء، يرتبط بالخشب ويتميز بقبعات بنية لزجة؛ تعرض البطاقة خصائص النوع.",
-                  "children": []
-                },
-                {
-                  "id": "ar-hypsizygus-ulmarius",
-                  "title": "Hypsizygus ulmarius — بطاقة الكائن",
-                  "notionId": "40173152f17181338fe8f9fe77d8554a",
-                  "url": "https://app.notion.com/p/40173152f17181338fe8f9fe77d8554a",
-                  "description": "فطر المحار الدردار، من الأنواع الخشبية التي تُكوّن عناقيد جانبية؛ تعرض البطاقة هويته وخصائصه البيولوجية.",
-                  "children": []
-                },
-                {
-                  "id": "ar-hypsizygus-marmoreus",
-                  "title": "Hypsizygus marmoreus — بطاقة الكائن",
-                  "notionId": "40173152f17181549a76c71217f7337d",
-                  "url": "https://app.notion.com/p/40173152f17181549a76c71217f7337d",
-                  "description": "فطر الزان، ينمو طبيعيًا على الخشب ويُزرع تجاريًا في عناقيد؛ تعرض البطاقة معلومات النوع مع الحفاظ على اسمه العلمي.",
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ar-soil-propagation",
-          "title": "الزراعة والإكثار",
-          "notionId": "40173152f1718101afcbdb364eb5d44a",
-          "url": "https://app.notion.com/p/40173152f1718101afcbdb364eb5d44a",
-          "description": "صفحة الزراعة والإكثار المرتبطة مباشرة بجذر علم الفطريات.",
+          "id": "page-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
           "children": []
         },
-        {
-          "id": "ar-mycorrhizae",
-          "title": "الفطريات المرتبطة بجذور النباتات",
-          "notionId": "40173152f17181c6b3baf6efc7bb60bc",
-          "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
-          "description": "العلاقات بين الفطريات والجذور والتفاعلات البيولوجية المرتبطة بها.",
-          "children": [
-            {
-              "id": "ar-arbuscular-resources",
-              "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
-              "notionId": "40273152f171813fb16ac5000499acfd",
-              "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
-              "description": "مدخل إلى الفطريات الجذرية الشجيرية ووظائفها البيولوجية المحتملة وعلاقتها بجذور النباتات.",
-              "children": [
-                {
-                  "id": "ar-rhizophagus-clarus",
-                  "title": "Rhizophagus clarus (Glomus clarum) — بطاقة الكائن",
-                  "notionId": "40173152f17181719006ef281004f5b9",
-                  "url": "https://app.notion.com/p/40173152f17181719006ef281004f5b9",
-                  "description": "فطر جذري تكافلي؛ تتناول البطاقة علاقته بالجذور وسياقه الزراعي.",
-                  "children": []
-                },
-                {
-                  "id": "ar-funneliformis-mosseae",
-                  "title": "Funneliformis mosseae (Glomus mosseae) — بطاقة الكائن",
-                  "notionId": "40173152f171815b98f8e23d75ce30dc",
-                  "url": "https://app.notion.com/p/40173152f171815b98f8e23d75ce30dc",
-                  "description": "فطر جذري تكافلي من مجموعة الفطريات الشجيرية، مرتبط بتفاعلات الجذور.",
-                  "children": []
-                },
-                {
-                  "id": "ar-glomus-brasilianum",
-                  "title": "Glomus brasilianum — بطاقة الكائن",
-                  "notionId": "40173152f1718130a2f3ecb93f2b4bb2",
-                  "url": "https://app.notion.com/p/40173152f1718130a2f3ecb93f2b4bb2",
-                  "description": "بطاقة تعريف لفطر جذري ضمن مجموعة الفطريات الشجيرية.",
-                  "children": []
-                },
-                {
-                  "id": "ar-rhizophagus-irregularis",
-                  "title": "Rhizophagus irregularis (Glomus intraradices) — بطاقة الكائن",
-                  "notionId": "40173152f171814d8f84de5e8a48e1e6",
-                  "url": "https://app.notion.com/p/40173152f171814d8f84de5e8a48e1e6",
-                  "description": "فطر جذري شجيري واسع الدراسة، يرتبط بتبادل الموارد مع جذور النبات.",
-                  "children": []
-                },
-                {
-                  "id": "ar-gigaspora-margarita",
-                  "title": "Gigaspora margarita — بطاقة الكائن",
-                  "notionId": "40173152f17181cd8677ec3204dfb9dd",
-                  "url": "https://app.notion.com/p/40173152f17181cd8677ec3204dfb9dd",
-                  "description": "فطر جذري شجيري من مجموعة Gigaspora، ضمن تفاعلات الفطر والنبات.",
-                  "children": []
-                },
-                {
-                  "id": "ar-glomus-aggregatum",
-                  "title": "Glomus aggregatum — بطاقة الكائن",
-                  "notionId": "40173152f171815ea37ffc16917d2386",
-                  "url": "https://app.notion.com/p/40173152f171815ea37ffc16917d2386",
-                  "description": "فطر جذري شجيري، يُعرض ضمن الكائنات المرتبطة بجذور النباتات.",
-                  "children": []
-                },
-                {
-                  "id": "ar-glomus-deserticola",
-                  "title": "Glomus deserticola — بطاقة الكائن",
-                  "notionId": "40173152f17181838ae8f585441b5db7",
-                  "url": "https://app.notion.com/p/40173152f17181838ae8f585441b5db7",
-                  "description": "فطر جذري شجيري مرتبط بدراسة تفاعلات الجذور والبيئة.",
-                  "children": []
-                },
-                {
-                  "id": "ar-glomus-monosporus",
-                  "title": "Glomus monosporus — بطاقة الكائن",
-                  "notionId": "40173152f17181deb719fcea5367afe1",
-                  "url": "https://app.notion.com/p/40173152f17181deb719fcea5367afe1",
-                  "description": "بطاقة تعريف لفطر جذري ضمن مجموعة Glomus.",
-                  "children": []
-                }
-              ]
-            },
-            {
-              "id": "ar-ectomycorrhizal-resources",
-              "title": "الفطريات الجذرية الخارجية — الموارد والتفاعلات مع النباتات",
-              "notionId": "40273152f17181e59ab3feebe521aa71",
-              "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
-              "description": "مدخل إلى الفطريات الجذرية الخارجية وتفاعلاتها مع النباتات المضيفة والسياق البيئي.",
-              "children": [
-                {
-                  "id": "ar-pisolithus",
-                  "title": "Pisolithus tinctorius — بطاقة الكائن",
-                  "notionId": "40173152f171816294f4e4279f59b3f0",
-                  "url": "https://app.notion.com/p/40173152f171816294f4e4279f59b3f0",
-                  "description": "فطر جذري خارجي يرتبط بجذور بعض النباتات، ويُدرس ضمن التفاعلات بين الفطر والنبات.",
-                  "children": []
-                },
-                {
-                  "id": "ar-laccaria",
-                  "title": "Laccaria laccata — بطاقة الكائن",
-                  "notionId": "40173152f1718181af4ece2b3f17309a",
-                  "url": "https://app.notion.com/p/40173152f1718181af4ece2b3f17309a",
-                  "description": "فطر جذري خارجي؛ تعرض البطاقة علاقته بالنباتات المضيفة وسياقه البيئي.",
-                  "children": []
-                },
-                {
-                  "id": "ar-rhizopogon",
-                  "title": "Rhizopogon spp. — مجموعة الفطريات الجذرية الخارجية",
-                  "notionId": "40273152f17181329255c2052485c6c0",
-                  "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
-                  "description": "فطريات جذرية خارجية غالبًا ما تتكون أجسامها الثمرية تحت سطح التربة؛ ترتبط بجذور الأشجار وتُعرض هنا كمجموعة بيئية.",
-                  "children": []
-                },
-                {
-                  "id": "ar-scleroderma",
-                  "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
-                  "notionId": "40273152f17181d4aa96c4d6aac56b26",
-                  "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
-                  "description": "فطريات جذرية خارجية تكوّن علاقة تكافلية مع جذور بعض الأشجار؛ تُعرض هنا كمجموعة بيولوجية لا كمنتج زراعي جاهز.",
-                  "children": []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ar-myco-applications",
-          "title": "التطبيقات الفطرية",
-          "notionId": "40173152f17181afb288feda1d2c3e5c",
-          "url": "https://app.notion.com/p/40173152f17181afb288feda1d2c3e5c",
-          "description": "صفحة التطبيقات الفطرية المرتبطة مباشرة بجذر علم الفطريات.",
-          "children": []
-        }
-      ],
-      "description": "استكشف عالم الفطريات: الأنواع المزروعة، مواردها، طرق الإكثار، والتفاعلات التي تربطها بالتربة والمواد العضوية.",
-      "relations": [
-        {
-          "target": "products",
-          "label": "الموارد الفطرية ومنتجات الزراعة",
-          "basis": "notion-link",
-          "evidence": "علم الفطريات"
-        },
-        {
-          "target": "bio",
-          "label": "التطبيقات الفطرية ↔ التكنولوجيا الحيوية",
-          "basis": "notion-link",
-          "evidence": "التطبيقات الفطرية"
-        }
-      ]
-    },
-    {
-      "id": "bio",
-      "title": "التكنولوجيا الحيوية",
-      "notionId": "40173152f17181bc87b1c17830686007",
-      "url": "https://app.notion.com/p/40173152f17181bc87b1c17830686007",
-      "children": [
         {
           "id": "ar-soil-microbes",
           "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
@@ -553,6 +187,524 @@
           ]
         },
         {
+          "id": "ref-40273152f17181ea94edc6e07de079dd",
+          "title": "PGPR — بكتيريا مرتبطة بالجذور وإمكانات زراعية",
+          "kind": "reference",
+          "notionId": "40273152f17181ea94edc6e07de079dd",
+          "url": "https://app.notion.com/p/40273152f17181ea94edc6e07de079dd",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f17181df824fe38fd115c15d",
+          "title": "Trichoderma hamatum — بطاقة الكائن",
+          "kind": "reference",
+          "notionId": "40173152f17181df824fe38fd115c15d",
+          "url": "https://app.notion.com/p/40173152f17181df824fe38fd115c15d",
+          "children": []
+        },
+        {
+          "id": "ref-40273152f171814c8521e59c95c9709e",
+          "title": "Bacillus — مجموعة بكتيرية ذات أهمية زراعية",
+          "kind": "reference",
+          "notionId": "40273152f171814c8521e59c95c9709e",
+          "url": "https://app.notion.com/p/40273152f171814c8521e59c95c9709e",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181b78ccbe5de59e9e34f",
+          "title": "علم الجراثيم والأحياء الدقيقة التطبيقية",
+          "notionId": "41f73152f17181b78ccbe5de59e9e34f",
+          "url": "https://app.notion.com/p/41f73152f17181b78ccbe5de59e9e34f",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181cab3baecc6f0d141a8",
+          "title": "الأحياء الدقيقة الفطرية والخمائر",
+          "notionId": "41f73152f17181cab3baecc6f0d141a8",
+          "url": "https://app.notion.com/p/41f73152f17181cab3baecc6f0d141a8",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181aca1dafc95d3bdf985",
+          "title": "علم الخلية والأحياء الجزيئية والوراثة",
+          "notionId": "41f73152f17181aca1dafc95d3bdf985",
+          "url": "https://app.notion.com/p/41f73152f17181aca1dafc95d3bdf985",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "plants",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 3 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "ecology",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 3 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "bioprocesses",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "biomaterials",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "title": "🌱 علوم النبات والزراعة",
+      "notionId": "41f73152f171815fa5a1f577763e545d",
+      "url": "https://app.notion.com/p/41f73152f171815fa5a1f577763e545d",
+      "children": [
+        {
+          "id": "ref-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
+        {
+          "id": "ar-bio-micropropagation",
+          "title": "الإكثار الدقيق للنباتات",
+          "notionId": "40173152f171819797b1c99f4bdefd2c",
+          "url": "https://app.notion.com/p/40173152f171819797b1c99f4bdefd2c",
+          "description": "تقنيات الإكثار النباتي الدقيق ومراحل التحضير والمتابعة.",
+          "children": []
+        },
+        {
+          "id": "ar-lab-plant-experimentation",
+          "title": "التجارب النباتية",
+          "notionId": "40173152f1718185a9e8c2972ec186f3",
+          "url": "https://app.notion.com/p/40173152f1718185a9e8c2972ec186f3",
+          "description": "يعرض تجارب النباتات ضمن بيئة المختبر والدفيئة، مع توثيق الظروف والملاحظات وحدود النتائج.",
+          "children": []
+        },
+        {
+          "id": "ar-arbuscular-resources",
+          "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
+          "notionId": "40273152f171813fb16ac5000499acfd",
+          "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
+          "description": "مدخل إلى الفطريات الجذرية الشجيرية ووظائفها البيولوجية المحتملة وعلاقتها بجذور النباتات.",
+          "children": [
+            {
+              "id": "ar-rhizophagus-clarus",
+              "title": "Rhizophagus clarus (Glomus clarum) — بطاقة الكائن",
+              "notionId": "40173152f17181719006ef281004f5b9",
+              "url": "https://app.notion.com/p/40173152f17181719006ef281004f5b9",
+              "description": "فطر جذري تكافلي؛ تتناول البطاقة علاقته بالجذور وسياقه الزراعي.",
+              "children": []
+            },
+            {
+              "id": "ar-funneliformis-mosseae",
+              "title": "Funneliformis mosseae (Glomus mosseae) — بطاقة الكائن",
+              "notionId": "40173152f171815b98f8e23d75ce30dc",
+              "url": "https://app.notion.com/p/40173152f171815b98f8e23d75ce30dc",
+              "description": "فطر جذري تكافلي من مجموعة الفطريات الشجيرية، مرتبط بتفاعلات الجذور.",
+              "children": []
+            },
+            {
+              "id": "ar-glomus-brasilianum",
+              "title": "Glomus brasilianum — بطاقة الكائن",
+              "notionId": "40173152f1718130a2f3ecb93f2b4bb2",
+              "url": "https://app.notion.com/p/40173152f1718130a2f3ecb93f2b4bb2",
+              "description": "بطاقة تعريف لفطر جذري ضمن مجموعة الفطريات الشجيرية.",
+              "children": []
+            },
+            {
+              "id": "ar-rhizophagus-irregularis",
+              "title": "Rhizophagus irregularis (Glomus intraradices) — بطاقة الكائن",
+              "notionId": "40173152f171814d8f84de5e8a48e1e6",
+              "url": "https://app.notion.com/p/40173152f171814d8f84de5e8a48e1e6",
+              "description": "فطر جذري شجيري واسع الدراسة، يرتبط بتبادل الموارد مع جذور النبات.",
+              "children": []
+            },
+            {
+              "id": "ar-gigaspora-margarita",
+              "title": "Gigaspora margarita — بطاقة الكائن",
+              "notionId": "40173152f17181cd8677ec3204dfb9dd",
+              "url": "https://app.notion.com/p/40173152f17181cd8677ec3204dfb9dd",
+              "description": "فطر جذري شجيري من مجموعة Gigaspora، ضمن تفاعلات الفطر والنبات.",
+              "children": []
+            },
+            {
+              "id": "ar-glomus-aggregatum",
+              "title": "Glomus aggregatum — بطاقة الكائن",
+              "notionId": "40173152f171815ea37ffc16917d2386",
+              "url": "https://app.notion.com/p/40173152f171815ea37ffc16917d2386",
+              "description": "فطر جذري شجيري، يُعرض ضمن الكائنات المرتبطة بجذور النباتات.",
+              "children": []
+            },
+            {
+              "id": "ar-glomus-deserticola",
+              "title": "Glomus deserticola — بطاقة الكائن",
+              "notionId": "40173152f17181838ae8f585441b5db7",
+              "url": "https://app.notion.com/p/40173152f17181838ae8f585441b5db7",
+              "description": "فطر جذري شجيري مرتبط بدراسة تفاعلات الجذور والبيئة.",
+              "children": []
+            },
+            {
+              "id": "ar-glomus-monosporus",
+              "title": "Glomus monosporus — بطاقة الكائن",
+              "notionId": "40173152f17181deb719fcea5367afe1",
+              "url": "https://app.notion.com/p/40173152f17181deb719fcea5367afe1",
+              "description": "بطاقة تعريف لفطر جذري ضمن مجموعة Glomus.",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "ar-ectomycorrhizal-resources",
+          "title": "الفطريات الجذرية الخارجية — الموارد والتفاعلات مع النباتات",
+          "notionId": "40273152f17181e59ab3feebe521aa71",
+          "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
+          "description": "مدخل إلى الفطريات الجذرية الخارجية وتفاعلاتها مع النباتات المضيفة والسياق البيئي.",
+          "children": [
+            {
+              "id": "ar-pisolithus",
+              "title": "Pisolithus tinctorius — بطاقة الكائن",
+              "notionId": "40173152f171816294f4e4279f59b3f0",
+              "url": "https://app.notion.com/p/40173152f171816294f4e4279f59b3f0",
+              "description": "فطر جذري خارجي يرتبط بجذور بعض النباتات، ويُدرس ضمن التفاعلات بين الفطر والنبات.",
+              "children": []
+            },
+            {
+              "id": "ar-laccaria",
+              "title": "Laccaria laccata — بطاقة الكائن",
+              "notionId": "40173152f1718181af4ece2b3f17309a",
+              "url": "https://app.notion.com/p/40173152f1718181af4ece2b3f17309a",
+              "description": "فطر جذري خارجي؛ تعرض البطاقة علاقته بالنباتات المضيفة وسياقه البيئي.",
+              "children": []
+            },
+            {
+              "id": "ar-rhizopogon",
+              "title": "Rhizopogon spp. — مجموعة الفطريات الجذرية الخارجية",
+              "notionId": "40273152f17181329255c2052485c6c0",
+              "url": "https://app.notion.com/p/40273152f17181329255c2052485c6c0",
+              "description": "فطريات جذرية خارجية غالبًا ما تتكون أجسامها الثمرية تحت سطح التربة؛ ترتبط بجذور الأشجار وتُعرض هنا كمجموعة بيئية.",
+              "children": []
+            },
+            {
+              "id": "ar-scleroderma",
+              "title": "Scleroderma spp. — مجموعة الفطريات الجذرية الخارجية",
+              "notionId": "40273152f17181d4aa96c4d6aac56b26",
+              "url": "https://app.notion.com/p/40273152f17181d4aa96c4d6aac56b26",
+              "description": "فطريات جذرية خارجية تكوّن علاقة تكافلية مع جذور بعض الأشجار؛ تُعرض هنا كمجموعة بيولوجية لا كمنتج زراعي جاهز.",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "ref-plants-plants-5-40273152f17181ea94edc6e07de079dd",
+          "title": "PGPR — بكتيريا مرتبطة بالجذور وإمكانات زراعية",
+          "kind": "reference",
+          "notionId": "40273152f17181ea94edc6e07de079dd",
+          "url": "https://app.notion.com/p/40273152f17181ea94edc6e07de079dd",
+          "children": []
+        },
+        {
+          "id": "ar-soil-biostimulants",
+          "title": "المحفزات الحيوية والحلول البيولوجية",
+          "notionId": "40173152f17181849ca3e8e0b2475b37",
+          "url": "https://app.notion.com/p/40173152f17181849ca3e8e0b2475b37",
+          "description": "موارد وحلول بيولوجية قيد الدراسة والتوثيق.",
+          "children": []
+        },
+        {
+          "id": "ref-plants-plants-7-40273152f171814c8521e59c95c9709e",
+          "title": "Bacillus — مجموعة بكتيرية ذات أهمية زراعية",
+          "kind": "reference",
+          "notionId": "40273152f171814c8521e59c95c9709e",
+          "url": "https://app.notion.com/p/40273152f171814c8521e59c95c9709e",
+          "children": []
+        },
+        {
+          "id": "ar-bio-substrates",
+          "title": "الركائز والدعامات البيولوجية",
+          "notionId": "40173152f17181bb91b5d8326978d664",
+          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+          "description": "مواد وأوساط داعمة للعمليات والأنظمة البيولوجية.",
+          "children": []
+        },
+        {
+          "id": "evidence",
+          "title": "ما الذي تدعمه الأدلة حاليًا؟",
+          "notionId": "40173152f17181eb86f6f623452f9f5d",
+          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
+          "description": "Evidence, documented observations and limits of current work.",
+          "children": [
+            {
+              "id": "ar-work-documented",
+              "title": "الأعمال والإنجازات الموثقة",
+              "notionId": "40173152f171811aaac8db82b1c7a9fe",
+              "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
+              "description": "مشاريع وأعمال موثقة مع عرض حدود النتائج المتاحة.",
+              "children": [
+                {
+                  "id": "ar-work-detailed-examples",
+                  "title": "أمثلة مفصلة على المشاريع الموثقة",
+                  "notionId": "40173152f17181c7ab4ad1cdeac8d075",
+                  "url": "https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075",
+                  "description": "أمثلة تفصيلية للأعمال التطبيقية والمشاريع التي يجري تتبعها.",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "ar-work-methodology",
+              "title": "منهجية البحث والتطوير",
+              "notionId": "40273152f1718172aabbe09bb712c3d1",
+              "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
+              "description": "صياغة الأسئلة والفرضيات وتصميم المقارنات وفق مستوى الأدلة المتاح.",
+              "children": []
+            },
+            {
+              "id": "ar-public-catalogue",
+              "title": "CATALOGUE PUBLIC — Ressources publiables",
+              "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
+              "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
+              "description": "كتالوج موحد للموارد والمنتجات؛ يجب تأكيد الدفعة والتغليف والتوفر قبل أي طلب.",
+              "children": []
+            },
+            {
+              "id": "evidence-resource-4",
+              "title": "التعاون مع BA Labs",
+              "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
+              "notionId": "40173152f17181598fc7f2f5a3e64e8a",
+              "children": [
+                {
+                  "id": "collaboration-proposal-ar",
+                  "title": "إعداد مقترح مشروع",
+                  "notionId": "40273152f17181dc97fdfeeca44a791c",
+                  "url": "https://app.notion.com/p/40273152f17181dc97fdfeeca44a791c",
+                  "description": "إرشادات إعداد مقترح تعاون مع BA Labs.",
+                  "children": []
+                }
+              ]
+            }
+          ],
+          "relations": []
+        },
+        {
+          "id": "page-41f73152f17181e5ac1feaed66cbe12c",
+          "title": "فسيولوجيا النبات ونموه",
+          "notionId": "41f73152f17181e5ac1feaed66cbe12c",
+          "url": "https://app.notion.com/p/41f73152f17181e5ac1feaed66cbe12c",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171811f8494c13a07201e50",
+          "title": "الإكثار والمشاتل والإكثار الدقيق",
+          "notionId": "41f73152f171811f8494c13a07201e50",
+          "url": "https://app.notion.com/p/41f73152f171811f8494c13a07201e50",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718160ba9eef4138d09304",
+          "title": "علم الزراعة والتغذية وصحة النبات",
+          "notionId": "41f73152f1718160ba9eef4138d09304",
+          "url": "https://app.notion.com/p/41f73152f1718160ba9eef4138d09304",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "ecology",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 5 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "bioprocesses",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "biomaterials",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
+    },
+    {
+      "id": "ecology",
+      "title": "🌍 التربة والأنظمة البيئية والبيئة",
+      "notionId": "41f73152f171819bb147da5152914bf2",
+      "url": "https://app.notion.com/p/41f73152f171819bb147da5152914bf2",
+      "children": [
+        {
+          "id": "ref-ecology-ecology-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
+        {
+          "id": "ref-40273152f171813fb16ac5000499acfd",
+          "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
+          "kind": "reference",
+          "notionId": "40273152f171813fb16ac5000499acfd",
+          "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
+          "children": []
+        },
+        {
+          "id": "ref-40273152f17181e59ab3feebe521aa71",
+          "title": "الفطريات الجذرية الخارجية — الموارد والتفاعلات مع النباتات",
+          "kind": "reference",
+          "notionId": "40273152f17181e59ab3feebe521aa71",
+          "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
+          "children": []
+        },
+        {
+          "id": "ar-soil-substrate-preparation",
+          "title": "تحضير الركائز",
+          "notionId": "40173152f1718117a1b5d73ad90a1951",
+          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
+          "description": "تحضير الدعامات الزراعية وتوثيق المواد الخام والمعالجة والرطوبة والبنية.",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f17181bb91b5d8326978d664",
+          "title": "الركائز والدعامات البيولوجية",
+          "kind": "reference",
+          "notionId": "40173152f17181bb91b5d8326978d664",
+          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f17181f18a55d7ba9a90a713",
+          "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
+          "kind": "reference",
+          "notionId": "40173152f17181f18a55d7ba9a90a713",
+          "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
+          "children": []
+        },
+        {
+          "id": "ref-ecology-ecology-6-40273152f17181ea94edc6e07de079dd",
+          "title": "PGPR — بكتيريا مرتبطة بالجذور وإمكانات زراعية",
+          "kind": "reference",
+          "notionId": "40273152f17181ea94edc6e07de079dd",
+          "url": "https://app.notion.com/p/40273152f17181ea94edc6e07de079dd",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718135bdd6f1c211a11573",
+          "title": "علم التربة وخصائص الركائز",
+          "notionId": "41f73152f1718135bdd6f1c211a11573",
+          "url": "https://app.notion.com/p/41f73152f1718135bdd6f1c211a11573",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181cb8175eb9b7112eb82",
+          "title": "علم البيئة والتنوع الحيوي والدورات الجيوكيميائية الحيوية",
+          "notionId": "41f73152f17181cb8175eb9b7112eb82",
+          "url": "https://app.notion.com/p/41f73152f17181cb8175eb9b7112eb82",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181a9a12cd5257b6f9558",
+          "title": "الموارد والتثمين والبيئة",
+          "notionId": "41f73152f17181a9a12cd5257b6f9558",
+          "url": "https://app.notion.com/p/41f73152f17181a9a12cd5257b6f9558",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "bioprocesses",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "biomaterials",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 3 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
+    },
+    {
+      "id": "bioprocesses",
+      "title": "♻️ العمليات الحيوية والتحويل البيولوجي",
+      "notionId": "41f73152f171815db156c978c9e23179",
+      "url": "https://app.notion.com/p/41f73152f171815db156c978c9e23179",
+      "children": [
+        {
+          "id": "ref-bioprocesses-bioprocesses-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
+        {
           "id": "ar-bio-fermentation",
           "title": "التخمير البيولوجي",
           "notionId": "40173152f17181319400c0c68635241b",
@@ -569,95 +721,206 @@
           "children": []
         },
         {
-          "id": "ar-bio-substrates",
-          "title": "الركائز والدعامات البيولوجية",
-          "notionId": "40173152f17181bb91b5d8326978d664",
-          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
-          "description": "مواد وأوساط داعمة للعمليات والأنظمة البيولوجية.",
-          "children": []
-        },
-        {
-          "id": "ar-bio-micropropagation",
-          "title": "الإكثار الدقيق للنباتات",
-          "notionId": "40173152f171819797b1c99f4bdefd2c",
-          "url": "https://app.notion.com/p/40173152f171819797b1c99f4bdefd2c",
-          "description": "تقنيات الإكثار النباتي الدقيق ومراحل التحضير والمتابعة.",
-          "children": []
-        }
-      ],
-      "description": "مسارات التكنولوجيا الحيوية التطبيقية: التخمير، الأوساط والركائز، وأنظمة الزراعة والعمليات التجريبية.",
-      "relations": [
-        {
-          "target": "evidence",
-          "label": "الموارد الميكروبية · مستويات الإثبات",
-          "basis": "notion-link",
-          "evidence": "الكائنات الدقيقة ذات الأهمية الزراعية"
-        }
-      ]
-    },
-    {
-      "id": "soil",
-      "title": "التكنولوجيا الزراعية",
-      "notionId": "40173152f17181488cf8ec1851cddb56",
-      "url": "https://app.notion.com/p/40173152f17181488cf8ec1851cddb56",
-      "children": [
-        {
-          "id": "ar-soil-biostimulants",
-          "title": "المحفزات الحيوية والحلول البيولوجية",
-          "notionId": "40173152f17181849ca3e8e0b2475b37",
-          "url": "https://app.notion.com/p/40173152f17181849ca3e8e0b2475b37",
-          "description": "موارد وحلول بيولوجية قيد الدراسة والتوثيق.",
-          "children": []
-        },
-        {
-          "id": "ar-soil-equipment",
-          "title": "المعدات التجريبية",
-          "notionId": "40173152f17181808451e8fe7c9931e1",
-          "url": "https://app.notion.com/p/40173152f17181808451e8fe7c9931e1",
-          "description": "معدات البحث والتجريب وأنظمة الزراعة والتخمير والقياس، مع توضيح مرحلة التطوير.",
-          "children": []
-        },
-        {
-          "id": "ar-soil-substrate-preparation",
+          "id": "ref-40173152f1718117a1b5d73ad90a1951",
           "title": "تحضير الركائز",
+          "kind": "reference",
           "notionId": "40173152f1718117a1b5d73ad90a1951",
           "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
-          "description": "تحضير الدعامات الزراعية وتوثيق المواد الخام والمعالجة والرطوبة والبنية.",
           "children": []
         },
         {
-          "id": "ar-soil-prototyping",
-          "title": "النمذجة الأولية والتصنيع",
-          "notionId": "40173152f1718145a405d8ce78d45516",
-          "url": "https://app.notion.com/p/40173152f1718145a405d8ce78d45516",
-          "description": "تحويل الحاجة التجريبية إلى تصميم أو جهاز أولي ثم اختباره بحسب مرحلة المشروع.",
+          "id": "page-41f73152f17181afb735e92aaf2acf4a",
+          "title": "التخمير والمزارع البيولوجية",
+          "notionId": "41f73152f17181afb735e92aaf2acf4a",
+          "url": "https://app.notion.com/p/41f73152f17181afb735e92aaf2acf4a",
           "children": []
         },
         {
-          "id": "ar-soil-embedded-measurement",
-          "title": "القياس المدمج",
-          "notionId": "40173152f1718137aee3c9cab4a9bbdf",
-          "url": "https://app.notion.com/p/40173152f1718137aee3c9cab4a9bbdf",
-          "description": "دمج المستشعرات والقياس في المعدات وربط البيانات بسياق التشغيل والتحقق.",
+          "id": "page-41f73152f17181c39f3df06051e9be99",
+          "title": "التحويل الحيوي والإنزيمات",
+          "notionId": "41f73152f17181c39f3df06051e9be99",
+          "url": "https://app.notion.com/p/41f73152f17181c39f3df06051e9be99",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171812daea4c5602996bd3c",
+          "title": "تحضير المواد والعمليات التجريبية",
+          "notionId": "41f73152f171812daea4c5602996bd3c",
+          "url": "https://app.notion.com/p/41f73152f171812daea4c5602996bd3c",
           "children": []
         }
       ],
-      "description": "تعرّف على الكائنات الدقيقة والتفاعلات الجذرية والحلول البيولوجية التي يمكن دراستها لدعم الأنظمة الزراعية.",
       "relations": [
         {
-          "target": "lab",
-          "label": "Technosoil · التجارب النباتية",
-          "basis": "page-content",
-          "evidence": "التكنولوجيا الزراعية — أوساط الزراعة وتثمين الكتلة الحيوية"
+          "target": "biomaterials",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
         }
       ]
     },
     {
-      "id": "iot",
-      "title": "القياس والأتمتة",
-      "notionId": "40173152f17181bf9bcfee1773043585",
-      "url": "https://app.notion.com/p/40173152f17181bf9bcfee1773043585",
+      "id": "biomaterials",
+      "title": "🧱 المواد الحيوية والتصنيع الحيوي",
+      "notionId": "41f73152f1718192b9aedbaa5e027402",
+      "url": "https://app.notion.com/p/41f73152f1718192b9aedbaa5e027402",
       "children": [
+        {
+          "id": "ref-biomaterials-biomaterials-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
+        {
+          "id": "ref-biomaterials-biomaterials-1-40173152f17181bb91b5d8326978d664",
+          "title": "الركائز والدعامات البيولوجية",
+          "kind": "reference",
+          "notionId": "40173152f17181bb91b5d8326978d664",
+          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+          "children": []
+        },
+        {
+          "id": "ref-biomaterials-biomaterials-2-40173152f1718117a1b5d73ad90a1951",
+          "title": "تحضير الركائز",
+          "kind": "reference",
+          "notionId": "40173152f1718117a1b5d73ad90a1951",
+          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
+          "children": []
+        },
+        {
+          "id": "bio",
+          "title": "أرشيف — مرجع تقني للتكنولوجيا الحيوية",
+          "notionId": "40173152f17181bc87b1c17830686007",
+          "url": "https://app.notion.com/p/40173152f17181bc87b1c17830686007",
+          "children": [
+            {
+              "id": "ref-biomaterials-bio-0-40173152f17181f18a55d7ba9a90a713",
+              "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
+              "kind": "reference",
+              "notionId": "40173152f17181f18a55d7ba9a90a713",
+              "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
+              "children": []
+            },
+            {
+              "id": "ref-40173152f17181319400c0c68635241b",
+              "title": "التخمير البيولوجي",
+              "kind": "reference",
+              "notionId": "40173152f17181319400c0c68635241b",
+              "url": "https://app.notion.com/p/40173152f17181319400c0c68635241b",
+              "children": []
+            },
+            {
+              "id": "ref-40173152f17181c0af95d99c3e5e2908",
+              "title": "المفاعلات الحيوية والعمليات الأولية",
+              "kind": "reference",
+              "notionId": "40173152f17181c0af95d99c3e5e2908",
+              "url": "https://app.notion.com/p/40173152f17181c0af95d99c3e5e2908",
+              "children": []
+            },
+            {
+              "id": "ref-biomaterials-bio-3-40173152f17181bb91b5d8326978d664",
+              "title": "الركائز والدعامات البيولوجية",
+              "kind": "reference",
+              "notionId": "40173152f17181bb91b5d8326978d664",
+              "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+              "children": []
+            },
+            {
+              "id": "ref-40173152f171819797b1c99f4bdefd2c",
+              "title": "الإكثار الدقيق للنباتات",
+              "kind": "reference",
+              "notionId": "40173152f171819797b1c99f4bdefd2c",
+              "url": "https://app.notion.com/p/40173152f171819797b1c99f4bdefd2c",
+              "children": []
+            }
+          ],
+          "description": "مسارات التكنولوجيا الحيوية التطبيقية: التخمير، الأوساط والركائز، وأنظمة الزراعة والعمليات التجريبية.",
+          "relations": [
+            {
+              "target": "evidence",
+              "label": "الموارد الميكروبية · مستويات الإثبات",
+              "basis": "notion-link",
+              "evidence": "الكائنات الدقيقة ذات الأهمية الزراعية"
+            }
+          ]
+        },
+        {
+          "id": "page-41f73152f1718176aa2bdafa3e2a0746",
+          "title": "المواد الفطرية والمركبات البيولوجية",
+          "notionId": "41f73152f1718176aa2bdafa3e2a0746",
+          "url": "https://app.notion.com/p/41f73152f1718176aa2bdafa3e2a0746",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171819db566ec96da0547ee",
+          "title": "الكتلة الحيوية والألياف والمواد ذات المصدر الحيوي",
+          "notionId": "41f73152f171819db566ec96da0547ee",
+          "url": "https://app.notion.com/p/41f73152f171819db566ec96da0547ee",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181fa89b6d7edbd44e655",
+          "title": "التصنيع الحيوي والتوصيف والتطبيقات",
+          "notionId": "41f73152f17181fa89b6d7edbd44e655",
+          "url": "https://app.notion.com/p/41f73152f17181fa89b6d7edbd44e655",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
+    },
+    {
+      "id": "instrumentation",
+      "title": "⚙️ الأجهزة والهندسة والأتمتة",
+      "notionId": "41f73152f17181dd81c9cfe38d9845d6",
+      "url": "https://app.notion.com/p/41f73152f17181dd81c9cfe38d9845d6",
+      "children": [
+        {
+          "id": "ref-instrumentation-instrumentation-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
         {
           "id": "ar-iot-sensors",
           "title": "القياس والمستشعرات",
@@ -675,504 +938,70 @@
           "children": []
         },
         {
+          "id": "ar-soil-equipment",
+          "title": "المعدات التجريبية",
+          "notionId": "40173152f17181808451e8fe7c9931e1",
+          "url": "https://app.notion.com/p/40173152f17181808451e8fe7c9931e1",
+          "description": "معدات البحث والتجريب وأنظمة الزراعة والتخمير والقياس، مع توضيح مرحلة التطوير.",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718194b779debf5f7cf331",
+          "title": "الأجهزة والمستشعرات والقياس",
+          "notionId": "41f73152f1718194b779debf5f7cf331",
+          "url": "https://app.notion.com/p/41f73152f1718194b779debf5f7cf331",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171814fa54ec4fac145924a",
+          "title": "الهندسة والمعدات والنمذجة الأولية",
+          "notionId": "41f73152f171814fa54ec4fac145924a",
+          "url": "https://app.notion.com/p/41f73152f171814fa54ec4fac145924a",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181aba8c8ef9e04645277",
+          "title": "الأتمتة والتحكم وأنظمة إنترنت الأشياء",
+          "notionId": "41f73152f17181aba8c8ef9e04645277",
+          "url": "https://app.notion.com/p/41f73152f17181aba8c8ef9e04645277",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
+    },
+    {
+      "id": "digital",
+      "title": "💻 الذكاء الرقمي والبيانات",
+      "notionId": "41f73152f17181418684e3445718a489",
+      "url": "https://app.notion.com/p/41f73152f17181418684e3445718a489",
+      "children": [
+        {
+          "id": "ref-digital-digital-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
+        {
           "id": "ar-iot-traceability",
           "title": "التتبع والبيانات",
           "notionId": "40173152f1718101b2c1f56cd9b8c8c4",
           "url": "https://app.notion.com/p/40173152f1718101b2c1f56cd9b8c8c4",
           "description": "يربط بيانات الدفعات والملاحظات والظروف التجريبية لتسهيل المقارنة والتفسير.",
-          "children": []
-        }
-      ],
-      "description": "أجهزة القياس والحساسات والأتمتة: كيف نجمع بيانات المختبر والبيئة ونحوّلها إلى متابعة عملية.",
-      "relations": [
-        {
-          "target": "myco",
-          "label": "Batch Tracker · تتبع المزارع",
-          "basis": "page-content",
-          "evidence": "قسم Batch Tracker"
-        },
-        {
-          "target": "bio",
-          "label": "Batch Tracker · تتبع الدفعات الحيوية",
-          "basis": "page-content",
-          "evidence": "قسم Batch Tracker"
-        },
-        {
-          "target": "soil",
-          "label": "قياس أوساط الزراعة",
-          "basis": "page-content",
-          "evidence": "قسم Batch Tracker"
-        },
-        {
-          "target": "lab",
-          "label": "متابعة التجارب النباتية",
-          "basis": "page-content",
-          "evidence": "قسم Batch Tracker"
-        }
-      ]
-    },
-    {
-      "id": "lab",
-      "title": "المختبر",
-      "notionId": "40173152f1718187b28fd8c0a564c936",
-      "url": "https://app.notion.com/p/40173152f1718187b28fd8c0a564c936",
-      "children": [
-        {
-          "id": "ar-lab-plant-experimentation",
-          "title": "التجارب النباتية",
-          "notionId": "40173152f1718185a9e8c2972ec186f3",
-          "url": "https://app.notion.com/p/40173152f1718185a9e8c2972ec186f3",
-          "description": "يعرض تجارب النباتات ضمن بيئة المختبر والدفيئة، مع توثيق الظروف والملاحظات وحدود النتائج.",
-          "children": []
-        }
-      ],
-      "description": "مساحة العمل المخبري: الأدوات، إجراءات العمل، والتحضيرات التي تدعم التجارب والتوثيق.",
-      "relations": [
-        {
-          "target": "evidence",
-          "label": "الملاحظات · مستويات الإثبات",
-          "basis": "notion-link",
-          "evidence": "التجارب النباتية"
-        }
-      ]
-    },
-    {
-      "id": "products",
-      "title": "المنتجات والموارد البيولوجية",
-      "notionId": "40173152f171817d8608cafa8a118065",
-      "url": "https://app.notion.com/p/40173152f171817d8608cafa8a118065",
-      "children": [
-        {
-          "id": "ar-public-catalogue",
-          "title": "CATALOGUE PUBLIC — Ressources publiables",
-          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e",
-          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "description": "كتالوج موحد للموارد والمنتجات؛ يجب تأكيد الدفعة والتغليف والتوفر قبل أي طلب.",
-          "children": []
-        },
-        {
-          "id": "ar-product-wa",
-          "title": "WA — آغار الماء الجاهز للاستخدام",
-          "notionId": "40173152f171817d966dd334a044b4e8",
-          "url": "https://app.notion.com/p/40173152f171817d966dd334a044b4e8",
-          "description": "WA (آغار الماء): وسط هلامي فقير بالمغذيات يُحضّر في أطباق بتري. متاح حسب الطلب ووفق الدفعة؛ تُؤكد الكمية والقطر والتغليف والسعر وظروف الحفظ قبل التوريد.",
-          "children": []
-        },
-        {
-          "id": "ar-product-myco-start",
-          "title": "Myco Start — نموذج أولي لطقم بدء زراعة الفطريات",
-          "notionId": "40173152f17181fdb34bf72c6ac036e9",
-          "url": "https://app.notion.com/p/40173152f17181fdb34bf72c6ac036e9",
-          "description": "نموذج أولي تعليمي قيد التطوير — غير متاح للبيع. لم يُحسم بعد المحتوى النهائي والموارد المخصصة وفحوصات الجودة وظروف الحفظ.",
-          "children": []
-        },
-        {
-          "id": "ar-product-myco-plate",
-          "title": "Myco Plate — نموذج أولي لطقم الملاحظة على وسط هلامي",
-          "notionId": "40173152f17181aa8206f4337a7f67d5",
-          "url": "https://app.notion.com/p/40173152f17181aa8206f4337a7f67d5",
-          "description": "نموذج أولي لطقم الملاحظة — غير متاح للبيع. ما تزال مواصفات الوسط والمورد البيولوجي وتتبع الدفعة وفحوصات الجودة بحاجة إلى تحديد وتحقق.",
-          "children": []
-        },
-        {
-          "id": "ar-product-qr-guide",
-          "title": "دليل البدء عبر QR — Myco Start / Myco Plate",
-          "notionId": "40173152f171810bb1afe68cfc91ee7c",
-          "url": "https://app.notion.com/p/40173152f171810bb1afe68cfc91ee7c",
-          "description": "دليل وصول سريع يرافق نماذج Myco Start وMyco Plate ويوجه المستخدم إلى تعليمات البدء.",
-          "children": []
-        },
-        {
-          "id": "ar-products-reference-collection",
-          "title": "مجموعات المرجع البيولوجي",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "ar-products-microbes",
-              "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
-              "notionId": "40173152f17181f18a55d7ba9a90a713",
-              "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
-              "children": [],
-              "kind": "reference"
-            },
-            {
-              "id": "ar-products-pleurotus",
-              "title": "فطر المحار والموارد المرتبطة",
-              "notionId": "40273152f1718104965acbf434612d39",
-              "url": "https://app.notion.com/p/40273152f1718104965acbf434612d39",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
-              "children": [],
-              "kind": "reference"
-            },
-            {
-              "id": "ar-products-other-fungi",
-              "title": "فطريات أخرى",
-              "notionId": "40273152f171817dafeae0d07ecb305f",
-              "url": "https://app.notion.com/p/40273152f171817dafeae0d07ecb305f",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
-              "children": [],
-              "kind": "reference"
-            },
-            {
-              "id": "ar-products-fungal-resources",
-              "title": "الموارد الفطرية",
-              "notionId": "40173152f171814b88a0dbb38a75acdd",
-              "url": "https://app.notion.com/p/40173152f171814b88a0dbb38a75acdd",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
-              "children": [],
-              "kind": "reference"
-            },
-            {
-              "id": "ar-products-mycorrhizae",
-              "title": "الفطريات المرتبطة بجذور النباتات",
-              "notionId": "40173152f17181c6b3baf6efc7bb60bc",
-              "url": "https://app.notion.com/p/40173152f17181c6b3baf6efc7bb60bc",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques. Cross-reference to the canonical page already mapped in its biological universe.",
-              "children": [],
-              "kind": "reference"
-            }
-          ]
-        },
-        {
-          "id": "ar-products-liquid-cultures",
-          "title": "المزارع السائلة — بطاقات الموارد",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "ar-products-lc-1",
-              "title": "LC — Pleurotus ostreatus HK35",
-              "notionId": "40173152f1718150a36eddc52198e963",
-              "url": "https://app.notion.com/p/40173152f1718150a36eddc52198e963",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-2",
-              "title": "LC — Pleurotus ostreatus P80",
-              "notionId": "40173152f17181e7acbcd20c85566bc6",
-              "url": "https://app.notion.com/p/40173152f17181e7acbcd20c85566bc6",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-3",
-              "title": "LC — Pleurotus ostreatus Blue Oyster",
-              "notionId": "40173152f17181fc877cd198e7911eac",
-              "url": "https://app.notion.com/p/40173152f17181fc877cd198e7911eac",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-4",
-              "title": "LC — Pleurotus ostreatus الرمادي الأمريكي",
-              "notionId": "40173152f17181388138ce462dc3596e",
-              "url": "https://app.notion.com/p/40173152f17181388138ce462dc3596e",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-5",
-              "title": "LC — Pleurotus ostreatus KRYOS",
-              "notionId": "40173152f171813081afe4ef7766742b",
-              "url": "https://app.notion.com/p/40173152f171813081afe4ef7766742b",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-6",
-              "title": "LC — Pleurotus ostreatus G8",
-              "notionId": "40173152f17181f4888dc89c8c43ee76",
-              "url": "https://app.notion.com/p/40173152f17181f4888dc89c8c43ee76",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-7",
-              "title": "LC — Pleurotus pulmonarius",
-              "notionId": "40173152f17181ab8b0bd41a5832e355",
-              "url": "https://app.notion.com/p/40173152f17181ab8b0bd41a5832e355",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-8",
-              "title": "LC — Pleurotus eryngii (الهجن)",
-              "notionId": "40173152f1718121bb57fd5eb152e64d",
-              "url": "https://app.notion.com/p/40173152f1718121bb57fd5eb152e64d",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-9",
-              "title": "LC — Pleurotus columbinus",
-              "notionId": "40173152f17181c393c6c26aa5b9191b",
-              "url": "https://app.notion.com/p/40173152f17181c393c6c26aa5b9191b",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-10",
-              "title": "LC — Trichoderma harzianum",
-              "notionId": "40173152f171816c812df39d52e2484c",
-              "url": "https://app.notion.com/p/40173152f171816c812df39d52e2484c",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-11",
-              "title": "LC — Trichoderma hamatum",
-              "notionId": "40173152f1718190872de4a9c5a21e64",
-              "url": "https://app.notion.com/p/40173152f1718190872de4a9c5a21e64",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-12",
-              "title": "LC — Trichoderma koningii",
-              "notionId": "40173152f1718110a2dfc823dc27bf03",
-              "url": "https://app.notion.com/p/40173152f1718110a2dfc823dc27bf03",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-13",
-              "title": "LC — Trichoderma longibrachiatum",
-              "notionId": "40173152f17181c49f19f0cb82752d75",
-              "url": "https://app.notion.com/p/40173152f17181c49f19f0cb82752d75",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-14",
-              "title": "LC — Trichoderma reesei",
-              "notionId": "40173152f171813aa500fc6f2f1684c4",
-              "url": "https://app.notion.com/p/40173152f171813aa500fc6f2f1684c4",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-15",
-              "title": "LC — Pleurotus pulmonarius، الصيف",
-              "notionId": "40173152f1718165a79ace1bc6189c24",
-              "url": "https://app.notion.com/p/40173152f1718165a79ace1bc6189c24",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-lc-16",
-              "title": "LC — Pleurotus pulmonarius، الشتاء",
-              "notionId": "40173152f17181cab9f3e85af551ebde",
-              "url": "https://app.notion.com/p/40173152f17181cab9f3e85af551ebde",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "ar-products-solid-supports",
-          "title": "الآغار والدعامات الصلبة",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "ar-products-solid-1",
-              "title": "WA — gélose à l’eau prête à l’emploi",
-              "notionId": "3f473152f171812a814dd7b951786313",
-              "url": "https://app.notion.com/p/3f473152f171812a814dd7b951786313",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-solid-2",
-              "title": "PDA — آغار البطاطا والدكستروز",
-              "notionId": "40173152f1718183ac57e3d7235ce00b",
-              "url": "https://app.notion.com/p/40173152f1718183ac57e3d7235ce00b",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-solid-3",
-              "title": "PDAE GRAIN+ — آغار مدعم بماء الحبوب",
-              "notionId": "40173152f17181098d44c5e85d73b05c",
-              "url": "https://app.notion.com/p/40173152f17181098d44c5e85d73b05c",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
-        },
-        {
-          "id": "ar-products-formulations",
-          "title": "تركيبات وأوساط BA Labs",
-          "kind": "section",
-          "description": "Rubrique de la page Notion parente ; ce n’est pas une page Notion autonome.",
-          "children": [
-            {
-              "id": "ar-products-formula-1",
-              "title": "MASTER B / BLAGARD",
-              "notionId": "40173152f17181c482b4f0d4f3ce27e4",
-              "url": "https://app.notion.com/p/40173152f17181c482b4f0d4f3ce27e4",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-2",
-              "title": "G CLAIR",
-              "notionId": "40173152f171811eb843dd419d8279c0",
-              "url": "https://app.notion.com/p/40173152f171811eb843dd419d8279c0",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-3",
-              "title": "G LIGNEUX",
-              "notionId": "40173152f1718179a6faf08806253a46",
-              "url": "https://app.notion.com/p/40173152f1718179a6faf08806253a46",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-4",
-              "title": "BA CLEAN — آغار للتنقية المساعدة",
-              "notionId": "40173152f17181af8deed2f4f1437990",
-              "url": "https://app.notion.com/p/40173152f17181af8deed2f4f1437990",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-5",
-              "title": "LC GRAIN",
-              "notionId": "40173152f17181e580bcc4963a38ab29",
-              "url": "https://app.notion.com/p/40173152f17181e580bcc4963a38ab29",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-6",
-              "title": "LC TRANSFER",
-              "notionId": "40173152f17181a5928ae148d8e07a85",
-              "url": "https://app.notion.com/p/40173152f17181a5928ae148d8e07a85",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-7",
-              "title": "LC HOLDING",
-              "notionId": "40173152f1718150bbf6f9054be8b905",
-              "url": "https://app.notion.com/p/40173152f1718150bbf6f9054be8b905",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-8",
-              "title": "LCMD — وسط سائل بدبس التمر",
-              "notionId": "40173152f17181888a6af073a562afcd",
-              "url": "https://app.notion.com/p/40173152f17181888a6af073a562afcd",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-9",
-              "title": "LC LIGNICOLE",
-              "notionId": "40173152f171815b8537fd09016220d6",
-              "url": "https://app.notion.com/p/40173152f171815b8537fd09016220d6",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            },
-            {
-              "id": "ar-products-formula-10",
-              "title": "LC TERRICOLE",
-              "notionId": "40173152f17181c5ab66c8dab2791814",
-              "url": "https://app.notion.com/p/40173152f17181c5ab66c8dab2791814",
-              "description": "Page publique référencée dans la page Produits & ressources biologiques.",
-              "children": []
-            }
-          ]
-        }
-      ],
-      "description": "تصفّح الموارد والمنتجات البيولوجية، مع معلومات الاستخدام والصيغ والتوفر وحدود الأدلة لكل بطاقة.",
-      "relations": [
-        {
-          "target": "bio",
-          "label": "الموارد الميكروبية",
-          "basis": "notion-link",
-          "evidence": "المنتجات والموارد الحيوية"
-        },
-        {
-          "target": "myco",
-          "label": "الموارد الفطرية",
-          "basis": "notion-link",
-          "evidence": "المنتجات والموارد الحيوية"
-        },
-        {
-          "target": "work",
-          "label": "الأعمال الموثقة",
-          "basis": "notion-link",
-          "evidence": "المنتجات والموارد الحيوية"
-        },
-        {
-          "target": "evidence",
-          "label": "مستويات الإثبات",
-          "basis": "notion-link",
-          "evidence": "المنتجات والموارد الحيوية"
-        }
-      ]
-    },
-    {
-      "id": "work",
-      "title": "البحث والتطوير",
-      "notionId": "40173152f17181668ddef98b9e1ddec4",
-      "url": "https://app.notion.com/p/40173152f17181668ddef98b9e1ddec4",
-      "children": [
-        {
-          "id": "ar-home",
-          "title": "BA Labs — التكنولوجيا الحيوية التطبيقية",
-          "notionId": "40173152f17181eaaffbeb758d7dc175",
-          "url": "https://app.notion.com/p/40173152f17181eaaffbeb758d7dc175",
-          "description": "الصفحة الرئيسية العامة باللغة العربية.",
-          "children": [],
-          "kind": "page"
-        },
-        {
-          "id": "ar-work-documented",
-          "title": "الأعمال والإنجازات الموثقة",
-          "notionId": "40173152f171811aaac8db82b1c7a9fe",
-          "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
-          "description": "مشاريع وأعمال موثقة مع عرض حدود النتائج المتاحة.",
-          "children": [
-            {
-              "id": "ar-work-detailed-examples",
-              "title": "أمثلة مفصلة على المشاريع الموثقة",
-              "notionId": "40173152f17181c7ab4ad1cdeac8d075",
-              "url": "https://app.notion.com/p/40173152f17181c7ab4ad1cdeac8d075",
-              "description": "أمثلة تفصيلية للأعمال التطبيقية والمشاريع التي يجري تتبعها."
-            }
-          ]
-        },
-        {
-          "id": "ar-work-collaboration",
-          "title": "التعاون مع BA Labs",
-          "notionId": "40173152f171810fb42cfa5856ae0356",
-          "url": "https://app.notion.com/p/40173152f171810fb42cfa5856ae0356",
-          "description": "مسارات التعاون وتحديد احتياجات المشاريع.",
-          "children": []
-        },
-        {
-          "id": "ar-work-methodology",
-          "title": "منهجية البحث والتطوير",
-          "notionId": "40273152f1718172aabbe09bb712c3d1",
-          "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
-          "description": "صياغة الأسئلة والفرضيات وتصميم المقارنات وفق مستوى الأدلة المتاح.",
-          "children": []
-        },
-        {
-          "id": "ar-work-prototypes",
-          "title": "النماذج الأولية والتجارب",
-          "notionId": "40273152f17181b1bd80d6bd6f490e76",
-          "url": "https://app.notion.com/p/40273152f17181b1bd80d6bd6f490e76",
-          "description": "اختبار الفرضيات البيولوجية والتقنية عبر نماذج أولية وتجارب قابلة للتوثيق.",
           "children": []
         },
         {
@@ -1184,83 +1013,105 @@
           "children": []
         },
         {
-          "id": "ar-work-validation",
-          "title": "التكرار والتحقق",
-          "notionId": "40273152f17181b1b609e3d7bf74b712",
-          "url": "https://app.notion.com/p/40273152f17181b1b609e3d7bf74b712",
-          "description": "تحليل الانحرافات وتحسين العمليات مع التمييز بين النتيجة الأولية والتحقق.",
+          "id": "ref-40173152f1718187930fd89b1a619738",
+          "title": "القياس والمستشعرات",
+          "kind": "reference",
+          "notionId": "40173152f1718187930fd89b1a619738",
+          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
           "children": []
         },
         {
-          "id": "ar-work-network",
-          "title": "الخبرات والشبكة العلمية",
-          "notionId": "40273152f17181ceb6a0ce339a9df585",
-          "url": "https://app.notion.com/p/40273152f17181ceb6a0ce339a9df585",
-          "description": "عرض القدرات الحالية ومجالات الخبرة الخارجية المطلوبة للتوصيف والتحقق.",
+          "id": "page-41f73152f17181afa901e82b7a48fc0b",
+          "title": "البرمجيات والهندسة والتطوير",
+          "notionId": "41f73152f17181afa901e82b7a48fc0b",
+          "url": "https://app.notion.com/p/41f73152f17181afa901e82b7a48fc0b",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718125b8d6cbd9f1f7dc60",
+          "title": "البيانات والتتبع ونظم المعلومات",
+          "notionId": "41f73152f1718125b8d6cbd9f1f7dc60",
+          "url": "https://app.notion.com/p/41f73152f1718125b8d6cbd9f1f7dc60",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171819baa96f199be1d799f",
+          "title": "الذكاء الاصطناعي والنمذجة والتصور",
+          "notionId": "41f73152f171819baa96f199be1d799f",
+          "url": "https://app.notion.com/p/41f73152f171819baa96f199be1d799f",
           "children": []
         }
       ],
-      "description": "مشاريع BA Labs وأعمال البحث والتطوير: النماذج التجريبية، النتائج الموثقة، وفرص التعاون.",
       "relations": [
         {
-          "target": "evidence",
-          "label": "الأعمال والإنجازات الموثقة",
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
           "basis": "notion-link",
-          "evidence": "البحث والتطوير"
+          "evidence": "تشير بوابتا العالمين إلى 3 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
         }
       ]
     },
     {
-      "id": "evidence",
-      "title": "ما الذي تدعمه الأدلة حاليًا؟",
-      "notionId": "40173152f17181eb86f6f623452f9f5d",
-      "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
-      "description": "Evidence, documented observations and limits of current work.",
+      "id": "physical",
+      "title": "⚗️ العلوم الفيزيائية والكيميائية والنمذجة",
+      "notionId": "41f73152f171812aad13dc593fa7ba60",
+      "url": "https://app.notion.com/p/41f73152f171812aad13dc593fa7ba60",
       "children": [
         {
-          "id": "evidence-resource-1",
-          "title": "الأعمال والإنجازات الموثقة",
-          "url": "https://app.notion.com/p/40173152f171811aaac8db82b1c7a9fe",
-          "children": [],
+          "id": "ref-physical-physical-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
           "kind": "reference",
-          "notionId": "40173152f171811aaac8db82b1c7a9fe"
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
         },
         {
-          "id": "evidence-resource-2",
-          "title": "منهجية البحث والتطوير",
-          "url": "https://app.notion.com/p/40273152f1718172aabbe09bb712c3d1",
-          "children": [],
+          "id": "ref-40273152f171810f82d3fafb6e7003be",
+          "title": "القياس وقابلية التكرار",
           "kind": "reference",
-          "notionId": "40273152f1718172aabbe09bb712c3d1"
+          "notionId": "40273152f171810f82d3fafb6e7003be",
+          "url": "https://app.notion.com/p/40273152f171810f82d3fafb6e7003be",
+          "children": []
         },
         {
-          "id": "evidence-resource-3",
-          "title": "CATALOGUE PUBLIC — Ressources publiables",
-          "url": "https://app.notion.com/p/d0fbe1d779344eb58bc240fe7876ae0e",
-          "children": [],
+          "id": "ref-40173152f17181eb86f6f623452f9f5d",
+          "title": "ما الذي تدعمه الأدلة حاليًا؟",
           "kind": "reference",
-          "notionId": "d0fbe1d779344eb58bc240fe7876ae0e"
+          "notionId": "40173152f17181eb86f6f623452f9f5d",
+          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
+          "children": []
         },
         {
-          "id": "evidence-resource-4",
-          "title": "التعاون مع BA Labs",
-          "url": "https://app.notion.com/p/40173152f17181598fc7f2f5a3e64e8a",
-          "notionId": "40173152f17181598fc7f2f5a3e64e8a",
-          "children": [
-            {
-              "id": "collaboration-proposal-ar",
-              "title": "إعداد مقترح مشروع",
-              "notionId": "40273152f17181dc97fdfeeca44a791c",
-              "url": "https://app.notion.com/p/40273152f17181dc97fdfeeca44a791c",
-              "description": "إرشادات إعداد مقترح تعاون مع BA Labs.",
-              "children": []
-            }
-          ]
+          "id": "ref-physical-physical-3-40173152f1718187930fd89b1a619738",
+          "title": "القياس والمستشعرات",
+          "kind": "reference",
+          "notionId": "40173152f1718187930fd89b1a619738",
+          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718142ad6ee514071bd254",
+          "title": "الكيمياء وتوصيف الأوساط",
+          "notionId": "41f73152f1718142ad6ee514071bd254",
+          "url": "https://app.notion.com/p/41f73152f1718142ad6ee514071bd254",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c3bcb9eda6d462053c",
+          "title": "الفيزياء والانتقال والديناميكا الحرارية",
+          "notionId": "41f73152f17181c3bcb9eda6d462053c",
+          "url": "https://app.notion.com/p/41f73152f17181c3bcb9eda6d462053c",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181d6b9a9d643da7dfdc6",
+          "title": "الرياضيات والإحصاء والنمذجة",
+          "notionId": "41f73152f17181d6b9a9d643da7dfdc6",
+          "url": "https://app.notion.com/p/41f73152f17181d6b9a9d643da7dfdc6",
+          "children": []
         }
       ],
       "relations": []
     }
-  ],
-  "hub": null,
-  "relationModel": "notion-crosslinks-and-documented-topics-v1"
+  ]
 }

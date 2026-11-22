@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const fn = readFileSync("supabase/functions/store-notion-order/index.ts", "utf8");
-assert.ok(fn.includes('Deno.env.get("NOTION" + "_API_KEY")'), "Notion credential must stay server-side");
-assert.ok(fn.includes('type: "data_source_id", data_source_id: DATA_SOURCE_ID'), "Orders must be written to the existing Notion commercial data source");
-assert.ok(fn.includes('"🆕 Nouvelle"') && fn.includes('"Statut"'), "New requests must enter the sales pipeline as new");
-assert.ok(fn.includes("ALLOWED_ORIGINS") && fn.includes("payload_too_large"), "Endpoint must enforce origin and request-size checks");
-assert.ok(fn.includes("PRODUCTS[code]") && fn.includes("fixedPricesOnly"), "Server must validate product codes and avoid treating indicative prices as confirmed");
-assert.ok(fn.includes('NOTION" + "_API_KEY') && !fn.includes("service_role"), "No service-role credential may be exposed or required in the browser");
-console.log("Notion order endpoint contract checks passed.");
+assert.ok(fn.includes("endpoint_retired"), "Legacy endpoint must remain explicitly retired");
+assert.ok(fn.includes("status: 410"), "Retired legacy endpoint must return HTTP 410 Gone");
+assert.ok(fn.includes("create-store-order"), "Legacy endpoint must direct callers to the current Supabase order endpoint");
+const notionKeyName = ["NOTION", "API", "KEY"].join("_");
+const privilegedRoleName = ["service", "role"].join("_");
+assert.ok(!fn.includes(notionKeyName) && !fn.includes(privilegedRoleName), "Retired endpoint must not contain credentials or privileged client secrets");
+console.log("Retired Notion order endpoint contract checks passed.");

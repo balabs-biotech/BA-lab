@@ -214,23 +214,26 @@ try {
       assert.ok(catalogueLayout.paragraphs.length > 0 && catalogueLayout.paragraphs.every(p => p.width > catalogueLayout.viewportWidth * .65 && p.writingMode === 'horizontal-tb'), 'Mobile catalogue copy must remain horizontal and readable, not stretched into a narrow vertical strip');
     }
     const originalUrl = page.url();
-    await page.locator('.experience-controls button').nth(0).click();
-    await page.locator('.experience-controls button').nth(0).click();
+    const researchChapter = page.locator('.neural-node[data-index="1"]');
+    await researchChapter.click();
+    await page.waitForFunction(() => document.querySelector('#chapter-research')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
+    const networkChapter = page.locator('.neural-node[data-index="2"]');
+    await networkChapter.click();
     await page.waitForFunction(() => document.querySelector('#chapter-network')?.getAttribute('aria-current') === 'page', undefined, { timeout: 10000 });
-    await page.locator('#chapter-network a[data-domain-page="myco"]').click();
-    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === 'MYCOLOGIE', undefined, { timeout: 15000 });
+    await page.locator('#chapter-network a[data-domain-page="microbiology"]').click();
+    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === '🧫 Microbiologie & sciences cellulaires', undefined, { timeout: 15000 });
     assert.equal(page.url(), originalUrl, 'Selecting a universe must stay inside the normal BA Labs homepage');
     assert.ok((await page.locator('#selection').innerText()).length > 0, 'Direct domain selection must focus the requested universe in the embedded scene');
-    assert.equal(await page.locator('#selection .selection-title').textContent(), 'MYCOLOGIE', 'The selected universe must be visibly named in the compact dock');
-    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), 'https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063', 'The selected universe must expose its canonical public Notion page');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), '🧫 Microbiologie & sciences cellulaires', 'The selected universe must be visibly named in the compact dock');
+    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), 'https://app.notion.com/p/41f73152f171818ea68cf2ed99aa3706', 'The selected universe must expose its canonical public Notion page');
     assert.ok(await page.locator('#selection').evaluate((element) => element.getBoundingClientRect().width > 100 && element.getBoundingClientRect().height > 20), 'The selected-node dock must be visible and not clipped');
-    assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), 'location', 'The side rail must reflect the focused universe');
-    await page.locator('.universe-rail [data-universe="bio"]').click();
-    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === 'BIOTECHNOLOGIE', undefined, { timeout: 10000 });
-    assert.equal(await page.locator('.universe-rail [data-universe="bio"]').getAttribute('aria-current'), 'location', 'Clicking a side point must focus and activate its matching universe');
-    assert.equal(await page.locator('.universe-rail [data-universe="myco"]').getAttribute('aria-current'), null, 'Only the currently focused universe may be active in the side rail');
+    assert.equal(await page.locator('.universe-rail [data-universe="microbiology"]').getAttribute('aria-current'), 'location', 'The side rail must reflect the focused universe');
+    await page.locator('.universe-rail [data-universe="plants"]').click();
+    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent?.trim() === '🌱 Sciences végétales & agronomie', undefined, { timeout: 10000 });
+    assert.equal(await page.locator('.universe-rail [data-universe="plants"]').getAttribute('aria-current'), 'location', 'Clicking a side point must focus and activate its matching universe');
+    assert.equal(await page.locator('.universe-rail [data-universe="microbiology"]').getAttribute('aria-current'), null, 'Only the currently focused universe may be active in the side rail');
     // Every one of the eight public points must stay synchronized with the focused root.
-    for (const domain of ['myco','bio','iot','soil','lab','products','work','learn']) {
+    for (const domain of ['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical']) {
       await page.locator('.universe-rail [data-universe="' + domain + '"]').click();
       await page.waitForFunction((expected) => {
         const canvas = document.querySelector('#field');
@@ -249,8 +252,8 @@ try {
     await page.close();
   }
   const route = await browser.newPage();
-  await route.goto(base + 'universe.html?domain=soil&lang=pt', { waitUntil: 'domcontentloaded' });
-  await route.waitForURL(/explorer-2d\.html\?domain=soil&lang=pt|explorer-2d\.html\?lang=pt&domain=soil/, { timeout: 10000 });
+  await route.goto(base + 'universe.html?domain=physical&lang=pt', { waitUntil: 'domcontentloaded' });
+  await route.waitForURL(/explorer-2d\.html\?domain=physical&lang=pt|explorer-2d\.html\?lang=pt&domain=physical/, { timeout: 10000 });
   console.log(JSON.stringify({ vernpixiEmbeddedHomepage: 'PASS', results, universeRouteRedirect: true }, null, 2));
   await route.close();
 } finally {

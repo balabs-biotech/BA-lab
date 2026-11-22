@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "source": "Live public Notion universe pages; canonical page IDs and URLs",
+  "language": "fr",
+  "universeModel": "eight-peer-scientific-domains-v1",
+  "relationModel": "notion-crosslinks-and-documented-topics-v1",
+  "domains": [
+    {
+      "id": "microbiology",
+      "title": "Microbiologie & sciences cellulaires",
+      "notionId": "41f73152f171818ea68cf2ed99aa3706",
+      "url": "https://app.notion.com/p/41f73152f171818ea68cf2ed99aa3706",
+      "children": [],
+      "relations": [
+        {
+          "target": "plants",
+          "label": "Interactions microorganismes–plantes",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre microbiology et plants."
+        },
+        {
+          "target": "bioprocesses",
+          "label": "Microorganismes et bioconversion",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre microbiology et bioprocesses."
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "title": "Sciences végétales & agronomie",
+      "notionId": "41f73152f1718161af13d1fbe52250de",
+      "url": "https://app.notion.com/p/41f73152f1718161af13d1fbe52250de",
+      "children": [],
+      "relations": [
+        {
+          "target": "ecology",
+          "label": "Systèmes végétaux et sols",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre plants et ecology."
+        },
+        {
+          "target": "bioprocesses",
+          "label": "Cultures et procédés biologiques",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre plants et bioprocesses."
+        }
+      ]
+    },
+    {
+      "id": "ecology",
+      "title": "Sols, écosystèmes & environnement",
+      "notionId": "41f73152f171819f9b7acbd64ccf4a3e",
+      "url": "https://app.notion.com/p/41f73152f171819f9b7acbd64ccf4a3e",
+      "children": [],
+      "relations": [
+        {
+          "target": "bioprocesses",
+          "label": "Cycles de biomasse et bioconversion",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre ecology et bioprocesses."
+        }
+      ]
+    },
+    {
+      "id": "bioprocesses",
+      "title": "Bioprocédés & bioconversion",
+      "notionId": "41f73152f1718108ac67e06204a60c7f",
+      "url": "https://app.notion.com/p/41f73152f1718108ac67e06204a60c7f",
+      "children": [],
+      "relations": [
+        {
+          "target": "biomaterials",
+          "label": "Biomasses et matériaux biosourcés",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre bioprocesses et biomaterials."
+        }
+      ]
+    },
+    {
+      "id": "biomaterials",
+      "title": "Biomatières & biofabrication",
+      "notionId": "41f73152f1718117a38df4afe2d4fb9d",
+      "url": "https://app.notion.com/p/41f73152f1718117a38df4afe2d4fb9d",
+      "children": [],
+      "relations": [
+        {
+          "target": "engineering",
+          "label": "Prototypage et fabrication",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre biomaterials et engineering."
+        }
+      ]
+    },
+    {
+      "id": "engineering",
+      "title": "Instrumentation, ingénierie & automatisation",
+      "notionId": "41f73152f1718170ba14e91650b0c806",
+      "url": "https://app.notion.com/p/41f73152f1718170ba14e91650b0c806",
+      "children": [],
+      "relations": [
+        {
+          "target": "digital",
+          "label": "Instrumentation et données",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre engineering et digital."
+        }
+      ]
+    },
+    {
+      "id": "digital",
+      "title": "Intelligence numérique & données",
+      "notionId": "41f73152f171816e8f0ed9e629fb70fe",
+      "url": "https://app.notion.com/p/41f73152f171816e8f0ed9e629fb70fe",
+      "children": [],
+      "relations": [
+        {
+          "target": "physical",
+          "label": "Mesures, modèles et données",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre digital et physical."
+        }
+      ]
+    },
+    {
+      "id": "physical",
+      "title": "Sciences physiques, chimiques & modélisation",
+      "notionId": "41f73152f1718142aaf0d01bba51ecfb",
+      "url": "https://app.notion.com/p/41f73152f1718142aaf0d01bba51ecfb",
+      "children": [],
+      "relations": [
+        {
+          "target": "bioprocesses",
+          "label": "Caractérisation physico-chimique des procédés",
+          "basis": "page-content",
+          "evidence": "Connexion interdisciplinaire décrite dans les pages publiques BA Labs entre physical et bioprocesses."
+        }
+      ]
+    }
+  ]
+}
