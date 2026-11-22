@@ -55,6 +55,37 @@ try {
     assert.deepEqual(mappedTree.unmapped, [], 'No synthetic folders or unlinked placeholder nodes');
     assert.equal(mappedTree.uniquePages, mappedTree.canonicalPages, 'Canonical Notion pages must not be duplicated; explicit reference links are allowed');
     assert.ok(mappedTree.roots.every(root => root.url && root.notionId), 'All eight public Notion universe roots must be directly mapped');
+    // Pick a real root -> branch -> leaf path. A leaf elsewhere in the tree
+    // cannot be used to assert the Back behavior of this selected branch.
+    const navigationFixture = await page.evaluate(async () => {
+      const data = await (await fetch('./notion-tree.fr.json')).json();
+      const flatten = items => (items || []).flatMap(item => item.kind === 'section' ? flatten(item.children) : [item]);
+      const findLeaf = (items, parent) => {
+        for (const node of flatten(items)) {
+          if (node.notionId && node.url && node.kind !== 'reference' && !(node.children || []).length) {
+            return { node, parent };
+          }
+          const nested = findLeaf(node.children, node);
+          if (nested) return nested;
+        }
+        return null;
+      };
+      for (const root of data.domains || []) {
+        for (const branch of flatten(root.children)) {
+          const found = findLeaf(branch.children, branch);
+          if (found) return {
+            rootId: root.id, rootTitle: root.title,
+            branchId: branch.id, branchTitle: branch.title,
+            leafId: found.node.id, leafTitle: found.node.title,
+            leafUrl: found.node.url, leafParentId: found.parent.id,
+            leafParentTitle: found.parent.title
+          };
+        }
+      }
+      return null;
+    });
+    assert.ok(navigationFixture?.rootId && navigationFixture?.branchId && navigationFixture?.leafId,
+      'The manifest must expose one complete canonical root -> branch -> leaf path');
 
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
@@ -68,7 +99,7 @@ try {
     assert.ok(visibleNodes >= 8, 'At least the eight universe roots must be available');
     // A real point activation must preserve the explorer and open the exact
     // canonical Notion page in a separate tab. Use trusted Playwright clicks.
-    const rootButton = nav.first();
+    const rootButton = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.rootId + '"]');
     const rootNodeId = await rootButton.getAttribute('data-node-id');
     const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
     await page.evaluate(() => {
@@ -83,7 +114,7 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
-    const firstChild = page.locator('#accessibleNodes button[data-level="1"]').first();
+    const firstChild = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.branchId + '"]');
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
     const childExpectedUrl = mappedTree.nodeUrls[childNodeId];
@@ -93,19 +124,13 @@ try {
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Keyboard selection must not open Notion on first activation');
 
     // Regression: clicking any verified leaf label must open its exact Notion destination.
-    const leafFixture = await page.evaluate(async () => {
-      const data = await (await fetch('./notion-tree.fr.json')).json();
-      let result = null;
-      const visit = (items, visibleParent = null) => (items || []).forEach(node => {
-        if (!result && node.notionId && node.url && node.kind !== 'reference' && !(node.children || []).length && visibleParent) {
-          result = { id: node.id, parentId: visibleParent.id, parentTitle: visibleParent.title, url: node.url, title: node.title };
-        }
-        visit(node.children, node.kind === 'section' ? visibleParent : node);
-      });
-      visit(data.domains);
-      return result;
-    });
-    assert.ok(leafFixture?.id && leafFixture.url, 'The manifest must expose a canonical leaf page with a Notion destination');
+    const leafFixture = {
+      id: navigationFixture.leafId,
+      parentId: navigationFixture.leafParentId,
+      parentTitle: navigationFixture.leafParentTitle,
+      url: navigationFixture.leafUrl,
+      title: navigationFixture.leafTitle
+    };
     const leafButton = page.locator('#accessibleNodes button[data-node-id="' + leafFixture.id + '"]');
     await leafButton.focus();
     await leafButton.press('Enter');
