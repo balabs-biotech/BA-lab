@@ -6,7 +6,8 @@
   "domains": [
     {
       "id": "microbiology",
-      "title": "🧫 Microbiologie & sciences cellulaires",
+      "academyUniverseId": "myco",
+      "title": "MYCOLOGIE",
       "notionId": "41f73152f171818ea68cf2ed99aa3706",
       "url": "https://app.notion.com/p/41f73152f171818ea68cf2ed99aa3706",
       "children": [
@@ -411,7 +412,8 @@
     },
     {
       "id": "plants",
-      "title": "🌱 Sciences végétales & agronomie",
+      "academyUniverseId": "bio",
+      "title": "BIOTECHNOLOGIE",
       "notionId": "41f73152f1718161af13d1fbe52250de",
       "url": "https://app.notion.com/p/41f73152f1718161af13d1fbe52250de",
       "children": [
@@ -625,7 +627,8 @@
     },
     {
       "id": "ecology",
-      "title": "🌍 Sols, écosystèmes & environnement",
+      "academyUniverseId": "iot",
+      "title": "INSTRUMENTATION & AUTOMATISATION",
       "notionId": "41f73152f171819f9b7acbd64ccf4a3e",
       "url": "https://app.notion.com/p/41f73152f171819f9b7acbd64ccf4a3e",
       "children": [
@@ -785,7 +788,8 @@
     },
     {
       "id": "bioprocesses",
-      "title": "♻️ Bioprocédés & bioconversion",
+      "academyUniverseId": "soil",
+      "title": "AGROTECHNOLOGIE",
       "notionId": "41f73152f1718108ac67e06204a60c7f",
       "url": "https://app.notion.com/p/41f73152f1718108ac67e06204a60c7f",
       "children": [
@@ -906,7 +910,8 @@
     },
     {
       "id": "biomaterials",
-      "title": "🧱 Biomatières & biofabrication",
+      "academyUniverseId": "lab",
+      "title": "LABORATOIRE & EXPÉRIMENTATION",
       "notionId": "41f73152f1718117a38df4afe2d4fb9d",
       "url": "https://app.notion.com/p/41f73152f1718117a38df4afe2d4fb9d",
       "children": [
@@ -997,7 +1002,8 @@
     },
     {
       "id": "instrumentation",
-      "title": "⚙️ Instrumentation, ingénierie & automatisation",
+      "academyUniverseId": "products",
+      "title": "PRODUITS & RESSOURCES BIOLOGIQUES",
       "notionId": "41f73152f1718170ba14e91650b0c806",
       "url": "https://app.notion.com/p/41f73152f1718170ba14e91650b0c806",
       "children": [
@@ -1112,7 +1118,8 @@
     },
     {
       "id": "digital",
-      "title": "💻 Intelligence numérique & données",
+      "academyUniverseId": "work",
+      "title": "RECHERCHE & DÉVELOPPEMENT",
       "notionId": "41f73152f171816e8f0ed9e629fb70fe",
       "url": "https://app.notion.com/p/41f73152f171816e8f0ed9e629fb70fe",
       "children": [
@@ -1197,7 +1204,8 @@
     },
     {
       "id": "physical",
-      "title": "⚗️ Sciences physiques, chimiques & modélisation",
+      "academyUniverseId": "learn",
+      "title": "RESSOURCES & TRANSMISSION",
       "notionId": "41f73152f1718142aaf0d01bba51ecfb",
       "url": "https://app.notion.com/p/41f73152f1718142aaf0d01bba51ecfb",
       "children": [
