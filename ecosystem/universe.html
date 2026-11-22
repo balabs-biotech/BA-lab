@@ -7,7 +7,7 @@
 <script>
 (function(){
  const params=new URLSearchParams(location.search);
- const allowed=['bio','myco','soil','lab','products','iot','work','learn'];
+ const allowed=['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'];
  const domain=params.get('domain'),lang=params.get('lang')||'fr';
  const target=new URL('./explorer-2d.html',location.href);
  if(allowed.includes(domain))target.searchParams.set('domain',domain);
