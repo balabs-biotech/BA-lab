@@ -6,7 +6,6 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 
 export function createVernpixiNetwork(tree,options={}){
  let nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
- const anchorIds=options.rootLayoutIds||tree.map(root=>root.id);
   nodes=[];edges=[];byId.clear();
   const roots=tree.length;
   const rootLayoutIds=options.rootLayoutIds||tree.map(root=>root.id);
@@ -97,6 +96,5 @@ export function createVernpixiNetwork(tree,options={}){
     existing.add(key);degree.set(pair.a.id,1);degree.set(pair.b.id,1);localAnastomoses++;
    }
   });
-  canvas.dataset.edgeCount=String(edges.length);
  return {nodes,edges,byId,relationIndex,stats:{universeCount:roots,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations:verifiedRelationCount,explicitRelations:explicitRelationCount,contentRelations:contentRelationCount,crossUniverseConnections,localAnastomoses}};
 }
