@@ -24,6 +24,9 @@ export async function createPixiRenderer(canvas){
   for(let i=0;i<110;i++){const x=(i*137.51)%width,y=(i*83.71)%height;field.circle(x,y,i%9===0?1.1:.6).fill({color:i%7===0?0xb96b4d:0xd1d0c5,alpha:i%5===0?.16:.055});}
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
+  const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
+  const terminalIds=new Set(nodes.filter(n=>n.level>0&&!branchParents.has(n.id)).map(n=>n.id));
+  const bezierPoint=(a,c,b,t)=>{const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};};
   for(const e of edges){
    const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
    const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
@@ -32,8 +35,21 @@ export async function createPixiRenderer(canvas){
    const drift=(((seed>>>12)&255)/255-.5)*Math.min(24,len*.09);
    const cx=(a.x+b.x)/2-dy/len*bend+dx/len*drift,cy=(a.y+b.y)/2+dx/len*bend+dy/len*drift;
    const color=PALETTE[e.a.colorKey||e.a.rootId]||0x91a99b,widthBase=e.verified?1.2:e.cross?.55:Math.max(.45,(e.depth===1?1.5:e.depth===2?1.15:.85));
-   if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color,alpha:alpha*.12,width:widthBase*3.1,cap:"round"});
-   filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color,alpha:alpha*(e.verified?.82:e.cross?.34:depth>=3?.42:depth===2?.62:.78),width:widthBase,cap:"round"});
+   const terminalTip=!e.cross&&terminalIds.has(e.b.id);
+   const strokeColor=e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
+   const strokeAlpha=alpha*(e.verified?.82:e.cross?.34:depth>=3?.42:depth===2?.62:.78);
+   if(terminalTip){
+    // Taper the final hypha progressively; no terminal bead is drawn.
+    const cuts=[0,.48,.72,.88,1],widths=[widthBase,widthBase*.82,widthBase*.58,widthBase*.30,.06];
+    for(let s=0;s<cuts.length-1;s++){
+     const p0=bezierPoint(a,{x:cx,y:cy},b,cuts[s]),p1=bezierPoint(a,{x:cx,y:cy},b,cuts[s+1]);
+     const midT=(cuts[s]+cuts[s+1])*.5,mid=bezierPoint(a,{x:cx,y:cy},b,midT);
+     filaments.moveTo(p0.x,p0.y).quadraticCurveTo(mid.x,mid.y,p1.x,p1.y).stroke({color:strokeColor,alpha:strokeAlpha*(s===3?.72:1),width:widths[s],cap:"round"});
+    }
+   }else{
+    if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color,alpha:alpha*.12,width:widthBase*3.1,cap:"round"});
+    filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:strokeColor,alpha:strokeAlpha,width:widthBase,cap:"round"});
+   }
    if(e.verified)junctions.circle(cx,cy,Math.max(1.25,1.8/Math.sqrt(scale))).fill({color:e.basis==="notion-link"?0xb96b4d:0x7eaaa3,alpha:.9});
    if(!e.cross&&len>24&&depth<5){
     const count=depth===1?4:depth===2?3:2,nx=-dy/len,ny=dx/len;
@@ -44,9 +60,11 @@ export async function createPixiRenderer(canvas){
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
    const r=Math.max(1.25,n.r),color=PALETTE[n.colorKey||n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
-   if(n.level<=1)junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
-   const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
-   junctions.poly(polygon).fill({color:0x111b1d,alpha}).stroke({color,alpha:alpha*(n.level===0?.88:n.level===1?.68:.42),width:n.level===0?1.6:.9});
+   if(n.level<=1&&!terminalIds.has(n.id))junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
+   if(!terminalIds.has(n.id)){
+    const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
+    junctions.poly(polygon).fill({color:0x111b1d,alpha}).stroke({color,alpha:alpha*(n.level===0?.88:n.level===1?.68:.42),width:n.level===0?1.6:.9});
+   }
    if(selected?.id===n.id)junctions.circle(n.x,n.y,r+7/scale+5/scale).stroke({color:0xe4e7dd,alpha:.9,width:1/scale});
   }
   // One camera transform controls all biological geometry; labels remain screen-readable.
