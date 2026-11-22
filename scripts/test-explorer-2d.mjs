@@ -106,7 +106,8 @@ try {
     // A real point activation must preserve the explorer and open the exact
     // canonical Notion page in a separate tab. Use trusted Playwright clicks.
     const rootButton = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.rootId + '"]');
-    const rootNodeId = await rootButton.getAttribute('data-node-id');\n    assert.equal(await rootButton.getAttribute('data-notion-title'), mappedTree.roots.find(root => root.id === rootNodeId).title, 'Browser navigation title must exactly match the canonical Notion manifest title');
+    const rootNodeId = await rootButton.getAttribute('data-node-id');
+    assert.equal(await rootButton.getAttribute('data-notion-title'), mappedTree.roots.find(root => root.id === rootNodeId).title, 'Browser navigation title must exactly match the canonical Notion manifest title');
     const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
     await page.evaluate(() => {
       window.__openedNotionUrls = [];
@@ -123,7 +124,8 @@ try {
     assert.equal(await page.locator('#field').getAttribute('data-radial-root'), navigationFixture.rootId,
       'Selecting a universe must unfold its own radial hierarchy');
     const ringRadii = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialRingRadii || '[]'));
-    assert.ok(ringRadii.length >= 2, 'The selected universe must unfold at least secondary and tertiary rings');\n    assert.ok(ringRadii[0] >= 400, `The first ring must leave room for long canonical Notion titles (got ${ringRadii[0]})`);
+    assert.ok(ringRadii.length >= 2, 'The selected universe must unfold at least secondary and tertiary rings');
+    assert.ok(ringRadii[0] >= 400, `The first ring must leave room for long canonical Notion titles (got ${ringRadii[0]})`);
     assert.ok(ringRadii.every((radius, index) => index === 0 || radius > ringRadii[index - 1]),
       'Each hierarchy level must occupy a strictly larger concentric ring');
     const ringCounts = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialLevelCounts || '{}'));
