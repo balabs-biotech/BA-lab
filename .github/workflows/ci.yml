@@ -280,15 +280,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Verify shared Vernpixi graph and renderer modules
+        run: |
+          node --experimental-default-type=module scripts/test-vernpixi-shared-engine.mjs
+          node --check --input-type=module < ecosystem-core/explorer-2d-network.js
+          node --check --input-type=module < ecosystem-core/explorer-2d-pixi.js
       - name: Install Playwright
         run: npm install --no-save --no-package-lock playwright
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Serve the 2D explorer
+      - name: Serve repository for public and Academy explorers
         run: |
-          python3 -m http.server 8766 --directory ecosystem > /tmp/explorer-2d.log 2>&1 &
+          python3 -m http.server 8766 --directory . > /tmp/explorer-2d.log 2>&1 &
           for attempt in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:8766/explorer-2d.html > /dev/null; then exit 0; fi
+            if curl --fail --silent http://127.0.0.1:8766/ecosystem/explorer-2d.html > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/explorer-2d.log
@@ -296,7 +301,12 @@ jobs:
       - name: Test continuous scene, direct selection, zoom and languages
         run: node scripts/test-explorer-2d.mjs
         env:
-          BALABS_EXPLORER_URL: http://127.0.0.1:8766/explorer-2d.html?lang=fr
+          BALABS_EXPLORER_URL: http://127.0.0.1:8766/ecosystem/explorer-2d.html?lang=fr
+      - name: Test Academy against the same shared Vernpixi engine
+        run: |
+          node scripts/test-vernpixi-academy-browser.mjs
+        env:
+          BALABS_ACADEMY_EXPLORER_URL: http://127.0.0.1:8766/ecosystem-preview/explorer-2d.html?lang=fr
       - name: Upload desktop and mobile screenshots
         if: always()
         uses: actions/upload-artifact@v4
