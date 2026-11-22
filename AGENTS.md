@@ -11,3 +11,5 @@ Do not add motion unless it has a clear purpose. Respect reduced-motion settings
 Preserve project architecture and deployment choices. The public BA Labs website is hosted on GitHub Pages; do not migrate it to Vercel or another provider unless the user explicitly asks.
 
 See `.agents/skills/README.md` for the installed Emil Kowalski skill pack, references, and BA Labs usage guidance.
+
+For BA Labs-specific visual work, also read `.agents/skills/ba-labs-design-engineering/SKILL.md` and the central catalogue at `docs/design-toolkit/README.md`. This workflow is mandatory for design exploration, component selection, implementation and visual QA.
