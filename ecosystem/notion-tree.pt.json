@@ -72,30 +72,27 @@
               "children": []
             },
             {
-              "id": "page-undefined",
+              "id": "label-microbiology-products-5",
               "title": "Coleções de referência biológica",
-              "url": "https://app.notion.com/p/undefined",
-              "children": []
+              "children": [],
+              "kind": "label"
             },
             {
-              "id": "ref-undefined",
+              "id": "label-microbiology-products-6",
               "title": "Culturas líquidas — fichas de recursos",
-              "kind": "reference",
-              "url": "https://app.notion.com/p/undefined",
+              "kind": "label",
               "children": []
             },
             {
-              "id": "ref-undefined",
+              "id": "label-microbiology-products-7",
               "title": "Ágares e suportes sólidos",
-              "kind": "reference",
-              "url": "https://app.notion.com/p/undefined",
+              "kind": "label",
               "children": []
             },
             {
-              "id": "ref-undefined",
+              "id": "label-microbiology-products-8",
               "title": "Formulações e meios BA Labs",
-              "kind": "reference",
-              "url": "https://app.notion.com/p/undefined",
+              "kind": "label",
               "children": []
             }
           ],
@@ -625,7 +622,7 @@
       "url": "https://app.notion.com/p/41f73152f17181658b77c14bcbff5940",
       "children": [
         {
-          "id": "ref-41f73152f17181568091ece73bfdb09a",
+          "id": "ref-ecology-ecology-0-41f73152f17181568091ece73bfdb09a",
           "title": "Explorar os oito universos da BA Labs",
           "kind": "reference",
           "notionId": "41f73152f17181568091ece73bfdb09a",
@@ -712,7 +709,7 @@
               "children": []
             },
             {
-              "id": "ref-40273152f17181ec8f91e8b65217488d",
+              "id": "ref-ecology-pt-bio-microbes-5-40273152f17181ec8f91e8b65217488d",
               "title": "Bacillus — grupo bacteriano de interesse agrícola",
               "kind": "reference",
               "notionId": "40273152f17181ec8f91e8b65217488d",
@@ -720,7 +717,7 @@
               "children": []
             },
             {
-              "id": "ref-40273152f17181b68096ff132de0480f",
+              "id": "ref-ecology-pt-bio-microbes-6-40273152f17181b68096ff132de0480f",
               "title": "PGPR — bactérias associadas às raízes e potencial agronómico",
               "kind": "reference",
               "notionId": "40273152f17181b68096ff132de0480f",
@@ -730,7 +727,7 @@
           ]
         },
         {
-          "id": "ref-40273152f17181b68096ff132de0480f",
+          "id": "ref-ecology-ecology-6-40273152f17181b68096ff132de0480f",
           "title": "PGPR — Bactérias associadas às raízes e potencial agronómico",
           "kind": "reference",
           "notionId": "40273152f17181b68096ff132de0480f",
@@ -799,7 +796,7 @@
       "url": "https://app.notion.com/p/41f73152f17181488f9eff06d48d9379",
       "children": [
         {
-          "id": "ref-41f73152f17181568091ece73bfdb09a",
+          "id": "ref-bioprocesses-bioprocesses-0-41f73152f17181568091ece73bfdb09a",
           "title": "Explorar os oito universos da BA Labs",
           "kind": "reference",
           "notionId": "41f73152f17181568091ece73bfdb09a",
@@ -886,7 +883,7 @@
       "url": "https://app.notion.com/p/41f73152f17181babafbd221031866b4",
       "children": [
         {
-          "id": "ref-41f73152f17181568091ece73bfdb09a",
+          "id": "ref-biomaterials-biomaterials-0-41f73152f17181568091ece73bfdb09a",
           "title": "Explorar os oito universos da BA Labs",
           "kind": "reference",
           "notionId": "41f73152f17181568091ece73bfdb09a",
@@ -894,7 +891,7 @@
           "children": []
         },
         {
-          "id": "ref-40173152f17181b780dcc20a20962afa",
+          "id": "ref-biomaterials-biomaterials-1-40173152f17181b780dcc20a20962afa",
           "title": "Substratos e suportes biológicos",
           "kind": "reference",
           "notionId": "40173152f17181b780dcc20a20962afa",
@@ -967,7 +964,7 @@
       "url": "https://app.notion.com/p/41f73152f17181049050c327f2b0df92",
       "children": [
         {
-          "id": "ref-41f73152f17181568091ece73bfdb09a",
+          "id": "ref-instrumentation-instrumentation-0-41f73152f17181568091ece73bfdb09a",
           "title": "Explorar os oito universos da BA Labs",
           "kind": "reference",
           "notionId": "41f73152f17181568091ece73bfdb09a",
@@ -1042,7 +1039,7 @@
       "url": "https://app.notion.com/p/41f73152f17181a1aba9d5b91d32a153",
       "children": [
         {
-          "id": "ref-41f73152f17181568091ece73bfdb09a",
+          "id": "ref-digital-digital-0-41f73152f17181568091ece73bfdb09a",
           "title": "Explorar os oito universos da BA Labs",
           "kind": "reference",
           "notionId": "41f73152f17181568091ece73bfdb09a",
@@ -1111,7 +1108,7 @@
       "url": "https://app.notion.com/p/41f73152f1718146a959f08cd87ea17b",
       "children": [
         {
-          "id": "ref-41f73152f17181568091ece73bfdb09a",
+          "id": "ref-physical-physical-0-41f73152f17181568091ece73bfdb09a",
           "title": "Explorar os oito universos da BA Labs",
           "kind": "reference",
           "notionId": "41f73152f17181568091ece73bfdb09a",
@@ -1119,7 +1116,7 @@
           "children": []
         },
         {
-          "id": "ref-40273152f1718150b2beccb7c12d0792",
+          "id": "ref-physical-physical-1-40273152f1718150b2beccb7c12d0792",
           "title": "Medição e reprodutibilidade",
           "kind": "reference",
           "notionId": "40273152f1718150b2beccb7c12d0792",
@@ -1127,7 +1124,7 @@
           "children": []
         },
         {
-          "id": "ref-40173152f17181b780dcc20a20962afa",
+          "id": "ref-physical-physical-2-40173152f17181b780dcc20a20962afa",
           "title": "Substratos e suportes biológicos",
           "kind": "reference",
           "notionId": "40173152f17181b780dcc20a20962afa",
