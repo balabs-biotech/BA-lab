@@ -11,7 +11,7 @@ let pixiRenderer=null,relationIndex=new Map(),overviewPositions=new Map(),radial
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
 const t=k=>COPY[lang][k]||COPY.fr[k],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
-function levelOpacity(level){const thresholds=[0,.72,1.55,2.65,4.1,6.2,8.8],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
+function levelOpacity(level){const thresholds=[0,.55,1.55,2.65,4.1,6.2,8.8],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
@@ -26,8 +26,7 @@ function buildNetwork(){
   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:13,level:0,data:root,rootId:root.id,parent:null,angle};
   nodes.push(rootNode);byId.set(root.id,rootNode);
   const walk=(data,parent,depth,branchAngle)=>{
-   const expandSections=items=>items.flatMap(item=>item.kind==="section"?expandSections(item.children||[]):[item]);
-   const kids=expandSections(data.children||[]);if(!kids.length)return;
+   const kids=data.children||[];if(!kids.length)return;
    const spreadCap=depth===1?2.25:depth===2?1.8:depth===3?1.48:1.25;
    const spread=Math.min(spreadCap,.92+Math.log2(kids.length+1)*.34);
    const dist=depth===1?Math.min(126,98+Math.sqrt(kids.length)*3.5):
@@ -166,7 +165,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=active||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const z=zoomTo??(n.level===0?(w<700?.48:.72):n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const z=zoomTo??(n.level===0?(w<700?.72:.85):n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
