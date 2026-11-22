@@ -165,7 +165,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=active||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const depthZoom=[w<700?.72:.85,1.65,2.8,4.5,6.2,7.8,9.4,10.8,12];const z=zoomTo??depthZoom[Math.min(n.level,depthZoom.length-1)];targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const depthZoom=[w<700?.30:.55,1.35,2.25,3.6,5.0,6.5,8.0,9.6,11.2];const z=zoomTo??depthZoom[Math.min(n.level,depthZoom.length-1)];targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
