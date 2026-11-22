@@ -3,7 +3,16 @@ import { readFile } from 'node:fs/promises';
 import { createVernpixiNetwork } from '../ecosystem-core/explorer-2d-network.js';
 
 const languages = ['fr', 'en', 'ar', 'pt'];
-const canonicalRoots = ['myco', 'bio', 'iot', 'soil', 'lab', 'products', 'work', 'learn'];
+const publicDomainIdentity = {
+  microbiology: 'myco',
+  bioprocesses: 'bio',
+  instrumentation: 'iot',
+  plants: 'soil',
+  physical: 'lab',
+  biomaterials: 'products',
+  digital: 'work',
+  ecology: 'learn'
+};
 
 for (const lang of languages) {
   const academyTree = JSON.parse(await readFile(`ecosystem-preview/notion-tree.${lang}.json`, 'utf8')).domains;
@@ -13,7 +22,14 @@ for (const lang of languages) {
 
   const publicLayoutIds = publicTree.map(root => root.academyUniverseId);
   assert.deepEqual(publicLayoutIds, academyTree.map(root => root.id),
-    `${lang}: every public scientific domain must explicitly map to the Academy's canonical universe order`);
+    `${lang}: public roots must follow the Academy's canonical locale order`);
+  for (const root of publicTree) {
+    assert.equal(root.academyUniverseId, publicDomainIdentity[root.id],
+      `${lang}: ${root.id} must map to its semantically corresponding Academy universe`);
+    const academyRoot = academyTree.find(item => item.id === root.academyUniverseId);
+    assert.equal(root.title, academyRoot.title,
+      `${lang}: public root title must exactly match the Academy identity`);
+  }
   assert.equal(new Set(publicLayoutIds).size, 8, `${lang}: canonical universe mappings must be unique`);
 
   const academy = createVernpixiNetwork(academyTree);
