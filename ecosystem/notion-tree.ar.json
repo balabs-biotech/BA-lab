@@ -6,7 +6,8 @@
   "domains": [
     {
       "id": "microbiology",
-      "title": "🧫 علم الأحياء الدقيقة والعلوم الخلوية",
+      "academyUniverseId": "myco",
+      "title": "علم الفطريات",
       "notionId": "41f73152f1718186b79bdea4ce892562",
       "url": "https://app.notion.com/p/41f73152f1718186b79bdea4ce892562",
       "children": [
@@ -279,7 +280,8 @@
     },
     {
       "id": "plants",
-      "title": "🌱 علوم النبات والزراعة",
+      "academyUniverseId": "bio",
+      "title": "التكنولوجيا الحيوية",
       "notionId": "41f73152f171815fa5a1f577763e545d",
       "url": "https://app.notion.com/p/41f73152f171815fa5a1f577763e545d",
       "children": [
@@ -575,7 +577,8 @@
     },
     {
       "id": "ecology",
-      "title": "🌍 التربة والأنظمة البيئية والبيئة",
+      "academyUniverseId": "soil",
+      "title": "التكنولوجيا الزراعية",
       "notionId": "41f73152f171819bb147da5152914bf2",
       "url": "https://app.notion.com/p/41f73152f171819bb147da5152914bf2",
       "children": [
@@ -692,7 +695,8 @@
     },
     {
       "id": "bioprocesses",
-      "title": "♻️ العمليات الحيوية والتحويل البيولوجي",
+      "academyUniverseId": "iot",
+      "title": "القياس والأتمتة",
       "notionId": "41f73152f171815db156c978c9e23179",
       "url": "https://app.notion.com/p/41f73152f171815db156c978c9e23179",
       "children": [
@@ -779,7 +783,8 @@
     },
     {
       "id": "biomaterials",
-      "title": "🧱 المواد الحيوية والتصنيع الحيوي",
+      "academyUniverseId": "lab",
+      "title": "المختبر",
       "notionId": "41f73152f1718192b9aedbaa5e027402",
       "url": "https://app.notion.com/p/41f73152f1718192b9aedbaa5e027402",
       "children": [
@@ -909,7 +914,8 @@
     },
     {
       "id": "instrumentation",
-      "title": "⚙️ الأجهزة والهندسة والأتمتة",
+      "academyUniverseId": "products",
+      "title": "المنتجات والموارد البيولوجية",
       "notionId": "41f73152f17181dd81c9cfe38d9845d6",
       "url": "https://app.notion.com/p/41f73152f17181dd81c9cfe38d9845d6",
       "children": [
@@ -984,7 +990,8 @@
     },
     {
       "id": "digital",
-      "title": "💻 الذكاء الرقمي والبيانات",
+      "academyUniverseId": "work",
+      "title": "البحث والتطوير",
       "notionId": "41f73152f17181418684e3445718a489",
       "url": "https://app.notion.com/p/41f73152f17181418684e3445718a489",
       "children": [
@@ -1053,7 +1060,8 @@
     },
     {
       "id": "physical",
-      "title": "⚗️ العلوم الفيزيائية والكيميائية والنمذجة",
+      "academyUniverseId": "learn",
+      "title": "الموارد ونقل المعرفة",
       "notionId": "41f73152f171812aad13dc593fa7ba60",
       "url": "https://app.notion.com/p/41f73152f171812aad13dc593fa7ba60",
       "children": [
