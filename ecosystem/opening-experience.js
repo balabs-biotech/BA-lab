@@ -16,10 +16,12 @@
   if(play){
    const lang=root.lang||'fr';
    const skip=overlay.querySelector('[data-intro-skip]');
-   const labels={fr:['Passer','Biologie appliquée · Recherche · Ingénierie'],en:['Skip','Applied biology · Research · Engineering'],ar:['تخطي','الأحياء التطبيقية · البحث · الهندسة'],pt:['Saltar','Biologia aplicada · Pesquisa · Engenharia']};
+   const labels={fr:['Passer','Biologie appliquée · Recherche · Ingénierie','Biologie appliquée'],en:['Skip','Applied biology · Research · Engineering','Applied biology'],ar:['تخطي','الأحياء التطبيقية · البحث · الهندسة','التكنولوجيا الحيوية التطبيقية'],pt:['Saltar','Biologia aplicada · Pesquisa · Engenharia','Biologia aplicada']};
    if(skip)skip.textContent=(labels[lang]||labels.fr)[0];
    const caption=overlay.querySelector('[data-intro-caption]');
    if(caption)caption.textContent=(labels[lang]||labels.fr)[1];
+   const subtitle=overlay.querySelector('[data-intro-subtitle]');
+   if(subtitle)subtitle.textContent=(labels[lang]||labels.fr)[2];
    overlay.classList.add('is-playing');
    skip?.addEventListener('click',finishIntro,{once:true});
    const onKey=e=>{if(e.key==='Escape'){finishIntro();document.removeEventListener('keydown',onKey)}};
