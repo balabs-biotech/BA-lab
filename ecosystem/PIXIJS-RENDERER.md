@@ -4,7 +4,8 @@
 
 The 2D explorer now uses PixiJS v8 as its primary WebGL renderer. The existing graph model, eight-language tree loading, stable node IDs, hit testing, pan/zoom camera, and Notion resource links remain in the explorer controller.
 
-- `explorer-2d-pixi.js`: GPU rendering of the hyphal graph, junctions, side filaments, spores, moving edge particles, selection and zoom-dependent labels.
+- `../ecosystem-core/explorer-2d-pixi.js`: the shared PixiJS/WebGL renderer used by both the Academy and public explorer.
+- `../ecosystem-core/explorer-2d-network.js`: the shared eight-anchor geometry, recursive branch placement, evidence-backed Notion relations and local anastomoses. Each explorer supplies its own Notion tree; the public explorer maps its eight root IDs onto the Academy's canonical anchor order.
 - `explorer-2d.js`: data loading, deterministic graph topology, camera, gestures, selection and accessible node navigation.
 - DaisyUI remains the shell/component layer; it is not used to render the biological field.
 - The historical 3D engine is outside this migration and must not be modified.
