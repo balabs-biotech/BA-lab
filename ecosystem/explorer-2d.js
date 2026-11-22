@@ -11,7 +11,7 @@ let pixiRenderer=null,relationIndex=new Map(),overviewPositions=new Map(),radial
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
 const t=k=>COPY[lang][k]||COPY.fr[k],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
-function levelOpacity(level){const thresholds=[0,.55,1.55,2.65,4.1,6.2,8.8],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
+function levelOpacity(level){if(level===0)return 1;const thresholds=[0,.65,1.15,1.8,2.6,3.6,4.8,6.2,7.8,9.6],t=thresholds[Math.min(level,thresholds.length-1)],x=clamp((scale-t*1.3)/(t*1.1),0,1);return .022*Math.pow(.78,Math.max(0,level-1))+.88*x*x*(3-2*x);}
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
@@ -165,7 +165,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=active||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const z=zoomTo??(n.level===0?(w<700?.72:.85):n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const root=n.level===0?n:byId.get(n.rootId);if(root&&radialLayoutRoot!==root.id)applyRadialLayout(root);const depthZoom=[w<700?.72:.85,1.65,2.8,4.5,6.2,7.8,9.4,10.8,12];const z=zoomTo??depthZoom[Math.min(n.level,depthZoom.length-1)];targetScale=clamp(z,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
@@ -183,7 +183,7 @@ function hit(x,y){
  }
  if(labelHit)return labelHit;
  let found=null,best=22;
- const labelZoom=[0,.72,1.3,2.55,4.3];
+ const labelZoom=[0,1.2,2.0,3.0,4.2,5.5,7.0,8.6,10.2];
  for(const n of nodes){
   const threshold=labelZoom[Math.min(n.level,labelZoom.length-1)]||0;
   if(!visibleLabels.has(n.id)||scale<threshold||levelOpacity(n.level)<.5)continue;
@@ -214,6 +214,16 @@ function updateSelection(){
  if(selected.data.description){
   const description=el("p","selection-description",selected.data.description);
   dock.append(description);
+ }
+ const directChildren=(selected.data.children||[]).map(child=>byId.get(child.id)).filter(Boolean);
+ if(directChildren.length){
+  const branches=el("div","child-branches");
+  directChildren.forEach(child=>{
+   const button=el("button","btn btn-xs btn-outline",child.title);
+   button.type="button";button.title=child.title;button.onclick=()=>focusNode(child);
+   branches.append(button);
+  });
+  dock.append(branches);
  }
  const notionUrl=selected.data.url;
  if(typeof notionUrl==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(notionUrl)){
