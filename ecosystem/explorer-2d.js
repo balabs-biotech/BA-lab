@@ -7,11 +7,11 @@ en:{title:"Living network",desc:"Eight interconnected universes in one living sp
 ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · نقرة للاختيار · نقرتان لفتح Notion",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
 pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · CLIQUE PARA SELECIONAR · DUPLO CLIQUE PARA ABRIR NOTION",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
 const $=id=>document.getElementById(id),canvas=$("field"),reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-let pixiRenderer=null,relationIndex=new Map(),overviewPositions=new Map(),radialLayoutRoot=null;
+let pixiRenderer=null,relationIndex=new Map();
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
 const t=k=>COPY[lang][k]||COPY.fr[k],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
-function levelOpacity(level){if(level===0)return 1;const thresholds=[0,.65,1.15,1.8,2.6,3.6,4.8,6.2,7.8,9.6],t=thresholds[Math.min(level,thresholds.length-1)],x=clamp((scale-t*1.3)/(t*1.1),0,1);return .022*Math.pow(.78,Math.max(0,level-1))+.88*x*x*(3-2*x);}
+function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  nodes=[];edges=[];byId.clear();
@@ -113,61 +113,10 @@ function buildNetwork(){
  canvas.dataset.nodeCount=String(nodes.length);
  canvas.dataset.edgeCount=String(edges.length);
 }
-function restoreOverviewLayout(){
- for(const n of nodes){const p=overviewPositions.get(n.id);if(p){n.x=p.x;n.y=p.y;n.angle=p.angle;}}
- radialLayoutRoot=null;canvas.dataset.radialRoot="";canvas.dataset.radialRingRadii="[]";canvas.dataset.radialLevelCounts="{}";
-}
-function applyRadialLayout(root){
- if(!root)return;
- const scoped=nodes.filter(n=>n.rootId===root.id),children=new Map();
- scoped.forEach(n=>{if(n.parent){if(!children.has(n.parent))children.set(n.parent,[]);children.get(n.parent).push(n);}});
- const leafMemo=new Map();
- const leaves=n=>{if(leafMemo.has(n.id))return leafMemo.get(n.id);const kids=children.get(n.id)||[];const count=kids.length?kids.reduce((sum,k)=>sum+leaves(k),0):1;leafMemo.set(n.id,count);return count;};
- const start=-Math.PI/2,end=start+Math.PI*2;
- root.x=0;root.y=0;root.angle=-Math.PI/2;root.sectorStart=start;root.sectorEnd=end;
- const parents=[root],radii=[],counts={};let depth=1,previousRadius=0;
- while(parents.length){
-  const parentData=parents.map(parent=>({parent,kids:children.get(parent.id)||[],span:Math.max(.001,parent.sectorEnd-parent.sectorStart)})).filter(x=>x.kids.length);
-  if(!parentData.length)break;
-  const required=Math.max(...parentData.map(x=>x.kids.length*150/x.span));
-  // Long canonical Notion titles need real screen-space room, especially
-  // the twelve direct microbiology resources around the selected universe.
-  const radius=Math.max(640+(depth-1)*320,previousRadius+300,required);
-  radii.push(Math.round(radius));counts[depth]=parentData.reduce((sum,x)=>sum+x.kids.length,0);
-  const next=[];
-  for(const {parent,kids,span} of parentData){
-   const weights=kids.map(child=>1+Math.sqrt(leaves(child))),total=weights.reduce((a,b)=>a+b,0);let cursor=parent.sectorStart;
-   kids.forEach((child,index)=>{
-    const width=span*weights[index]/total,lo=cursor,hi=cursor+width,angle=(lo+hi)/2;
-    child.sectorStart=lo;child.sectorEnd=hi;child.angle=angle;child.x=Math.cos(angle)*radius;child.y=Math.sin(angle)*radius;cursor=hi;next.push(child);
-   });
-  }
-  parents.splice(0,parents.length,...next);previousRadius=radius;depth++;
- }
- radialLayoutRoot=root.id;canvas.dataset.radialRoot=root.id;canvas.dataset.radialRingRadii=JSON.stringify(radii);canvas.dataset.radialLevelCounts=JSON.stringify(counts);
- const minGaps=[];
- for(let level=1;level<depth;level++){const group=scoped.filter(n=>n.level===level);let min=Infinity;for(let i=0;i<group.length;i++)for(let k=i+1;k<group.length;k++)min=Math.min(min,Math.hypot(group[i].x-group[k].x,group[i].y-group[k].y));if(Number.isFinite(min))minGaps.push(min);}
- canvas.dataset.radialMinNodeGap=minGaps.length?Math.min(...minGaps).toFixed(1):"0";
-}
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
 function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
-function renderUniverseRail(){
- const rail=$("universeRail");if(!rail)return;rail.replaceChildren();
- tree.forEach(root=>{const b=el("button","universe-point",root.title);b.type="button";b.dataset.universe=root.id;b.title=root.title;b.setAttribute("aria-label",root.title);b.onclick=()=>{const n=byId.get(root.id);if(n)focusNode(n);};rail.append(b);});
- syncUniverseRail(selected);
-}
-function syncUniverseRail(n){
- const root=n?(n.level===0?n.id:n.rootId):null;
- const active=root;
- document.querySelectorAll(".universe-rail [data-universe]").forEach(b=>{
-  const on=b.dataset.universe===active;
-  if(on){b.setAttribute("aria-current","location");b.classList.add("is-active");}
-  else{b.removeAttribute("aria-current");b.classList.remove("is-active");}
- });
- canvas.dataset.activeUniverse=active||"";
-}
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}targetScale=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}targetScale=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;updateSelection();draw();}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
  const hitBoxes=JSON.parse(canvas.dataset.visibleNodeHitBoxes||"{}");
@@ -258,7 +207,7 @@ function updateUI(){
   ["notion","content","hypha"].forEach((kind,i)=>{const item=el("span",kind);item.append(el("i",""),document.createTextNode(labels[i]));legend.append(item);});
  }
  if(!document.getElementById("inlineExplorer"))document.title="BA Labs — "+t("title");
- renderUniverseRail();
+
 }
 function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,12),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
 function pointerDown(e){canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragged=false;gesture={x:e.clientX,y:e.clientY,ox:targetOffset.x,oy:targetOffset.y};canvas.classList.add("dragging");}
@@ -274,6 +223,6 @@ window.addEventListener("balabs:focus-domain",event=>{const target=event.detail?
 document.querySelectorAll("[data-lang]").forEach(button=>button.addEventListener("click",()=>{const next=button.dataset.lang;if(!LANGS.includes(next)||next===lang)return;lang=next;$("language").value=lang;updateUI();$("loading").hidden=false;loadTree();}));
 window.addEventListener("resize",resize,{passive:true});
 function animate(){if(!reduced){scale+=(targetScale-scale)*.12;offset.x+=(targetOffset.x-offset.x)*.12;offset.y+=(targetOffset.y-offset.y)*.12;draw();}raf=requestAnimationFrame(animate);}
-async function loadTree(){try{const res=await fetch("./notion-tree."+lang+".json",{cache:"no-cache"});if(!res.ok)throw Error("Tree HTTP "+res.status);const data=await res.json();tree=data.domains||[];if(tree.length!==8)throw Error("Expected 8 universes; received "+tree.length);viewHistory=[];buildNetwork();fitOverview();scale=targetScale;offset={...targetOffset};selected=null;syncUniverseRail(null);updateUI();updateSelection();draw();const requestedDomain=new URLSearchParams(location.search).get("domain");const requestedRoot=nodes.find(n=>n.level===0&&n.id===requestedDomain);if(requestedRoot)focusNode(requestedRoot);$("loading").hidden=true;}catch(e){console.error(e);$("loading").querySelector("p").textContent=t("error");}}
+async function loadTree(){try{const res=await fetch("./notion-tree."+lang+".json",{cache:"no-cache"});if(!res.ok)throw Error("Tree HTTP "+res.status);const data=await res.json();tree=data.domains||[];if(tree.length!==8)throw Error("Expected 8 universes; received "+tree.length);viewHistory=[];buildNetwork();fitOverview();scale=targetScale;offset={...targetOffset};selected=null;updateUI();updateSelection();draw();const requestedDomain=new URLSearchParams(location.search).get("domain");const requestedRoot=nodes.find(n=>n.level===0&&n.id===requestedDomain);if(requestedRoot)focusNode(requestedRoot);$("loading").hidden=true;}catch(e){console.error(e);$("loading").querySelector("p").textContent=t("error");}}
 async function init(){pixiRenderer=await createPixiRenderer(canvas);let l=new URLSearchParams(location.search).get("lang");try{if(!LANGS.includes(l))l=localStorage.getItem("balabs-language");}catch(_){}lang=LANGS.includes(l)?l:"fr";resize();await loadTree();if(!reduced)raf=requestAnimationFrame(animate);}
 init().catch(error=>{console.error("PixiJS initialization failed",error);const loading=$("loading");loading.querySelector("p").textContent="Le moteur graphique WebGL n’a pas pu démarrer. Rechargez la page ou essayez un navigateur compatible.";});
