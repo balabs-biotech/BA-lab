@@ -93,6 +93,13 @@ export async function createPixiRenderer(canvas){
    occupied.push(box);hitBoxes[n.id]=box;live.add(n.id);drawn++;
   }
   for(const [id,label] of labelPool){if(!live.has(id))label.visible=false;}
+  canvas.dataset.visibleNodeIds=JSON.stringify([...live]);
+  canvas.dataset.visibleNodeHitBoxes=JSON.stringify(hitBoxes);
+  canvas.dataset.labelCandidateCount=String(candidates.length);
+  canvas.dataset.labelLiveCount=String(live.size);
+  canvas.dataset.rootCandidateCount=String(rootCount);
+  canvas.dataset.viewportWidth=String(width);
+  canvas.dataset.viewportHeight=String(height);
   app.render();
  }
  return{render,resize,destroy:()=>app.destroy({removeView:false,children:true})};
