@@ -18,12 +18,12 @@ export async function createPixiRenderer(canvas){
  const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
  const alphaFor=level=>{
   if(level===0)return 1;
-  const thresholds=[0,.52,.92,1.42,2.05,2.85,3.85,5.1,6.6,8.4];
+  const thresholds=[0,.65,1.15,1.8,2.6,3.6,4.8,6.2,7.8,9.6];
   const t=thresholds[Math.min(level,thresholds.length-1)];
   // Every depth contributes to the global mycelium silhouette; each zoom
   // progressively resolves another layer into visible branches and junctions.
   const trace=.022*Math.pow(.78,Math.max(0,level-1));
-  return clamp(trace+smooth(t*.72,t*1.48,cameraScale)*.88,0,1);
+  return clamp(trace+smooth(t*1.3,t*2.4,cameraScale)*.88,0,1);
  };
  let cameraScale=1;
  function render({nodes,edges,selected,scale,offset,width,height,reduced,lang="fr",time=performance.now(),core,radialRings=[]}){
@@ -124,7 +124,7 @@ export async function createPixiRenderer(canvas){
    if(selected&&!activeBranch.has(n.id)&&!lineage.has(n.id))alpha*=.22;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
-   const thresholds=[0,.72,1.35,2.15,3.15,4.45,5.9,7.5,9.2];const threshold=thresholds[Math.min(n.level,thresholds.length-1)]||0;
+   const thresholds=[0,1.2,2.0,3.0,4.2,5.5,7.0,8.6,10.2];const threshold=thresholds[Math.min(n.level,thresholds.length-1)]||0;
    const show=n.level===0||(alpha>.38&&scale>threshold)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
