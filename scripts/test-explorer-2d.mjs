@@ -148,6 +148,7 @@ try {
     await firstChild.press('Enter');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Keyboard selection must not open Notion on first activation');
+    assert.ok(await page.locator('#selection .selection-path').count(), 'The selection panel must preserve the full parent path for deep navigation, including mobile');
 
     // Regression: clicking any verified leaf label must open its exact Notion destination.
     const leafFixture = {
