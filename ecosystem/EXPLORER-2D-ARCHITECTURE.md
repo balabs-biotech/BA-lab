@@ -42,5 +42,8 @@ Les arbres publics sont ordonnés selon l’ordre Academy de chaque langue. Les 
 4. Les tests vérifient l’alignement dans FR/EN/AR/PT.
 5. Aucun changement au moteur Academy ou au moteur 3D.
 
-## Statut
-L’alignement public est préparé sur une branche dédiée. Ne pas publier avant les tests automatisés et une inspection visuelle du rendu dans un navigateur.
+## Statut de cette adaptation
+- Tests automatisés : validés, y compris les tests Chromium desktop/mobile, la navigation, le zoom, les langues et la comparaison des coordonnées des huit racines avec l’Academy.
+- Inspection visuelle : captures desktop et mobile générées par Chromium et examinées. Le réseau, les huit univers, la sélection et les commandes sont rendus.
+- Branche publique isolée : aucune modification du contrôleur Academy ni du moteur partagé.
+- Point bloquant restant : le code Academy actuellement disponible dans la branche de référence ne définit pas encore de nœud central BA Labs indépendant des huit univers. La parité centre + huit univers ne peut donc pas être finalisée sans la définition canonique provenant de l’Academy. Ne pas inventer une géométrie concurrente et ne pas publier comme si ce point était terminé.
