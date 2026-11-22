@@ -131,7 +131,7 @@ function applyRadialLayout(root){
   const required=Math.max(...parentData.map(x=>x.kids.length*150/x.span));
   // Long canonical Notion titles need real screen-space room, especially
   // the twelve direct microbiology resources around the selected universe.
-  const radius=Math.max(470+(depth-1)*330,previousRadius+300,required);
+  const radius=Math.max(420+(depth-1)*290,previousRadius+260,required);
   radii.push(Math.round(radius));counts[depth]=parentData.reduce((sum,x)=>sum+x.kids.length,0);
   const next=[];
   for(const {parent,kids,span} of parentData){
