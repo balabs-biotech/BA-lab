@@ -29,6 +29,13 @@ Produce interfaces with a distinctive BA Labs visual identity, not generic AI-ge
 - Do not add a whole library for one component; do not install every library into every app.
 - Keep the public BA Labs website deployed on GitHub Pages.
 
+## Motion and 3D
+- Use the Animate Anything registry to research the correct motion layer; it is a discovery map, not a runtime package.
+- Use Motion (`motion`) for UI state, gestures, layout and scroll-linked animation when it fits the app.
+- Use Three.js only when real 3D/WebGL adds explanatory or brand value; consider existing PixiJS for 2D.
+- Keep 3D optional, performant, responsive and backed by an accessible static/2D fallback.
+- Respect `prefers-reduced-motion`; motion must clarify feedback, hierarchy or continuity.
+
 ## Motion
 Use Emil Kowalski skills where relevant: emil-design-eng, prototype, learn-taste, find-animation-opportunities, animate, choreograph, review-animations, animation-performance, break-ui and mobile-native.
 Motion must serve feedback, comprehension or continuity. Respect prefers-reduced-motion and avoid layout-thrashing animation.
