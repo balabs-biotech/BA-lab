@@ -89,7 +89,7 @@ jobs:
           verify_asset "assets/universe-soil.jpg" "image/jpeg"
           verify_asset "assets/universe-products.jpg" "image/jpeg"
           verify_asset "assets/editorial-penicillium.png" "image/png"
-          verify_asset "explorer-2d.js?v=radial-rings-4" "javascript"
+          verify_asset "explorer-2d.js?v=overview-radial-6" "javascript"
 
       - name: Verify storefront publication
         run: curl --fail --silent --show-error --output /dev/null --write-out 'Storefront HTTP %{http_code} (%{content_type})\n' https://balabs-biotech.github.io/BA-lab/store/index.html
