@@ -279,9 +279,97 @@
       ]
     },
     {
-      "id": "plants",
+      "id": "bioprocesses",
       "academyUniverseId": "bio",
       "title": "التكنولوجيا الحيوية",
+      "notionId": "41f73152f171815db156c978c9e23179",
+      "url": "https://app.notion.com/p/41f73152f171815db156c978c9e23179",
+      "children": [
+        {
+          "id": "ref-bioprocesses-bioprocesses-0-41f73152f171810eb1b3e0312942567c",
+          "title": "استكشف عوالم BA Labs الثمانية",
+          "kind": "reference",
+          "notionId": "41f73152f171810eb1b3e0312942567c",
+          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
+          "children": []
+        },
+        {
+          "id": "ar-bio-fermentation",
+          "title": "التخمير البيولوجي",
+          "notionId": "40173152f17181319400c0c68635241b",
+          "url": "https://app.notion.com/p/40173152f17181319400c0c68635241b",
+          "description": "عمليات التخمير وتحويل المواد الحيوية.",
+          "children": []
+        },
+        {
+          "id": "ar-bio-reactors",
+          "title": "المفاعلات الحيوية والعمليات الأولية",
+          "notionId": "40173152f17181c0af95d99c3e5e2908",
+          "url": "https://app.notion.com/p/40173152f17181c0af95d99c3e5e2908",
+          "description": "أنظمة الزراعة والعمليات التجريبية المرتبطة بها.",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f1718117a1b5d73ad90a1951",
+          "title": "تحضير الركائز",
+          "kind": "reference",
+          "notionId": "40173152f1718117a1b5d73ad90a1951",
+          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181afb735e92aaf2acf4a",
+          "title": "التخمير والمزارع البيولوجية",
+          "notionId": "41f73152f17181afb735e92aaf2acf4a",
+          "url": "https://app.notion.com/p/41f73152f17181afb735e92aaf2acf4a",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c39f3df06051e9be99",
+          "title": "التحويل الحيوي والإنزيمات",
+          "notionId": "41f73152f17181c39f3df06051e9be99",
+          "url": "https://app.notion.com/p/41f73152f17181c39f3df06051e9be99",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171812daea4c5602996bd3c",
+          "title": "تحضير المواد والعمليات التجريبية",
+          "notionId": "41f73152f171812daea4c5602996bd3c",
+          "url": "https://app.notion.com/p/41f73152f171812daea4c5602996bd3c",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "biomaterials",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "academyUniverseId": "soil",
+      "title": "التكنولوجيا الزراعية",
       "notionId": "41f73152f171815fa5a1f577763e545d",
       "url": "https://app.notion.com/p/41f73152f171815fa5a1f577763e545d",
       "children": [
@@ -576,14 +664,14 @@
       ]
     },
     {
-      "id": "ecology",
-      "academyUniverseId": "soil",
-      "title": "التكنولوجيا الزراعية",
-      "notionId": "41f73152f171819bb147da5152914bf2",
-      "url": "https://app.notion.com/p/41f73152f171819bb147da5152914bf2",
+      "id": "instrumentation",
+      "academyUniverseId": "iot",
+      "title": "القياس والأتمتة",
+      "notionId": "41f73152f17181dd81c9cfe38d9845d6",
+      "url": "https://app.notion.com/p/41f73152f17181dd81c9cfe38d9845d6",
       "children": [
         {
-          "id": "ref-ecology-ecology-0-41f73152f171810eb1b3e0312942567c",
+          "id": "ref-instrumentation-instrumentation-0-41f73152f171810eb1b3e0312942567c",
           "title": "استكشف عوالم BA Labs الثمانية",
           "kind": "reference",
           "notionId": "41f73152f171810eb1b3e0312942567c",
@@ -591,117 +679,75 @@
           "children": []
         },
         {
-          "id": "ref-40273152f171813fb16ac5000499acfd",
-          "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
-          "kind": "reference",
-          "notionId": "40273152f171813fb16ac5000499acfd",
-          "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
+          "id": "ar-iot-sensors",
+          "title": "القياس والمستشعرات",
+          "notionId": "40173152f1718187930fd89b1a619738",
+          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
+          "description": "يعرض القياسات اليدوية والمستشعرات ومسار جمع البيانات، مع توضيح ما هو قائم وما يزال قيد التطوير.",
           "children": []
         },
         {
-          "id": "ref-40273152f17181e59ab3feebe521aa71",
-          "title": "الفطريات الجذرية الخارجية — الموارد والتفاعلات مع النباتات",
-          "kind": "reference",
-          "notionId": "40273152f17181e59ab3feebe521aa71",
-          "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
+          "id": "ar-iot-automation",
+          "title": "أتمتة الزراعات",
+          "notionId": "40173152f171812bb348fa458bf85443",
+          "url": "https://app.notion.com/p/40173152f171812bb348fa458bf85443",
+          "description": "يشرح اتجاه أتمتة التهوية والرطوبة والحرارة والإضاءة، مع التنبيه إلى أن حلقات التحكم ما تزال قيد التطوير والتحقق.",
           "children": []
         },
         {
-          "id": "ar-soil-substrate-preparation",
-          "title": "تحضير الركائز",
-          "notionId": "40173152f1718117a1b5d73ad90a1951",
-          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
-          "description": "تحضير الدعامات الزراعية وتوثيق المواد الخام والمعالجة والرطوبة والبنية.",
+          "id": "ar-soil-equipment",
+          "title": "المعدات التجريبية",
+          "notionId": "40173152f17181808451e8fe7c9931e1",
+          "url": "https://app.notion.com/p/40173152f17181808451e8fe7c9931e1",
+          "description": "معدات البحث والتجريب وأنظمة الزراعة والتخمير والقياس، مع توضيح مرحلة التطوير.",
           "children": []
         },
         {
-          "id": "ref-40173152f17181bb91b5d8326978d664",
-          "title": "الركائز والدعامات البيولوجية",
-          "kind": "reference",
-          "notionId": "40173152f17181bb91b5d8326978d664",
-          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
+          "id": "page-41f73152f1718194b779debf5f7cf331",
+          "title": "الأجهزة والمستشعرات والقياس",
+          "notionId": "41f73152f1718194b779debf5f7cf331",
+          "url": "https://app.notion.com/p/41f73152f1718194b779debf5f7cf331",
           "children": []
         },
         {
-          "id": "ref-40173152f17181f18a55d7ba9a90a713",
-          "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
-          "kind": "reference",
-          "notionId": "40173152f17181f18a55d7ba9a90a713",
-          "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
+          "id": "page-41f73152f171814fa54ec4fac145924a",
+          "title": "الهندسة والمعدات والنمذجة الأولية",
+          "notionId": "41f73152f171814fa54ec4fac145924a",
+          "url": "https://app.notion.com/p/41f73152f171814fa54ec4fac145924a",
           "children": []
         },
         {
-          "id": "ref-ecology-ecology-6-40273152f17181ea94edc6e07de079dd",
-          "title": "PGPR — بكتيريا مرتبطة بالجذور وإمكانات زراعية",
-          "kind": "reference",
-          "notionId": "40273152f17181ea94edc6e07de079dd",
-          "url": "https://app.notion.com/p/40273152f17181ea94edc6e07de079dd",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f1718135bdd6f1c211a11573",
-          "title": "علم التربة وخصائص الركائز",
-          "notionId": "41f73152f1718135bdd6f1c211a11573",
-          "url": "https://app.notion.com/p/41f73152f1718135bdd6f1c211a11573",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181cb8175eb9b7112eb82",
-          "title": "علم البيئة والتنوع الحيوي والدورات الجيوكيميائية الحيوية",
-          "notionId": "41f73152f17181cb8175eb9b7112eb82",
-          "url": "https://app.notion.com/p/41f73152f17181cb8175eb9b7112eb82",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181a9a12cd5257b6f9558",
-          "title": "الموارد والتثمين والبيئة",
-          "notionId": "41f73152f17181a9a12cd5257b6f9558",
-          "url": "https://app.notion.com/p/41f73152f17181a9a12cd5257b6f9558",
+          "id": "page-41f73152f17181aba8c8ef9e04645277",
+          "title": "الأتمتة والتحكم وأنظمة إنترنت الأشياء",
+          "notionId": "41f73152f17181aba8c8ef9e04645277",
+          "url": "https://app.notion.com/p/41f73152f17181aba8c8ef9e04645277",
           "children": []
         }
       ],
       "relations": [
         {
-          "target": "bioprocesses",
+          "target": "digital",
           "label": "موارد عامة مشتركة",
           "basis": "notion-link",
           "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
         },
         {
-          "target": "biomaterials",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 3 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
-          "target": "instrumentation",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
-          "target": "digital",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
           "target": "physical",
           "label": "موارد عامة مشتركة",
           "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
         }
       ]
     },
     {
-      "id": "bioprocesses",
-      "academyUniverseId": "iot",
-      "title": "القياس والأتمتة",
-      "notionId": "41f73152f171815db156c978c9e23179",
-      "url": "https://app.notion.com/p/41f73152f171815db156c978c9e23179",
+      "id": "physical",
+      "academyUniverseId": "lab",
+      "title": "المختبر",
+      "notionId": "41f73152f171812aad13dc593fa7ba60",
+      "url": "https://app.notion.com/p/41f73152f171812aad13dc593fa7ba60",
       "children": [
         {
-          "id": "ref-bioprocesses-bioprocesses-0-41f73152f171810eb1b3e0312942567c",
+          "id": "ref-physical-physical-0-41f73152f171810eb1b3e0312942567c",
           "title": "استكشف عوالم BA Labs الثمانية",
           "kind": "reference",
           "notionId": "41f73152f171810eb1b3e0312942567c",
@@ -709,82 +755,57 @@
           "children": []
         },
         {
-          "id": "ar-bio-fermentation",
-          "title": "التخمير البيولوجي",
-          "notionId": "40173152f17181319400c0c68635241b",
-          "url": "https://app.notion.com/p/40173152f17181319400c0c68635241b",
-          "description": "عمليات التخمير وتحويل المواد الحيوية.",
-          "children": []
-        },
-        {
-          "id": "ar-bio-reactors",
-          "title": "المفاعلات الحيوية والعمليات الأولية",
-          "notionId": "40173152f17181c0af95d99c3e5e2908",
-          "url": "https://app.notion.com/p/40173152f17181c0af95d99c3e5e2908",
-          "description": "أنظمة الزراعة والعمليات التجريبية المرتبطة بها.",
-          "children": []
-        },
-        {
-          "id": "ref-40173152f1718117a1b5d73ad90a1951",
-          "title": "تحضير الركائز",
+          "id": "ref-40273152f171810f82d3fafb6e7003be",
+          "title": "القياس وقابلية التكرار",
           "kind": "reference",
-          "notionId": "40173152f1718117a1b5d73ad90a1951",
-          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
+          "notionId": "40273152f171810f82d3fafb6e7003be",
+          "url": "https://app.notion.com/p/40273152f171810f82d3fafb6e7003be",
           "children": []
         },
         {
-          "id": "page-41f73152f17181afb735e92aaf2acf4a",
-          "title": "التخمير والمزارع البيولوجية",
-          "notionId": "41f73152f17181afb735e92aaf2acf4a",
-          "url": "https://app.notion.com/p/41f73152f17181afb735e92aaf2acf4a",
+          "id": "ref-40173152f17181eb86f6f623452f9f5d",
+          "title": "ما الذي تدعمه الأدلة حاليًا؟",
+          "kind": "reference",
+          "notionId": "40173152f17181eb86f6f623452f9f5d",
+          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
           "children": []
         },
         {
-          "id": "page-41f73152f17181c39f3df06051e9be99",
-          "title": "التحويل الحيوي والإنزيمات",
-          "notionId": "41f73152f17181c39f3df06051e9be99",
-          "url": "https://app.notion.com/p/41f73152f17181c39f3df06051e9be99",
+          "id": "ref-physical-physical-3-40173152f1718187930fd89b1a619738",
+          "title": "القياس والمستشعرات",
+          "kind": "reference",
+          "notionId": "40173152f1718187930fd89b1a619738",
+          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
           "children": []
         },
         {
-          "id": "page-41f73152f171812daea4c5602996bd3c",
-          "title": "تحضير المواد والعمليات التجريبية",
-          "notionId": "41f73152f171812daea4c5602996bd3c",
-          "url": "https://app.notion.com/p/41f73152f171812daea4c5602996bd3c",
+          "id": "page-41f73152f1718142ad6ee514071bd254",
+          "title": "الكيمياء وتوصيف الأوساط",
+          "notionId": "41f73152f1718142ad6ee514071bd254",
+          "url": "https://app.notion.com/p/41f73152f1718142ad6ee514071bd254",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c3bcb9eda6d462053c",
+          "title": "الفيزياء والانتقال والديناميكا الحرارية",
+          "notionId": "41f73152f17181c3bcb9eda6d462053c",
+          "url": "https://app.notion.com/p/41f73152f17181c3bcb9eda6d462053c",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181d6b9a9d643da7dfdc6",
+          "title": "الرياضيات والإحصاء والنمذجة",
+          "notionId": "41f73152f17181d6b9a9d643da7dfdc6",
+          "url": "https://app.notion.com/p/41f73152f17181d6b9a9d643da7dfdc6",
           "children": []
         }
       ],
-      "relations": [
-        {
-          "target": "biomaterials",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
-          "target": "instrumentation",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
-          "target": "digital",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
-          "target": "physical",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        }
-      ]
+      "relations": []
     },
     {
       "id": "biomaterials",
-      "academyUniverseId": "lab",
-      "title": "المختبر",
+      "academyUniverseId": "products",
+      "title": "المنتجات والموارد البيولوجية",
       "notionId": "41f73152f1718192b9aedbaa5e027402",
       "url": "https://app.notion.com/p/41f73152f1718192b9aedbaa5e027402",
       "children": [
@@ -913,82 +934,6 @@
       ]
     },
     {
-      "id": "instrumentation",
-      "academyUniverseId": "products",
-      "title": "المنتجات والموارد البيولوجية",
-      "notionId": "41f73152f17181dd81c9cfe38d9845d6",
-      "url": "https://app.notion.com/p/41f73152f17181dd81c9cfe38d9845d6",
-      "children": [
-        {
-          "id": "ref-instrumentation-instrumentation-0-41f73152f171810eb1b3e0312942567c",
-          "title": "استكشف عوالم BA Labs الثمانية",
-          "kind": "reference",
-          "notionId": "41f73152f171810eb1b3e0312942567c",
-          "url": "https://app.notion.com/p/41f73152f171810eb1b3e0312942567c",
-          "children": []
-        },
-        {
-          "id": "ar-iot-sensors",
-          "title": "القياس والمستشعرات",
-          "notionId": "40173152f1718187930fd89b1a619738",
-          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
-          "description": "يعرض القياسات اليدوية والمستشعرات ومسار جمع البيانات، مع توضيح ما هو قائم وما يزال قيد التطوير.",
-          "children": []
-        },
-        {
-          "id": "ar-iot-automation",
-          "title": "أتمتة الزراعات",
-          "notionId": "40173152f171812bb348fa458bf85443",
-          "url": "https://app.notion.com/p/40173152f171812bb348fa458bf85443",
-          "description": "يشرح اتجاه أتمتة التهوية والرطوبة والحرارة والإضاءة، مع التنبيه إلى أن حلقات التحكم ما تزال قيد التطوير والتحقق.",
-          "children": []
-        },
-        {
-          "id": "ar-soil-equipment",
-          "title": "المعدات التجريبية",
-          "notionId": "40173152f17181808451e8fe7c9931e1",
-          "url": "https://app.notion.com/p/40173152f17181808451e8fe7c9931e1",
-          "description": "معدات البحث والتجريب وأنظمة الزراعة والتخمير والقياس، مع توضيح مرحلة التطوير.",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f1718194b779debf5f7cf331",
-          "title": "الأجهزة والمستشعرات والقياس",
-          "notionId": "41f73152f1718194b779debf5f7cf331",
-          "url": "https://app.notion.com/p/41f73152f1718194b779debf5f7cf331",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171814fa54ec4fac145924a",
-          "title": "الهندسة والمعدات والنمذجة الأولية",
-          "notionId": "41f73152f171814fa54ec4fac145924a",
-          "url": "https://app.notion.com/p/41f73152f171814fa54ec4fac145924a",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181aba8c8ef9e04645277",
-          "title": "الأتمتة والتحكم وأنظمة إنترنت الأشياء",
-          "notionId": "41f73152f17181aba8c8ef9e04645277",
-          "url": "https://app.notion.com/p/41f73152f17181aba8c8ef9e04645277",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "digital",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        },
-        {
-          "target": "physical",
-          "label": "موارد عامة مشتركة",
-          "basis": "notion-link",
-          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
-        }
-      ]
-    },
-    {
       "id": "digital",
       "academyUniverseId": "work",
       "title": "البحث والتطوير",
@@ -1059,14 +1004,14 @@
       ]
     },
     {
-      "id": "physical",
+      "id": "ecology",
       "academyUniverseId": "learn",
       "title": "الموارد ونقل المعرفة",
-      "notionId": "41f73152f171812aad13dc593fa7ba60",
-      "url": "https://app.notion.com/p/41f73152f171812aad13dc593fa7ba60",
+      "notionId": "41f73152f171819bb147da5152914bf2",
+      "url": "https://app.notion.com/p/41f73152f171819bb147da5152914bf2",
       "children": [
         {
-          "id": "ref-physical-physical-0-41f73152f171810eb1b3e0312942567c",
+          "id": "ref-ecology-ecology-0-41f73152f171810eb1b3e0312942567c",
           "title": "استكشف عوالم BA Labs الثمانية",
           "kind": "reference",
           "notionId": "41f73152f171810eb1b3e0312942567c",
@@ -1074,52 +1019,107 @@
           "children": []
         },
         {
-          "id": "ref-40273152f171810f82d3fafb6e7003be",
-          "title": "القياس وقابلية التكرار",
+          "id": "ref-40273152f171813fb16ac5000499acfd",
+          "title": "الفطريات الجذرية الشجيرية — الموارد والوظائف",
           "kind": "reference",
-          "notionId": "40273152f171810f82d3fafb6e7003be",
-          "url": "https://app.notion.com/p/40273152f171810f82d3fafb6e7003be",
+          "notionId": "40273152f171813fb16ac5000499acfd",
+          "url": "https://app.notion.com/p/40273152f171813fb16ac5000499acfd",
           "children": []
         },
         {
-          "id": "ref-40173152f17181eb86f6f623452f9f5d",
-          "title": "ما الذي تدعمه الأدلة حاليًا؟",
+          "id": "ref-40273152f17181e59ab3feebe521aa71",
+          "title": "الفطريات الجذرية الخارجية — الموارد والتفاعلات مع النباتات",
           "kind": "reference",
-          "notionId": "40173152f17181eb86f6f623452f9f5d",
-          "url": "https://app.notion.com/p/40173152f17181eb86f6f623452f9f5d",
+          "notionId": "40273152f17181e59ab3feebe521aa71",
+          "url": "https://app.notion.com/p/40273152f17181e59ab3feebe521aa71",
           "children": []
         },
         {
-          "id": "ref-physical-physical-3-40173152f1718187930fd89b1a619738",
-          "title": "القياس والمستشعرات",
+          "id": "ar-soil-substrate-preparation",
+          "title": "تحضير الركائز",
+          "notionId": "40173152f1718117a1b5d73ad90a1951",
+          "url": "https://app.notion.com/p/40173152f1718117a1b5d73ad90a1951",
+          "description": "تحضير الدعامات الزراعية وتوثيق المواد الخام والمعالجة والرطوبة والبنية.",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f17181bb91b5d8326978d664",
+          "title": "الركائز والدعامات البيولوجية",
           "kind": "reference",
-          "notionId": "40173152f1718187930fd89b1a619738",
-          "url": "https://app.notion.com/p/40173152f1718187930fd89b1a619738",
+          "notionId": "40173152f17181bb91b5d8326978d664",
+          "url": "https://app.notion.com/p/40173152f17181bb91b5d8326978d664",
           "children": []
         },
         {
-          "id": "page-41f73152f1718142ad6ee514071bd254",
-          "title": "الكيمياء وتوصيف الأوساط",
-          "notionId": "41f73152f1718142ad6ee514071bd254",
-          "url": "https://app.notion.com/p/41f73152f1718142ad6ee514071bd254",
+          "id": "ref-40173152f17181f18a55d7ba9a90a713",
+          "title": "الكائنات الدقيقة ذات الأهمية الزراعية",
+          "kind": "reference",
+          "notionId": "40173152f17181f18a55d7ba9a90a713",
+          "url": "https://app.notion.com/p/40173152f17181f18a55d7ba9a90a713",
           "children": []
         },
         {
-          "id": "page-41f73152f17181c3bcb9eda6d462053c",
-          "title": "الفيزياء والانتقال والديناميكا الحرارية",
-          "notionId": "41f73152f17181c3bcb9eda6d462053c",
-          "url": "https://app.notion.com/p/41f73152f17181c3bcb9eda6d462053c",
+          "id": "ref-ecology-ecology-6-40273152f17181ea94edc6e07de079dd",
+          "title": "PGPR — بكتيريا مرتبطة بالجذور وإمكانات زراعية",
+          "kind": "reference",
+          "notionId": "40273152f17181ea94edc6e07de079dd",
+          "url": "https://app.notion.com/p/40273152f17181ea94edc6e07de079dd",
           "children": []
         },
         {
-          "id": "page-41f73152f17181d6b9a9d643da7dfdc6",
-          "title": "الرياضيات والإحصاء والنمذجة",
-          "notionId": "41f73152f17181d6b9a9d643da7dfdc6",
-          "url": "https://app.notion.com/p/41f73152f17181d6b9a9d643da7dfdc6",
+          "id": "page-41f73152f1718135bdd6f1c211a11573",
+          "title": "علم التربة وخصائص الركائز",
+          "notionId": "41f73152f1718135bdd6f1c211a11573",
+          "url": "https://app.notion.com/p/41f73152f1718135bdd6f1c211a11573",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181cb8175eb9b7112eb82",
+          "title": "علم البيئة والتنوع الحيوي والدورات الجيوكيميائية الحيوية",
+          "notionId": "41f73152f17181cb8175eb9b7112eb82",
+          "url": "https://app.notion.com/p/41f73152f17181cb8175eb9b7112eb82",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181a9a12cd5257b6f9558",
+          "title": "الموارد والتثمين والبيئة",
+          "notionId": "41f73152f17181a9a12cd5257b6f9558",
+          "url": "https://app.notion.com/p/41f73152f17181a9a12cd5257b6f9558",
           "children": []
         }
       ],
-      "relations": []
+      "relations": [
+        {
+          "target": "bioprocesses",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 2 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "biomaterials",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 3 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "digital",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        },
+        {
+          "target": "physical",
+          "label": "موارد عامة مشتركة",
+          "basis": "notion-link",
+          "evidence": "تشير بوابتا العالمين إلى 1 موردًا مشتركًا، منها استكشف عوالم BA Labs الثمانية (41f73152f171810eb1b3e0312942567c)."
+        }
+      ]
     }
   ]
 }
