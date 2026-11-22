@@ -1,0 +1,30 @@
+/* BA Labs — Petri opening sequence. One self-contained, lightweight SVG scene. */
+.balabs-intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 44%,#243b32 0%,#111b19 48%,#080e0d 100%);color:#f0eee5;opacity:0;visibility:hidden;pointer-events:none}
+html.balabs-intro-pending .balabs-intro{opacity:1;visibility:visible;pointer-events:auto}
+.balabs-intro::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,#d9a16b0b 50%,transparent 66%);transform:translateX(-100%);animation:petri-sheen 2.8s .2s ease-in-out both}
+.balabs-intro-inner{position:relative;width:min(92vw,850px);display:grid;justify-items:center;gap:14px;text-align:center}
+.balabs-petri{display:block;width:min(82vw,690px);height:auto;overflow:visible;filter:drop-shadow(0 28px 45px #0008);transform:translateY(16px) scale(.94);opacity:0;animation:petri-arrive .9s .15s cubic-bezier(.18,.78,.2,1) forwards}
+.petri-lid{transform:translateY(-58px);animation:petri-lid .95s .35s cubic-bezier(.2,.75,.2,1) forwards}
+.petri-agar{transform:translateY(0);animation:petri-core .95s .35s cubic-bezier(.2,.75,.2,1) forwards}
+.petri-base{transform:translateY(58px);animation:petri-base .95s .35s cubic-bezier(.2,.75,.2,1) forwards}
+.petri-hyphae{stroke-dasharray:1;stroke-dashoffset:1;animation:petri-grow 1.55s 1.05s ease-out forwards}
+.balabs-intro-copy{opacity:0;transform:translateY(9px);animation:petri-copy .65s 1.55s ease-out forwards}
+.balabs-intro-copy strong{display:block;font-size:clamp(15px,2vw,20px);font-weight:650;letter-spacing:.28em}
+.balabs-intro-copy span{display:block;margin-top:7px;color:#a9b9aa;font:600 9px/1.4 ui-monospace,monospace;letter-spacing:.24em;text-transform:uppercase}
+.balabs-intro-line{width:100px;height:1px;margin:18px auto 0;background:#9bb19b33;overflow:hidden}
+.balabs-intro-line::after{content:"";display:block;width:100%;height:100%;background:#c18a60;transform:translateX(-100%);animation:petri-progress 2.6s .2s ease-in-out forwards}
+.balabs-intro-skip{position:absolute;right:max(22px,env(safe-area-inset-right));bottom:max(22px,env(safe-area-inset-bottom));border:1px solid #9aab9b55;border-radius:999px;padding:9px 15px;background:#101b18aa;color:#c8d1c7;font:600 10px/1 system-ui,sans-serif;letter-spacing:.08em;cursor:pointer}
+.balabs-intro-skip:hover{border-color:#c18a60;color:#fff}
+html.balabs-intro-pending body{overflow:hidden}
+html.balabs-intro-leaving .balabs-intro{opacity:0;visibility:hidden;transition:opacity .72s ease,visibility .72s}
+html.balabs-intro-leaving .balabs-petri{transform:scale(1.12);opacity:0;transition:transform .72s ease,opacity .5s ease}
+@keyframes petri-arrive{to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes petri-lid{to{transform:translateY(0)}}
+@keyframes petri-core{to{transform:translateY(0)}}
+@keyframes petri-base{to{transform:translateY(0)}}
+@keyframes petri-grow{to{stroke-dashoffset:0}}
+@keyframes petri-copy{to{opacity:1;transform:translateY(0)}}
+@keyframes petri-progress{to{transform:translateX(0)}}
+@keyframes petri-sheen{to{transform:translateX(100%)}}
+@media(max-width:600px){.balabs-intro-inner{gap:8px}.balabs-petri{width:min(94vw,560px)}.balabs-intro-copy span{font-size:8px;letter-spacing:.16em}}
+@media(prefers-reduced-motion:reduce){.balabs-intro,.balabs-intro *{animation:none!important;transition:none!important}.balabs-petri,.balabs-intro-copy{opacity:1!important;transform:none!important}.petri-hyphae{stroke-dashoffset:0!important}}
