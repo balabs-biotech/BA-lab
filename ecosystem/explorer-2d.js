@@ -1,7 +1,6 @@
 import { createPixiRenderer } from "../ecosystem-core/explorer-2d-pixi.js";
 import { createVernpixiNetwork } from "../ecosystem-core/explorer-2d-network.js";
 const LANGS=["fr","en","ar","pt"];
-const PALETTE={microbiology:"#79a991",plants:"#8fb58c",ecology:"#c19b73",bioprocesses:"#b58d73",biomaterials:"#c88773",instrumentation:"#7eaaa3",digital:"#aa9cbb",physical:"#b5b58d"};
 const COPY={
 fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · 1 CLIC POUR SÉLECTIONNER · DOUBLE-CLIC POUR OUVRIR NOTION",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
 en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · CLICK TO SELECT · DOUBLE-CLICK TO OPEN NOTION",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
@@ -16,7 +15,9 @@ function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresh
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  canvas.dataset.engine="vernpixi-shared";
- const graph=createVernpixiNetwork(tree,{rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]});
+ const canonicalOrder=tree.map(root=>root.academyUniverseId);
+  if(canonicalOrder.length!==8||canonicalOrder.some(id=>!id)||new Set(canonicalOrder).size!==8)throw new Error("Public universe mapping must contain eight unique Academy identities");
+  const graph=createVernpixiNetwork(tree,{rootLayoutIds:canonicalOrder});
  nodes=graph.nodes;edges=graph.edges;byId=graph.byId;relationIndex=graph.relationIndex;
  for(const [key,value] of Object.entries(graph.stats))canvas.dataset[key]=String(value);
  canvas.dataset.universeCount=String(graph.stats.universeCount);

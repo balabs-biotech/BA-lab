@@ -28,7 +28,7 @@ assert.ok(sharedNetworkJs.includes('createVernpixiNetwork') && sharedNetworkJs.i
 assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && /src="\.\/explorer-2d\.js\?v=[^"]+"/.test(html), 'Public homepage must mount a versioned Vernpixi 2D script directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
 assert.ok(publicExplorerJs.includes('../ecosystem-core/explorer-2d-pixi.js') && publicExplorerJs.includes('../ecosystem-core/explorer-2d-network.js'), 'Public Vernpixi must import the exact same renderer and graph geometry as Academy');
-assert.ok(publicExplorerJs.includes('rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]'), 'Public universes must reuse the Academy anchor identity and ordering');
+assert.ok(publicExplorerJs.includes('root.academyUniverseId') && publicExplorerJs.includes('rootLayoutIds:canonicalOrder'), 'Public universes must use explicit Academy identity mappings for canonical anchors');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
 
 
@@ -45,8 +45,8 @@ const expectedRootIds = {
 };
 for (const language of ['fr','en','ar','pt']) {
   const tree = languageTrees[language];
-  assert.deepEqual(tree.domains.map(domain => domain.id), expectedExplorerDomains, language + ' manifest must expose the eight scientific universes in canonical order');
-  assert.deepEqual(tree.domains.map(domain => domain.notionId), expectedRootIds[language], language + ' roots must point to the actual public Notion universe portals');
+  assert.deepEqual([...tree.domains.map(domain => domain.id)].sort(), [...expectedExplorerDomains].sort(), language + ' manifest must preserve all eight scientific resource domains');
+  assert.deepEqual([...tree.domains.map(domain => domain.notionId)].sort(), [...expectedRootIds[language]].sort(), language + ' roots must point to the actual public Notion universe portals');
   const allNodes = [];
   const visit = nodes => (nodes || []).forEach(node => { allNodes.push(node); visit(node.children); });
   visit(tree.domains);
@@ -83,9 +83,15 @@ for (const language of ['fr','en','ar','pt']) {
 const explorer = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 assert.ok(explorer.includes('createPixiRenderer') && explorer.includes('fetch("./notion-tree."+lang+".json"'), 'The existing PixiJS 2D engine must load the active language manifest');
 assert.ok(explorer.includes('Expected 8 universes') && explorer.includes('function buildNetwork()') && explorer.includes('createVernpixiNetwork'), 'The 2D engine must build the eight-universe network through the shared graph engine');
-assert.ok(explorer.includes('microbiology:') && explorer.includes('instrumentation:') && explorer.includes('physical:'), 'The public 2D engine must retain its canonical Notion universe identifiers');
+assert.ok(explorer.includes('root.academyUniverseId') && explorer.includes('rootLayoutIds:canonicalOrder'), 'The public 2D engine must map scientific Notion roots onto explicit Academy universe identities');
 assert.ok(explorer.includes('function activateNode(n)') && explorer.includes('window.open(url,"_blank","noopener,noreferrer")'), 'A double-clicked point must open its exact Notion destination');
 assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('window.addEventListener("click"') && explorer.includes('e.detail<2'), 'Point activation must preserve single-click selection and double-click opening');
+const railMarkup = html.match(/<nav class="universe-rail"[\s\S]*?<\/nav>/)?.[0] || '';
+const canonicalRailOrder = ['microbiology','bioprocesses','instrumentation','plants','physical','biomaterials','digital','ecology'];
+assert.deepEqual([...railMarkup.matchAll(/data-universe="([^"]+)"/g)].map(match => match[1]), canonicalRailOrder, 'The public navigation rail must follow the Academy canonical universe order');
+const canonicalRailColors = ['#b18fc2','#79a991','#7eaaa3','#c19b73','#80aeb8','#c88773','#aa9cbb','#d1d0c5'];
+const cssRailColors = new Map([...html.matchAll(/\.universe-rail button\[data-universe="([^"]+)"\]\{--dot:([^}]+)\}/g)].map(match => [match[1], match[2]]));
+assert.deepEqual(canonicalRailOrder.map(id => cssRailColors.get(id)), canonicalRailColors, 'Public rail colors must match the shared Pixi renderer palette, including the neutral fallback for the eighth universe');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
 for (const id of expectedExplorerDomains) assert.ok(universeEntry.includes("'" + id + "'"), 'Direct universe routing must allow ' + id);
 for (const id of expectedExplorerDomains) {

@@ -201,8 +201,8 @@ try {
     domainUrl.searchParams.set('lang', 'fr');
     await page.goto(domainUrl.toString(), { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.querySelector('#loading')?.hidden === true, undefined, { timeout: 30000 });
-    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent === '🧫 Microbiologie & sciences cellulaires');
-    assert.equal(await page.locator('#selection .selection-title').textContent(), '🧫 Microbiologie & sciences cellulaires', 'Direct domain URL must focus the requested universe');
+    await page.waitForFunction(() => document.querySelector('#selection .selection-title')?.textContent === 'MYCOLOGIE');
+    assert.equal(await page.locator('#selection .selection-title').textContent(), 'MYCOLOGIE', 'Direct domain URL must focus the Academy canonical mycology universe');
     assert.equal(page.url(), domainUrl.toString(), 'Direct domain entry must remain inside the same explorer route');
     await page.locator('#zoomIn').click();
     assert.ok(await page.locator('#field').isVisible(), 'Canvas remains in the same scene after zoom');

@@ -3,6 +3,16 @@ import { readFile } from 'node:fs/promises';
 
 const languages = ['fr', 'en', 'ar', 'pt'];
 const universeIds = ['microbiology', 'plants', 'ecology', 'bioprocesses', 'biomaterials', 'instrumentation', 'digital', 'physical'];
+const canonicalIdentity = {
+  microbiology: 'myco',
+  bioprocesses: 'bio',
+  instrumentation: 'iot',
+  plants: 'soil',
+  physical: 'lab',
+  biomaterials: 'products',
+  digital: 'work',
+  ecology: 'learn'
+};
 const expectedRoots = {
   fr: ['41f73152f171818ea68cf2ed99aa3706','41f73152f1718161af13d1fbe52250de','41f73152f171819f9b7acbd64ccf4a3e','41f73152f1718108ac67e06204a60c7f','41f73152f1718117a38df4afe2d4fb9d','41f73152f1718170ba14e91650b0c806','41f73152f171816e8f0ed9e629fb70fe','41f73152f1718142aaf0d01bba51ecfb'],
   en: ['41f73152f17181129686ced284bc5de8','41f73152f17181d99104ca04dd66d0b5','41f73152f17181edaa7fe423fe6efa68','41f73152f1718104a3d5e5863fd10a58','41f73152f1718122992cc99b0609aab3','41f73152f17181b1a27ce32ef73cb66b','41f73152f1718127a894c85bc7af01af','41f73152f17181358e32ce72c1846326'],
@@ -15,8 +25,15 @@ for (const language of languages) {
   assert.equal(manifest.version, 2, language + ': unsupported public-universe manifest version');
   assert.equal(manifest.language, language, language + ': language marker mismatch');
   assert.equal(manifest.universeModel, 'eight-scientific-domains', language + ': universe model marker missing');
-  assert.deepEqual(manifest.domains.map(domain => domain.id), universeIds, language + ': universe roots/order mismatch');
-  assert.deepEqual(manifest.domains.map(domain => domain.notionId), expectedRoots[language], language + ': roots must match the public Notion portal IDs');
+  const academy = JSON.parse(await readFile(new URL('../ecosystem-preview/notion-tree.' + language + '.json', import.meta.url), 'utf8'));
+  const academyById = new Map(academy.domains.map(domain => [domain.id, domain]));
+  assert.deepEqual([...manifest.domains.map(domain => domain.id)].sort(), [...universeIds].sort(), language + ': public scientific domains mismatch');
+  assert.deepEqual([...manifest.domains.map(domain => domain.notionId)].sort(), [...expectedRoots[language]].sort(), language + ': roots must match the public Notion portal IDs');
+  assert.deepEqual(manifest.domains.map(domain => domain.academyUniverseId), academy.domains.map(domain => domain.id), language + ': public roots must follow Academy canonical locale order');
+  for (const domain of manifest.domains) {
+    assert.equal(domain.academyUniverseId, canonicalIdentity[domain.id], language + ': incorrect semantic Academy universe mapping for ' + domain.id);
+    assert.equal(domain.title, academyById.get(domain.academyUniverseId)?.title, language + ': public root title must match Academy for ' + domain.id);
+  }
 
   const nodes = [];
   const visit = list => (list || []).forEach(node => { nodes.push(node); visit(node.children); });
