@@ -98,6 +98,7 @@ try {
     const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
     assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
     const initialUrl = page.url();
+    assert.equal(await page.locator('#field').getAttribute('data-radial-root'), '', 'The overview must begin as a clean eight-universe ring around Mycology');
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
     const visibleNodes = await nav.count();
@@ -119,6 +120,15 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
+    assert.equal(await page.locator('#field').getAttribute('data-radial-root'), navigationFixture.rootId,
+      'Selecting a universe must unfold its own radial hierarchy');
+    const ringRadii = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialRingRadii || '[]'));
+    assert.ok(ringRadii.length >= 2, 'The selected universe must unfold at least secondary and tertiary rings');
+    assert.ok(ringRadii.every((radius, index) => index === 0 || radius > ringRadii[index - 1]),
+      'Each hierarchy level must occupy a strictly larger concentric ring');
+    const ringCounts = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialLevelCounts || '{}'));
+    assert.ok(Number(ringCounts[1]) > 0 && Number(ringCounts[2]) > 0,
+      'The first and second radial rings must both contain real Notion descendants');
     const firstChild = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.branchId + '"]');
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
