@@ -96,6 +96,6 @@ for (const id of expectedExplorerDomains) {
 assert.ok(html.includes('explorer-2d.js?v=scientific-universes-hover-2'), 'Homepage must invalidate cached 2D engine code after the universe update');
 
 
-assert.ok(publicExplorerJs.includes('let hovered=null') && publicExplorerJs.includes('canvas.addEventListener("pointerleave",pointerLeave)'), 'The embedded explorer must expose a lightweight pointer-hover state and clear it when the pointer leaves');
+assert.ok(publicExplorerJs.includes('hovered=null') && publicExplorerJs.includes('canvas.addEventListener("pointerleave",pointerLeave)'), 'The embedded explorer must expose a lightweight pointer-hover state and clear it when the pointer leaves');
 assert.ok(sharedPixiJs.includes('hovered=null') && sharedPixiJs.includes('hovered?.id===n.id'), 'The PixiJS renderer must visibly highlight the hovered biological node');
 assert.ok(publicExplorerJs.includes('IntersectionObserver') && publicExplorerJs.includes('document.hidden') && publicExplorerJs.includes('function startAnimation()'), 'The animated explorer must pause rendering when off-screen or when the browser tab is hidden');
