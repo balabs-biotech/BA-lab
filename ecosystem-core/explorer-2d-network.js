@@ -58,11 +58,15 @@ function relaxBiologicalMorphology(nodes,edges){
    for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
     const bucket=grid.get((gx+ox)+":"+(gy+oy));if(!bucket)continue;
     for(const b of bucket){
-     if(a.id>=b.id||a.rootId!==b.rootId)continue;
-     if(parentPairs.has([a.id,b.id].sort().join("|")))continue;
+     if(a.id>=b.id)continue;
+     const bothTerminal=leafIds.has(a.id)&&leafIds.has(b.id);
+     const sameTerritory=a.rootId===b.rootId;
+     // Terminal tips are spaced across the whole field, not only inside one root.
+     // Non-terminal crowding remains local to each root territory.
+     if(!sameTerritory&&!bothTerminal)continue;
+     if(sameTerritory&&parentPairs.has([a.id,b.id].sort().join("|")))continue;
      const dx=b.x-a.x,dy=b.y-a.y;
      let d=Math.hypot(dx,dy);
-     const bothTerminal=leafIds.has(a.id)&&leafIds.has(b.id);
      const min=bothTerminal?82:Math.max(23,a.r+b.r+13);
      if(d>=min)continue;
      if(d<.001){const h=hash(a.id+"|"+b.id),angle=(h%6283)/1000;d=1;
@@ -72,7 +76,7 @@ function relaxBiologicalMorphology(nodes,edges){
       if(b.level>0){db.x+=ux*f;db.y+=uy*f;db.count++;}
       continue;
      }
-     const force=Math.min(bothTerminal?7:3.2,(min-d)*(bothTerminal?.24:.16));
+     const force=Math.min(bothTerminal?(sameTerritory?7:2.4):3.2,(min-d)*(bothTerminal?(sameTerritory?.24:.10):.16));
      const ux=dx/d,uy=dy/d;
      const wa=a.level===0?0:leafIds.has(a.id)?.78:.42;
      const wb=b.level===0?0:leafIds.has(b.id)?.78:.42;
