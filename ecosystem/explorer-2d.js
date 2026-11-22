@@ -30,7 +30,7 @@ function buildNetwork(){
 }
 function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
-function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
+function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function syncUniverseRail(n){
  const root=n?(n.level===0?n.id:n.rootId):null;
  document.querySelectorAll(".universe-rail [data-universe]").forEach(button=>{
