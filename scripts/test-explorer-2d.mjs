@@ -139,10 +139,8 @@ try {
     }, leafFixture.id);
     const firstLeafPoint = await pointForLeaf();
     assert.ok(firstLeafPoint, 'Leaf label must be visible before pointer activation');
-    // Keep the two pointer activations contiguous: the engine intentionally
-    // recognizes a double-click within its 650 ms gesture window.
-    await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y);
-    await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
+    // Send a trusted native double-click sequence, including click detail=2.
+    await page.mouse.dblclick(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
     assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
     await page.waitForFunction(root => document.querySelector('#selection')?.textContent !== root, selectedRoot);
