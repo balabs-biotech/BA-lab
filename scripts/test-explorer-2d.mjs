@@ -117,10 +117,15 @@ try {
       const rect = el.getBoundingClientRect();
       return { x: rect.left + (box.left + box.right) / 2, y: rect.top + (box.top + box.bottom) / 2 };
     }, leafFixture.id);
-    // Move selection away first so this click must genuinely hit the target leaf.
+    // Start a clean history: overview -> universe -> branch -> leaf.
+    // This makes Back assertions deterministic and tests each navigation level.
+    await page.locator('#reset').click();
     await rootButton.focus();
     await rootButton.press('Enter');
     await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), mappedTree.roots[0].title);
+    await firstChild.focus();
+    await firstChild.press('Enter');
+    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), await firstChild.innerText());
     const pointForLeaf = async () => page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
       if (!box) return null;
