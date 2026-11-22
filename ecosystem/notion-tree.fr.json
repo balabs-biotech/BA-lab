@@ -411,9 +411,247 @@
       ]
     },
     {
-      "id": "plants",
+      "id": "bioprocesses",
       "academyUniverseId": "bio",
       "title": "BIOTECHNOLOGIE",
+      "notionId": "41f73152f1718108ac67e06204a60c7f",
+      "url": "https://app.notion.com/p/41f73152f1718108ac67e06204a60c7f",
+      "children": [
+        {
+          "id": "page-41f73152f17181029956e42b3398967c",
+          "title": "Bioconversion & enzymes",
+          "notionId": "41f73152f17181029956e42b3398967c",
+          "url": "https://app.notion.com/p/41f73152f17181029956e42b3398967c",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181d0914fcb9a31239076",
+          "title": "Préparation des matières & procédés pilotes",
+          "notionId": "41f73152f17181d0914fcb9a31239076",
+          "url": "https://app.notion.com/p/41f73152f17181d0914fcb9a31239076",
+          "children": []
+        },
+        {
+          "id": "bio-fermentation",
+          "title": "Fermentation biologique",
+          "notionId": "3e273152f17181929dcbe5581e2ebd48",
+          "url": "https://app.notion.com/p/3e273152f17181929dcbe5581e2ebd48",
+          "description": "Travaux sur les cultures liquides et les procédés de fermentation : formulation, inoculation, suivi des variables, récolte et caractérisation. Une culture liquide n’est pas automatiquement un procédé fermentaire maîtrisé.",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f17181ec9ee4dcf0c18a2abc",
+          "title": "Fermenteurs & procédés pilotes",
+          "kind": "reference",
+          "notionId": "3e273152f17181ec9ee4dcf0c18a2abc",
+          "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc",
+          "children": []
+        },
+        {
+          "id": "ref-bioprocesses-bioprocesses-4-3e273152f171812e9dd5f9df0b269046",
+          "title": "Préparation des substrats",
+          "kind": "reference",
+          "notionId": "3e273152f171812e9dd5f9df0b269046",
+          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046",
+          "children": []
+        },
+        {
+          "id": "myco-applications",
+          "title": "Applications mycologiques",
+          "notionId": "3e273152f1718144bb67d07e93c3aa2d",
+          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
+          "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées.",
+          "children": []
+        },
+        {
+          "id": "myco-culture",
+          "title": "Culture & multiplication",
+          "notionId": "3e273152f171817c82bdee3cf1c68bb8",
+          "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8",
+          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert.",
+          "children": []
+        },
+        {
+          "id": "ref-bioprocesses-bioprocesses-7-3e273152f17181ab88bfe456f838b011",
+          "title": "Méthodologie R&D",
+          "kind": "reference",
+          "notionId": "3e273152f17181ab88bfe456f838b011",
+          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
+          "children": []
+        },
+        {
+          "id": "work-iteration",
+          "title": "Itération & validation",
+          "url": "https://app.notion.com/p/3e273152f17181b1a786db5143e19f53",
+          "description": "Suivre les écarts entre versions, comprendre les modifications et distinguer un essai exploratoire d’une validation fondée sur des critères définis.",
+          "children": [],
+          "notionId": "3e273152f17181b1a786db5143e19f53"
+        },
+        {
+          "id": "ref-bioprocesses-bioprocesses-9-3ff73152f1718184bcacee1fac9f6aba",
+          "title": "Trichoderma reesei — fiche d’organisme",
+          "kind": "reference",
+          "notionId": "3ff73152f1718184bcacee1fac9f6aba",
+          "url": "https://app.notion.com/p/3ff73152f1718184bcacee1fac9f6aba",
+          "children": []
+        },
+        {
+          "id": "ref-bioprocesses-bioprocesses-10-3ff73152f17181598282ef83b40dbf7a",
+          "title": "Trichoderma longibrachiatum — fiche d’organisme",
+          "kind": "reference",
+          "notionId": "3ff73152f17181598282ef83b40dbf7a",
+          "url": "https://app.notion.com/p/3ff73152f17181598282ef83b40dbf7a",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181248d16c9e9969dc0ad",
+          "title": "Fermentation & cultures biologiques",
+          "notionId": "41f73152f17181248d16c9e9969dc0ad",
+          "url": "https://app.notion.com/p/41f73152f17181248d16c9e9969dc0ad",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "biomaterials",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 2 ressource(s) commune(s), dont Préparation des substrats (3e273152f171812e9dd5f9df0b269046)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Itération & validation (3e273152f17181b1a786db5143e19f53)."
+        },
+        {
+          "target": "digital",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Méthodologie R&D (3e273152f17181ab88bfe456f838b011)."
+        }
+      ]
+    },
+    {
+      "id": "instrumentation",
+      "academyUniverseId": "iot",
+      "title": "INSTRUMENTATION & AUTOMATISATION",
+      "notionId": "41f73152f1718170ba14e91650b0c806",
+      "url": "https://app.notion.com/p/41f73152f1718170ba14e91650b0c806",
+      "children": [
+        {
+          "id": "page-41f73152f17181739cf4f9d0192503ff",
+          "title": "Ingénierie, équipements & prototypage",
+          "notionId": "41f73152f17181739cf4f9d0192503ff",
+          "url": "https://app.notion.com/p/41f73152f17181739cf4f9d0192503ff",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c397fed64209d7ed87",
+          "title": "Automatisation, contrôle & systèmes IoT",
+          "notionId": "41f73152f17181c397fed64209d7ed87",
+          "url": "https://app.notion.com/p/41f73152f17181c397fed64209d7ed87",
+          "children": []
+        },
+        {
+          "id": "iot-sensors",
+          "title": "Instrumentation & capteurs",
+          "notionId": "3e273152f17181f58c57c93b4c8c790f",
+          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f",
+          "description": "Capteurs et microcontrôleurs envisagés pour suivre les paramètres des systèmes expérimentaux ; le déploiement opérationnel reste à distinguer des études.",
+          "children": []
+        },
+        {
+          "id": "iot-automation",
+          "title": "Automatisation des cultures",
+          "notionId": "3e273152f171818a8ffff2585126f904",
+          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904",
+          "description": "Étude du pilotage des conditions de culture : renouvellement d’air, humidification, température et éclairage.",
+          "children": []
+        },
+        {
+          "id": "iot-traceability",
+          "title": "Traçabilité & données",
+          "notionId": "3e273152f171811db9a6f46cc9959da4",
+          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
+          "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats.",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f171818bae74c015daa192cd",
+          "title": "Instrumentation intégrée",
+          "kind": "reference",
+          "notionId": "3e273152f171818bae74c015daa192cd",
+          "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f1718167be9fc11cf0b00386",
+          "title": "Équipements expérimentaux",
+          "kind": "reference",
+          "notionId": "3e273152f1718167be9fc11cf0b00386",
+          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386",
+          "children": []
+        },
+        {
+          "id": "ref-instrumentation-instrumentation-7-3e273152f17181ffa96cee6f70fb11e3",
+          "title": "Prototypage & fabrication",
+          "kind": "reference",
+          "notionId": "3e273152f17181ffa96cee6f70fb11e3",
+          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f1718174904bd0043fc5d976",
+          "title": "Prototypes & essais",
+          "kind": "reference",
+          "notionId": "3e273152f1718174904bd0043fc5d976",
+          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
+          "children": []
+        },
+        {
+          "id": "iot-measurement",
+          "title": "Mesure & reproductibilité",
+          "notionId": "3e273152f1718119b0f7eeeb897f206a",
+          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
+          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité.",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f17181b1a786db5143e19f53",
+          "title": "Itération & validation",
+          "kind": "reference",
+          "notionId": "3e273152f17181b1a786db5143e19f53",
+          "url": "https://app.notion.com/p/3e273152f17181b1a786db5143e19f53",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718119bde3defa34a46e40",
+          "title": "Instrumentation, capteurs & métrologie",
+          "notionId": "41f73152f1718119bde3defa34a46e40",
+          "url": "https://app.notion.com/p/41f73152f1718119bde3defa34a46e40",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "digital",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 5 ressource(s) commune(s), dont Automatisation des cultures (3e273152f171818a8ffff2585126f904)."
+        },
+        {
+          "target": "physical",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 2 ressource(s) commune(s), dont Instrumentation & capteurs (3e273152f17181f58c57c93b4c8c790f)."
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "academyUniverseId": "soil",
+      "title": "AGROTECHNOLOGIE",
       "notionId": "41f73152f1718161af13d1fbe52250de",
       "url": "https://app.notion.com/p/41f73152f1718161af13d1fbe52250de",
       "children": [
@@ -626,9 +864,242 @@
       ]
     },
     {
+      "id": "physical",
+      "academyUniverseId": "lab",
+      "title": "LABORATOIRE & EXPÉRIMENTATION",
+      "notionId": "41f73152f1718142aaf0d01bba51ecfb",
+      "url": "https://app.notion.com/p/41f73152f1718142aaf0d01bba51ecfb",
+      "children": [
+        {
+          "id": "page-41f73152f17181809798cd7b47080365",
+          "title": "Physique, transferts & thermodynamique",
+          "notionId": "41f73152f17181809798cd7b47080365",
+          "url": "https://app.notion.com/p/41f73152f17181809798cd7b47080365",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181a3a1b2f63d4a0e48e1",
+          "title": "Mathématiques, statistiques & modélisation",
+          "notionId": "41f73152f17181a3a1b2f63d4a0e48e1",
+          "url": "https://app.notion.com/p/41f73152f17181a3a1b2f63d4a0e48e1",
+          "children": []
+        },
+        {
+          "id": "ref-physical-physical-2-3e273152f1718119b0f7eeeb897f206a",
+          "title": "Mesure & reproductibilité",
+          "kind": "reference",
+          "notionId": "3e273152f1718119b0f7eeeb897f206a",
+          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
+          "children": []
+        },
+        {
+          "id": "ref-physical-physical-3-3e273152f17181e7ab61c84b44557e9c",
+          "title": "Substrats & supports biologiques",
+          "kind": "reference",
+          "notionId": "3e273152f17181e7ab61c84b44557e9c",
+          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f17181f58c57c93b4c8c790f",
+          "title": "Instrumentation & capteurs",
+          "kind": "reference",
+          "notionId": "3e273152f17181f58c57c93b4c8c790f",
+          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c688f6df43892b3e6a",
+          "title": "Chimie & caractérisation des milieux",
+          "notionId": "41f73152f17181c688f6df43892b3e6a",
+          "url": "https://app.notion.com/p/41f73152f17181c688f6df43892b3e6a",
+          "children": []
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "biomaterials",
+      "academyUniverseId": "products",
+      "title": "PRODUITS & RESSOURCES BIOLOGIQUES",
+      "notionId": "41f73152f1718117a38df4afe2d4fb9d",
+      "url": "https://app.notion.com/p/41f73152f1718117a38df4afe2d4fb9d",
+      "children": [
+        {
+          "id": "page-41f73152f17181c399e5e82b83705dcb",
+          "title": "Biomasses, fibres & matières biosourcées",
+          "notionId": "41f73152f17181c399e5e82b83705dcb",
+          "url": "https://app.notion.com/p/41f73152f17181c399e5e82b83705dcb",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171813dbe2dda66b86a3d8b",
+          "title": "Biofabrication, caractérisation & usages",
+          "notionId": "41f73152f171813dbe2dda66b86a3d8b",
+          "url": "https://app.notion.com/p/41f73152f171813dbe2dda66b86a3d8b",
+          "children": []
+        },
+        {
+          "id": "ref-biomaterials-biomaterials-2-3e273152f17181e7ab61c84b44557e9c",
+          "title": "Substrats & supports biologiques",
+          "kind": "reference",
+          "notionId": "3e273152f17181e7ab61c84b44557e9c",
+          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f17181ffa96cee6f70fb11e3",
+          "title": "Prototypage & fabrication",
+          "kind": "reference",
+          "notionId": "3e273152f17181ffa96cee6f70fb11e3",
+          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3",
+          "children": []
+        },
+        {
+          "id": "ref-biomaterials-biomaterials-4-3e273152f171812e9dd5f9df0b269046",
+          "title": "Préparation des substrats",
+          "kind": "reference",
+          "notionId": "3e273152f171812e9dd5f9df0b269046",
+          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f1718144bb67d07e93c3aa2d",
+          "title": "Applications mycologiques",
+          "kind": "reference",
+          "notionId": "3e273152f1718144bb67d07e93c3aa2d",
+          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
+          "children": []
+        },
+        {
+          "id": "ref-3f273152f171815597b6c696402b42c0",
+          "title": "Travaux & réalisations documentés",
+          "kind": "reference",
+          "notionId": "3f273152f171815597b6c696402b42c0",
+          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
+          "children": []
+        },
+        {
+          "id": "iot-prototypes",
+          "title": "Prototypes & essais",
+          "notionId": "3e273152f1718174904bd0043fc5d976",
+          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
+          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement.",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181e0a6f9e5b1258fff18",
+          "title": "Mycomatériaux & composites biologiques",
+          "notionId": "41f73152f17181e0a6f9e5b1258fff18",
+          "url": "https://app.notion.com/p/41f73152f17181e0a6f9e5b1258fff18",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "instrumentation",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 2 ressource(s) commune(s), dont Prototypage & fabrication (3e273152f17181ffa96cee6f70fb11e3)."
+        },
+        {
+          "target": "physical",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Substrats & supports biologiques (3e273152f17181e7ab61c84b44557e9c)."
+        }
+      ]
+    },
+    {
+      "id": "digital",
+      "academyUniverseId": "work",
+      "title": "RECHERCHE & DÉVELOPPEMENT",
+      "notionId": "41f73152f171816e8f0ed9e629fb70fe",
+      "url": "https://app.notion.com/p/41f73152f171816e8f0ed9e629fb70fe",
+      "children": [
+        {
+          "id": "page-41f73152f17181afa56ddec00b290b49",
+          "title": "Données, traçabilité & systèmes d'information",
+          "notionId": "41f73152f17181afa56ddec00b290b49",
+          "url": "https://app.notion.com/p/41f73152f17181afa56ddec00b290b49",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171818aa658f0fcff631d1e",
+          "title": "Intelligence artificielle, modélisation & visualisation",
+          "notionId": "41f73152f171818aa658f0fcff631d1e",
+          "url": "https://app.notion.com/p/41f73152f171818aa658f0fcff631d1e",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f171811db9a6f46cc9959da4",
+          "title": "Traçabilité & données",
+          "kind": "reference",
+          "notionId": "3e273152f171811db9a6f46cc9959da4",
+          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f171818a8ffff2585126f904",
+          "title": "Automatisation des cultures",
+          "kind": "reference",
+          "notionId": "3e273152f171818a8ffff2585126f904",
+          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904",
+          "children": []
+        },
+        {
+          "id": "ref-3e273152f1718119b0f7eeeb897f206a",
+          "title": "Mesure & reproductibilité",
+          "kind": "reference",
+          "notionId": "3e273152f1718119b0f7eeeb897f206a",
+          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
+          "children": []
+        },
+        {
+          "id": "ref-digital-digital-5-3e273152f171818bae74c015daa192cd",
+          "title": "Instrumentation intégrée",
+          "kind": "reference",
+          "notionId": "3e273152f171818bae74c015daa192cd",
+          "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
+          "children": []
+        },
+        {
+          "id": "ref-digital-digital-6-3e273152f1718167be9fc11cf0b00386",
+          "title": "Équipements expérimentaux",
+          "kind": "reference",
+          "notionId": "3e273152f1718167be9fc11cf0b00386",
+          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386",
+          "children": []
+        },
+        {
+          "id": "ref-digital-digital-7-3e273152f17181ab88bfe456f838b011",
+          "title": "Méthodologie R&D",
+          "kind": "reference",
+          "notionId": "3e273152f17181ab88bfe456f838b011",
+          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718100968ed254611fc02c",
+          "title": "Logiciels, architecture & développement",
+          "notionId": "41f73152f1718100968ed254611fc02c",
+          "url": "https://app.notion.com/p/41f73152f1718100968ed254611fc02c",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "physical",
+          "label": "Ressources publiques partagées",
+          "basis": "notion-link",
+          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Mesure & reproductibilité (3e273152f1718119b0f7eeeb897f206a)."
+        }
+      ]
+    },
+    {
       "id": "ecology",
-      "academyUniverseId": "iot",
-      "title": "INSTRUMENTATION & AUTOMATISATION",
+      "academyUniverseId": "learn",
+      "title": "RESSOURCES & TRANSMISSION",
       "notionId": "41f73152f171819f9b7acbd64ccf4a3e",
       "url": "https://app.notion.com/p/41f73152f171819f9b7acbd64ccf4a3e",
       "children": [
@@ -785,477 +1256,6 @@
           "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Substrats & supports biologiques (3e273152f17181e7ab61c84b44557e9c)."
         }
       ]
-    },
-    {
-      "id": "bioprocesses",
-      "academyUniverseId": "soil",
-      "title": "AGROTECHNOLOGIE",
-      "notionId": "41f73152f1718108ac67e06204a60c7f",
-      "url": "https://app.notion.com/p/41f73152f1718108ac67e06204a60c7f",
-      "children": [
-        {
-          "id": "page-41f73152f17181029956e42b3398967c",
-          "title": "Bioconversion & enzymes",
-          "notionId": "41f73152f17181029956e42b3398967c",
-          "url": "https://app.notion.com/p/41f73152f17181029956e42b3398967c",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181d0914fcb9a31239076",
-          "title": "Préparation des matières & procédés pilotes",
-          "notionId": "41f73152f17181d0914fcb9a31239076",
-          "url": "https://app.notion.com/p/41f73152f17181d0914fcb9a31239076",
-          "children": []
-        },
-        {
-          "id": "bio-fermentation",
-          "title": "Fermentation biologique",
-          "notionId": "3e273152f17181929dcbe5581e2ebd48",
-          "url": "https://app.notion.com/p/3e273152f17181929dcbe5581e2ebd48",
-          "description": "Travaux sur les cultures liquides et les procédés de fermentation : formulation, inoculation, suivi des variables, récolte et caractérisation. Une culture liquide n’est pas automatiquement un procédé fermentaire maîtrisé.",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f17181ec9ee4dcf0c18a2abc",
-          "title": "Fermenteurs & procédés pilotes",
-          "kind": "reference",
-          "notionId": "3e273152f17181ec9ee4dcf0c18a2abc",
-          "url": "https://app.notion.com/p/3e273152f17181ec9ee4dcf0c18a2abc",
-          "children": []
-        },
-        {
-          "id": "ref-bioprocesses-bioprocesses-4-3e273152f171812e9dd5f9df0b269046",
-          "title": "Préparation des substrats",
-          "kind": "reference",
-          "notionId": "3e273152f171812e9dd5f9df0b269046",
-          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046",
-          "children": []
-        },
-        {
-          "id": "myco-applications",
-          "title": "Applications mycologiques",
-          "notionId": "3e273152f1718144bb67d07e93c3aa2d",
-          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
-          "description": "Découvrir les champs d’application de la mycologie, de la transformation de matières aux interactions biologiques, en distinguant les pistes scientifiques des solutions validées.",
-          "children": []
-        },
-        {
-          "id": "myco-culture",
-          "title": "Culture & multiplication",
-          "notionId": "3e273152f171817c82bdee3cf1c68bb8",
-          "url": "https://app.notion.com/p/3e273152f171817c82bdee3cf1c68bb8",
-          "description": "Du maintien des cultures à leur amplification et aux essais de fructification : les étapes sont suivies avec des contrôles avant chaque transfert.",
-          "children": []
-        },
-        {
-          "id": "ref-bioprocesses-bioprocesses-7-3e273152f17181ab88bfe456f838b011",
-          "title": "Méthodologie R&D",
-          "kind": "reference",
-          "notionId": "3e273152f17181ab88bfe456f838b011",
-          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
-          "children": []
-        },
-        {
-          "id": "work-iteration",
-          "title": "Itération & validation",
-          "url": "https://app.notion.com/p/3e273152f17181b1a786db5143e19f53",
-          "description": "Suivre les écarts entre versions, comprendre les modifications et distinguer un essai exploratoire d’une validation fondée sur des critères définis.",
-          "children": [],
-          "notionId": "3e273152f17181b1a786db5143e19f53"
-        },
-        {
-          "id": "ref-bioprocesses-bioprocesses-9-3ff73152f1718184bcacee1fac9f6aba",
-          "title": "Trichoderma reesei — fiche d’organisme",
-          "kind": "reference",
-          "notionId": "3ff73152f1718184bcacee1fac9f6aba",
-          "url": "https://app.notion.com/p/3ff73152f1718184bcacee1fac9f6aba",
-          "children": []
-        },
-        {
-          "id": "ref-bioprocesses-bioprocesses-10-3ff73152f17181598282ef83b40dbf7a",
-          "title": "Trichoderma longibrachiatum — fiche d’organisme",
-          "kind": "reference",
-          "notionId": "3ff73152f17181598282ef83b40dbf7a",
-          "url": "https://app.notion.com/p/3ff73152f17181598282ef83b40dbf7a",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181248d16c9e9969dc0ad",
-          "title": "Fermentation & cultures biologiques",
-          "notionId": "41f73152f17181248d16c9e9969dc0ad",
-          "url": "https://app.notion.com/p/41f73152f17181248d16c9e9969dc0ad",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "biomaterials",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 2 ressource(s) commune(s), dont Préparation des substrats (3e273152f171812e9dd5f9df0b269046)."
-        },
-        {
-          "target": "instrumentation",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Itération & validation (3e273152f17181b1a786db5143e19f53)."
-        },
-        {
-          "target": "digital",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Méthodologie R&D (3e273152f17181ab88bfe456f838b011)."
-        }
-      ]
-    },
-    {
-      "id": "biomaterials",
-      "academyUniverseId": "lab",
-      "title": "LABORATOIRE & EXPÉRIMENTATION",
-      "notionId": "41f73152f1718117a38df4afe2d4fb9d",
-      "url": "https://app.notion.com/p/41f73152f1718117a38df4afe2d4fb9d",
-      "children": [
-        {
-          "id": "page-41f73152f17181c399e5e82b83705dcb",
-          "title": "Biomasses, fibres & matières biosourcées",
-          "notionId": "41f73152f17181c399e5e82b83705dcb",
-          "url": "https://app.notion.com/p/41f73152f17181c399e5e82b83705dcb",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171813dbe2dda66b86a3d8b",
-          "title": "Biofabrication, caractérisation & usages",
-          "notionId": "41f73152f171813dbe2dda66b86a3d8b",
-          "url": "https://app.notion.com/p/41f73152f171813dbe2dda66b86a3d8b",
-          "children": []
-        },
-        {
-          "id": "ref-biomaterials-biomaterials-2-3e273152f17181e7ab61c84b44557e9c",
-          "title": "Substrats & supports biologiques",
-          "kind": "reference",
-          "notionId": "3e273152f17181e7ab61c84b44557e9c",
-          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f17181ffa96cee6f70fb11e3",
-          "title": "Prototypage & fabrication",
-          "kind": "reference",
-          "notionId": "3e273152f17181ffa96cee6f70fb11e3",
-          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3",
-          "children": []
-        },
-        {
-          "id": "ref-biomaterials-biomaterials-4-3e273152f171812e9dd5f9df0b269046",
-          "title": "Préparation des substrats",
-          "kind": "reference",
-          "notionId": "3e273152f171812e9dd5f9df0b269046",
-          "url": "https://app.notion.com/p/3e273152f171812e9dd5f9df0b269046",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f1718144bb67d07e93c3aa2d",
-          "title": "Applications mycologiques",
-          "kind": "reference",
-          "notionId": "3e273152f1718144bb67d07e93c3aa2d",
-          "url": "https://app.notion.com/p/3e273152f1718144bb67d07e93c3aa2d",
-          "children": []
-        },
-        {
-          "id": "ref-3f273152f171815597b6c696402b42c0",
-          "title": "Travaux & réalisations documentés",
-          "kind": "reference",
-          "notionId": "3f273152f171815597b6c696402b42c0",
-          "url": "https://app.notion.com/p/3f273152f171815597b6c696402b42c0",
-          "children": []
-        },
-        {
-          "id": "iot-prototypes",
-          "title": "Prototypes & essais",
-          "notionId": "3e273152f1718174904bd0043fc5d976",
-          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
-          "description": "Cycles de prototypage destinés à tester une hypothèse et produire des informations utiles à la suite du développement.",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181e0a6f9e5b1258fff18",
-          "title": "Mycomatériaux & composites biologiques",
-          "notionId": "41f73152f17181e0a6f9e5b1258fff18",
-          "url": "https://app.notion.com/p/41f73152f17181e0a6f9e5b1258fff18",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "instrumentation",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 2 ressource(s) commune(s), dont Prototypage & fabrication (3e273152f17181ffa96cee6f70fb11e3)."
-        },
-        {
-          "target": "physical",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Substrats & supports biologiques (3e273152f17181e7ab61c84b44557e9c)."
-        }
-      ]
-    },
-    {
-      "id": "instrumentation",
-      "academyUniverseId": "products",
-      "title": "PRODUITS & RESSOURCES BIOLOGIQUES",
-      "notionId": "41f73152f1718170ba14e91650b0c806",
-      "url": "https://app.notion.com/p/41f73152f1718170ba14e91650b0c806",
-      "children": [
-        {
-          "id": "page-41f73152f17181739cf4f9d0192503ff",
-          "title": "Ingénierie, équipements & prototypage",
-          "notionId": "41f73152f17181739cf4f9d0192503ff",
-          "url": "https://app.notion.com/p/41f73152f17181739cf4f9d0192503ff",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181c397fed64209d7ed87",
-          "title": "Automatisation, contrôle & systèmes IoT",
-          "notionId": "41f73152f17181c397fed64209d7ed87",
-          "url": "https://app.notion.com/p/41f73152f17181c397fed64209d7ed87",
-          "children": []
-        },
-        {
-          "id": "iot-sensors",
-          "title": "Instrumentation & capteurs",
-          "notionId": "3e273152f17181f58c57c93b4c8c790f",
-          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f",
-          "description": "Capteurs et microcontrôleurs envisagés pour suivre les paramètres des systèmes expérimentaux ; le déploiement opérationnel reste à distinguer des études.",
-          "children": []
-        },
-        {
-          "id": "iot-automation",
-          "title": "Automatisation des cultures",
-          "notionId": "3e273152f171818a8ffff2585126f904",
-          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904",
-          "description": "Étude du pilotage des conditions de culture : renouvellement d’air, humidification, température et éclairage.",
-          "children": []
-        },
-        {
-          "id": "iot-traceability",
-          "title": "Traçabilité & données",
-          "notionId": "3e273152f171811db9a6f46cc9959da4",
-          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
-          "description": "Relier observations, mesures et enregistrements pour conserver le contexte des essais et comparer les résultats.",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f171818bae74c015daa192cd",
-          "title": "Instrumentation intégrée",
-          "kind": "reference",
-          "notionId": "3e273152f171818bae74c015daa192cd",
-          "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f1718167be9fc11cf0b00386",
-          "title": "Équipements expérimentaux",
-          "kind": "reference",
-          "notionId": "3e273152f1718167be9fc11cf0b00386",
-          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386",
-          "children": []
-        },
-        {
-          "id": "ref-instrumentation-instrumentation-7-3e273152f17181ffa96cee6f70fb11e3",
-          "title": "Prototypage & fabrication",
-          "kind": "reference",
-          "notionId": "3e273152f17181ffa96cee6f70fb11e3",
-          "url": "https://app.notion.com/p/3e273152f17181ffa96cee6f70fb11e3",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f1718174904bd0043fc5d976",
-          "title": "Prototypes & essais",
-          "kind": "reference",
-          "notionId": "3e273152f1718174904bd0043fc5d976",
-          "url": "https://app.notion.com/p/3e273152f1718174904bd0043fc5d976",
-          "children": []
-        },
-        {
-          "id": "iot-measurement",
-          "title": "Mesure & reproductibilité",
-          "notionId": "3e273152f1718119b0f7eeeb897f206a",
-          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
-          "description": "Définition des variables et des méthodes de mesure pour documenter les conditions et apprécier la reproductibilité.",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f17181b1a786db5143e19f53",
-          "title": "Itération & validation",
-          "kind": "reference",
-          "notionId": "3e273152f17181b1a786db5143e19f53",
-          "url": "https://app.notion.com/p/3e273152f17181b1a786db5143e19f53",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f1718119bde3defa34a46e40",
-          "title": "Instrumentation, capteurs & métrologie",
-          "notionId": "41f73152f1718119bde3defa34a46e40",
-          "url": "https://app.notion.com/p/41f73152f1718119bde3defa34a46e40",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "digital",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 5 ressource(s) commune(s), dont Automatisation des cultures (3e273152f171818a8ffff2585126f904)."
-        },
-        {
-          "target": "physical",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 2 ressource(s) commune(s), dont Instrumentation & capteurs (3e273152f17181f58c57c93b4c8c790f)."
-        }
-      ]
-    },
-    {
-      "id": "digital",
-      "academyUniverseId": "work",
-      "title": "RECHERCHE & DÉVELOPPEMENT",
-      "notionId": "41f73152f171816e8f0ed9e629fb70fe",
-      "url": "https://app.notion.com/p/41f73152f171816e8f0ed9e629fb70fe",
-      "children": [
-        {
-          "id": "page-41f73152f17181afa56ddec00b290b49",
-          "title": "Données, traçabilité & systèmes d'information",
-          "notionId": "41f73152f17181afa56ddec00b290b49",
-          "url": "https://app.notion.com/p/41f73152f17181afa56ddec00b290b49",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171818aa658f0fcff631d1e",
-          "title": "Intelligence artificielle, modélisation & visualisation",
-          "notionId": "41f73152f171818aa658f0fcff631d1e",
-          "url": "https://app.notion.com/p/41f73152f171818aa658f0fcff631d1e",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f171811db9a6f46cc9959da4",
-          "title": "Traçabilité & données",
-          "kind": "reference",
-          "notionId": "3e273152f171811db9a6f46cc9959da4",
-          "url": "https://app.notion.com/p/3e273152f171811db9a6f46cc9959da4",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f171818a8ffff2585126f904",
-          "title": "Automatisation des cultures",
-          "kind": "reference",
-          "notionId": "3e273152f171818a8ffff2585126f904",
-          "url": "https://app.notion.com/p/3e273152f171818a8ffff2585126f904",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f1718119b0f7eeeb897f206a",
-          "title": "Mesure & reproductibilité",
-          "kind": "reference",
-          "notionId": "3e273152f1718119b0f7eeeb897f206a",
-          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
-          "children": []
-        },
-        {
-          "id": "ref-digital-digital-5-3e273152f171818bae74c015daa192cd",
-          "title": "Instrumentation intégrée",
-          "kind": "reference",
-          "notionId": "3e273152f171818bae74c015daa192cd",
-          "url": "https://app.notion.com/p/3e273152f171818bae74c015daa192cd",
-          "children": []
-        },
-        {
-          "id": "ref-digital-digital-6-3e273152f1718167be9fc11cf0b00386",
-          "title": "Équipements expérimentaux",
-          "kind": "reference",
-          "notionId": "3e273152f1718167be9fc11cf0b00386",
-          "url": "https://app.notion.com/p/3e273152f1718167be9fc11cf0b00386",
-          "children": []
-        },
-        {
-          "id": "ref-digital-digital-7-3e273152f17181ab88bfe456f838b011",
-          "title": "Méthodologie R&D",
-          "kind": "reference",
-          "notionId": "3e273152f17181ab88bfe456f838b011",
-          "url": "https://app.notion.com/p/3e273152f17181ab88bfe456f838b011",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f1718100968ed254611fc02c",
-          "title": "Logiciels, architecture & développement",
-          "notionId": "41f73152f1718100968ed254611fc02c",
-          "url": "https://app.notion.com/p/41f73152f1718100968ed254611fc02c",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "physical",
-          "label": "Ressources publiques partagées",
-          "basis": "notion-link",
-          "evidence": "Les deux portails publics référencent 1 ressource(s) commune(s), dont Mesure & reproductibilité (3e273152f1718119b0f7eeeb897f206a)."
-        }
-      ]
-    },
-    {
-      "id": "physical",
-      "academyUniverseId": "learn",
-      "title": "RESSOURCES & TRANSMISSION",
-      "notionId": "41f73152f1718142aaf0d01bba51ecfb",
-      "url": "https://app.notion.com/p/41f73152f1718142aaf0d01bba51ecfb",
-      "children": [
-        {
-          "id": "page-41f73152f17181809798cd7b47080365",
-          "title": "Physique, transferts & thermodynamique",
-          "notionId": "41f73152f17181809798cd7b47080365",
-          "url": "https://app.notion.com/p/41f73152f17181809798cd7b47080365",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181a3a1b2f63d4a0e48e1",
-          "title": "Mathématiques, statistiques & modélisation",
-          "notionId": "41f73152f17181a3a1b2f63d4a0e48e1",
-          "url": "https://app.notion.com/p/41f73152f17181a3a1b2f63d4a0e48e1",
-          "children": []
-        },
-        {
-          "id": "ref-physical-physical-2-3e273152f1718119b0f7eeeb897f206a",
-          "title": "Mesure & reproductibilité",
-          "kind": "reference",
-          "notionId": "3e273152f1718119b0f7eeeb897f206a",
-          "url": "https://app.notion.com/p/3e273152f1718119b0f7eeeb897f206a",
-          "children": []
-        },
-        {
-          "id": "ref-physical-physical-3-3e273152f17181e7ab61c84b44557e9c",
-          "title": "Substrats & supports biologiques",
-          "kind": "reference",
-          "notionId": "3e273152f17181e7ab61c84b44557e9c",
-          "url": "https://app.notion.com/p/3e273152f17181e7ab61c84b44557e9c",
-          "children": []
-        },
-        {
-          "id": "ref-3e273152f17181f58c57c93b4c8c790f",
-          "title": "Instrumentation & capteurs",
-          "kind": "reference",
-          "notionId": "3e273152f17181f58c57c93b4c8c790f",
-          "url": "https://app.notion.com/p/3e273152f17181f58c57c93b4c8c790f",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181c688f6df43892b3e6a",
-          "title": "Chimie & caractérisation des milieux",
-          "notionId": "41f73152f17181c688f6df43892b3e6a",
-          "url": "https://app.notion.com/p/41f73152f17181c688f6df43892b3e6a",
-          "children": []
-        }
-      ],
-      "relations": []
     }
   ]
 }
