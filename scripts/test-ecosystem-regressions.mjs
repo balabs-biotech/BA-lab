@@ -89,7 +89,8 @@ assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('windo
 const railMarkup = html.match(/<nav class="universe-rail"[\s\S]*?<\/nav>/)?.[0] || '';
 const canonicalRailOrder = ['microbiology','bioprocesses','instrumentation','plants','physical','biomaterials','digital','ecology'];
 assert.deepEqual([...railMarkup.matchAll(/data-universe="([^"]+)"/g)].map(match => match[1]), canonicalRailOrder, 'The public navigation rail must follow the Academy canonical universe order');
-assert.ok(canonicalRailOrder.every(id => html.includes('button[data-universe="' + id + '"]{--dot:')), 'Each public universe rail marker must use its Academy-matched palette color');
+const canonicalRailColors = ['#b18fc2','#79a991','#7eaaa3','#c19b73','#80aeb8','#c88773','#aa9cbb','#d1d0c5'];
+assert.deepEqual(canonicalRailOrder.map(id => html.match(new RegExp('button\\\\[data-universe="' + id + '"\\\\]\\\\{--dot:([^}]+)'))?.[1]), canonicalRailColors, 'Public rail colors must match the shared Pixi renderer palette, including the neutral fallback for the eighth universe');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
 for (const id of expectedExplorerDomains) assert.ok(universeEntry.includes("'" + id + "'"), 'Direct universe routing must allow ' + id);
 for (const id of expectedExplorerDomains) {
