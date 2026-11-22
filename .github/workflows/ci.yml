@@ -295,6 +295,10 @@ jobs:
           done
           cat /tmp/explorer-2d.log
           exit 1
+      - name: Test isolated fractal preview in desktop and mobile browsers
+        run: node scripts/test-explorer-2d-fractal-preview.mjs
+        env:
+          BALABS_FRACTAL_PREVIEW_URL: http://127.0.0.1:8766/explorer-2d-fractal-preview.html
       - name: Test continuous scene, direct selection, zoom and languages
         run: node scripts/test-explorer-2d.mjs
         env:
