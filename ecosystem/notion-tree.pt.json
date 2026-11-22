@@ -330,9 +330,97 @@
       ]
     },
     {
-      "id": "plants",
+      "id": "bioprocesses",
       "academyUniverseId": "bio",
       "title": "Biotecnologia",
+      "notionId": "41f73152f17181488f9eff06d48d9379",
+      "url": "https://app.notion.com/p/41f73152f17181488f9eff06d48d9379",
+      "children": [
+        {
+          "id": "ref-bioprocesses-bioprocesses-0-41f73152f17181568091ece73bfdb09a",
+          "title": "Explorar os oito universos da BA Labs",
+          "kind": "reference",
+          "notionId": "41f73152f17181568091ece73bfdb09a",
+          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
+          "children": []
+        },
+        {
+          "id": "pt-bio-fermentation",
+          "title": "Fermentação biológica",
+          "notionId": "40173152f17181f4ba7fe948f52041fc",
+          "url": "https://app.notion.com/p/40173152f17181f4ba7fe948f52041fc",
+          "description": "Processos de fermentação biológica e respetivos parâmetros.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-fermenters",
+          "title": "Fermentadores e processos-piloto",
+          "notionId": "40173152f17181f19424c0aee1e7a863",
+          "description": "Conceitos de fermentadores modulares e processos-piloto em desenvolvimento, distinguindo desenhos de equipamentos construídos e validados.",
+          "url": "https://app.notion.com/p/40173152f17181f19424c0aee1e7a863",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f17181628dace7026da068a9",
+          "title": "Preparação de substratos",
+          "kind": "reference",
+          "notionId": "40173152f17181628dace7026da068a9",
+          "url": "https://app.notion.com/p/40173152f17181628dace7026da068a9",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181a59634e9d1e2afa220",
+          "title": "Fermentação & Culturas Biológicas",
+          "notionId": "41f73152f17181a59634e9d1e2afa220",
+          "url": "https://app.notion.com/p/41f73152f17181a59634e9d1e2afa220",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171816ab229d0cda99e6736",
+          "title": "Bioconversão & Enzimas",
+          "notionId": "41f73152f171816ab229d0cda99e6736",
+          "url": "https://app.notion.com/p/41f73152f171816ab229d0cda99e6736",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181cd9cc6c04e46d1c876",
+          "title": "Preparação de Matérias-Primas & Processos-Piloto",
+          "notionId": "41f73152f17181cd9cc6c04e46d1c876",
+          "url": "https://app.notion.com/p/41f73152f17181cd9cc6c04e46d1c876",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "biomaterials",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        },
+        {
+          "target": "instrumentation",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        },
+        {
+          "target": "digital",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        },
+        {
+          "target": "physical",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        }
+      ]
+    },
+    {
+      "id": "plants",
+      "academyUniverseId": "soil",
+      "title": "Agrotecnologia",
       "notionId": "41f73152f1718151b56bf6ad98617c22",
       "url": "https://app.notion.com/p/41f73152f1718151b56bf6ad98617c22",
       "children": [
@@ -618,9 +706,300 @@
       ]
     },
     {
+      "id": "instrumentation",
+      "academyUniverseId": "iot",
+      "title": "Instrumentação e automação",
+      "notionId": "41f73152f17181049050c327f2b0df92",
+      "url": "https://app.notion.com/p/41f73152f17181049050c327f2b0df92",
+      "children": [
+        {
+          "id": "ref-instrumentation-instrumentation-0-41f73152f17181568091ece73bfdb09a",
+          "title": "Explorar os oito universos da BA Labs",
+          "kind": "reference",
+          "notionId": "41f73152f17181568091ece73bfdb09a",
+          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
+          "children": []
+        },
+        {
+          "id": "pt-iot-sensors",
+          "title": "Instrumentação e sensores",
+          "notionId": "40173152f171811bb877f46a99d03912",
+          "url": "https://app.notion.com/p/40173152f171811bb877f46a99d03912",
+          "description": "Instrumentos e sensores para observação e medição.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-instrumentation",
+          "title": "Instrumentação integrada",
+          "notionId": "40173152f171819b8edfc928072a23a0",
+          "url": "https://app.notion.com/p/40173152f171819b8edfc928072a23a0",
+          "description": "Integração de sensores e sistemas de controlo para observar processos biológicos.",
+          "children": []
+        },
+        {
+          "id": "pt-soil-equipment",
+          "title": "Equipamentos experimentais",
+          "notionId": "40173152f171815692d6c55cd7032b94",
+          "url": "https://app.notion.com/p/40173152f171815692d6c55cd7032b94",
+          "description": "Equipamentos e dispositivos para investigação e experimentação.",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718175b2b3e8a236870027",
+          "title": "Instrumentação, Sensores & Metrologia",
+          "notionId": "41f73152f1718175b2b3e8a236870027",
+          "url": "https://app.notion.com/p/41f73152f1718175b2b3e8a236870027",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171814da33fc1d7a16ae241",
+          "title": "Engenharia, Equipamentos & Prototipagem",
+          "notionId": "41f73152f171814da33fc1d7a16ae241",
+          "url": "https://app.notion.com/p/41f73152f171814da33fc1d7a16ae241",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f1718194b1b6eefbdb0c8f2d",
+          "title": "Automação, Controlo & Sistemas IoT",
+          "notionId": "41f73152f1718194b1b6eefbdb0c8f2d",
+          "url": "https://app.notion.com/p/41f73152f1718194b1b6eefbdb0c8f2d",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "digital",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        },
+        {
+          "target": "physical",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        }
+      ]
+    },
+    {
+      "id": "physical",
+      "academyUniverseId": "lab",
+      "title": "O laboratório",
+      "notionId": "41f73152f1718146a959f08cd87ea17b",
+      "url": "https://app.notion.com/p/41f73152f1718146a959f08cd87ea17b",
+      "children": [
+        {
+          "id": "ref-physical-physical-0-41f73152f17181568091ece73bfdb09a",
+          "title": "Explorar os oito universos da BA Labs",
+          "kind": "reference",
+          "notionId": "41f73152f17181568091ece73bfdb09a",
+          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
+          "children": []
+        },
+        {
+          "id": "ref-physical-physical-1-40273152f1718150b2beccb7c12d0792",
+          "title": "Medição e reprodutibilidade",
+          "kind": "reference",
+          "notionId": "40273152f1718150b2beccb7c12d0792",
+          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
+          "children": []
+        },
+        {
+          "id": "ref-physical-physical-2-40173152f17181b780dcc20a20962afa",
+          "title": "Substratos e suportes biológicos",
+          "kind": "reference",
+          "notionId": "40173152f17181b780dcc20a20962afa",
+          "url": "https://app.notion.com/p/40173152f17181b780dcc20a20962afa",
+          "children": []
+        },
+        {
+          "id": "pt-work-iteration",
+          "title": "Iteração e validação",
+          "notionId": "40273152f1718144ac4ddd7a46c410d8",
+          "url": "https://app.notion.com/p/40273152f1718144ac4ddd7a46c410d8",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181b1a903c040013bf3ea",
+          "title": "Química & Caracterização de Meios",
+          "notionId": "41f73152f17181b1a903c040013bf3ea",
+          "url": "https://app.notion.com/p/41f73152f17181b1a903c040013bf3ea",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171813682caf6448aecabb8",
+          "title": "Física, Transferências & Termodinâmica",
+          "notionId": "41f73152f171813682caf6448aecabb8",
+          "url": "https://app.notion.com/p/41f73152f171813682caf6448aecabb8",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181cea8b9ec2b1dcb2e84",
+          "title": "Matemática, Estatística & Modelação",
+          "notionId": "41f73152f17181cea8b9ec2b1dcb2e84",
+          "url": "https://app.notion.com/p/41f73152f17181cea8b9ec2b1dcb2e84",
+          "children": []
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "biomaterials",
+      "academyUniverseId": "products",
+      "title": "Produtos e recursos biológicos",
+      "notionId": "41f73152f17181babafbd221031866b4",
+      "url": "https://app.notion.com/p/41f73152f17181babafbd221031866b4",
+      "children": [
+        {
+          "id": "ref-biomaterials-biomaterials-0-41f73152f17181568091ece73bfdb09a",
+          "title": "Explorar os oito universos da BA Labs",
+          "kind": "reference",
+          "notionId": "41f73152f17181568091ece73bfdb09a",
+          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
+          "children": []
+        },
+        {
+          "id": "ref-biomaterials-biomaterials-1-40173152f17181b780dcc20a20962afa",
+          "title": "Substratos e suportes biológicos",
+          "kind": "reference",
+          "notionId": "40173152f17181b780dcc20a20962afa",
+          "url": "https://app.notion.com/p/40173152f17181b780dcc20a20962afa",
+          "children": []
+        },
+        {
+          "id": "pt-work-prototypes",
+          "title": "Protótipos e ensaios",
+          "notionId": "40273152f17181ed8c23f8efa76a2587",
+          "url": "https://app.notion.com/p/40273152f17181ed8c23f8efa76a2587",
+          "description": "Sous-page directement référencée par la page R&D de cette langue.",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f17181fcadf1cd543c83ed60",
+          "title": "Produtos e recursos biológicos",
+          "kind": "reference",
+          "notionId": "40173152f17181fcadf1cd543c83ed60",
+          "url": "https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c6afe1ef6f8553057c",
+          "title": "Micomateriais & Compósitos Biológicos",
+          "notionId": "41f73152f17181c6afe1ef6f8553057c",
+          "url": "https://app.notion.com/p/41f73152f17181c6afe1ef6f8553057c",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171812eaef8da800ef37bdf",
+          "title": "Biomassa, Fibras & Materiais de Base Biológica",
+          "notionId": "41f73152f171812eaef8da800ef37bdf",
+          "url": "https://app.notion.com/p/41f73152f171812eaef8da800ef37bdf",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181f09d09fabc4be40019",
+          "title": "Biofabricação, Caracterização & Aplicações",
+          "notionId": "41f73152f17181f09d09fabc4be40019",
+          "url": "https://app.notion.com/p/41f73152f17181f09d09fabc4be40019",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "instrumentation",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        },
+        {
+          "target": "digital",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        },
+        {
+          "target": "physical",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        }
+      ]
+    },
+    {
+      "id": "digital",
+      "academyUniverseId": "work",
+      "title": "Investigação e desenvolvimento",
+      "notionId": "41f73152f17181a1aba9d5b91d32a153",
+      "url": "https://app.notion.com/p/41f73152f17181a1aba9d5b91d32a153",
+      "children": [
+        {
+          "id": "ref-digital-digital-0-41f73152f17181568091ece73bfdb09a",
+          "title": "Explorar os oito universos da BA Labs",
+          "kind": "reference",
+          "notionId": "41f73152f17181568091ece73bfdb09a",
+          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
+          "children": []
+        },
+        {
+          "id": "pt-iot-traceability",
+          "title": "Rastreabilidade e dados",
+          "notionId": "40173152f17181888deee64e2fcc1597",
+          "url": "https://app.notion.com/p/40173152f17181888deee64e2fcc1597",
+          "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
+          "children": []
+        },
+        {
+          "id": "ref-40273152f1718150b2beccb7c12d0792",
+          "title": "Medição e reprodutibilidade",
+          "kind": "reference",
+          "notionId": "40273152f1718150b2beccb7c12d0792",
+          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
+          "children": []
+        },
+        {
+          "id": "ref-40173152f171819b8edfc928072a23a0",
+          "title": "Instrumentação integrada",
+          "kind": "reference",
+          "notionId": "40173152f171819b8edfc928072a23a0",
+          "url": "https://app.notion.com/p/40173152f171819b8edfc928072a23a0",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f17181c187cdd626e1c5f54e",
+          "title": "Software, Arquitetura & Desenvolvimento",
+          "notionId": "41f73152f17181c187cdd626e1c5f54e",
+          "url": "https://app.notion.com/p/41f73152f17181c187cdd626e1c5f54e",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171819db2bec2d568e2ed99",
+          "title": "Dados, Rastreabilidade & Sistemas de Informação",
+          "notionId": "41f73152f171819db2bec2d568e2ed99",
+          "url": "https://app.notion.com/p/41f73152f171819db2bec2d568e2ed99",
+          "children": []
+        },
+        {
+          "id": "page-41f73152f171819c86f5d09a5472c6f5",
+          "title": "Inteligência Artificial, Modelação & Visualização",
+          "notionId": "41f73152f171819c86f5d09a5472c6f5",
+          "url": "https://app.notion.com/p/41f73152f171819c86f5d09a5472c6f5",
+          "children": []
+        }
+      ],
+      "relations": [
+        {
+          "target": "physical",
+          "label": "Recursos públicos partilhados",
+          "basis": "notion-link",
+          "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
+        }
+      ]
+    },
+    {
       "id": "ecology",
-      "academyUniverseId": "soil",
-      "title": "Agrotecnologia",
+      "academyUniverseId": "learn",
+      "title": "Recursos e transmissão",
       "notionId": "41f73152f17181658b77c14bcbff5940",
       "url": "https://app.notion.com/p/41f73152f17181658b77c14bcbff5940",
       "children": [
@@ -791,385 +1170,6 @@
           "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
         }
       ]
-    },
-    {
-      "id": "bioprocesses",
-      "academyUniverseId": "iot",
-      "title": "Instrumentação e automação",
-      "notionId": "41f73152f17181488f9eff06d48d9379",
-      "url": "https://app.notion.com/p/41f73152f17181488f9eff06d48d9379",
-      "children": [
-        {
-          "id": "ref-bioprocesses-bioprocesses-0-41f73152f17181568091ece73bfdb09a",
-          "title": "Explorar os oito universos da BA Labs",
-          "kind": "reference",
-          "notionId": "41f73152f17181568091ece73bfdb09a",
-          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
-          "children": []
-        },
-        {
-          "id": "pt-bio-fermentation",
-          "title": "Fermentação biológica",
-          "notionId": "40173152f17181f4ba7fe948f52041fc",
-          "url": "https://app.notion.com/p/40173152f17181f4ba7fe948f52041fc",
-          "description": "Processos de fermentação biológica e respetivos parâmetros.",
-          "children": []
-        },
-        {
-          "id": "pt-soil-fermenters",
-          "title": "Fermentadores e processos-piloto",
-          "notionId": "40173152f17181f19424c0aee1e7a863",
-          "description": "Conceitos de fermentadores modulares e processos-piloto em desenvolvimento, distinguindo desenhos de equipamentos construídos e validados.",
-          "url": "https://app.notion.com/p/40173152f17181f19424c0aee1e7a863",
-          "children": []
-        },
-        {
-          "id": "ref-40173152f17181628dace7026da068a9",
-          "title": "Preparação de substratos",
-          "kind": "reference",
-          "notionId": "40173152f17181628dace7026da068a9",
-          "url": "https://app.notion.com/p/40173152f17181628dace7026da068a9",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181a59634e9d1e2afa220",
-          "title": "Fermentação & Culturas Biológicas",
-          "notionId": "41f73152f17181a59634e9d1e2afa220",
-          "url": "https://app.notion.com/p/41f73152f17181a59634e9d1e2afa220",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171816ab229d0cda99e6736",
-          "title": "Bioconversão & Enzimas",
-          "notionId": "41f73152f171816ab229d0cda99e6736",
-          "url": "https://app.notion.com/p/41f73152f171816ab229d0cda99e6736",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181cd9cc6c04e46d1c876",
-          "title": "Preparação de Matérias-Primas & Processos-Piloto",
-          "notionId": "41f73152f17181cd9cc6c04e46d1c876",
-          "url": "https://app.notion.com/p/41f73152f17181cd9cc6c04e46d1c876",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "biomaterials",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        },
-        {
-          "target": "instrumentation",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        },
-        {
-          "target": "digital",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        },
-        {
-          "target": "physical",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        }
-      ]
-    },
-    {
-      "id": "biomaterials",
-      "academyUniverseId": "lab",
-      "title": "O laboratório",
-      "notionId": "41f73152f17181babafbd221031866b4",
-      "url": "https://app.notion.com/p/41f73152f17181babafbd221031866b4",
-      "children": [
-        {
-          "id": "ref-biomaterials-biomaterials-0-41f73152f17181568091ece73bfdb09a",
-          "title": "Explorar os oito universos da BA Labs",
-          "kind": "reference",
-          "notionId": "41f73152f17181568091ece73bfdb09a",
-          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
-          "children": []
-        },
-        {
-          "id": "ref-biomaterials-biomaterials-1-40173152f17181b780dcc20a20962afa",
-          "title": "Substratos e suportes biológicos",
-          "kind": "reference",
-          "notionId": "40173152f17181b780dcc20a20962afa",
-          "url": "https://app.notion.com/p/40173152f17181b780dcc20a20962afa",
-          "children": []
-        },
-        {
-          "id": "pt-work-prototypes",
-          "title": "Protótipos e ensaios",
-          "notionId": "40273152f17181ed8c23f8efa76a2587",
-          "url": "https://app.notion.com/p/40273152f17181ed8c23f8efa76a2587",
-          "description": "Sous-page directement référencée par la page R&D de cette langue.",
-          "children": []
-        },
-        {
-          "id": "ref-40173152f17181fcadf1cd543c83ed60",
-          "title": "Produtos e recursos biológicos",
-          "kind": "reference",
-          "notionId": "40173152f17181fcadf1cd543c83ed60",
-          "url": "https://app.notion.com/p/40173152f17181fcadf1cd543c83ed60",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181c6afe1ef6f8553057c",
-          "title": "Micomateriais & Compósitos Biológicos",
-          "notionId": "41f73152f17181c6afe1ef6f8553057c",
-          "url": "https://app.notion.com/p/41f73152f17181c6afe1ef6f8553057c",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171812eaef8da800ef37bdf",
-          "title": "Biomassa, Fibras & Materiais de Base Biológica",
-          "notionId": "41f73152f171812eaef8da800ef37bdf",
-          "url": "https://app.notion.com/p/41f73152f171812eaef8da800ef37bdf",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181f09d09fabc4be40019",
-          "title": "Biofabricação, Caracterização & Aplicações",
-          "notionId": "41f73152f17181f09d09fabc4be40019",
-          "url": "https://app.notion.com/p/41f73152f17181f09d09fabc4be40019",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "instrumentation",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        },
-        {
-          "target": "digital",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        },
-        {
-          "target": "physical",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        }
-      ]
-    },
-    {
-      "id": "instrumentation",
-      "academyUniverseId": "products",
-      "title": "Produtos e recursos biológicos",
-      "notionId": "41f73152f17181049050c327f2b0df92",
-      "url": "https://app.notion.com/p/41f73152f17181049050c327f2b0df92",
-      "children": [
-        {
-          "id": "ref-instrumentation-instrumentation-0-41f73152f17181568091ece73bfdb09a",
-          "title": "Explorar os oito universos da BA Labs",
-          "kind": "reference",
-          "notionId": "41f73152f17181568091ece73bfdb09a",
-          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
-          "children": []
-        },
-        {
-          "id": "pt-iot-sensors",
-          "title": "Instrumentação e sensores",
-          "notionId": "40173152f171811bb877f46a99d03912",
-          "url": "https://app.notion.com/p/40173152f171811bb877f46a99d03912",
-          "description": "Instrumentos e sensores para observação e medição.",
-          "children": []
-        },
-        {
-          "id": "pt-soil-instrumentation",
-          "title": "Instrumentação integrada",
-          "notionId": "40173152f171819b8edfc928072a23a0",
-          "url": "https://app.notion.com/p/40173152f171819b8edfc928072a23a0",
-          "description": "Integração de sensores e sistemas de controlo para observar processos biológicos.",
-          "children": []
-        },
-        {
-          "id": "pt-soil-equipment",
-          "title": "Equipamentos experimentais",
-          "notionId": "40173152f171815692d6c55cd7032b94",
-          "url": "https://app.notion.com/p/40173152f171815692d6c55cd7032b94",
-          "description": "Equipamentos e dispositivos para investigação e experimentação.",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f1718175b2b3e8a236870027",
-          "title": "Instrumentação, Sensores & Metrologia",
-          "notionId": "41f73152f1718175b2b3e8a236870027",
-          "url": "https://app.notion.com/p/41f73152f1718175b2b3e8a236870027",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171814da33fc1d7a16ae241",
-          "title": "Engenharia, Equipamentos & Prototipagem",
-          "notionId": "41f73152f171814da33fc1d7a16ae241",
-          "url": "https://app.notion.com/p/41f73152f171814da33fc1d7a16ae241",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f1718194b1b6eefbdb0c8f2d",
-          "title": "Automação, Controlo & Sistemas IoT",
-          "notionId": "41f73152f1718194b1b6eefbdb0c8f2d",
-          "url": "https://app.notion.com/p/41f73152f1718194b1b6eefbdb0c8f2d",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "digital",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        },
-        {
-          "target": "physical",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 1 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        }
-      ]
-    },
-    {
-      "id": "digital",
-      "academyUniverseId": "work",
-      "title": "Investigação e desenvolvimento",
-      "notionId": "41f73152f17181a1aba9d5b91d32a153",
-      "url": "https://app.notion.com/p/41f73152f17181a1aba9d5b91d32a153",
-      "children": [
-        {
-          "id": "ref-digital-digital-0-41f73152f17181568091ece73bfdb09a",
-          "title": "Explorar os oito universos da BA Labs",
-          "kind": "reference",
-          "notionId": "41f73152f17181568091ece73bfdb09a",
-          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
-          "children": []
-        },
-        {
-          "id": "pt-iot-traceability",
-          "title": "Rastreabilidade e dados",
-          "notionId": "40173152f17181888deee64e2fcc1597",
-          "url": "https://app.notion.com/p/40173152f17181888deee64e2fcc1597",
-          "description": "Fiche d’organisme listée dans la sous-rubrique mycorhizienne correspondante.",
-          "children": []
-        },
-        {
-          "id": "ref-40273152f1718150b2beccb7c12d0792",
-          "title": "Medição e reprodutibilidade",
-          "kind": "reference",
-          "notionId": "40273152f1718150b2beccb7c12d0792",
-          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
-          "children": []
-        },
-        {
-          "id": "ref-40173152f171819b8edfc928072a23a0",
-          "title": "Instrumentação integrada",
-          "kind": "reference",
-          "notionId": "40173152f171819b8edfc928072a23a0",
-          "url": "https://app.notion.com/p/40173152f171819b8edfc928072a23a0",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181c187cdd626e1c5f54e",
-          "title": "Software, Arquitetura & Desenvolvimento",
-          "notionId": "41f73152f17181c187cdd626e1c5f54e",
-          "url": "https://app.notion.com/p/41f73152f17181c187cdd626e1c5f54e",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171819db2bec2d568e2ed99",
-          "title": "Dados, Rastreabilidade & Sistemas de Informação",
-          "notionId": "41f73152f171819db2bec2d568e2ed99",
-          "url": "https://app.notion.com/p/41f73152f171819db2bec2d568e2ed99",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171819c86f5d09a5472c6f5",
-          "title": "Inteligência Artificial, Modelação & Visualização",
-          "notionId": "41f73152f171819c86f5d09a5472c6f5",
-          "url": "https://app.notion.com/p/41f73152f171819c86f5d09a5472c6f5",
-          "children": []
-        }
-      ],
-      "relations": [
-        {
-          "target": "physical",
-          "label": "Recursos públicos partilhados",
-          "basis": "notion-link",
-          "evidence": "Ambos os portais públicos ligam a 2 recurso(s) partilhado(s), incluindo Explorar os oito universos da BA Labs (41f73152f17181568091ece73bfdb09a)."
-        }
-      ]
-    },
-    {
-      "id": "physical",
-      "academyUniverseId": "learn",
-      "title": "Recursos e transmissão",
-      "notionId": "41f73152f1718146a959f08cd87ea17b",
-      "url": "https://app.notion.com/p/41f73152f1718146a959f08cd87ea17b",
-      "children": [
-        {
-          "id": "ref-physical-physical-0-41f73152f17181568091ece73bfdb09a",
-          "title": "Explorar os oito universos da BA Labs",
-          "kind": "reference",
-          "notionId": "41f73152f17181568091ece73bfdb09a",
-          "url": "https://app.notion.com/p/41f73152f17181568091ece73bfdb09a",
-          "children": []
-        },
-        {
-          "id": "ref-physical-physical-1-40273152f1718150b2beccb7c12d0792",
-          "title": "Medição e reprodutibilidade",
-          "kind": "reference",
-          "notionId": "40273152f1718150b2beccb7c12d0792",
-          "url": "https://app.notion.com/p/40273152f1718150b2beccb7c12d0792",
-          "children": []
-        },
-        {
-          "id": "ref-physical-physical-2-40173152f17181b780dcc20a20962afa",
-          "title": "Substratos e suportes biológicos",
-          "kind": "reference",
-          "notionId": "40173152f17181b780dcc20a20962afa",
-          "url": "https://app.notion.com/p/40173152f17181b780dcc20a20962afa",
-          "children": []
-        },
-        {
-          "id": "pt-work-iteration",
-          "title": "Iteração e validação",
-          "notionId": "40273152f1718144ac4ddd7a46c410d8",
-          "url": "https://app.notion.com/p/40273152f1718144ac4ddd7a46c410d8",
-          "description": "Sous-page directement référencée par la page R&D de cette langue.",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181b1a903c040013bf3ea",
-          "title": "Química & Caracterização de Meios",
-          "notionId": "41f73152f17181b1a903c040013bf3ea",
-          "url": "https://app.notion.com/p/41f73152f17181b1a903c040013bf3ea",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f171813682caf6448aecabb8",
-          "title": "Física, Transferências & Termodinâmica",
-          "notionId": "41f73152f171813682caf6448aecabb8",
-          "url": "https://app.notion.com/p/41f73152f171813682caf6448aecabb8",
-          "children": []
-        },
-        {
-          "id": "page-41f73152f17181cea8b9ec2b1dcb2e84",
-          "title": "Matemática, Estatística & Modelação",
-          "notionId": "41f73152f17181cea8b9ec2b1dcb2e84",
-          "url": "https://app.notion.com/p/41f73152f17181cea8b9ec2b1dcb2e84",
-          "children": []
-        }
-      ],
-      "relations": []
     }
   ]
 }
