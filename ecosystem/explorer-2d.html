@@ -28,11 +28,11 @@ body{background:radial-gradient(ellipse at 50% 45%,#1c302d 0%,#142220 48%,#10171
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 /* Compact eight-point universe rail: direct access without a drawer. */
-.universe-rail{position:absolute;z-index:3;left:clamp(10px,1.5vw,20px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;padding:8px 5px;border:1px solid #8da4942c;border-radius:999px;background:rgba(17,27,29,.72);backdrop-filter:blur(12px)}
-.universe-point{width:34px;height:34px;display:grid;place-items:center;border:1px solid #91a79a35;border-radius:50%;background:transparent;color:#aebdb3;font:600 8px/1 ui-monospace,monospace;letter-spacing:-.03em;cursor:pointer;transition:background .25s,border-color .25s,color .25s,transform .25s}
+.universe-rail{position:absolute;z-index:3;left:clamp(10px,1.5vw,20px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:8px;border:1px solid #8da4942c;border-radius:14px;background:rgba(17,27,29,.78);backdrop-filter:blur(12px);max-width:190px}
+.universe-point{width:172px;min-height:32px;height:auto;display:block;padding:6px 9px;border:1px solid #91a79a35;border-radius:8px;background:transparent;color:#aebdb3;font:500 9px/1.25 Inter,system-ui,sans-serif;letter-spacing:0;text-align:left;white-space:normal;cursor:pointer;transition:background .25s,border-color .25s,color .25s,transform .25s}
 .universe-point:hover{border-color:#b96b4d;color:#f0eee3;transform:scale(1.08)}
 .universe-point.is-active{background:#263b38;border-color:#b96b4d;color:#f0eee3;box-shadow:0 0 0 3px #b96b4d20}
-@media(max-width:700px){.universe-rail{left:9px;top:auto;bottom:12px;transform:none;flex-direction:row;gap:4px;padding:5px}.universe-point{width:29px;height:29px;font-size:7px}#selection{left:9px;bottom:55px;width:min(300px,calc(100% - 18px))}}
+@media(max-width:700px){.universe-rail{left:9px;right:9px;top:auto;bottom:12px;transform:none;flex-direction:row;gap:4px;padding:5px;max-width:calc(100% - 18px);overflow-x:auto;border-radius:11px}.universe-point{width:max-content;min-width:max-content;max-width:170px;min-height:29px;padding:5px 8px;font-size:8px;line-height:1.2}#selection{left:9px;bottom:58px;width:min(300px,calc(100% - 18px))}}
 </style>
 </head>
 <body>
