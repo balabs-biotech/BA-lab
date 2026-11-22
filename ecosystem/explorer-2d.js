@@ -147,7 +147,7 @@ function applyRadialLayout(root){
  for(let level=1;level<depth;level++){const group=scoped.filter(n=>n.level===level);let min=Infinity;for(let i=0;i<group.length;i++)for(let k=i+1;k<group.length;k++)min=Math.min(min,Math.hypot(group[i].x-group[k].x,group[i].y-group[k].y));if(Number.isFinite(min))minGaps.push(min);}
  canvas.dataset.radialMinNodeGap=minGaps.length?Math.min(...minGaps).toFixed(1):"0";
 }
-function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(104,Math.max(38,Math.min(w,h)*.09)),spanX=Math.max(...xs)-Math.min(...xs)+130,spanY=Math.max(...ys)-Math.min(...ys)+130;targetScale=clamp(Math.min((w-pad*2)/spanX,(h-pad*2)/spanY),.22,.78);targetOffset={x:0,y:0};}
+function fitOverview(){const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y),pad=Math.min(90,Math.max(28,Math.min(w,h)*.07)),spanX=Math.max(...xs)-Math.min(...xs)+100,spanY=Math.max(...ys)-Math.min(...ys)+100;targetScale=clamp(Math.min((w-pad*2)/spanX,(h-pad*2)/spanY),.26,.78);targetOffset={x:0,y:0};}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){if(!selected)fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
 function draw(){if(!pixiRenderer)return;pixiRenderer.render({nodes,edges,selected,scale,offset,width:w,height:h,reduced,lang,time:performance.now(),radialRings:JSON.parse(canvas.dataset.radialRingRadii||"[]"),core:{x:0,y:0,title:{fr:'MYCOLOGIE',en:'MYCOLOGY',ar:'علم الفطريات',pt:'MICOLOGIA'}[lang]}});}
 function renderUniverseRail(){
