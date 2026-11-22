@@ -83,7 +83,7 @@ for (const language of ['fr','en','ar','pt']) {
 const explorer = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 assert.ok(explorer.includes('createPixiRenderer') && explorer.includes('fetch("./notion-tree."+lang+".json"'), 'The existing PixiJS 2D engine must load the active language manifest');
 assert.ok(explorer.includes('Expected 8 universes') && explorer.includes('function buildNetwork()') && explorer.includes('createVernpixiNetwork'), 'The 2D engine must build the eight-universe network through the shared graph engine');
-assert.ok(explorer.includes('microbiology:') && explorer.includes('instrumentation:') && explorer.includes('physical:'), 'The public 2D engine must retain its canonical Notion universe identifiers');
+assert.ok(explorer.includes('root.academyUniverseId') && explorer.includes('rootLayoutIds:canonicalOrder'), 'The public 2D engine must map scientific Notion roots onto explicit Academy universe identities');
 assert.ok(explorer.includes('function activateNode(n)') && explorer.includes('window.open(url,"_blank","noopener,noreferrer")'), 'A double-clicked point must open its exact Notion destination');
 assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('window.addEventListener("click"') && explorer.includes('e.detail<2'), 'Point activation must preserve single-click selection and double-click opening');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
