@@ -98,6 +98,13 @@ try {
     const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
     assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
     const initialUrl = page.url();
+    const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
+    await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
+    await page.waitForFunction(count => JSON.parse(document.querySelector('#field')?.dataset.visibleNodeIds || '[]').length > count, overviewVisibleCount, { timeout: 12000 });
+    const zoomedVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
+    assert.ok(zoomedVisibleCount > overviewVisibleCount, `Zooming from the global overview must reveal additional network labels (${overviewVisibleCount} -> ${zoomedVisibleCount})`);
+    await page.locator('#reset').click();
+    await page.waitForFunction(() => document.querySelector('#field')?.dataset.radialRoot === '');
     assert.equal(await page.locator('#field').getAttribute('data-radial-root'), '', 'The overview must begin as a clean eight-universe ring around Mycology');
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
@@ -121,6 +128,7 @@ try {
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
+    assert.ok(await page.locator('#selection .child-branches button').count() > 0, 'Selecting a node must expose direct child navigation controls');
     assert.equal(await page.locator('#field').getAttribute('data-radial-root'), navigationFixture.rootId,
       'Selecting a universe must unfold its own radial hierarchy');
     const ringRadii = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.radialRingRadii || '[]'));
