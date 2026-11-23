@@ -23,6 +23,9 @@ for(const lang of languages){
   assert.equal(center.data.url,hubUrls[lang]);
   assert.equal(graph.stats.universeCount,8);
   assert.equal(new Set(graph.nodes.map(node=>node.id)).size,graph.nodes.length,"node IDs must be unique");
+  assert.equal(graph.stats.mycologyArms,3,lang+": the mycology core must develop through three organic arms");
+  assert.equal(new Set(graph.edges.filter(edge=>edge.hubLink).map(edge=>edge.arm)).size,3,lang+": the eight territories must be distributed across three mycelial arms");
+  assert.ok(graph.nodes.filter(node=>node.level===0&&node.id!==center.id).some(node=>node.x<0)&&graph.nodes.filter(node=>node.level===0&&node.id!==center.id).some(node=>node.x>0),lang+": the organism must extend on both sides of the mycology core");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
@@ -38,6 +41,8 @@ for(const lang of languages){
 }
 
 const explorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
-assert.match(explorer,/if\(n\)activateNode\(n\)/,"a single click must open the selected Notion destination");
+assert.match(explorer,/if\(n\)activateNode\(n\)/,"a single click must select and focus a node");
+assert.match(explorer,/function activateNode\(n\)\{if\(!n\)return;focusNode\(n\);\}/,"node selection must not automatically navigate away");
+assert.match(explorer,/selection-open-link/,"the selected node must expose an explicit Notion action");
 assert.doesNotMatch(explorer,/DOUBLE-CLICK|DOUBLE CLICK|e\.detail<2/,"the public explorer must not require a double-click");
 console.log("✓ public explorer single-click navigation contract");
