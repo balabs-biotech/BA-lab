@@ -30,6 +30,7 @@ Le noyau mycologique ne doit pas être traité comme un hub en étoile auquel hu
 - Les ramifications peuvent croître à mesure que les manifests Notion évoluent ; les identifiants stables doivent préserver la continuité.
 - La géométrie est déterministe pour un même ensemble de données, mais asymétrique et non radiale.
 - Les trois troncs mycéliens partagés sont des éléments de structure visuelle ; les huit territoires restent des nœuds de données autonomes.
+- Le cadrage initial est calculé depuis la boîte englobante réelle des huit territoires racines, puis recentré sur son milieu géométrique ; il ne suppose pas que le centre de marque soit le centre de gravité du réseau. Cette asymétrie est indispensable au Y et au format portrait.
 - Le jeton de couleur `publicCore` et les chemins de branche `branchPoint` sont réservés au graphe public ; le comportement et la palette historiques de l’Academy restent inchangés.
 
 ## Rendu biologique
