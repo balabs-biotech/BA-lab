@@ -7,9 +7,9 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 // eight equidistant satellites. The grouping is spatial only; content and
 // cross-territory relationships remain sourced from the localized Notion tree.
 const ARMS=[
-  {id:"upper-left",junction:{x:-128,y:-96},indices:[0,3,4],points:[[-390,-250],[-520,-35],[-365,190]]},
-  {id:"upper-right",junction:{x:132,y:-92},indices:[1,2,7],points:[[390,-260],[525,-20],[370,205]]},
-  {id:"lower",junction:{x:0,y:158},indices:[5,6],points:[[-185,445],[190,465]]}
+  {id:"upper-left",junction:{x:-128,y:-18},indices:[0,3,4],points:[[-390,-172],[-520,43],[-365,268]]},
+  {id:"upper-right",junction:{x:132,y:-14},indices:[1,2,7],points:[[390,-182],[525,58],[370,283]]},
+  {id:"lower",junction:{x:0,y:236},indices:[5,6],points:[[-185,523],[190,543]]}
 ];
 const ARM_BY_INDEX=new Map(ARMS.flatMap(arm=>arm.indices.map((index,position)=>[index,{...arm,point:arm.points[position]}])));
 const COLOR_KEYS={
@@ -22,8 +22,10 @@ export function createPublicMycologyNetwork(tree,hub){
   if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
   if(!hub||typeof hub.id!=="string"||typeof hub.url!=="string")throw new Error("A valid public mycology hub is required.");
   const nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
-  const center={id:"mycology-center",title:hub.title,x:0,y:0,r:23,level:0,data:{...hub,children:tree},rootId:"mycology-center",colorKey:COLOR_KEYS.mycology,parent:null,angle:0};
-  nodes.push(center);byId.set(center.id,center);
+  const brand={id:"balabs-identity",title:"BA Labs",x:0,y:0,r:29,level:0,data:{kind:"identity"},rootId:"balabs-identity",colorKey:COLOR_KEYS.mycology,parent:null,angle:-Math.PI/2,identity:true};
+  const center={id:"mycology-center",title:hub.title,x:0,y:78,r:22,level:0,data:{...hub,children:tree},rootId:"mycology-center",colorKey:COLOR_KEYS.mycology,parent:brand.id,angle:Math.PI/2};
+  nodes.push(brand,center);byId.set(brand.id,brand);byId.set(center.id,center);
+  edges.push({a:brand,b:center,depth:0,seed:hash("identity|mycology"),identityLink:true});
   const walk=(data,parent,depth,baseAngle,rootId)=>{
     const kids=data.children||[];
     if(!kids.length)return;
