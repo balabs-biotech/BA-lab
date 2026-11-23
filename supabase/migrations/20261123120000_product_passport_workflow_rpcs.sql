@@ -8,9 +8,7 @@ CREATE OR REPLACE FUNCTION public.approve_alert_with_audit(p_alert_id uuid, p_ac
  SET search_path TO ''
 AS $function$ declare v_id uuid; begin
 if p_actor_id is null then raise exception 'actor_id_required' using errcode='22023'; end if; update public.alerts set status='approved',approved_by=p_actor_id,approved_at=now() where id=p_alert_id and status='draft' returning id into v_id; if v_id is null then raise exception 'alert_not_found_or_not_draft' using errcode='P0002'; end if;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'alert.approved','alert',v_id::text,'success',jsonb_build_object('source','admin_ui')); return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.archive_document_with_audit(p_document_id uuid, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'alert.approved','alert',v_id::text,'success',jsonb_build_object('source','admin_ui')); return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.archive_document_with_audit(p_document_id uuid, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -26,9 +24,7 @@ begin
     jsonb_build_object('permission','documents:publish','source','admin_ui'));
   return v_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.create_alert_draft_with_audit(p_incident_id uuid, p_public_title text, p_public_summary text, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.create_alert_draft_with_audit(p_incident_id uuid, p_public_title text, p_public_summary text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -37,9 +33,7 @@ if p_actor_id is null or p_public_title is null or length(btrim(p_public_title))
 select * into v_incident from public.incidents where id=p_incident_id for share; if not found then raise exception 'incident_not_found' using errcode='P0002'; end if; if v_incident.status='closed' then raise exception 'closed_incident_cannot_be_alerted' using errcode='23514'; end if;
 insert into public.alerts(incident_id,scope_type,lot_id,product_id,category_id,status,public_title,public_summary,prepared_by)
 values(v_incident.id,v_incident.scope_type,v_incident.lot_id,v_incident.product_id,v_incident.category_id,'draft',btrim(p_public_title),btrim(p_public_summary),p_actor_id) returning id into v_id;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'alert.prepared','alert',v_id::text,'success',jsonb_build_object('source','admin_ui','incidentId',p_incident_id::text)); return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.create_incident_with_scope_with_audit(p_scope_type text, p_lot_id uuid, p_product_id uuid, p_category_id uuid, p_severity text, p_title text, p_internal_description text, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'alert.prepared','alert',v_id::text,'success',jsonb_build_object('source','admin_ui','incidentId',p_incident_id::text)); return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.create_incident_with_scope_with_audit(p_scope_type text, p_lot_id uuid, p_product_id uuid, p_category_id uuid, p_severity text, p_title text, p_internal_description text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -51,9 +45,7 @@ or (p_scope_type='family' and (p_category_id is null or p_lot_id is not null or 
 or (p_internal_description is not null and length(p_internal_description)>5000) then raise exception 'invalid_incident_input' using errcode='22023'; end if;
 insert into public.incidents(scope_type,lot_id,product_id,category_id,severity,title,internal_description,created_by)
 values(p_scope_type,p_lot_id,p_product_id,p_category_id,p_severity,btrim(p_title),nullif(btrim(p_internal_description),''),p_actor_id) returning id into v_id;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'incident.created','incident',v_id::text,'success',jsonb_build_object('source','admin_ui','scopeType',p_scope_type,'severity',p_severity)); return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.create_lot_with_audit(p_product_id uuid, p_lot_code text, p_manufactured_on date, p_expires_on date, p_quantity numeric, p_quantity_unit text, p_internal_notes text, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'incident.created','incident',v_id::text,'success',jsonb_build_object('source','admin_ui','scopeType',p_scope_type,'severity',p_severity)); return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.create_lot_with_audit(p_product_id uuid, p_lot_code text, p_manufactured_on date, p_expires_on date, p_quantity numeric, p_quantity_unit text, p_internal_notes text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -73,9 +65,7 @@ begin
   values (p_actor_id,'lot.created','lot',v_lot_id::text,'success',pg_catalog.jsonb_build_object('permission','lots:create','source','admin_ui'));
   return v_lot_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.create_passport_draft_with_audit(p_lot_id uuid, p_qr_token_hash text, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.create_passport_draft_with_audit(p_lot_id uuid, p_qr_token_hash text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -83,9 +73,7 @@ AS $function$ declare v_id uuid; begin
 if p_actor_id is null or p_qr_token_hash !~ '^[a-f0-9]{64}$' then raise exception 'invalid_passport_input' using errcode='22023'; end if;
 if not exists(select 1 from public.lots where id=p_lot_id and status='released') then raise exception 'lot_not_released' using errcode='23514'; end if;
 insert into public.passports(lot_id,qr_token_hash,status,current_version) values(p_lot_id,p_qr_token_hash,'draft',0) returning id into v_id;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.created','passport',v_id::text,'success',jsonb_build_object('source','admin_ui','lotId',p_lot_id::text)); return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.create_product_with_public_info_with_audit(p_category_id uuid, p_code text, p_name_fr text, p_name_en text, p_name_pt text, p_name_ar text, p_internal_description text, p_public_description_fr text, p_public_usage_fr text, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.created','passport',v_id::text,'success',jsonb_build_object('source','admin_ui','lotId',p_lot_id::text)); return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.create_product_with_public_info_with_audit(p_category_id uuid, p_code text, p_name_fr text, p_name_en text, p_name_pt text, p_name_ar text, p_internal_description text, p_public_description_fr text, p_public_usage_fr text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -96,17 +84,13 @@ insert into public.products(category_id,code,name_fr,name_en,name_pt,name_ar,int
 values(p_category_id,upper(btrim(p_code)),btrim(p_name_fr),nullif(btrim(p_name_en),''),nullif(btrim(p_name_pt),''),nullif(btrim(p_name_ar),''),nullif(btrim(p_internal_description),''),nullif(btrim(p_public_description_fr),''),nullif(btrim(p_public_usage_fr),''),p_actor_id)
 returning id into v_product_id;
 insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'product.created','product',v_product_id::text,'success',jsonb_build_object('permission','catalog:manage','source','admin_ui'));
-return v_product_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.publish_alert_with_audit(p_alert_id uuid, p_actor_id uuid)
+return v_product_id; end; $function$;CREATE OR REPLACE FUNCTION public.publish_alert_with_audit(p_alert_id uuid, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
 AS $function$ declare v_id uuid; begin
 if p_actor_id is null then raise exception 'actor_id_required' using errcode='22023'; end if; update public.alerts set status='published',published_at=now() where id=p_alert_id and status='approved' and approved_by is not null and approved_at is not null returning id into v_id; if v_id is null then raise exception 'alert_not_approved_or_not_found' using errcode='P0002'; end if;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'alert.published','alert',v_id::text,'success',jsonb_build_object('source','admin_ui')); return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.publish_passport_with_audit(p_passport_id uuid, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'alert.published','alert',v_id::text,'success',jsonb_build_object('source','admin_ui')); return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.publish_passport_with_audit(p_passport_id uuid, p_actor_id uuid)
  RETURNS integer
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -122,9 +106,7 @@ v_version:=v_passport.current_version+1;
 v_snapshot:=jsonb_build_object('schema_version','1.0','passport_code',v_lot.lot_code,'product',jsonb_build_object('code',v_product.code,'name',v_product.name_fr,'category',v_category.name_fr,'description',v_product.public_description_fr,'usage',v_product.public_usage_fr),'lot',jsonb_build_object('code',v_lot.lot_code,'manufactured_on',v_lot.manufactured_on,'expires_on',v_lot.expires_on),'quality',jsonb_build_object('status','released','reviewed_passing_checks',v_checks),'status',v_lot.status,'published_at',now(),'alerts',v_alerts,'documents','[]'::jsonb);
 insert into public.passport_versions(passport_id,version,snapshot,published_by) values(v_passport.id,v_version,v_snapshot,p_actor_id);
 update public.passports set status='published',current_version=v_version,published_by=p_actor_id,published_at=now(),revoked_by=null,revoked_at=null where id=v_passport.id;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.published','passport',v_passport.id::text,'success',jsonb_build_object('version',v_version,'lotId',v_lot.id::text)); return v_version; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.record_quality_check_with_audit(p_lot_id uuid, p_check_type text, p_result text, p_internal_notes text, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.published','passport',v_passport.id::text,'success',jsonb_build_object('version',v_version,'lotId',v_lot.id::text)); return v_version; end; $function$;CREATE OR REPLACE FUNCTION public.record_quality_check_with_audit(p_lot_id uuid, p_check_type text, p_result text, p_internal_notes text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -140,9 +122,7 @@ begin
   values (p_actor_id,'quality.check_recorded','lot',p_lot_id::text,'success',pg_catalog.jsonb_build_object('source','admin_ui','result',p_result));
   return v_check_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.register_document_upload_with_audit(p_lot_id uuid, p_product_id uuid, p_storage_path text, p_original_filename text, p_mime_type text, p_byte_size bigint, p_classification text, p_title text, p_description text, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.register_document_upload_with_audit(p_lot_id uuid, p_product_id uuid, p_storage_path text, p_original_filename text, p_mime_type text, p_byte_size bigint, p_classification text, p_title text, p_description text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -228,9 +208,7 @@ begin
 
   return v_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.release_lot_with_audit(p_lot_id uuid, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.release_lot_with_audit(p_lot_id uuid, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -247,9 +225,7 @@ begin
   values (p_actor_id,'quality.released','lot',v_lot_id::text,'success',pg_catalog.jsonb_build_object('source','admin_ui'));
   return v_lot_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.review_quality_check_with_audit(p_check_id uuid, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.review_quality_check_with_audit(p_check_id uuid, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -266,9 +242,7 @@ begin
   values (p_actor_id,'quality.check_reviewed','lot',v_lot_id::text,'success',pg_catalog.jsonb_build_object('source','admin_ui','check_id',p_check_id::text));
   return p_check_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.revoke_passport_with_audit(p_passport_id uuid, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.revoke_passport_with_audit(p_passport_id uuid, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -276,9 +250,7 @@ AS $function$ declare v_id uuid; begin
 if p_actor_id is null then raise exception 'actor_id_required' using errcode='22023'; end if;
 update public.passports set status='revoked',revoked_by=p_actor_id,revoked_at=now() where id=p_passport_id and status='published' returning id into v_id;
 if v_id is null then raise exception 'passport_not_published_or_not_found' using errcode='P0002'; end if;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.revoked','passport',v_id::text,'success',jsonb_build_object('source','admin_ui')); return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.rotate_passport_token_with_audit(p_passport_id uuid, p_qr_token_hash text, p_actor_id uuid)
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.revoked','passport',v_id::text,'success',jsonb_build_object('source','admin_ui')); return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.rotate_passport_token_with_audit(p_passport_id uuid, p_qr_token_hash text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -287,9 +259,7 @@ if p_actor_id is null or p_qr_token_hash !~ '^[a-f0-9]{64}$' then raise exceptio
 update public.passports set qr_token_hash=p_qr_token_hash,status='draft',revoked_by=null,revoked_at=null where id=p_passport_id and status='revoked' returning id into v_id;
 if v_id is null then raise exception 'passport_not_revoked_or_not_found' using errcode='P0002'; end if;
 insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'passport.token_rotated','passport',v_id::text,'success',jsonb_build_object('source','admin_ui'));
-return v_id; end; $function$;
-
-CREATE OR REPLACE FUNCTION public.transition_lot_with_audit(p_lot_id uuid, p_new_status text, p_reason text, p_actor_id uuid)
+return v_id; end; $function$;CREATE OR REPLACE FUNCTION public.transition_lot_with_audit(p_lot_id uuid, p_new_status text, p_reason text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -355,9 +325,7 @@ begin
 
   return p_lot_id;
 end;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.update_incident_with_audit(p_incident_id uuid, p_status text, p_root_cause text, p_corrective_actions text, p_actor_id uuid)
+$function$;CREATE OR REPLACE FUNCTION public.update_incident_with_audit(p_incident_id uuid, p_status text, p_root_cause text, p_corrective_actions text, p_actor_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -365,9 +333,7 @@ AS $function$ declare v_id uuid; begin
 if p_actor_id is null or p_status not in ('open','investigating','corrective_action','resolved','closed') or (p_root_cause is not null and length(p_root_cause)>5000) or (p_corrective_actions is not null and length(p_corrective_actions)>5000) then raise exception 'invalid_incident_update' using errcode='22023'; end if;
 update public.incidents set status=p_status,root_cause=nullif(btrim(p_root_cause),''),corrective_actions=nullif(btrim(p_corrective_actions),''),resolved_at=case when p_status in ('resolved','closed') then coalesce(resolved_at,now()) else null end where id=p_incident_id returning id into v_id;
 if v_id is null then raise exception 'incident_not_found' using errcode='P0002'; end if;
-insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'incident.updated','incident',v_id::text,'success',jsonb_build_object('source','admin_ui','changedFields',jsonb_build_array('status','root_cause','corrective_actions'))); return v_id; end; $function$
-
-
+insert into public.audit_events(actor_id,action,target_type,target_id,outcome,metadata) values(p_actor_id,'incident.updated','incident',v_id::text,'success',jsonb_build_object('source','admin_ui','changedFields',jsonb_build_array('status','root_cause','corrective_actions'))); return v_id; end; $function$;
 -- Do not expose privileged workflow RPCs to browser roles.
 REVOKE ALL ON FUNCTION public.approve_alert_with_audit(p_alert_id uuid, p_actor_id uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.approve_alert_with_audit(p_alert_id uuid, p_actor_id uuid) TO service_role;
