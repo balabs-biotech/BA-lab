@@ -21,6 +21,8 @@ L’espace public représente un organisme scientifique continu :
 - des ramifications déterministes dont la position dépend des contenus et de leur hiérarchie ;
 - des hyphes transversales uniquement lorsqu’une relation documentée relie deux territoires.
 
+La vue globale ne doit pas afficher toutes les relations transversales en même temps : elles sont révélées à la sélection d’un nœud lié, puis en totalité au zoom rapproché. Cette progressive disclosure évite que les relations documentées forment une toile dominante qui masque les filaments hiérarchiques.
+
 L’ajout d’une ressource dans un territoire ne doit pas déplacer ni recolorer les sept autres. Les huit coordonnées actuelles sont provisoires : l’asset source du logo officiel doit encore être ajouté pour caler précisément les points d’inoculation sur le symbole de marque.
 
 ## Rendu biologique
@@ -31,7 +33,7 @@ Le renderer doit distinguer explicitement :
 - **anastomoses transversales** : relations Notion ou relations de contenu vérifiables, plus fines et moins lumineuses que les filaments hiérarchiques ;
 - **pointes de croissance** : extrémités ouvertes et effilées, sans bille terminale.
 
-Aucune branche latérale décorative ne doit être inventée par le renderer pour remplir l’espace. Une bifurcation visible doit correspondre à une ramification réelle du graphe. Les courbures, dérives et épaisseurs peuvent varier de façon déterministe pour donner une morphologie rhizomorphique, sans créer de nouveaux liens.
+Aucune branche latérale décorative ne doit être inventée par le renderer pour remplir l’espace. Une bifurcation visible doit correspondre à une ramification réelle du graphe. Les courbures, dérives et épaisseurs peuvent varier de façon déterministe pour donner une morphologie rhizomorphique, sans créer de nouveaux liens. Les premières ramifications restent contenues dans un cône de croissance étroit et irrégulier ; elles ne doivent pas former une étoile de rayons autour du point d’inoculation.
 
 La couleur du filament doit provenir du territoire auquel il appartient, y compris pour les huit hyphes primaires issues du noyau central. Les liens transversaux restent visuellement secondaires. Le fond, les halos et les particules doivent rester sobres et ne pas concurrencer les structures biologiques.
 
