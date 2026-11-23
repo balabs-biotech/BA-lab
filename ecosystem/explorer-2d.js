@@ -35,7 +35,20 @@ function buildNetwork(){
  canvas.dataset.crossUniverseConnections=String(graph.stats.crossUniverseConnections);
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
-function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
+function fitOverview(){
+ const roots=nodes.filter(n=>n.level===0);
+ if(!roots.length){targetScale=.5;targetOffset={x:0,y:0};return;}
+ const minX=Math.min(...roots.map(n=>n.x)),maxX=Math.max(...roots.map(n=>n.x));
+ const minY=Math.min(...roots.map(n=>n.y)),maxY=Math.max(...roots.map(n=>n.y));
+ // The Y-shaped organism is intentionally asymmetric around its brand node.
+ // Fit its actual bounding-box centre, not the BA Labs origin, or the lower
+ // mycelial arm drifts off-screen on portrait/mobile viewports.
+ const pad=Math.min(88,Math.max(22,Math.min(w,h)*.065));
+ const scaleX=(w-pad*2)/(maxX-minX+190);
+ const scaleY=(h-pad*2)/(maxY-minY+190);
+ targetScale=clamp(Math.min(scaleX,scaleY),.14,.62);
+ targetOffset={x:-(minX+maxX)*.5*targetScale,y:-(minY+maxY)*.5*targetScale};
+}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
 function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function syncUniverseRail(n){
