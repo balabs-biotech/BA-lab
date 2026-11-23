@@ -317,6 +317,16 @@ begin
   end loop;
 end $$;
 
-insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
-values ('ba-labs-documents','ba-labs-documents',false,4194304,array['application/pdf'])
-on conflict (id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
+-- Supabase Storage is provisioned by the hosted platform. Generic PostgreSQL
+-- migration-replay CI does not create its schema, so skip only that platform object there.
+do $
+begin
+  if to_regclass('storage.buckets') is not null then
+    execute $bucket$
+      insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
+      values ('ba-labs-documents','ba-labs-documents',false,4194304,array['application/pdf'])
+      on conflict (id) do update
+        set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types
+    $bucket$;
+  end if;
+end $;
