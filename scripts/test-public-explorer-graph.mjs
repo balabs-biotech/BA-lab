@@ -52,11 +52,18 @@ for(const lang of languages){
     assert.notEqual(edge.a.rootId,edge.b.rootId,"verified cross-universe links must connect distinct territories");
     assert.ok(["notion-link","page-content"].includes(edge.basis));
   }
-  if(lang==="fr")assert.ok(graph.edges.some(edge=>edge.verified&&(edge.a.level>0||edge.b.level>0)),"Nested documented relations must produce transverse links between knowledge nodes");
   console.log(`✓ ${lang}: mycology hub + eight universes + ${graph.nodes.length} nodes`);
 }
 
 const fixture=JSON.parse(readFileSync(new URL("../ecosystem/notion-tree.fr.json",import.meta.url),"utf8")).domains;
+const nestedFixture=structuredClone(fixture);
+const plants=nestedFixture.find(domain=>domain.id==="plants");
+const ecology=nestedFixture.find(domain=>domain.id==="ecology");
+const soilNode=plants.children.find(node=>node.id==="soil");
+ecology.children.push({id:"test-cross-territory-node",title:"Cross-territory test node",children:[]});
+soilNode.relations=[...(soilNode.relations||[]),{target:"test-cross-territory-node",label:"Verified nested relation",basis:"notion-link",evidence:"Synthetic test relation only"}];
+const nestedGraph=createPublicMycologyNetwork(nestedFixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
+assert.ok(nestedGraph.edges.some(edge=>edge.verified&&edge.a.id==="soil"&&edge.b.id==="test-cross-territory-node"),"Nested documented relations must produce transverse links between knowledge nodes");
 const original=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
 const expanded=structuredClone(fixture);
 expanded[0].children.push({id:"future-knowledge-node",title:"Future knowledge",children:[]});
