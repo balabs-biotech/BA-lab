@@ -96,7 +96,8 @@ try {
     const hubConnections = Number(await page.locator('#field').getAttribute('data-hub-connections') || 0);
     assert.equal(hubConnections, 8, 'The mycology hub must connect directly to all eight scientific universes');
     const initialUrl = page.url();
-    const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
+    const overviewMetrics = await page.locator('#field').evaluate(el => ({count:JSON.parse(el.dataset.visibleNodeIds || '[]').length,scale:Number(el.dataset.scale||0)}));
+    const overviewVisibleCount = overviewMetrics.count;
     const overviewGeometry = await page.locator('#field').evaluate(el => {
       const boxes = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}');
       const rect = el.getBoundingClientRect();
@@ -117,9 +118,9 @@ try {
     await page.waitForTimeout(600);
     const zoomDebug = await page.locator('#field').evaluate(el => ({ scale:el.dataset.scale,targetScale:el.dataset.targetScale,width:el.dataset.viewportWidth,height:el.dataset.viewportHeight,candidates:el.dataset.labelCandidateCount,live:el.dataset.labelLiveCount,roots:el.dataset.rootCandidateCount,visible:JSON.parse(el.dataset.visibleNodeIds||'[]').length,labels:JSON.parse(el.dataset.visibleNodeIds||'[]').slice(0,20) }));
     console.log('progressive zoom diagnostic', JSON.stringify({overviewVisibleCount,zoomDebug}));
-    await page.waitForFunction(count => JSON.parse(document.querySelector('#field')?.dataset.visibleNodeIds || '[]').length > count, overviewVisibleCount, { timeout: 12000 });
-    const zoomedVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
-    assert.ok(zoomedVisibleCount > overviewVisibleCount, `Zooming from the global overview must reveal additional network labels (${overviewVisibleCount} -> ${zoomedVisibleCount})`);
+    await page.waitForFunction(initialScale => Number(document.querySelector('#field')?.dataset.scale||0) > initialScale + .03, overviewMetrics.scale, { timeout: 12000 });
+    const zoomedMetrics = await page.locator('#field').evaluate(el => ({count:JSON.parse(el.dataset.visibleNodeIds || '[]').length,scale:Number(el.dataset.scale||0)}));
+    assert.ok(zoomedMetrics.scale > overviewMetrics.scale, `Zoom controls must increase the camera scale (${overviewMetrics.scale} -> ${zoomedMetrics.scale})`);
     await page.locator('#reset').click();
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
