@@ -391,8 +391,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
-          cache-dependency-path: product-passport/admin/package.json
       - name: Install administration dependencies
         run: npm install --no-package-lock
         working-directory: product-passport/admin
