@@ -17,8 +17,13 @@ for(const lang of languages){
   const graph=createPublicMycologyNetwork(manifest.domains,{
     id:"mycology-center",title:"Mycology",description:"The BA Labs mycology hub",url:hubUrls[lang]
   });
+  const brand=graph.byId.get("balabs-identity");
+  assert.ok(brand,"BA Labs identity must occupy the visual center");
+  assert.equal(brand.title,"BA Labs");
   const center=graph.byId.get("mycology-center");
   assert.ok(center,"mycology hub must exist");
+  assert.equal(center.parent,brand.id);
+  assert.ok(graph.edges.some(edge=>edge.identityLink&&edge.a.id===brand.id&&edge.b.id===center.id),"BA Labs identity must connect to the mycology core");
   assert.equal(center.level,0);
   assert.equal(center.data.url,hubUrls[lang]);
   assert.equal(graph.stats.universeCount,8);
