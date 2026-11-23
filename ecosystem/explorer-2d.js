@@ -40,9 +40,8 @@ function fitOverview(){
  if(!roots.length){targetScale=.5;targetOffset={x:0,y:0};return;}
  const minX=Math.min(...roots.map(n=>n.x)),maxX=Math.max(...roots.map(n=>n.x));
  const minY=Math.min(...roots.map(n=>n.y)),maxY=Math.max(...roots.map(n=>n.y));
- // The Y-shaped organism is intentionally asymmetric around its brand node.
- // Fit its actual bounding-box centre, not the BA Labs origin, or the lower
- // mycelial arm drifts off-screen on portrait/mobile viewports.
+ // Fit the complete central tissue and eight asymmetric inoculation territories.
+ // The camera follows their combined bounds while preserving the brand origin.
  const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
  // Root labels extend beyond their node coordinates, with the longest labels
  // on the lateral arms. Reserve an explicit text-safe envelope on both axes.
