@@ -21,9 +21,9 @@ for(const lang of languages){
   const brand=graph.byId.get("balabs-identity");
   assert.ok(brand,"BA Labs identity must occupy the visual center");
   assert.equal(brand.title,"BA Labs");
-  assert.notDeepEqual([brand.x,brand.y],[center?.x,center?.y],"The BA Labs logo and mycology tissue must have distinct positions");
   const center=graph.byId.get("mycology-center");
   assert.ok(center,"mycology hub must exist");
+  assert.notDeepEqual([brand.x,brand.y],[center.x,center.y],"The BA Labs logo and mycology tissue must have distinct positions");
   assert.equal(center.parent,brand.id);
   assert.ok(graph.edges.some(edge=>edge.identityLink&&edge.a.id===brand.id&&edge.b.id===center.id),"BA Labs identity must connect to the mycology core");
   assert.equal(center.level,0);
