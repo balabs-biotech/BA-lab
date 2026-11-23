@@ -4,6 +4,7 @@ import { createPublicMycologyNetwork } from "../ecosystem/explorer-2d-graph.js";
 
 const languages=["fr","en","ar","pt"];
 const expected=["microbiology","plants","ecology","bioprocesses","biomaterials","instrumentation","digital","physical"];
+const indexOfUniverse=id=>expected.indexOf(id);
 const hubUrls={
   fr:"https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063",
   en:"https://app.notion.com/p/40173152f17181019838de83de8173f3",
@@ -28,14 +29,20 @@ for(const lang of languages){
   assert.equal(center.data.url,hubUrls[lang]);
   assert.equal(graph.stats.universeCount,8);
   assert.equal(new Set(graph.nodes.map(node=>node.id)).size,graph.nodes.length,"node IDs must be unique");
-  assert.equal(graph.stats.mycologyArms,3,lang+": the mycology core must develop through three organic arms");
-  assert.equal(new Set(graph.edges.filter(edge=>edge.hubLink).map(edge=>edge.arm)).size,3,lang+": the eight territories must be distributed across three mycelial arms");
-  assert.ok(graph.nodes.filter(node=>node.level===0&&node.id!==center.id).some(node=>node.x<0)&&graph.nodes.filter(node=>node.level===0&&node.id!==center.id).some(node=>node.x>0),lang+": the organism must extend on both sides of the mycology core");
+  assert.equal(graph.stats.inoculationPoints,8,lang+": each territory must have its own inoculation point");
+  const roots=expected.map(id=>graph.byId.get(id));
+  assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
+  assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
+  assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
+  assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.primaryHypha===true),lang+": each universe must emerge from the central mycelial tissue");
+  assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
+  assert.ok(graph.edges.some(edge=>edge.generation>=2),lang+": recursive knowledge branches must carry their biological generation");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
     assert.equal(universe.level,0);
     assert.equal(universe.parent,center.id);
+    assert.equal(universe.inoculationIndex,indexOfUniverse(id));
     assert.ok(graph.edges.some(edge=>edge.hubLink&&edge.a.id===center.id&&edge.b.id===id),`${lang}: missing hub connection for ${id}`);
   }
   for(const edge of graph.edges.filter(item=>item.verified)){
