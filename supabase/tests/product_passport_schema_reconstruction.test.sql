@@ -23,6 +23,7 @@ drop table if exists public.alerts, public.incidents, public.documents, public.q
   public.passport_versions, public.passports, public.lot_events, public.lots,
   public.products, public.product_categories, public.user_roles cascade;
 \ir ../migrations/20261123110000_reconcile_product_passport_schema.sql
+\ir ../migrations/20261123120000_product_passport_workflow_rpcs.sql
 
 do $$
 declare n integer; is_private boolean;
