@@ -280,11 +280,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Verify shared Vernpixi graph and renderer modules
+      - name: Verify Academy shared engine and public constellation graph
         run: |
           node --experimental-default-type=module scripts/test-vernpixi-shared-engine.mjs
           node --check --input-type=module < ecosystem-core/explorer-2d-network.js
           node --check --input-type=module < ecosystem-core/explorer-2d-pixi.js
+          node --check --input-type=module < ecosystem/explorer-2d-graph.js
       - name: Install Playwright
         run: npm install --no-save --no-package-lock playwright
       - name: Install Chromium
