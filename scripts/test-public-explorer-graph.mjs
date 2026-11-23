@@ -48,9 +48,11 @@ for(const lang of languages){
     assert.ok(graph.edges.some(edge=>edge.hubLink&&edge.a.id===center.id&&edge.b.id===id),`${lang}: missing hub connection for ${id}`);
   }
   for(const edge of graph.edges.filter(item=>item.verified)){
-    assert.ok(expected.includes(edge.a.id)&&expected.includes(edge.b.id),"verified cross-universe links must connect universe roots only");
+    assert.ok(expected.includes(edge.a.rootId)&&expected.includes(edge.b.rootId),"verified cross-universe links must remain inside known territories");
+    assert.notEqual(edge.a.rootId,edge.b.rootId,"verified cross-universe links must connect distinct territories");
     assert.ok(["notion-link","page-content"].includes(edge.basis));
   }
+  if(lang==="fr")assert.ok(graph.edges.some(edge=>edge.verified&&(edge.a.level>0||edge.b.level>0)),"Nested documented relations must produce transverse links between knowledge nodes");
   console.log(`✓ ${lang}: mycology hub + eight universes + ${graph.nodes.length} nodes`);
 }
 
