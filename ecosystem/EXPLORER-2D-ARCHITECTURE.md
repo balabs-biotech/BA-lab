@@ -15,11 +15,13 @@ Chaque territoire peut croître sans perdre son autonomie, tout en restant reli�
 
 ## Modèle spatial et biologique
 
-### Centre et noyau mycologique
+### Centre de marque et noyau mycologique
 
-Le logo BA Labs occupe le centre visuel de la composition. Le noyau mycologique se développe autour de cette identité sous une forme organique évoquant un Y vivant : un tronc commun, des bifurcations et des prolongements qui distribuent le réseau.
+Le centre visuel reprend le symbole BA Labs fourni comme référence : même identité centrale pour le site public et l’Academy. Le logo n’est pas un simple nœud de plus dans le graphe ; c’est le repère de marque qui donne son origine à l’organisme.
 
-La mycologie est un noyau de connexion privilégié, pas une catégorie décorative ni un simple bouton central. Elle relie les territoires et donne sa cohérence biologique à l’ensemble.
+La mycologie constitue le noyau biologique au centre de cette composition. Elle doit être perceptible dans le signe central et dans le tissu de filaments qui relie les huit territoires. Elle ne doit pas devenir une branche latérale, un neuvième univers ni un simple hub en étoile.
+
+Le Y du logo sert de géométrie d’inoculation et de repère initial. Il ne dicte pas une classification en trois grands bras rigides. Les huit territoires prennent leurs points d’ancrage autour du centre selon la géométrie du symbole de marque.
 
 ### Huit territoires autonomes
 
@@ -33,19 +35,34 @@ Les huit territoires de premier niveau sont exactement :
 7. `digital`
 8. `physical`
 
-Chaque territoire possède sa propre identité visuelle, ses branches, sous-branches et ressources. Les territoires ne doivent pas être disposés comme huit satellites équidistants autour d’un hub. Leur implantation est irrégulière, organique et guidée par la topologie des connaissances.
+Les huit points d’ancrage, leur ordre et leurs couleurs forment un contrat visuel commun au site public et à l’Academy. Les deux moteurs peuvent avoir des interactions, des règles de navigation, des données et des comportements différents ; ils doivent néanmoins présenter le même centre BA Labs / mycologie et les mêmes huit territoires, avec les mêmes repères chromatiques.
 
-### Ramifications et connexions transversales
+Chaque territoire possède son identité chromatique, son point d’inoculation, sa propre densité et ses ramifications. Il reste autonome : ajouter une branche dans un territoire ne doit pas déplacer arbitrairement les autres territoires ni modifier leur identité.
 
-Les descendants des pages Notion forment les ramifications locales. Les relations transversales ne sont créées que lorsqu’elles sont soutenues par des relations Notion ou des éléments de contenu identifiables et vérifiables.
+### Croissance fractale contrôlée
 
-Le réseau doit distinguer :
-- les liens de parenté à l’intérieur d’un territoire ;
-- les connexions transversales entre territoires ;
-- les liens du noyau mycologique vers les territoires ;
-- les nouvelles ramifications ajoutées lorsque la connaissance s’enrichit.
+La croissance évoque un mycélium rhizomorphique qui colonise progressivement une gélose depuis plusieurs points d’inoculation :
+- un filament primaire se prolonge, puis se divise en branches secondaires et tertiaires ;
+- les bifurcations sont irrégulières, asymétriques et déterministes pour un même jeu de données ;
+- la direction, la longueur, la courbure et l’épaisseur varient selon la profondeur et le territoire ;
+- les branches peuvent s’anastomoser lorsqu’une relation réelle relie deux connaissances ;
+- la densité locale augmente avec le contenu disponible et le niveau de zoom ;
+- les extrémités restent fines et ouvertes, pour suggérer une croissance encore possible.
 
-Aucune connexion ne doit être ajoutée uniquement pour remplir visuellement l’espace. L’organisme peut être asymétrique et présenter des densités différentes selon les contenus disponibles.
+La géométrie est fractale dans son principe de croissance, mais ne doit pas être une fractale mathématique répétitive. Les branches ne doivent pas se multiplier artificiellement pour remplir l’écran : chaque prolongement représente un contenu, une sous-discipline, une ressource ou une relation réelle.
+
+### Lisibilité et maîtrise de la densité
+
+L’organicité ne doit jamais redevenir le fouillis de l’ancienne version. La lisibilité repose sur des règles explicites :
+- les huit territoires gardent des zones de croissance reconnaissables, sans être enfermés dans des secteurs ou des cercles ;
+- les filaments principaux sont plus lisibles que les branches secondaires, qui sont elles-mêmes plus lisibles que les hyphes terminales ;
+- les labels ne s’affichent qu’au niveau de zoom où ils peuvent être lus sans collision ;
+- les connexions transversales sont plus fines et moins lumineuses que les branches hiérarchiques ;
+- les anastomoses restent rares, locales et fondées sur des relations documentées ;
+- la couleur du territoire accompagne les ramifications sans transformer le réseau en huit blocs colorés ;
+- les zones denses se révèlent progressivement par zoom, plutôt que d’être toutes affichées à la même échelle.
+
+Aucune connexion ne doit être ajoutée uniquement pour remplir visuellement l’espace. Le graphe peut rester asymétrique et présenter des densités différentes selon les contenus disponibles.
 
 ## Expérience d’exploration
 
