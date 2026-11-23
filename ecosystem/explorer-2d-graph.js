@@ -3,10 +3,15 @@
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
 
-const ANCHORS=[
-  [-430,-175],[-175,-455],[245,-415],[475,-105],
-  [345,335],[-75,475],[-455,285],[-505,-75]
+// Three unequal mycelial arms create a living Y-shaped organism rather than
+// eight equidistant satellites. The grouping is spatial only; content and
+// cross-territory relationships remain sourced from the localized Notion tree.
+const ARMS=[
+  {id:"upper-left",junction:{x:-128,y:-96},indices:[0,3,4],points:[[-390,-250],[-520,-35],[-365,190]]},
+  {id:"upper-right",junction:{x:132,y:-92},indices:[1,2,7],points:[[390,-260],[525,-20],[370,205]]},
+  {id:"lower",junction:{x:0,y:158},indices:[5,6],points:[[-185,445],[190,465]]}
 ];
+const ARM_BY_INDEX=new Map(ARMS.flatMap(arm=>arm.indices.map((index,position)=>[index,{...arm,point:arm.points[position]}])));
 const COLOR_KEYS={
   mycology:"myco",microbiology:"bio",plants:"soil",ecology:"lab",
   bioprocesses:"products",biomaterials:"iot",instrumentation:"work",
@@ -40,11 +45,13 @@ export function createPublicMycologyNetwork(tree,hub){
   };
   tree.forEach((universe,index)=>{
     if(!universe.id||!universe.title)throw new Error("Every scientific universe needs an id and title.");
-    const [x,y]=ANCHORS[index],angle=Math.atan2(y,x);
+    const arm=ARM_BY_INDEX.get(index);
+    if(!arm)throw new Error("Every scientific universe must belong to a mycelial arm.");
+    const [x,y]=arm.point,angle=Math.atan2(y,x);
     const root={id:universe.id,title:universe.title,x,y,r:16,level:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id]||"bio",angle};
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
-    edges.push({a:center,b:root,depth:0,seed:hash("hub|"+root.id),hubLink:true});
+    edges.push({a:center,b:root,depth:0,seed:hash("hub|"+root.id),hubLink:true,arm:arm.id,branchPoint:arm.junction});
     walk(universe,root,1,angle,universe.id);
   });
   const relationPairs=new Set();
@@ -66,5 +73,5 @@ export function createPublicMycologyNetwork(tree,hub){
       addIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
     }
   }
-  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0}};
+  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,mycologyArms:ARMS.length,localAnastomoses:0}};
 }
