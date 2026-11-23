@@ -29,8 +29,8 @@ async function render({ search = "", hash = "", passport = null } = {}) {
     setTimeout: () => 1,
     clearTimeout: () => {}
   };
-  const fetch = async url => {
-    calls.push(url);
+  const fetch = async (url, init) => {
+    calls.push({ url, init });
     return { ok: true, json: async () => ({ passport }) };
   };
 
@@ -65,7 +65,8 @@ test("renders the actual published snapshot schema from the QR hash", async () =
   });
 
   assert.equal(calls.length, 1);
-  assert.match(calls[0], new RegExp("token=" + token));
+  assert.match(calls[0].url, new RegExp("token=" + token));
+  assert.equal(calls[0].init.headers.apikey, undefined, "public endpoint must not trigger a preflight with an unnecessary apikey header");
   assert.equal(elements.passport.hidden, false);
   assert.equal(elements["product-name"].textContent, "Culture de Pleurote");
   assert.equal(elements["lot-code"].textContent, "BA-LOT-2026-001");
