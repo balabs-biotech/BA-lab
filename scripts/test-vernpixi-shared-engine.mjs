@@ -36,8 +36,12 @@ assert.match(academySource,/\.\.\/ecosystem-core\/explorer-2d-pixi\.js/,'Academy
 assert.match(academySource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'Academy must retain the shared Vernpixi graph geometry');
 const sharedRenderer=await readFile('ecosystem-core/explorer-2d-pixi.js','utf8');
 assert.match(sharedRenderer,/myco:0xb18fc2/,'The Academy mycology palette token must remain unchanged');
-assert.match(sharedRenderer,/if\(e\.branchPoint\)/,'The shared renderer must enable optional branch paths only when the public graph supplies them');
-assert.match(publicSource,/\.\.\/ecosystem-core\/explorer-2d-pixi\.js/,'The public site may reuse the shared Pixi renderer');
+assert.match(sharedRenderer,/if\(e\.branchPoint\)/,'The Academy renderer must retain its historical optional branch-path behavior');
+const publicRenderer=await readFile('ecosystem/explorer-2d-pixi.js','utf8');
+assert.match(publicSource,/\.\/explorer-2d-pixi\.js/,'The public site must use its own renderer implementation');
+assert.doesNotMatch(publicRenderer,/branchPoint|drawnArms|upper-left|upper-right/,'The rebuilt public renderer must not contain legacy three-arm geometry');
+assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'The public renderer must not invent decorative branches that have no graph data');
+assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
 assert.match(publicSource,/\.\/explorer-2d-graph\.js/,'The public site must use its dedicated mycology-centered graph');
 assert.doesNotMatch(publicSource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'The public site must not use the Academy graph geometry');
 console.log(JSON.stringify({academy:'shared Vernpixi unchanged',public:'dedicated mycology core + eight-point fractal growth',academyNodes:academy.nodes.length,publicNodes:publicSpace.nodes.length},null,2));
