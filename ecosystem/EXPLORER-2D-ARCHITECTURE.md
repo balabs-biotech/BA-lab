@@ -1,31 +1,91 @@
 # BA Labs — architecture cible de l’explorateur 2D
 
-## Direction retenue
-Un seul espace Canvas 2D continu, explorable par zoom progressif. Les huit univers, leurs branches, sous-branches et ressources restent dans le même espace et conservent leurs coordonnées. Cliquer sur un nœud ne change jamais de page ni de scène : le moteur centre le nœud, augmente le niveau de zoom et révèle les ramifications suivantes.
+## Intention générale
 
-## Architecture
-- **Canvas 2D natif** : filaments organiques, ramifications latérales, bifurcations, anastomoses, jonctions irrégulières et particules en mouvement.
-- **Graphe hiérarchique global** : tous les descendants des huit arbres JSON sont positionnés dès le chargement. La profondeur est révélée progressivement selon le niveau de zoom; aucune navigation par remplacement de scène.
-- **Zoom profond** : zoom molette, boutons et pincement tactile; caméra centrée sur le point de zoom; niveaux de zoom élevés pour parcourir les branches les plus fines.
-- **Sélection directe** : toucher/clic sur un nœud sélectionne et centre la ressource. La fiche flottante propose explicitement le lien Notion, sans redirection automatique.
-- **Données** : arbres notion-tree.fr/en/ar/pt.json, sans duplication de contenu.
-- **DaisyUI 5.8.1** : commandes et fiche de sélection uniquement. Le réseau biologique reste dessiné par Canvas.
-- **Accessibilité** : liste DOM des nœuds visibles, libellés ARIA et prise en compte de prefers-reduced-motion.
+L’explorateur représente BA Labs comme **un organisme scientifique global**, continu et évolutif. Il ne s’agit ni d’un organigramme, ni d’une roue de catégories, ni d’une constellation de huit satellites indépendants.
 
-## Principes visuels
-- Densité organique croissante avec le zoom, sans grille ni disposition en cartes.
-- Ramifications secondaires et tertiaires visibles à mesure que la caméra s’approche.
-- Anastomoses limitées et irrégulières pour relier le réseau sans créer une grille artificielle.
-- Labels hiérarchisés : univers à la vue globale, ressources profondes au zoom rapproché.
+L’organisme possède :
+- une identité centrale BA Labs, portée par le logo au cœur de la composition ;
+- un noyau mycologique qui constitue le tissu vivant de connexion ;
+- huit territoires scientifiques autonomes ;
+- des ramifications internes propres à chaque territoire ;
+- des connexions transversales documentées entre territoires.
+
+Chaque territoire peut croître sans perdre son autonomie, tout en restant relié à l’organisme global.
+
+## Modèle spatial et biologique
+
+### Centre et noyau mycologique
+
+Le logo BA Labs occupe le centre visuel de la composition. Le noyau mycologique se développe autour de cette identité sous une forme organique évoquant un Y vivant : un tronc commun, des bifurcations et des prolongements qui distribuent le réseau.
+
+La mycologie est un noyau de connexion privilégié, pas une catégorie décorative ni un simple bouton central. Elle relie les territoires et donne sa cohérence biologique à l’ensemble.
+
+### Huit territoires autonomes
+
+Les huit territoires de premier niveau sont exactement :
+1. `microbiology`
+2. `plants`
+3. `ecology`
+4. `bioprocesses`
+5. `biomaterials`
+6. `instrumentation`
+7. `digital`
+8. `physical`
+
+Chaque territoire possède sa propre identité visuelle, ses branches, sous-branches et ressources. Les territoires ne doivent pas être disposés comme huit satellites équidistants autour d’un hub. Leur implantation est irrégulière, organique et guidée par la topologie des connaissances.
+
+### Ramifications et connexions transversales
+
+Les descendants des pages Notion forment les ramifications locales. Les relations transversales ne sont créées que lorsqu’elles sont soutenues par des relations Notion ou des éléments de contenu identifiables et vérifiables.
+
+Le réseau doit distinguer :
+- les liens de parenté à l’intérieur d’un territoire ;
+- les connexions transversales entre territoires ;
+- les liens du noyau mycologique vers les territoires ;
+- les nouvelles ramifications ajoutées lorsque la connaissance s’enrichit.
+
+Aucune connexion ne doit être ajoutée uniquement pour remplir visuellement l’espace. L’organisme peut être asymétrique et présenter des densités différentes selon les contenus disponibles.
+
+## Expérience d’exploration
+
+- Un seul espace 2D continu, sans remplacement de scène.
+- Zoom progressif : les ramifications secondaires et tertiaires apparaissent avec le niveau de détail.
+- Déplacement libre et zoom à la souris, au clavier et au tactile.
+- La sélection d’un nœud centre et rapproche la caméra sans quitter l’explorateur.
+- La fiche de sélection propose une action explicite pour ouvrir la ressource Notion ; la sélection seule ne déclenche pas de navigation externe.
+- La liste DOM accessible permet d’atteindre les nœuds au clavier.
+- Les préférences `prefers-reduced-motion` sont respectées.
+
+## Données et internationalisation
+
+- Les quatre arbres Notion FR / EN / AR / PT restent les sources de vérité pour les territoires et leurs contenus.
+- Les identifiants stables sont conservés entre langues.
+- Les destinations Notion restent localisées.
+- L’arabe utilise le sens de lecture RTL.
+- Les relations transversales sont fondées sur les données disponibles ; leur preuve et leur type doivent rester traçables.
+
+## Direction visuelle
+
+- Référence biologique : mycélium qui colonise une gélose depuis un point d’inoculation, avec une densité et des ramifications qui augmentent progressivement.
+- Référence complémentaire : réseau neuronal, avec des nœuds et des prolongements qui établissent des connexions.
+- Filaments courbes, bifurcations irrégulières, anastomoses documentées, variations d’épaisseur et de densité.
+- Lueur maîtrisée et particules qui suivent les connexions réelles.
 - Palette BA Labs : graphite pétrole, vert minéral, cuivre oxydé et gris minéral.
+- Pas de roue radiale, d’anneau de satellites, de planètes, de cartes radiales, de tubes décoratifs ou de connexions arbitraires.
 
 ## Critères d’acceptation
-1. Les huit univers et tous leurs descendants sont chargés dans un graphe unique.
-2. Le zoom révèle les sous-branches sans changer de page ni remplacer la scène.
-3. Un clic sur un nœud centre et agrandit cette zone; seule l'action explicite « Ouvrir la ressource » ouvre Notion.
-4. Le déplacement et le zoom fonctionnent à la souris et au tactile.
-5. Les quatre langues FR/EN/AR/PT restent disponibles; arabe en RTL.
-6. Le moteur 3D historique n'est pas modifié par ce travail.
+
+1. BA Labs est identifiable au centre de la composition.
+2. La mycologie forme le noyau vivant de connexion, visuellement distinct des huit territoires.
+3. Les huit territoires restent autonomes et peuvent se ramifier indépendamment.
+4. Les connexions transversales relient les territoires uniquement sur la base de relations documentées.
+5. L’ensemble est un organisme continu et asymétrique, pas un organigramme ni une roue.
+6. Le zoom révèle les ramifications sans changer de page ni remplacer la scène.
+7. La sélection ne déclenche pas automatiquement l’ouverture de Notion.
+8. FR / EN / AR / PT, RTL, tactile et accessibilité clavier fonctionnent.
+9. Le moteur de l’Academy, CultureOps et les expériences 3D historiques restent hors du périmètre de modification.
 
 ## État
-Refonte continue en cours sur la branche feat/continuous-mycelium-explorer. Le déploiement public ne doit intervenir qu'après revue et validation du rendu.
+
+La refonte du moteur du site public est en cours sur la branche `rebuild/public-mycology-constellation`. Aucun déploiement public ne doit intervenir avant validation des tests, inspection visuelle desktop/mobile et revue de la PR.
