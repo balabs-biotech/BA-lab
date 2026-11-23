@@ -13,7 +13,9 @@ function packRootTerritories(nodes,tree){
  const roots=nodes.filter(n=>n.level===0);
  if(roots.length<2)return;
  const original=new Map(roots.map(r=>[r.id,{x:r.x,y:r.y}]));
- const mass=new Map(tree.map(root=>[root.id,countTree(root)]));
+ // Keep root territories identical across the public and Academy trees.
+ // Content depth must not move the eight shared universe anchors.
+ const mass=new Map(tree.map(root=>[root.id,144]));
  const radius=r=>92+Math.sqrt(mass.get(r.id)||1)*8.5;
  for(let pass=0;pass<34;pass++){
   const shifts=new Map(roots.map(r=>[r.id,{x:0,y:0}]));
@@ -38,7 +40,6 @@ function packRootTerritories(nodes,tree){
   for(const n of nodes)if(n.rootId===root.id){n.x+=dx;n.y+=dy;}
  }
 }
-function countTree(node){return 1+(node.children||[]).reduce((sum,child)=>sum+countTree(child),0);}
 function relaxBiologicalMorphology(nodes,edges){
  const parentPairs=new Set(edges.filter(e=>!e.cross).map(e=>[e.a.id,e.b.id].sort().join("|")));
  const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
