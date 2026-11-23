@@ -36,23 +36,23 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
-    const spread=depth===1?clamp(0.20+Math.log2(kids.length+1)*0.07,0.25,0.48):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
+    const spread=depth===1?clamp(0.08+Math.log2(kids.length+1)*0.04,0.10,0.25):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
     const distance=depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1);
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
       const fraction=kids.length===1?(((seed>>>9)&255)/255-.5)*0.3:index/(kids.length-1)-.5;
-      const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?0.12:0.22);
-      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.035:0.075);
+      const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?0.05:0.22);
+      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.018:0.075);
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateral=side*distance*(depth===1?0.08+((seed>>>2)&255)/255*0.12:0.16+((seed>>>2)&255)/255*0.20);
+      const lateral=side*distance*(depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20);
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
       const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
-      const inheritedSplit=side*(depth===1?0.07+((seed>>>20)&31)/180:0.12+((seed>>>20)&31)/120);
+      const inheritedSplit=side*(depth===1?0.04+((seed>>>20)&31)/220:0.12+((seed>>>20)&31)/120);
       walk(child,node,depth+1,angle+inheritedSplit,rootId,inoculationIndex);
     });
   };
