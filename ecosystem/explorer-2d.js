@@ -43,9 +43,12 @@ function fitOverview(){
  // The Y-shaped organism is intentionally asymmetric around its brand node.
  // Fit its actual bounding-box centre, not the BA Labs origin, or the lower
  // mycelial arm drifts off-screen on portrait/mobile viewports.
- const pad=Math.min(88,Math.max(22,Math.min(w,h)*.065));
- const scaleX=(w-pad*2)/(maxX-minX+190);
- const scaleY=(h-pad*2)/(maxY-minY+190);
+ const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
+ // Root labels extend beyond their node coordinates, with the longest labels
+ // on the lateral arms. Reserve an explicit text-safe envelope on both axes.
+ const labelSafeEnvelope=320;
+ const scaleX=(w-pad*2)/(maxX-minX+labelSafeEnvelope);
+ const scaleY=(h-pad*2)/(maxY-minY+labelSafeEnvelope);
  targetScale=clamp(Math.min(scaleX,scaleY),.14,.62);
  targetOffset={x:-(minX+maxX)*.5*targetScale,y:-(minY+maxY)*.5*targetScale};
 }
