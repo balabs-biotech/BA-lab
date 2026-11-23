@@ -113,6 +113,8 @@ try {
     });
     assert.equal(overviewBounds.length,10,'The global overview must expose all ten central labels');
     assert.ok(overviewBounds.every(item=>item.inside), 'All ten central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
+    const overviewCamera = await page.locator('#field').evaluate(el => ({scale:Number(el.dataset.targetScale||0),width:Number(el.dataset.viewportWidth||0),height:Number(el.dataset.viewportHeight||0)}));
+    assert.ok(overviewCamera.scale < .62, 'Overview camera must fit the eight outer inoculation territories, not only the central identity nodes: '+JSON.stringify(overviewCamera));
     await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
     await page.waitForTimeout(600);
