@@ -16,6 +16,9 @@ const hub={id:'mycology-center',title:'Mycology',description:'BA Labs mycology h
 const publicSpace=createPublicMycologyNetwork(publicTree,hub);
 assert.equal(publicSpace.stats.universeCount,8);
 assert.equal(publicSpace.byId.get('mycology-center').data.url,hub.url);
+assert.equal(publicSpace.byId.get('balabs-identity').title,'BA Labs','The BA Labs identity node must be the geometric center');
+assert.ok(publicSpace.edges.some(edge=>edge.identityLink&&edge.a.id==='balabs-identity'&&edge.b.id==='mycology-center'),'The brand identity must connect directly to the mycology core');
+assert.equal(publicSpace.stats.mycologyArms,3,'The public network must use three unequal mycelial arms');
 assert.equal(publicSpace.edges.filter(edge=>edge.hubLink).length,8,'The mycology hub must connect directly to all eight public universes');
 for(const universe of publicTree){
   const node=publicSpace.byId.get(universe.id);
@@ -29,6 +32,9 @@ const academySource=await readFile('ecosystem-preview/explorer-2d.js','utf8');
 const publicSource=await readFile('ecosystem/explorer-2d.js','utf8');
 assert.match(academySource,/\.\.\/ecosystem-core\/explorer-2d-pixi\.js/,'Academy must retain the shared Pixi renderer');
 assert.match(academySource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'Academy must retain the shared Vernpixi graph geometry');
+const sharedRenderer=await readFile('ecosystem-core/explorer-2d-pixi.js','utf8');
+assert.match(sharedRenderer,/myco:0xb18fc2/,'The Academy mycology palette token must remain unchanged');
+assert.match(sharedRenderer,/if\(e\.branchPoint\)/,'The shared renderer must enable optional branch paths only when the public graph supplies them');
 assert.match(publicSource,/\.\.\/ecosystem-core\/explorer-2d-pixi\.js/,'The public site may reuse the shared Pixi renderer');
 assert.match(publicSource,/\.\/explorer-2d-graph\.js/,'The public site must use its dedicated mycology-centered graph');
 assert.doesNotMatch(publicSource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'The public site must not use the Academy graph geometry');
