@@ -38,3 +38,8 @@ node --test product-passport/tests/passport-contract.test.mjs
 ```
 
 Le déploiement Cloudflare Pages actuel est un Direct Upload. Le dépôt GitHub reste la source de vérité. La connexion Git Cloudflare doit être réparée avant d'automatiser les prochains déploiements depuis les commits.
+
+
+## Administration
+
+The migrated React/Vite administration source is maintained in `product-passport/admin/`. Its open `#/demo` route is limited to fictitious read-only data. The production administration requires Supabase Auth and the server-side `passport-admin` role check. See `product-passport/admin/README.md` for build and deployment notes.
