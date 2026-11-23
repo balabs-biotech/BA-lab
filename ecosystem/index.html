@@ -97,6 +97,35 @@
 .inline-explorer-controls:hover,.inline-explorer-controls:focus-within{opacity:1}
 .inline-explorer-controls .btn{width:29px;height:29px;min-height:29px;font-size:14px;border-radius:50%;padding:0}
 @media(max-width:700px){.inline-explorer-title{left:10px;top:10px}.universe-rail{left:5px;gap:3px}.universe-rail button{width:30px;min-width:30px;height:30px}.universe-rail button span{left:28px}.inline-explorer-controls{right:8px;top:8px}.inline-explorer-controls .btn{width:27px;height:27px;min-height:27px}}
+
+/* Mobile selection: keep the hierarchy on one clipped, readable line.
+   The opaque dock must remain distinct from the moving biological canvas. */
+@media(max-width:700px){
+ #app.balabs-ui #selection{
+  left:56px!important;right:10px!important;width:auto!important;
+  max-height:22%!important;overflow:hidden!important;
+ }
+ #app.balabs-ui #selection .selection-dock{
+  max-height:100%;overflow:hidden;
+  background:#101b19!important;border-color:#71877b88!important;
+  box-shadow:0 8px 24px #0009!important;backdrop-filter:blur(16px);
+ }
+ #app.balabs-ui #selection .selection-path{
+  display:flex;flex-wrap:nowrap;min-width:0;max-width:100%;
+  overflow:hidden;white-space:nowrap;gap:3px;
+ }
+ #app.balabs-ui #selection .selection-path-link,
+ #app.balabs-ui #selection .selection-path-current{
+  display:block;min-width:0;max-width:34%;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;
+ }
+ #app.balabs-ui #selection .selection-path-separator{flex:0 0 auto}
+ #app.balabs-ui #selection .child-branches{
+  display:flex;flex-wrap:nowrap;max-width:100%;overflow-x:auto;
+  overscroll-behavior-x:contain;padding-bottom:2px;
+ }
+}
+
 </style>
 <style id="universe-rail-organic">
 #app.balabs-ui .inline-explorer .universe-rail{
