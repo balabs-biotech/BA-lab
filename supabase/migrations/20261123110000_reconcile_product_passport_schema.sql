@@ -319,7 +319,7 @@ end $$;
 
 -- Supabase Storage is provisioned by the hosted platform. Generic PostgreSQL
 -- migration-replay CI does not create its schema, so skip only that platform object there.
-do $
+do $do$
 begin
   if to_regclass('storage.buckets') is not null then
     execute $bucket$
@@ -329,4 +329,4 @@ begin
         set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types
     $bucket$;
   end if;
-end $;
+end $do$;
