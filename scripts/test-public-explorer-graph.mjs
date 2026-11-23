@@ -93,6 +93,6 @@ assert.doesNotMatch(explorer,/DOUBLE-CLICK|DOUBLE CLICK|e\.detail<2/,"the public
 console.log("✓ public explorer single-click navigation contract");
 
 const publicRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
-assert.match(publicRenderer,/cubicCurveTo/,"Primary and secondary hyphae must use flowing cubic morphology, not single-arc spokes");
+assert.match(publicRenderer,/bezierCurveTo/,"Primary and secondary hyphae must use flowing cubic morphology, not single-arc spokes");
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a desktop-sized label envelope");
