@@ -41,6 +41,8 @@ for(const lang of languages){
     const directChildren=graph.nodes.filter(node=>node.parent===root.id);
     assert.ok(directChildren.length>0,`${lang}: ${root.id} must retain its real first-generation knowledge nodes`);
     assert.ok(directChildren.every(node=>Math.abs(node.angle-root.angle)<=0.95),`${lang}: ${root.id} first-generation branches must grow as a controlled rhizomorphic fan, not a radial starburst`);
+    const hasLateralGrowth=directChildren.some(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)>Math.hypot(dx,dy)*.18;});
+    assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
   assert.ok(graph.edges.some(edge=>edge.generation>=2),lang+": recursive knowledge branches must carry their biological generation");
@@ -89,3 +91,8 @@ assert.match(explorer,/function activateNode\(n\)\{if\(!n\)return;focusNode\(n\)
 assert.match(explorer,/selection-open-link/,"the selected node must expose an explicit Notion action");
 assert.doesNotMatch(explorer,/DOUBLE-CLICK|DOUBLE CLICK|e\.detail<2/,"the public explorer must not require a double-click");
 console.log("✓ public explorer single-click navigation contract");
+
+const publicRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
+assert.match(publicRenderer,/cubicCurveTo/,"Primary and secondary hyphae must use flowing cubic morphology, not single-arc spokes");
+const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
+assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a desktop-sized label envelope");
