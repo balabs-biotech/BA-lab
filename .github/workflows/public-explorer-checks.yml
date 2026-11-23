@@ -1,0 +1,36 @@
+name: Public explorer checks
+
+on:
+  push:
+    branches: [main, rebuild/public-mycology-constellation]
+    paths:
+      - "ecosystem/explorer-2d.js"
+      - "ecosystem/explorer-2d-graph.js"
+      - "ecosystem/notion-tree.*.json"
+      - "scripts/test-public-explorer-graph.mjs"
+      - ".github/workflows/public-explorer-checks.yml"
+  pull_request:
+    paths:
+      - "ecosystem/explorer-2d.js"
+      - "ecosystem/explorer-2d-graph.js"
+      - "ecosystem/notion-tree.*.json"
+      - "scripts/test-public-explorer-graph.mjs"
+      - ".github/workflows/public-explorer-checks.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  public-explorer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check explorer JavaScript syntax
+        run: |
+          node --check ecosystem/explorer-2d.js
+          node --check ecosystem/explorer-2d-graph.js
+      - name: Verify public Notion graph in all languages
+        run: node scripts/test-public-explorer-graph.mjs
