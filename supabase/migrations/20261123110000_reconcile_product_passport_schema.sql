@@ -106,6 +106,7 @@ create table if not exists public.documents (
   published_at timestamptz,
   archived_at timestamptz,
   created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
   check (num_nonnulls(lot_id, product_id) = 1),
   check ((published_by is null) = (published_at is null)),
   check (classification <> 'public' or published_at is not null)
