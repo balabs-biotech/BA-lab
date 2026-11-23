@@ -27,9 +27,22 @@ export async function createPixiRenderer(canvas){
   const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
   const terminalIds=new Set(nodes.filter(n=>n.level>0&&!branchParents.has(n.id)).map(n=>n.id));
   const bezierPoint=(a,c,b,t)=>{const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};};
+  const drawnArms=new Set();
   for(const e of edges){
    const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
-   const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+   let a=point(e.a);const b=point(e.b);
+   if(e.branchPoint){
+    if(!drawnArms.has(e.arm)){
+     const j=e.branchPoint,dx=j.x-a.x,dy=j.y-a.y,len=Math.hypot(dx,dy)||1,side=e.arm==="upper-left"?-1:e.arm==="upper-right"?1:0;
+     const cx=(a.x+j.x)/2-dy/len*side*26,cy=(a.y+j.y)/2+dx/len*side*26;
+     filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,j.x,j.y).stroke({color:0xb18fc2,alpha:.78,width:2.5,cap:"round"});
+     junctions.circle(j.x,j.y,5).fill({color:0xb18fc2,alpha:.12});
+     junctions.circle(j.x,j.y,2.2).fill({color:0xd8c6e4,alpha:.85});
+     drawnArms.add(e.arm);
+    }
+    a=e.branchPoint;
+   }
+   const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
    const bend=Math.min(58,len*.19)*side*(.62+((seed>>>5)&63)/100);
    const drift=(((seed>>>12)&255)/255-.5)*Math.min(24,len*.09);
