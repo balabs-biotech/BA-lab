@@ -43,3 +43,13 @@ Le déploiement Cloudflare Pages actuel est un Direct Upload. Le dépôt GitHub 
 ## Administration
 
 The migrated React/Vite administration source is maintained in `product-passport/admin/`. Its open `#/demo` route is limited to fictitious read-only data. The production administration requires Supabase Auth and the server-side `passport-admin` role check. See `product-passport/admin/README.md` for build and deployment notes.
+
+
+## Backend versionné
+
+Les sources des fonctions Edge utilisées par le passeport sont également conservées dans ce dépôt :
+- `supabase/functions/passport-admin/index.ts` — console privée, JWT obligatoire et contrôle du rôle applicatif côté serveur.
+- `supabase/functions/public-passport/index.ts` — lecture publique par jeton opaque, limitée au snapshot publié.
+- `supabase/config.toml` — paramètres JWT explicites : vérification activée pour l'administration et désactivée pour l'endpoint QR public, qui réalise sa propre validation par jeton.
+
+Ces fichiers ont été récupérés depuis les versions actives du projet Supabase BA Labs. Les tests de contrat correspondants sont dans `supabase/tests/product-passport-functions.test.mjs`. Toute modification future doit être testée puis déployée sur le projet Supabase actif ; le simple déploiement Cloudflare ne met pas à jour les fonctions Edge.
