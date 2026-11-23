@@ -1,7 +1,7 @@
 import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const PALETTE={bio:0x79a991,myco:0xb18fc2,soil:0xc19b73,lab:0x80aeb8,products:0xc88773,iot:0x7eaaa3,work:0xaa9cbb,evidence:0xb5b58d};
+const PALETTE={bio:0x79a991,myco:0xb96b4d,soil:0xc19b73,lab:0x80aeb8,products:0xc88773,iot:0x7eaaa3,work:0xaa9cbb,evidence:0xb5b58d};
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
 
 export async function createPixiRenderer(canvas){
@@ -35,9 +35,10 @@ export async function createPixiRenderer(canvas){
     if(!drawnArms.has(e.arm)){
      const j=e.branchPoint,dx=j.x-a.x,dy=j.y-a.y,len=Math.hypot(dx,dy)||1,side=e.arm==="upper-left"?-1:e.arm==="upper-right"?1:0;
      const cx=(a.x+j.x)/2-dy/len*side*26,cy=(a.y+j.y)/2+dx/len*side*26;
-     filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,j.x,j.y).stroke({color:0xb18fc2,alpha:.78,width:2.5,cap:"round"});
-     junctions.circle(j.x,j.y,5).fill({color:0xb18fc2,alpha:.12});
-     junctions.circle(j.x,j.y,2.2).fill({color:0xd8c6e4,alpha:.85});
+     const stemColor=e.arm==="upper-left"?0xb96b4d:e.arm==="upper-right"?0x69b9b2:0xc8a58a;
+     filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,j.x,j.y).stroke({color:stemColor,alpha:.82,width:2.5,cap:"round"});
+     junctions.circle(j.x,j.y,5).fill({color:stemColor,alpha:.13});
+     junctions.circle(j.x,j.y,2.2).fill({color:0xe4e7dd,alpha:.86});
      drawnArms.add(e.arm);
     }
     a=e.branchPoint;
