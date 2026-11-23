@@ -1,0 +1,5 @@
+[functions.passport-admin]
+verify_jwt = true
+
+[functions.public-passport]
+verify_jwt = false
