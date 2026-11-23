@@ -97,6 +97,15 @@ try {
     assert.equal(hubConnections, 8, 'The mycology hub must connect directly to all eight scientific universes');
     const initialUrl = page.url();
     const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
+    const overviewGeometry = await page.locator('#field').evaluate(el => {
+      const boxes = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}');
+      const rect = el.getBoundingClientRect();
+      return { boxes:Object.keys(boxes), viewport:{width:rect.width,height:rect.height} };
+    });
+    assert.ok(overviewGeometry.boxes.includes('balabs-identity'), 'The global overview must visibly include the BA Labs identity node');
+    assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must visibly include the mycology core');
+    assert.ok(['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].every(id => overviewGeometry.boxes.includes(id)), 'All eight autonomous territories must be visible in the global overview');
+    await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
     await page.waitForTimeout(600);
     const zoomDebug = await page.locator('#field').evaluate(el => ({ scale:el.dataset.scale,targetScale:el.dataset.targetScale,width:el.dataset.viewportWidth,height:el.dataset.viewportHeight,candidates:el.dataset.labelCandidateCount,live:el.dataset.labelLiveCount,roots:el.dataset.rootCandidateCount,visible:JSON.parse(el.dataset.visibleNodeIds||'[]').length,labels:JSON.parse(el.dataset.visibleNodeIds||'[]').slice(0,20) }));
@@ -230,7 +239,7 @@ try {
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(consoleErrors, [], 'No browser console errors');
     assert.deepEqual(failedRequests, [], 'No failed network requests');
-    await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}.png`, fullPage: false });
+    await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-selected.png`, fullPage: false });
     results.push({ viewport: viewport.name, canvas: [canvasSize.width, canvasSize.height], accessibleNodes: visibleNodes, languages: 'FR/EN/AR/PT', selectionStaysInScene: true, renderer: 'PixiJS WebGL', browserErrors: errors.length });
     await page.close();
   }
