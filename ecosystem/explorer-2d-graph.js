@@ -36,23 +36,23 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
-    const spread=clamp(0.44+Math.log2(kids.length+1)*0.16,0.5,1.35);
+    const spread=depth===1?clamp(0.20+Math.log2(kids.length+1)*0.07,0.25,0.48):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
     const distance=depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1);
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
       const fraction=kids.length===1?(((seed>>>9)&255)/255-.5)*0.3:index/(kids.length-1)-.5;
-      const localDrift=(((seed>>>8)&255)/255-.5)*0.28;
-      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*0.08;
+      const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?0.12:0.22);
+      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.035:0.075);
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateral=side*distance*(0.76+((seed>>>2)&255)/255*0.30);
+      const lateral=side*distance*(depth===1?0.08+((seed>>>2)&255)/255*0.12:0.16+((seed>>>2)&255)/255*0.20);
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
       const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
-      const inheritedSplit=side*(0.14+((seed>>>20)&31)/96);
+      const inheritedSplit=side*(depth===1?0.07+((seed>>>20)&31)/180:0.12+((seed>>>20)&31)/120);
       walk(child,node,depth+1,angle+inheritedSplit,rootId,inoculationIndex);
     });
   };
@@ -83,7 +83,7 @@ export function createPublicMycologyNetwork(tree,hub){
     let magnitude=Math.hypot(dx,dy);
     if(magnitude<1){dx=Math.cos(parent.angle||0);dy=Math.sin(parent.angle||0);magnitude=1;}
     const averageLength=group.reduce((sum,edge)=>sum+Math.hypot(edge.b.x-parent.x,edge.b.y-parent.y),0)/group.length;
-    const advance=Math.min(averageLength*.34,parent.level===0?74:parent.level===1?52:34);
+    const advance=Math.min(averageLength*.58,parent.level===0?110:parent.level===1?82:56);
     const branchPoint={x:parent.x+dx/magnitude*advance,y:parent.y+dy/magnitude*advance};
     for(const edge of group)edge.branchPoint=branchPoint;
   }
