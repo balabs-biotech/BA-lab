@@ -1,6 +1,6 @@
 // Shared graph geometry for the BA Labs Academy and public Notion explorers.
-// Both spaces use the same eight root anchors, branching field and anastomosis rules;
-// only their Notion trees and optional root layout aliases differ.
+// Both spaces share branching, relaxation and anastomosis rules. Root anchor
+// fields and territory mass are configurable for graphs with different root counts.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
 
