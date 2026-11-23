@@ -1,0 +1,76 @@
+name: Deploy product passport to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ba-labs-product-passport-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and publish public passport + admin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require production branch
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Production deployment is allowed only from main."
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build administration
+        working-directory: product-passport/admin
+        run: |
+          npm install --no-package-lock
+          npm run build
+
+      - name: Assemble one Pages artifact
+        run: |
+          set -eu
+          DEPLOY_DIR="$RUNNER_TEMP/ba-labs-product-passport"
+          mkdir -p "$DEPLOY_DIR/admin"
+          cp product-passport/index.html "$DEPLOY_DIR/index.html"
+          cp product-passport/passport.css "$DEPLOY_DIR/passport.css"
+          cp product-passport/passport.js "$DEPLOY_DIR/passport.js"
+          cp -R product-passport/admin/dist/. "$DEPLOY_DIR/admin/"
+          test -s "$DEPLOY_DIR/index.html"
+          test -s "$DEPLOY_DIR/admin/index.html"
+          echo "DEPLOY_DIR=$DEPLOY_DIR" >> "$GITHUB_ENV"
+
+      - name: Verify deployment credentials are configured
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Add the CLOUDFLARE_API_TOKEN GitHub Actions secret."; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Add the CLOUDFLARE_ACCOUNT_ID GitHub Actions secret."; exit 1; }
+
+      - name: Publish to the existing Cloudflare Pages project
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes wrangler@4 pages deploy "$DEPLOY_DIR" \
+            --project-name ba-labs-product-passport \
+            --branch main \
+            --commit-dirty=true
+
+      - name: Publish deployment locations
+        run: |
+          {
+            echo "### BA Labs — Passeport Produit"
+            echo "- Page publique : https://ba-labs-product-passport.pages.dev/"
+            echo "- Administration : https://ba-labs-product-passport.pages.dev/admin/"
+          } >> "$GITHUB_STEP_SUMMARY"
