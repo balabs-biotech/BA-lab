@@ -31,6 +31,7 @@ for(const lang of languages){
   assert.equal(new Set(graph.nodes.map(node=>node.id)).size,graph.nodes.length,"node IDs must be unique");
   assert.equal(graph.stats.inoculationPoints,8,lang+": each territory must have its own inoculation point");
   const roots=expected.map(id=>graph.byId.get(id));
+  assert.equal(new Set(roots.map(node=>node.colorKey)).size,8,lang+": all eight universes must have distinct color identities");
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
@@ -51,6 +52,21 @@ for(const lang of languages){
   }
   console.log(`✓ ${lang}: mycology hub + eight universes + ${graph.nodes.length} nodes`);
 }
+
+const fixture=JSON.parse(readFileSync(new URL("../ecosystem/notion-tree.fr.json",import.meta.url),"utf8")).domains;
+const original=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
+const expanded=structuredClone(fixture);
+expanded[0].children.push({id:"future-knowledge-node",title:"Future knowledge",children:[]});
+const grown=createPublicMycologyNetwork(expanded,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
+for(const id of expected){
+  const before=original.byId.get(id),after=grown.byId.get(id);
+  assert.deepEqual([after.x,after.y,after.colorKey],[before.x,before.y,before.colorKey],"Adding knowledge must not move or recolor another territory");
+}
+assert.deepEqual(
+  original.nodes.map(node=>[node.id,node.x,node.y]),
+  createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).nodes.map(node=>[node.id,node.x,node.y]),
+  "The same knowledge tree must always produce the same biological morphology"
+);
 
 const explorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(explorer,/if\(n\)activateNode\(n\)/,"a single click must select and focus a node");
