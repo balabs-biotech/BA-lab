@@ -31,7 +31,7 @@ assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.in
 assert.ok(publicExplorerJs.includes('./explorer-2d-pixi.js') && publicExplorerJs.includes('./explorer-2d-graph.js'), 'Public explorer must use its independent Pixi renderer and mycology-centered graph');
 assert.ok(publicPixiJs.includes('primaryHypha') && publicPixiJs.includes('generation'), 'Public renderer must distinguish primary, secondary and tertiary biological filaments');
 assert.doesNotMatch(publicPixiJs, /branchPoint|drawnArms|upper-left|upper-right/, 'Public renderer must not retain legacy three-arm geometry');
-assert.doesNotMatch(publicPixiJs, /const count=depth===1\\?4:depth===2\\?3:2/, 'Public renderer must not draw synthetic branches without graph data');
+assert.equal(publicPixiJs.includes('const count=depth===1?4:depth===2?3:2'), false, 'Public renderer must not draw synthetic branches without graph data');
 assert.ok(publicExplorerJs.includes('createPublicMycologyNetwork(tree,HUB[lang])'), 'Public explorer must build the mycology hub and eight independent universes from the localized manifest');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
 
