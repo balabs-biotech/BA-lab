@@ -67,6 +67,27 @@ export function createPublicMycologyNetwork(tree,hub){
     walk(universe,root,1,anchor.angle,universe.id,index);
   });
 
+  // Give sibling hyphae a shared advancing trunk before they bifurcate.
+  // The junction is geometric only: it adds no synthetic knowledge node or relation.
+  const siblingEdges=new Map();
+  for(const edge of edges.filter(item=>item.fractal)){
+    if(!siblingEdges.has(edge.a.id))siblingEdges.set(edge.a.id,[]);
+    siblingEdges.get(edge.a.id).push(edge);
+  }
+  for(const [parentId,group] of siblingEdges){
+    if(group.length<2)continue;
+    const parent=byId.get(parentId);
+    const children=group.map(edge=>edge.b);
+    const centroid=children.reduce((sum,node)=>({x:sum.x+node.x/children.length,y:sum.y+node.y/children.length}),{x:0,y:0});
+    let dx=centroid.x-parent.x,dy=centroid.y-parent.y;
+    let magnitude=Math.hypot(dx,dy);
+    if(magnitude<1){dx=Math.cos(parent.angle||0);dy=Math.sin(parent.angle||0);magnitude=1;}
+    const averageLength=group.reduce((sum,edge)=>sum+Math.hypot(edge.b.x-parent.x,edge.b.y-parent.y),0)/group.length;
+    const advance=Math.min(averageLength*.34,parent.level===0?74:parent.level===1?52:34);
+    const branchPoint={x:parent.x+dx/magnitude*advance,y:parent.y+dy/magnitude*advance};
+    for(const edge of group)edge.branchPoint=branchPoint;
+  }
+
   // Transverse hyphae may connect any two knowledge nodes in different territories.
   // Relations are read recursively; no decorative or nearest-neighbour edges are invented.
   const relationPairs=new Set();let verifiedRelations=0,explicitRelations=0,contentRelations=0;
