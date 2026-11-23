@@ -46,7 +46,7 @@ function fitOverview(){
  const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
  // Root labels extend beyond their node coordinates, with the longest labels
  // on the lateral arms. Reserve an explicit text-safe envelope on both axes.
- const labelSafeEnvelope=320;
+ const labelSafeEnvelope=w<600?620:320;
  const scaleX=(w-pad*2)/(maxX-minX+labelSafeEnvelope);
  const scaleY=(h-pad*2)/(maxY-minY+labelSafeEnvelope);
  targetScale=clamp(Math.min(scaleX,scaleY),.14,.62);
