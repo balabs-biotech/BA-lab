@@ -18,8 +18,10 @@ assert.equal(publicSpace.stats.universeCount,8);
 assert.equal(publicSpace.byId.get('mycology-center').data.url,hub.url);
 assert.equal(publicSpace.byId.get('balabs-identity').title,'BA Labs','The BA Labs identity node must be the geometric center');
 assert.ok(publicSpace.edges.some(edge=>edge.identityLink&&edge.a.id==='balabs-identity'&&edge.b.id==='mycology-center'),'The brand identity must connect directly to the mycology core');
-assert.equal(publicSpace.stats.mycologyArms,3,'The public network must use three unequal mycelial arms');
-assert.equal(publicSpace.edges.filter(edge=>edge.hubLink).length,8,'The mycology hub must connect directly to all eight public universes');
+assert.equal(publicSpace.stats.inoculationPoints,8,'The public network must expose eight independent inoculation points');
+assert.equal(publicSpace.edges.filter(edge=>edge.hubLink&&edge.primaryHypha).length,8,'The mycology tissue must connect to all eight universes through primary hyphae');
+assert.ok(publicSpace.edges.filter(edge=>edge.hubLink).every(edge=>!('arm' in edge)),'The public graph must not partition territories into fixed arms');
+assert.ok(publicSpace.edges.some(edge=>edge.fractal&&edge.generation>=2),'The public graph must recursively grow knowledge branches');
 for(const universe of publicTree){
   const node=publicSpace.byId.get(universe.id);
   assert.ok(node,'Every public Notion universe must be present');
@@ -38,4 +40,4 @@ assert.match(sharedRenderer,/if\(e\.branchPoint\)/,'The shared renderer must ena
 assert.match(publicSource,/\.\.\/ecosystem-core\/explorer-2d-pixi\.js/,'The public site may reuse the shared Pixi renderer');
 assert.match(publicSource,/\.\/explorer-2d-graph\.js/,'The public site must use its dedicated mycology-centered graph');
 assert.doesNotMatch(publicSource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'The public site must not use the Academy graph geometry');
-console.log(JSON.stringify({academy:'shared Vernpixi unchanged',public:'dedicated mycology hub + eight universes',academyNodes:academy.nodes.length,publicNodes:publicSpace.nodes.length},null,2));
+console.log(JSON.stringify({academy:'shared Vernpixi unchanged',public:'dedicated mycology core + eight-point fractal growth',academyNodes:academy.nodes.length,publicNodes:publicSpace.nodes.length},null,2));
