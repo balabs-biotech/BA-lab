@@ -34,6 +34,12 @@ begin
   end if;
   select not public into is_private from storage.buckets where id='ba-labs-documents';
   if is_private is distinct from true then raise exception 'Passport document bucket must be private'; end if;
+  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='documents' and column_name='updated_at') then
+    raise exception 'Documents updated_at column missing';
+  end if;
+  if not exists(select 1 from pg_trigger where tgname='documents_set_updated_at' and not tgisinternal) then
+    raise exception 'Documents updated_at trigger missing';
+  end if;
   if not exists(select 1 from pg_trigger where tgname='passport_version_publication_guard' and not tgisinternal) then
     raise exception 'Passport publication guard trigger missing';
   end if;
