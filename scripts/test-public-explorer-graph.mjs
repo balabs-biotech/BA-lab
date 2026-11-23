@@ -44,7 +44,7 @@ for(const lang of languages){
     const hasLateralGrowth=directChildren.some(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)>Math.hypot(dx,dy)*.18;});
     assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
     const lateralRatios=directChildren.map(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)/(Math.hypot(dx,dy)||1);});
-    assert.ok(Math.max(...lateralRatios)<.62,`${lang}: ${root.id} primary hyphae must advance through the medium before widening laterally, not form a broad fan`);
+    assert.ok(Math.max(...lateralRatios)<.38,`${lang}: ${root.id} primary hyphae must advance through the medium before widening laterally, not form a broad fan`);
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
   assert.ok(graph.edges.some(edge=>edge.generation>=2),lang+": recursive knowledge branches must carry their biological generation");
@@ -57,6 +57,7 @@ for(const lang of languages){
   assert.ok(branchedGroups.length>0,lang+": real branching junctions must exist");
   assert.ok(branchedGroups.every(([,edges])=>edges.every(edge=>edge.branchPoint&&Number.isFinite(edge.branchPoint.x)&&Number.isFinite(edge.branchPoint.y))),lang+": sibling hyphae must share one biological branch origin instead of radiating independently from their parent");
   assert.ok(branchedGroups.every(([parentId,edges])=>{const parent=graph.byId.get(parentId),point=edges[0].branchPoint;return Math.hypot(point.x-parent.x,point.y-parent.y)>8&&edges.every(edge=>edge.branchPoint.x===point.x&&edge.branchPoint.y===point.y);}),lang+": each branch junction must advance along a shared growth trunk before lateral bifurcation");
+  assert.ok(branchedGroups.every(([parentId,edges])=>{const parent=graph.byId.get(parentId),point=edges[0].branchPoint,average=edges.reduce((sum,edge)=>sum+Math.hypot(edge.b.x-parent.x,edge.b.y-parent.y),0)/edges.length;return Math.hypot(point.x-parent.x,point.y-parent.y)>=average*.5;}),lang+": the common primary hypha must advance at least halfway to the branching zone before bifurcating");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
