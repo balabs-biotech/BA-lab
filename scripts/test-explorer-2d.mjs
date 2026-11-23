@@ -91,10 +91,10 @@ try {
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
-    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'vernpixi-shared',
-      'The public explorer must use the shared Academy Vernpixi engine');
-    const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
-    assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
+    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'public-mycology-constellation',
+      'The public explorer must use its dedicated mycology-centered graph');
+    const hubConnections = Number(await page.locator('#field').getAttribute('data-hub-connections') || 0);
+    assert.equal(hubConnections, 8, 'The mycology hub must connect directly to all eight scientific universes');
     const initialUrl = page.url();
     const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
@@ -117,19 +117,18 @@ try {
     const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
     await page.evaluate(() => {
       window.__openedNotionUrls = [];
-      const nativeOpen = window.open.bind(window);
-      window.open = (...args) => { window.__openedNotionUrls.push(args[0]); return nativeOpen(...args); };
+      window.open = (...args) => { window.__openedNotionUrls.push(args[0]); return null; };
     });
     await rootButton.focus();
     await rootButton.press('Enter');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Single activation must select/focus only; it must not open Notion');
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), rootExpectedUrl, 'A single keyboard activation must open the exact universe Notion page');
     assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
     const selectedRoot = await page.locator('#selection').innerText();
     assert.ok(await page.locator('#selection .child-branches button').count() > 0, 'Selecting a node must expose direct child navigation controls');
-    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'vernpixi-shared',
-      'Selecting a public universe must keep the shared Academy engine active');
+    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'public-mycology-constellation',
+      'Selecting a public universe must keep the dedicated public graph active');
     const firstChild = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.branchId + '"]');
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
@@ -137,7 +136,8 @@ try {
     await firstChild.focus();
     await firstChild.press('Enter');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Keyboard selection must not open Notion on first activation');
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 2);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[1]), childExpectedUrl, 'A single keyboard activation must open the exact branch Notion page');
     assert.ok(await page.locator('#selection .selection-path').count(), 'The selection panel must preserve the full parent path for deep navigation, including mobile');
 
     // Regression: clicking any verified leaf label must open its exact Notion destination.
@@ -152,7 +152,8 @@ try {
     await leafButton.focus();
     await leafButton.press('Enter');
     await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf by keyboard must not open Notion');
+    await page.waitForFunction(() => window.__openedNotionUrls?.length === 3);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[2]), leafFixture.url, 'A single keyboard activation must open the exact leaf Notion page');
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
@@ -181,10 +182,11 @@ try {
     }, leafFixture.id);
     const firstLeafPoint = await pointForLeaf();
     assert.ok(firstLeafPoint, 'Leaf label must be visible before pointer activation');
-    // Send a trusted native double-click sequence, including click detail=2.
-    await page.mouse.dblclick(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
+    // A single trusted pointer click must open the exact canonical Notion destination.
+    await page.evaluate(() => { window.__openedNotionUrls = []; });
+    await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y);
     await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Single-clicking a visible leaf label must open its exact Notion page');
     await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
