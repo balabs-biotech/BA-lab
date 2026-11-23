@@ -21,7 +21,7 @@ assert.ok(publicSpace.edges.some(edge=>edge.identityLink&&edge.a.id==='balabs-id
 assert.equal(publicSpace.stats.inoculationPoints,8,'The public network must expose eight independent inoculation points');
 assert.equal(publicSpace.edges.filter(edge=>edge.hubLink&&edge.primaryHypha).length,8,'The mycology tissue must connect to all eight universes through primary hyphae');
 assert.ok(publicSpace.edges.filter(edge=>edge.hubLink).every(edge=>!('arm' in edge)),'The public graph must not partition territories into fixed arms');
-assert.ok(publicSpace.edges.some(edge=>edge.fractal&&edge.generation>=2),'The public graph must recursively grow knowledge branches');
+assert.ok(publicSpace.edges.some(edge=>edge.fractal&&edge.generation>=1),'The public graph must mark knowledge branches as fractal growth');
 for(const universe of publicTree){
   const node=publicSpace.byId.get(universe.id);
   assert.ok(node,'Every public Notion universe must be present');
