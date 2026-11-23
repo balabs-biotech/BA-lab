@@ -34,7 +34,15 @@
         <span class="state-symbol" aria-hidden="true">⌁</span>
         <p class="micro-label">ACCÈS PAR QR CODE</p>
         <h1>Votre produit, son historique vérifiable.</h1>
-        <p class="state-copy">Scannez le QR code apposé sur le produit pour consulter son passeport numérique et les informations publiées par BA Labs.</p>
+        <p class="state-copy">Scannez le QR code avec l’appareil photo de votre téléphone : le passeport s’ouvrira automatiquement. Sur ordinateur, collez ci-dessous le lien du QR code ou son jeton.</p>
+        <form id="manual-lookup" class="manual-lookup">
+          <label for="passport-entry">Lien du QR code ou jeton</label>
+          <div class="manual-lookup-row">
+            <input id="passport-entry" name="passport-entry" type="text" autocomplete="off" spellcheck="false" placeholder="Coller le lien ou le jeton…" required>
+            <button type="submit">Consulter</button>
+          </div>
+          <p id="lookup-error" class="lookup-error" hidden>Le lien ou le jeton ne semble pas valide.</p>
+        </form>
         <a class="text-link" href="https://balabs-biotech.github.io/BA-lab/">Découvrir BA Labs <span aria-hidden="true">↗</span></a>
       </section>
 
