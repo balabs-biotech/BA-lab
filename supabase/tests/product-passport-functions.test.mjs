@@ -36,6 +36,6 @@ test("service-role credentials are not shipped to either browser surface", () =>
 test("admin function requires bearer authentication and role authorization for writes", () => {
   assert.match(admin, /authorization\.startsWith\("Bearer "\)/);
   assert.match(admin, /authResponse\.ok/);
-  assert.match(admin, /if \(action === "publish"\)[\s\S]*?hasRole\("approver", "administrator", "principal_admin"\)/);
+  assert.match(admin, /if \(action === "publish"\)[\s\S]*?activeRoles\.some[\s\S]*?\["approver", "administrator", "principal_admin"\]/);
   assert.match(admin, /if \(action === "create_draft"\)[\s\S]*?activeRoles\.some/);
 });
