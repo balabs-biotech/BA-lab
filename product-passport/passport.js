@@ -17,13 +17,13 @@
     }).format(date);
   };
   const addFact = (label, value) => {
-    if (!value) return;
+    if (value === null || value === undefined || value === "") return;
     const item = document.createElement("div");
     item.className = "fact";
     const caption = document.createElement("span");
     caption.textContent = label;
     const content = document.createElement("strong");
-    content.textContent = value;
+    content.textContent = String(value);
     item.append(caption, content);
     $("facts").append(item);
   };
@@ -59,18 +59,25 @@
   const renderPassport = (data) => {
     const product = data?.product || {};
     const lot = data?.lot || {};
+    const quality = data?.quality || {};
     $("product-name").textContent = safeText(product.name, "Produit BA Labs");
     $("product-code").textContent = safeText(product.code, "");
     $("product-category").textContent = [product.category, product.family].filter(Boolean).join(" · ");
-    $("lot-code").textContent = safeText(lot.code);
+    $("lot-code").textContent = safeText(lot.code || data.passport_code);
     $("facts").replaceChildren();
 
+    const lotStatus = data.status || lot.status || quality.status;
+    const statusLabels = { released: "Lot libéré", published: "Passeport publié" };
     addFact("DATE DE FABRICATION", formatDate(lot.manufactured_on));
     addFact("DATE LIMITE D’UTILISATION", formatDate(lot.expires_on));
-    addFact("STATUT DU LOT", safeText(lot.status_label || lot.public_status, "Passeport publié"));
-    addFact("RÉFÉRENCE PRODUIT", safeText(product.code));
-    addFact("CATÉGORIE", safeText(product.category));
-    addFact("VERSION DU PASSEPORT", data.version ? "V" + data.version : null);
+    addFact("STATUT DU LOT", statusLabels[lotStatus] || safeText(lotStatus, "Passeport publié"));
+    addFact("RÉFÉRENCE PRODUIT", safeText(product.code, ""));
+    addFact("CATÉGORIE", safeText(product.category, ""));
+    if (Number.isInteger(quality.reviewed_passing_checks)) {
+      addFact("CONTRÔLES QUALITÉ VALIDÉS", quality.reviewed_passing_checks);
+    }
+    addFact("RÉFÉRENCE DU PASSEPORT", safeText(data.passport_code, ""));
+    addFact("VERSION DU SCHÉMA", safeText(data.schema_version, ""));
 
     const description = safeText(product.description, "");
     $("description-section").hidden = !description;
@@ -95,7 +102,8 @@
       show("missing");
       return;
     }
-    if (token.length < 32 || token.length > 512) {
+    // The backend issues 32 random bytes encoded as a 43-character base64url token.
+    if (token.length < 32 || token.length > 256 || !/^[A-Za-z0-9_-]+$/.test(token)) {
       showError("QR code non reconnu", "Le jeton fourni ne correspond pas au format attendu. Vérifiez que le QR code est complet.");
       return;
     }
