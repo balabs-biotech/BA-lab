@@ -67,19 +67,20 @@ export function createPublicMycologyNetwork(tree,hub){
     walk(universe,root,1,anchor.angle,universe.id,index);
   });
 
-  // Transverse hyphae are created only from documented Notion relations.
+  // Transverse hyphae may connect any two knowledge nodes in different territories.
+  // Relations are read recursively; no decorative or nearest-neighbour edges are invented.
   const relationPairs=new Set();let verifiedRelations=0,explicitRelations=0,contentRelations=0;
   const addIndex=(id,entry)=>{if(!relationIndex.has(id))relationIndex.set(id,[]);relationIndex.get(id).push(entry);};
-  for(const universe of tree){
-    const source=byId.get(universe.id);
-    for(const relation of universe.relations||[]){
+  const knowledgeNodes=nodes.filter(node=>node.level>=0&&node.data?.relations?.length);
+  for(const source of knowledgeNodes){
+    for(const relation of source.data.relations){
       const target=byId.get(relation.target);
-      if(!target||target.level!==0||target.id===source.id||target.id===center.id)continue;
+      if(!target||target.id===source.id||target.id===center.id||source.rootId===target.rootId)continue;
       const key=[source.id,target.id].sort().join("|");
       if(relationPairs.has(key))continue;
       relationPairs.add(key);
       const basis=relation.basis==="notion-link"?"notion-link":"page-content";
-      edges.push({a:source,b:target,depth:0,generation:1,cross:true,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
+      edges.push({a:source,b:target,depth:Math.max(source.level,target.level),generation:Math.max(source.level,target.level)+1,cross:true,verified:true,basis,label:relation.label,evidence:relation.evidence,seed:hash(key)});
       verifiedRelations++;
       if(basis==="notion-link")explicitRelations++;else contentRelations++;
       addIndex(source.id,{target:target.id,label:relation.label,basis,evidence:relation.evidence});
