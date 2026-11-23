@@ -63,7 +63,7 @@
       const url = new URL(raw, window.location.origin);
       const direct = url.searchParams.get("token");
       if (direct) return direct;
-      const hash = url.hash.replace(/^#\\/?/, "");
+      const hash = url.hash.replace(/^#\/?/, "");
       const queryAt = hash.indexOf("?");
       if (queryAt >= 0) return new URLSearchParams(hash.slice(queryAt + 1)).get("token");
     } catch {
