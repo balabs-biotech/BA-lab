@@ -5,6 +5,7 @@ on:
     branches: [main, rebuild/public-mycology-constellation]
     paths:
       - "ecosystem/explorer-2d.js"
+      - "ecosystem/explorer-2d-pixi.js"
       - "ecosystem/explorer-2d-graph.js"
       - "ecosystem/notion-tree.*.json"
       - "scripts/test-public-explorer-graph.mjs"
@@ -31,6 +32,9 @@ jobs:
       - name: Check explorer JavaScript syntax
         run: |
           node --check ecosystem/explorer-2d.js
+          node --check ecosystem/explorer-2d-pixi.js
           node --check ecosystem/explorer-2d-graph.js
       - name: Verify public Notion graph in all languages
         run: node scripts/test-public-explorer-graph.mjs
+      - name: Verify renderer separation and biological filament contract
+        run: node --experimental-default-type=module scripts/test-vernpixi-shared-engine.mjs
