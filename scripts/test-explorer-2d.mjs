@@ -105,6 +105,13 @@ try {
     assert.ok(overviewGeometry.boxes.includes('balabs-identity'), 'The global overview must visibly include the BA Labs identity node');
     assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must visibly include the mycology core');
     assert.ok(['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].every(id => overviewGeometry.boxes.includes(id)), 'All eight autonomous territories must be visible in the global overview');
+    const overviewBounds = await page.locator('#field').evaluate(el => {
+      const boxes = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}');
+      const rect = el.getBoundingClientRect();
+      return Object.entries(boxes).filter(([id]) => ['balabs-identity','mycology-center','microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].includes(id)).map(([id,b]) => ({id,...b,inside:b.left>=0&&b.top>=0&&b.right<=rect.width&&b.bottom<=rect.height}));
+    });
+    assert.equal(overviewBounds.length,10,'The global overview must expose all ten central labels');
+    assert.ok(overviewBounds.every(item=>item.inside), 'All ten central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
     await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
     await page.waitForTimeout(600);
