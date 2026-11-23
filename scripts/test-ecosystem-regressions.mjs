@@ -7,6 +7,7 @@ const previewHtml = readFileSync('ecosystem-preview/legacy-3d-preview.html', 'ut
 const previewExplorerHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const previewExplorerJs = readFileSync('ecosystem-preview/explorer-2d.js', 'utf8');
 const sharedPixiJs = readFileSync('ecosystem-core/explorer-2d-pixi.js', 'utf8');
+const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
 const sharedNetworkJs = readFileSync('ecosystem-core/explorer-2d-network.js', 'utf8');
 const publicExplorerJs = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 
@@ -27,7 +28,10 @@ assert.ok(sharedPixiJs.includes('pixijs-webgl') && sharedPixiJs.includes('filame
 assert.ok(sharedNetworkJs.includes('createVernpixiNetwork') && sharedNetworkJs.includes('const anchors='), 'Shared Vernpixi graph builder must own the eight organic anchors and branching geometry');
 assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && /src="\.\/explorer-2d\.js\?v=[^"]+"/.test(html), 'Public homepage must mount a versioned Vernpixi 2D script directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
-assert.ok(publicExplorerJs.includes('../ecosystem-core/explorer-2d-pixi.js') && publicExplorerJs.includes('./explorer-2d-graph.js'), 'Public explorer must reuse the Pixi renderer while using its own mycology-centered graph');
+assert.ok(publicExplorerJs.includes('./explorer-2d-pixi.js') && publicExplorerJs.includes('./explorer-2d-graph.js'), 'Public explorer must use its independent Pixi renderer and mycology-centered graph');
+assert.ok(publicPixiJs.includes('primaryHypha') && publicPixiJs.includes('generation'), 'Public renderer must distinguish primary, secondary and tertiary biological filaments');
+assert.doesNotMatch(publicPixiJs, /branchPoint|drawnArms|upper-left|upper-right/, 'Public renderer must not retain legacy three-arm geometry');
+assert.doesNotMatch(publicPixiJs, /const count=depth===1\\?4:depth===2\\?3:2/, 'Public renderer must not draw synthetic branches without graph data');
 assert.ok(publicExplorerJs.includes('createPublicMycologyNetwork(tree,HUB[lang])'), 'Public explorer must build the mycology hub and eight independent universes from the localized manifest');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
 
