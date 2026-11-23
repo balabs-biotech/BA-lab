@@ -45,7 +45,7 @@ export function createPublicMycologyNetwork(tree,hub){
       const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*0.08;
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateral=(((seed>>>2)&255)/255-.5)*Math.min(36,distance*0.23);
+      const lateral=side*distance*(0.34+((seed>>>2)&255)/255*0.18);
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
       const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex};
