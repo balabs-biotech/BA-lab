@@ -6,6 +6,7 @@ const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 const admin = await read("../functions/passport-admin/index.ts");
 const publicFn = await read("../functions/public-passport/index.ts");
 const frontend = await read("../../product-passport/admin/src/App.tsx");
+const publicPage = await read("../../product-passport/passport.js");
 const config = await read("../config.toml");
 
 test("admin Edge Function verifies the Supabase user and resolves roles server-side", () => {
@@ -30,7 +31,7 @@ test("public Edge Function accepts only opaque tokens and published passports", 
 
 test("service-role credentials are not shipped to either browser surface", () => {
   assert.doesNotMatch(frontend, /SUPABASE_SERVICE_ROLE_KEY|service_role/i);
-  assert.doesNotMatch(await read("../../product-passport/passport.js"), /SUPABASE_SERVICE_ROLE_KEY|service_role/i);
+  assert.doesNotMatch(publicPage, /SUPABASE_SERVICE_ROLE_KEY|service_role/i);
 });
 
 test("admin function requires bearer authentication and role authorization for writes", () => {
