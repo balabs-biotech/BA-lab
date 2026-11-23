@@ -2,7 +2,6 @@
   "use strict";
 
   const SUPABASE_URL = "https://axcouwiodqsauwnsiotn.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8H4XRh8V07Hlo0WwdfOXwg_2RXRX992";
 
   const $ = (id) => document.getElementById(id);
   const states = ["loading", "missing", "error", "passport"];
@@ -116,7 +115,7 @@
         SUPABASE_URL + "/functions/v1/public-passport?token=" + encodeURIComponent(token),
         {
           method: "GET",
-          headers: { "apikey": SUPABASE_PUBLISHABLE_KEY, "Accept": "application/json" },
+          headers: { "Accept": "application/json" },
           signal: controller.signal,
           cache: "no-store"
         }
