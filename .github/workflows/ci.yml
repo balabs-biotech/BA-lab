@@ -400,6 +400,20 @@ jobs:
       - name: Verify generated administration entry point
         run: test -s dist/index.html
         working-directory: product-passport/admin
+      - name: Assemble and verify combined Cloudflare Pages artifact
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/passport-pages/admin"
+          cp product-passport/index.html "$RUNNER_TEMP/passport-pages/index.html"
+          cp product-passport/passport.css "$RUNNER_TEMP/passport-pages/passport.css"
+          cp product-passport/passport.js "$RUNNER_TEMP/passport-pages/passport.js"
+          cp product-passport/_headers "$RUNNER_TEMP/passport-pages/_headers"
+          cp -R product-passport/admin/dist/. "$RUNNER_TEMP/passport-pages/admin/"
+          test -s "$RUNNER_TEMP/passport-pages/index.html"
+          test -s "$RUNNER_TEMP/passport-pages/_headers"
+          test -s "$RUNNER_TEMP/passport-pages/admin/index.html"
+          grep -q 'src="/admin/' "$RUNNER_TEMP/passport-pages/admin/index.html"
+          echo "✓ Public passport and administration assembled in one Pages artifact"
 
   product-passport-public-page:
     runs-on: ubuntu-latest
