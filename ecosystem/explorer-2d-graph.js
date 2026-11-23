@@ -83,7 +83,7 @@ export function createPublicMycologyNetwork(tree,hub){
     let magnitude=Math.hypot(dx,dy);
     if(magnitude<1){dx=Math.cos(parent.angle||0);dy=Math.sin(parent.angle||0);magnitude=1;}
     const averageLength=group.reduce((sum,edge)=>sum+Math.hypot(edge.b.x-parent.x,edge.b.y-parent.y),0)/group.length;
-    const advance=Math.min(averageLength*.58,parent.level===0?110:parent.level===1?82:56);
+    const advance=averageLength*.58;
     const branchPoint={x:parent.x+dx/magnitude*advance,y:parent.y+dy/magnitude*advance};
     for(const edge of group)edge.branchPoint=branchPoint;
   }
