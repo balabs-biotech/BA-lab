@@ -106,3 +106,34 @@ test("accepts a pasted public QR URL from the manual lookup form", async () => {
   assert.equal(calls.length, 1);
   assert.match(calls[0].url, new RegExp("token=" + token));
 });
+
+test("renders untrusted public snapshot strings as text, never as HTML", async () => {
+  const payload = '<img src=x onerror=alert(1)>';
+  const { elements } = await render({
+    hash: "#/p?token=" + "C".repeat(43),
+    passport: {
+      product: { name: payload, description: payload, usage: payload },
+      lot: { code: payload },
+      alerts: [{ title: payload, summary: payload }]
+    }
+  });
+
+  assert.equal(elements["product-name"].textContent, payload);
+  assert.equal(elements["product-description"].textContent, payload);
+  assert.equal(elements["product-usage"].textContent, payload);
+  assert.equal(elements["lot-code"].textContent, payload);
+  assert.equal(elements["alerts-list"].children[0].children[0].textContent, payload);
+  assert.equal(elements["alerts-list"].children[0].children[1].textContent, payload);
+  assert.equal(elements["product-name"].innerHTML, undefined);
+});
+
+test("ships restrictive response headers for both public and admin surfaces", async () => {
+  const headers = await readFile(new URL("../_headers", import.meta.url), "utf8");
+  assert.match(headers, /X-Content-Type-Options: nosniff/);
+  assert.match(headers, /X-Frame-Options: DENY/);
+  assert.match(headers, /Referrer-Policy: strict-origin-when-cross-origin/);
+  assert.match(headers, /Content-Security-Policy:/);
+  assert.match(headers, /connect-src[^\\n]*axcouwiodqsauwnsiotn\\.supabase\\.co/);
+  assert.match(headers, /frame-ancestors 'none'/);
+  assert.match(headers, /object-src 'none'/);
+});
