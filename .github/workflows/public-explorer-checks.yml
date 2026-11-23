@@ -13,6 +13,7 @@ on:
   pull_request:
     paths:
       - "ecosystem/explorer-2d.js"
+      - "ecosystem/explorer-2d-pixi.js"
       - "ecosystem/explorer-2d-graph.js"
       - "ecosystem/notion-tree.*.json"
       - "scripts/test-public-explorer-graph.mjs"
