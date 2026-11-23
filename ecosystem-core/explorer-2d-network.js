@@ -9,13 +9,14 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
  * Organic territory packing + local collision relaxation.
  * The knowledge graph is immutable here: only visual coordinates are adjusted.
  */
-function packRootTerritories(nodes,tree){
+function packRootTerritories(nodes,tree,options={}){
  const roots=nodes.filter(n=>n.level===0);
  if(roots.length<2)return;
  const original=new Map(roots.map(r=>[r.id,{x:r.x,y:r.y}]));
  // Keep root territories identical across the public and Academy trees.
  // Content depth must not move the eight shared universe anchors.
- const mass=new Map(tree.map(root=>[root.id,144]));
+ const territoryMass=Number.isFinite(options.rootTerritoryMass)?Math.max(1,options.rootTerritoryMass):144;
+ const mass=new Map(tree.map(root=>[root.id,territoryMass]));
  const radius=r=>92+Math.sqrt(mass.get(r.id)||1)*8.5;
  for(let pass=0;pass<34;pass++){
   const shifts=new Map(roots.map(r=>[r.id,{x:0,y:0}]));
@@ -105,7 +106,7 @@ export function createVernpixiNetwork(tree,options={}){
   const rootLayoutIds=options.rootLayoutIds||tree.map(root=>root.id);
   // Uneven biological field anchors: deliberately not an eight-spoke radial layout.
   // Stable per-universe jitter keeps positions deterministic across reloads.
-  const anchors=[[-.62,-.34],[-.17,-.62],[.39,-.48],[.68,.08],[.24,.53],[-.34,.57],[-.70,.19],[.02,-.02]];
+  const anchors=options.rootAnchors||[[-.62,-.34],[-.17,-.62],[.39,-.48],[.68,.08],[.24,.53],[-.34,.57],[-.70,.19],[.02,-.02]];
   tree.forEach((root,i)=>{
    const anchor=anchors[i%anchors.length],layoutId=rootLayoutIds[i%rootLayoutIds.length],seed=hash(layoutId);
    const rx=anchor[0]*510+((seed&255)/255-.5)*58;
@@ -140,7 +141,7 @@ export function createVernpixiNetwork(tree,options={}){
   });
   // Rebalance root territories, then relax local crowding. Leaf tips stay present
   // in the topology but receive a stronger minimum separation in visual space.
-  packRootTerritories(nodes,tree);
+  packRootTerritories(nodes,tree,options);
   relaxBiologicalMorphology(nodes,edges);
   // Cross-universe connections come only from the Notion relation manifest.
   // page-content links are explicitly distinguished from direct Notion hyperlinks.
