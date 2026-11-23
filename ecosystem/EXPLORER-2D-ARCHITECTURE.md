@@ -56,6 +56,7 @@ La géométrie est fractale dans son principe de croissance, mais ne doit pas ê
 L’organicité ne doit jamais redevenir le fouillis de l’ancienne version. La lisibilité repose sur des règles explicites :
 - les huit territoires gardent des zones de croissance reconnaissables, sans être enfermés dans des secteurs ou des cercles ;
 - les filaments principaux sont plus lisibles que les branches secondaires, qui sont elles-mêmes plus lisibles que les hyphes terminales ;
+- les ramifications doivent progresser latéralement et se déployer en rhizomorphes, pas former huit faisceaux radiaux ou des éventails réguliers ;
 - les labels ne s’affichent qu’au niveau de zoom où ils peuvent être lus sans collision ;
 - les connexions transversales sont plus fines et moins lumineuses que les branches hiérarchiques ;
 - les anastomoses restent rares, locales et fondées sur des relations documentées ;
