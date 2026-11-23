@@ -286,6 +286,7 @@ jobs:
           node --check --input-type=module < ecosystem-core/explorer-2d-network.js
           node --check --input-type=module < ecosystem-core/explorer-2d-pixi.js
           node --check --input-type=module < ecosystem/explorer-2d-graph.js
+          node --check --input-type=module < ecosystem/explorer-2d-pixi.js
       - name: Install Playwright
         run: npm install --no-save --no-package-lock playwright
       - name: Install Chromium
