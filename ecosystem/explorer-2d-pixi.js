@@ -28,16 +28,19 @@ export async function createPixiRenderer(canvas){
   const terminalIds=new Set(nodes.filter(n=>n.level>0&&!branchParents.has(n.id)).map(n=>n.id));
   const bezierPoint=(a,c,b,t)=>{const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};};
   for(const e of edges){
+   const selectedRelation=!!selected&&(e.a.id===selected.id||e.b.id===selected.id);
+   if(e.cross&&!selectedRelation&&scale<3)continue;
    const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
    const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
-   const bend=Math.min(58,len*.19)*side*(.62+((seed>>>5)&63)/100);
-   const drift=(((seed>>>12)&255)/255-.5)*Math.min(24,len*.09);
+   const bendLimit=e.primaryHypha?Math.min(180,len*.30):e.cross?Math.min(130,len*.27):Math.min(92,len*.24);
+   const bend=bendLimit*side*(.62+((seed>>>5)&63)/100);
+   const drift=(((seed>>>12)&255)/255-.5)*Math.min(42,len*.14);
    const cx=(a.x+b.x)/2-dy/len*bend+dx/len*drift,cy=(a.y+b.y)/2+dx/len*bend+dy/len*drift;
    const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.15:e.cross?.55:e.primaryHypha?2.35:generation<=2?1.55:generation===3?1.12:Math.max(.42,.78-generation*.055))*(hot?1.55:1);
    const terminalTip=!e.cross&&terminalIds.has(e.b.id);
    const strokeColor=hot?0xe4e7dd:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
-   const strokeAlpha=hot?Math.max(.88,alpha):alpha*(e.verified?.82:e.cross?.34:depth>=3?.42:depth===2?.62:.78);
+   const strokeAlpha=hot?Math.max(.88,alpha):e.cross?(selectedRelation?.78:.13)*alpha:alpha*(depth>=3?.42:depth===2?.62:.78);
    if(hot)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:0xb96b4d,alpha:.16,width:widthBase*4.2,cap:"round"});
    if(terminalTip){
     // Taper the final hypha progressively; no terminal bead is drawn.
@@ -51,7 +54,7 @@ export async function createPixiRenderer(canvas){
     if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color,alpha:alpha*.12,width:widthBase*3.1,cap:"round"});
     filaments.moveTo(a.x,a.y).quadraticCurveTo(cx,cy,b.x,b.y).stroke({color:strokeColor,alpha:strokeAlpha,width:widthBase,cap:"round"});
    }
-   if(e.verified)junctions.circle(cx,cy,Math.max(1.25,1.8/Math.sqrt(scale))).fill({color:e.basis==="notion-link"?0xb96b4d:0x7eaaa3,alpha:.9});
+   if(e.verified&&(selectedRelation||scale>=3))junctions.circle(cx,cy,Math.max(1.1,1.45/Math.sqrt(scale))).fill({color:e.basis==="notion-link"?0xb96b4d:0x7eaaa3,alpha:selectedRelation?.8:.48});
    if(!reduced&&!e.cross&&alpha>.2){const particleCount=depth<=2&&len>150?3:depth<=2&&len>72?2:1;for(let particle=0;particle<particleCount;particle++){const phase=time*.00012+(seed%100)*.013+particle/particleCount,q=(phase*(depth===1?.7:.48))%1,u=1-q,x=u*u*a.x+2*u*q*cx+q*q*b.x,y=u*u*a.y+2*u*q*cy+q*q*b.y;filaments.circle(x,y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:particleCount===1?.82:.68});}}
   }
   for(const n of nodes){
