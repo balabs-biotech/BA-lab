@@ -55,6 +55,22 @@
     $("error-copy").textContent = message;
     show("error");
   };
+
+  const tokenFromInput = (value) => {
+    const raw = value.trim();
+    if (!raw) return null;
+    try {
+      const url = new URL(raw, window.location.origin);
+      const direct = url.searchParams.get("token");
+      if (direct) return direct;
+      const hash = url.hash.replace(/^#\\/?/, "");
+      const queryAt = hash.indexOf("?");
+      if (queryAt >= 0) return new URLSearchParams(hash.slice(queryAt + 1)).get("token");
+    } catch {
+      // A raw token is also accepted below.
+    }
+    return raw;
+  };
   const renderPassport = (data) => {
     const product = data?.product || {};
     const lot = data?.lot || {};
@@ -134,6 +150,27 @@
     } finally {
       window.clearTimeout(timeout);
     }
+  }
+
+  const lookupForm = $("manual-lookup");
+  if (lookupForm) {
+    lookupForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = $("passport-entry");
+      const token = tokenFromInput(input.value);
+      const valid = typeof token === "string" &&
+        token.length >= 32 &&
+        token.length <= 256 &&
+        /^[A-Za-z0-9_-]+$/.test(token);
+      $("lookup-error").hidden = valid;
+      if (!valid) {
+        input.setAttribute("aria-invalid", "true");
+        return;
+      }
+      input.removeAttribute("aria-invalid");
+      window.location.hash = "/p?token=" + encodeURIComponent(token);
+      init();
+    });
   }
 
   init();
