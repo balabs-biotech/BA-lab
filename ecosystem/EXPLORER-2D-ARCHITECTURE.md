@@ -55,6 +55,8 @@ La géométrie est fractale dans son principe de croissance, mais ne doit pas ê
 
 L’organicité ne doit jamais redevenir le fouillis de l’ancienne version. La lisibilité repose sur des règles explicites :
 - les huit territoires gardent des zones de croissance reconnaissables, sans être enfermés dans des secteurs ou des cercles ;
+- la caméra de vue globale calcule son cadre à partir des huit points d’inoculation et du noyau central, jamais à partir du seul centre de marque ;
+- sur mobile, l’ensemble des huit territoires doit rester visible à une échelle utile, sans simplement rabattre les labels sur les bords du viewport ;
 - les filaments principaux sont plus lisibles que les branches secondaires, qui sont elles-mêmes plus lisibles que les hyphes terminales ;
 - les ramifications doivent progresser latéralement et se déployer en rhizomorphes, pas former huit faisceaux radiaux ou des éventails réguliers ;
 - les labels ne s’affichent qu’au niveau de zoom où ils peuvent être lus sans collision ;
