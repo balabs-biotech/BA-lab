@@ -76,4 +76,59 @@ begin
       or has_function_privilege('authenticated',p.oid,'EXECUTE'))
   ) then raise exception 'Workflow RPC must be invoker-rights, service_role-only'; end if;
 end $$;
+
+-- Exercise the complete synthetic lifecycle without touching live BA Labs data.
+do $
+declare
+  actor_operator uuid := '00000000-0000-4000-8000-000000000001';
+  actor_reviewer uuid := '00000000-0000-4000-8000-000000000002';
+  token_hash text := repeat('a',64);
+  category_id uuid;
+  product_id uuid;
+  lot_id uuid;
+  check_id uuid;
+  passport_id uuid;
+  version_no integer;
+  snapshot jsonb;
+begin
+  insert into auth.users(id) values(actor_operator),(actor_reviewer) on conflict do nothing;
+  insert into public.product_categories(code,name_fr) values('TEST','Catégorie test') returning id into category_id;
+
+  product_id := public.create_product_with_public_info_with_audit(
+    category_id,'BA-TEST-001','Produit fixture',null,null,null,
+    'Description interne fixture','Description publique fixture','Utilisation fixture',actor_operator
+  );
+  lot_id := public.create_lot_with_audit(
+    product_id,'LOT-TEST-001',date '2026-11-23',date '2027-11-23',1,'unité',null,actor_operator
+  );
+  perform public.transition_lot_with_audit(lot_id,'in_production',null,actor_operator);
+  perform public.transition_lot_with_audit(lot_id,'awaiting_checks',null,actor_operator);
+
+  check_id := public.record_quality_check_with_audit(
+    lot_id,'Inspection visuelle','pass','Contrôle fixture',actor_operator
+  );
+  perform public.review_quality_check_with_audit(check_id,actor_reviewer);
+  perform public.release_lot_with_audit(lot_id,actor_reviewer);
+
+  passport_id := public.create_passport_draft_with_audit(lot_id,token_hash,actor_operator);
+  version_no := public.publish_passport_with_audit(passport_id,actor_reviewer);
+
+  select pv.snapshot into snapshot
+  from public.passport_versions pv
+  where pv.passport_id=passport_id and pv.version=version_no;
+
+  if version_no <> 1 then raise exception 'Expected first passport version, got %',version_no; end if;
+  if snapshot #>> '{product,name}' <> 'Produit fixture' then raise exception 'Published snapshot product name mismatch'; end if;
+  if snapshot #>> '{lot,code}' <> 'LOT-TEST-001' then raise exception 'Published snapshot lot code mismatch'; end if;
+  if snapshot #>> '{quality,status}' <> 'released' then raise exception 'Published snapshot quality state mismatch'; end if;
+  if snapshot->'alerts' <> '[]'::jsonb then raise exception 'Unexpected fixture alerts'; end if;
+  if snapshot ? 'internal_notes' then raise exception 'Internal lot notes leaked into public snapshot'; end if;
+  if not exists(
+    select 1 from public.passports p
+    join public.passport_versions pv on pv.passport_id=p.id and pv.version=p.current_version
+    where p.id=passport_id and p.qr_token_hash=token_hash and p.status='published'
+      and pv.snapshot=snapshot
+  ) then raise exception 'QR hash does not resolve to the current published snapshot'; end if;
+end $;
+
 rollback;
