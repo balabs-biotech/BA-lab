@@ -13,7 +13,7 @@ const ARMS=[
 ];
 const ARM_BY_INDEX=new Map(ARMS.flatMap(arm=>arm.indices.map((index,position)=>[index,{...arm,point:arm.points[position]}])));
 const COLOR_KEYS={
-  mycology:"myco",microbiology:"bio",plants:"soil",ecology:"lab",
+  mycology:"publicCore",microbiology:"bio",plants:"soil",ecology:"lab",
   bioprocesses:"products",biomaterials:"iot",instrumentation:"work",
   digital:"evidence",physical:"bio"
 };
