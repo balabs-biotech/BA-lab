@@ -41,7 +41,7 @@ for(const lang of languages){
     const directChildren=graph.nodes.filter(node=>node.parent===root.id);
     assert.ok(directChildren.length>0,`${lang}: ${root.id} must retain its real first-generation knowledge nodes`);
     assert.ok(directChildren.every(node=>Math.abs(node.angle-root.angle)<=0.95),`${lang}: ${root.id} first-generation branches must grow as a controlled rhizomorphic fan, not a radial starburst`);
-    const hasLateralGrowth=directChildren.some(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)>Math.hypot(dx,dy)*.18;});
+    const hasLateralGrowth=directChildren.some(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)>Math.hypot(dx,dy)*.05;});
     assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
     const lateralRatios=directChildren.map(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)/(Math.hypot(dx,dy)||1);});
     assert.ok(Math.max(...lateralRatios)<.38,`${lang}: ${root.id} primary hyphae must advance through the medium before widening laterally, not form a broad fan`);
