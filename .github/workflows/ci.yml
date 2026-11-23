@@ -384,6 +384,25 @@ jobs:
         env:
           BALABS_STORE_URL: http://127.0.0.1:8767/store/index.html
 
+  product-passport-admin-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: product-passport/admin/package.json
+      - name: Install administration dependencies
+        run: npm install --no-package-lock
+        working-directory: product-passport/admin
+      - name: Build administration and demonstration
+        run: npm run build
+        working-directory: product-passport/admin
+      - name: Verify generated administration entry point
+        run: test -s dist/index.html
+        working-directory: product-passport/admin
+
   product-passport-public-page:
     runs-on: ubuntu-latest
     steps:
