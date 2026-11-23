@@ -23,8 +23,8 @@ Champs du snapshot consommés :
 
 ## Sécurité
 
-- Clé publishable Supabase uniquement dans le navigateur.
-- Aucune clé `service_role`, aucun accès direct aux tables privées.
+- Aucune clé Supabase n'est nécessaire dans le navigateur : la fonction publique vérifie le jeton opaque côté serveur.
+- La clé `service_role` reste exclusivement côté Edge Function ; aucun accès direct aux tables privées.
 - Les données dynamiques sont injectées avec `textContent`, pas avec du HTML interprété.
 - Les réponses du passeport sont demandées avec `Cache-Control: no-store`.
 - La page est servie avec CSP, `X-Content-Type-Options`, `Referrer-Policy` et protection contre l'intégration en iframe.
