@@ -178,6 +178,12 @@ jobs:
         run: node scripts/test-store-order-notion-retry.mjs
       - name: Check store-catalogue Edge Function TypeScript syntax
         run: node --experimental-strip-types --check supabase/functions/store-catalogue/index.ts
+      - name: Check product passport Edge Function TypeScript syntax
+        run: |
+          node --experimental-strip-types --check supabase/functions/passport-admin/index.ts
+          node --experimental-strip-types --check supabase/functions/public-passport/index.ts
+      - name: Test product passport Edge Function security contract
+        run: node --test supabase/tests/product-passport-functions.test.mjs
       - name: Test public catalogue privacy contract
         run: node scripts/test-store-catalogue-contract.mjs
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
