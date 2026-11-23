@@ -42,6 +42,8 @@ assert.match(publicSource,/\.\/explorer-2d-pixi\.js/,'The public site must use i
 assert.doesNotMatch(publicRenderer,/branchPoint|drawnArms|upper-left|upper-right/,'The rebuilt public renderer must not contain legacy three-arm geometry');
 assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'The public renderer must not invent decorative branches that have no graph data');
 assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
+assert.match(publicRenderer,/if\(e\.cross&&!selectedRelation&&scale<3\)continue/,'Documented cross-territory anastomoses must stay quiet in the global overview and reveal progressively');
+assert.match(publicRenderer,/e\.primaryHypha\?Math\.min\(180,len\*\.30\)/,'Primary hyphae must use broad organic curvature rather than straight radial spokes');
 assert.match(publicSource,/\.\/explorer-2d-graph\.js/,'The public site must use its dedicated mycology-centered graph');
 assert.doesNotMatch(publicSource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'The public site must not use the Academy graph geometry');
 console.log(JSON.stringify({academy:'shared Vernpixi unchanged',public:'dedicated mycology core + eight-point fractal growth',academyNodes:academy.nodes.length,publicNodes:publicSpace.nodes.length},null,2));
