@@ -44,8 +44,10 @@ jobs:
           cp product-passport/index.html "$DEPLOY_DIR/index.html"
           cp product-passport/passport.css "$DEPLOY_DIR/passport.css"
           cp product-passport/passport.js "$DEPLOY_DIR/passport.js"
+          cp product-passport/_headers "$DEPLOY_DIR/_headers"
           cp -R product-passport/admin/dist/. "$DEPLOY_DIR/admin/"
           test -s "$DEPLOY_DIR/index.html"
+          test -s "$DEPLOY_DIR/_headers"
           test -s "$DEPLOY_DIR/admin/index.html"
           echo "DEPLOY_DIR=$DEPLOY_DIR" >> "$GITHUB_ENV"
 
