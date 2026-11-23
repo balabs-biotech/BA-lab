@@ -13,11 +13,12 @@ Ce document décrit le rendu 2D du **site public BA Labs**. Il ne redéfinit ni 
 
 Le graphe public représente BA Labs comme un organisme scientifique global composé de territoires autonomes et interconnectés.
 
-1. L’identité BA Labs et son logo occupent le centre visuel.
-2. Le noyau mycologique forme le tissu de connexion privilégié de l’organisme.
-3. Les huit territoires autonomes sont `microbiology`, `plants`, `ecology`, `bioprocesses`, `biomaterials`, `instrumentation`, `digital` et `physical`.
-4. Chaque territoire développe ses propres ramifications à partir de ses pages et sous-pages Notion.
-5. Des connexions transversales relient les territoires lorsque les relations sont étayées par les données Notion ou par des éléments de contenu vérifiables.
+1. Le nœud d’identité BA Labs occupe le centre géométrique ; le fichier maître du logo devra être intégré au rendu central lorsqu’il sera disponible dans les assets du site.
+2. Le noyau mycologique se développe immédiatement autour de cette identité et forme le tissu de connexion privilégié de l’organisme.
+3. La géométrie mycologique utilise trois bras inégaux en Y, avec des jonctions partagées, plutôt qu’une couronne de huit satellites.
+4. Les huit territoires autonomes sont `microbiology`, `plants`, `ecology`, `bioprocesses`, `biomaterials`, `instrumentation`, `digital` et `physical`.
+5. Chaque territoire développe ses propres ramifications à partir de ses pages et sous-pages Notion.
+6. Des connexions transversales relient les territoires lorsque les relations sont étayées par les données Notion ou par des éléments de contenu vérifiables.
 
 Le noyau mycologique ne doit pas être traité comme un hub en étoile auquel huit satellites seraient suspendus. Il doit apparaître comme une structure vivante qui traverse, relie et nourrit l’organisme. Les territoires gardent néanmoins leur autonomie topologique et éditoriale.
 
@@ -28,6 +29,8 @@ Le noyau mycologique ne doit pas être traité comme un hub en étoile auquel hu
 - Les connexions entre territoires doivent être traçables et ne doivent jamais être inventées pour améliorer la symétrie.
 - Les ramifications peuvent croître à mesure que les manifests Notion évoluent ; les identifiants stables doivent préserver la continuité.
 - La géométrie est déterministe pour un même ensemble de données, mais asymétrique et non radiale.
+- Les trois troncs mycéliens partagés sont des éléments de structure visuelle ; les huit territoires restent des nœuds de données autonomes.
+- Le jeton de couleur `publicCore` et les chemins de branche `branchPoint` sont réservés au graphe public ; le comportement et la palette historiques de l’Academy restent inchangés.
 
 ## Rendu biologique
 
@@ -67,4 +70,4 @@ La référence visuelle combine colonisation mycélienne sur gélose et réseau 
 
 ## État
 
-La branche `rebuild/public-mycology-constellation` porte la refonte du site public. La validation structurelle multilingue passe, mais le test navigateur de l’explorateur doit encore être corrigé et réussi. La PR ne doit pas être fusionnée ni déployée avant validation complète.
+La branche `rebuild/public-mycology-constellation` porte la refonte du site public. La géométrie à trois bras et le nœud d’identité BA Labs sont implémentés ; les tests doivent être relancés sur le dernier commit et le rendu desktop/mobile doit encore être inspecté. La PR ne doit pas être fusionnée ni déployée avant validation complète.
