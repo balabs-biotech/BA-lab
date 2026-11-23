@@ -36,13 +36,13 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
-    const spread=clamp(0.88+Math.log2(kids.length+1)*0.42,1.02,2.58);
+    const spread=clamp(0.44+Math.log2(kids.length+1)*0.16,0.5,1.35);
     const distance=depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1);
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
       const fraction=kids.length===1?(((seed>>>9)&255)/255-.5)*0.3:index/(kids.length-1)-.5;
-      const localDrift=(((seed>>>8)&255)/255-.5)*0.38;
-      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*0.13;
+      const localDrift=(((seed>>>8)&255)/255-.5)*0.28;
+      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*0.08;
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
       const lateral=(((seed>>>2)&255)/255-.5)*Math.min(36,distance*0.23);
