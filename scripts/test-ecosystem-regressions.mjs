@@ -12,7 +12,7 @@ const publicExplorerJs = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 
 assert.ok(publicExplorerJs.includes('selection-dock') && publicExplorerJs.includes('selection-open-link'), 'Selecting a 2D node must render a compact selection dock with its direct resource action');
 assert.ok(publicExplorerJs.includes('selected.data.url') && publicExplorerJs.includes('https:'), 'The selection action must use the verified Notion URL carried by the selected manifest node');
-assert.ok(publicExplorerJs.includes('function activateNode(n)') && publicExplorerJs.includes('window.open(url,"_blank","noopener,noreferrer")'), 'Clicking a visible 2D point must open that exact node page in Notion in a new tab while preserving the explorer');
+assert.ok(publicExplorerJs.includes('function activateNode(n){if(!n)return;focusNode(n);}'), 'Selecting a visible 2D point must focus it without navigating away');
 assert.ok(publicExplorerJs.includes('function pointerUp(e)') && publicExplorerJs.includes('canvas.addEventListener("pointerup",pointerUp)') && publicExplorerJs.includes('if(n)activateNode(n)'), 'Canvas navigation must open the selected canonical Notion destination on a single click');
 assert.ok(!html.includes('#selection{position:absolute!important;width:1px!important'), 'The public explorer must not clip the selected-node dock out of view');
 
@@ -84,8 +84,8 @@ const explorer = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 assert.ok(explorer.includes('createPixiRenderer') && explorer.includes('fetch("./notion-tree."+lang+".json"'), 'The existing PixiJS 2D engine must load the active language manifest');
 assert.ok(explorer.includes('Expected 8 scientific universes') && explorer.includes('function buildNetwork()') && explorer.includes('createPublicMycologyNetwork'), 'The public 2D engine must build the mycology hub and eight universes through its dedicated graph module');
 assert.ok(explorer.includes('microbiology:') && explorer.includes('instrumentation:') && explorer.includes('physical:'), 'The public 2D engine must retain its canonical Notion universe identifiers');
-assert.ok(explorer.includes('function activateNode(n)') && explorer.includes('window.open(url,"_blank","noopener,noreferrer")'), 'A double-clicked point must open its exact Notion destination');
-assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('if(n)activateNode(n)') && !explorer.includes('e.detail<2'), 'Point activation must open the exact Notion page on a single click');
+assert.ok(explorer.includes('function activateNode(n){if(!n)return;focusNode(n);}'), 'Selecting a point must focus it without automatic external navigation');
+assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('if(n)activateNode(n)') && explorer.includes('selection-open-link'), 'Point activation must select the node and expose an explicit Notion action');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
 for (const id of expectedExplorerDomains) assert.ok(universeEntry.includes("'" + id + "'"), 'Direct universe routing must allow ' + id);
 for (const id of expectedExplorerDomains) {
