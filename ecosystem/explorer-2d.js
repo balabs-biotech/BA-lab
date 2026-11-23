@@ -22,9 +22,9 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
- canvas.dataset.engine="vernpixi-shared";
+ canvas.dataset.engine="public-mycology-constellation";
  const graph=createPublicMycologyNetwork(tree,HUB[lang]);
- nodes=graph.nodes;edges=graph.edges;byId=graph.byId;relationIndex=graph.relationIndex;
+ nodes=graph.nodes;edges=graph.edges;byId=graph.byId;relationIndex=graph.relationIndex;canvas.dataset.hubConnections=String(edges.filter(edge=>edge.hubLink).length);
  for(const [key,value] of Object.entries(graph.stats))canvas.dataset[key]=String(value);
  canvas.dataset.universeCount=String(graph.stats.universeCount);
  canvas.dataset.nodeCount=String(graph.stats.nodeCount);
