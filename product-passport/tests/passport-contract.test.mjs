@@ -9,6 +9,9 @@ class Element {
   constructor() { this.hidden = false; this.textContent = ""; this.children = []; this.className = ""; }
   append(...items) { this.children.push(...items); }
   replaceChildren(...items) { this.children = items; }
+  addEventListener(type, callback) { this.listeners ||= {}; this.listeners[type] = callback; }
+  setAttribute(name, value) { this.attributes ||= {}; this.attributes[name] = value; }
+  removeAttribute(name) { if (this.attributes) delete this.attributes[name]; }
 }
 
 async function render({ search = "", hash = "", passport = null } = {}) {
@@ -16,7 +19,7 @@ async function render({ search = "", hash = "", passport = null } = {}) {
     "loading", "missing", "error", "passport", "error-title", "error-copy",
     "product-name", "product-code", "product-category", "lot-code", "facts",
     "description-section", "product-description", "usage-section", "product-usage",
-    "alerts-section", "alerts-list", "published-date"
+    "alerts-section", "alerts-list", "published-date", "manual-lookup", "passport-entry", "lookup-error"
   ];
   const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
   const calls = [];
@@ -25,7 +28,7 @@ async function render({ search = "", hash = "", passport = null } = {}) {
     createElement: () => new Element()
   };
   const window = {
-    location: { search, hash },
+    location: { search, hash, origin: "https://ba-labs-product-passport.pages.dev/" },
     setTimeout: () => 1,
     clearTimeout: () => {}
   };
@@ -35,11 +38,11 @@ async function render({ search = "", hash = "", passport = null } = {}) {
   };
 
   vm.runInNewContext(source, {
-    document, window, fetch, URLSearchParams, AbortController, Intl, Date,
+    document, window, fetch, URL, URLSearchParams, AbortController, Intl, Date,
     encodeURIComponent
   });
   await new Promise(resolve => setTimeout(resolve, 0));
-  return { elements, calls };
+  return { elements, calls, window };
 }
 
 test("renders the actual published snapshot schema from the QR hash", async () => {
@@ -90,4 +93,16 @@ test("shows the QR entry state when no token is present", async () => {
   const { elements, calls } = await render();
   assert.equal(calls.length, 0);
   assert.equal(elements.missing.hidden, false);
+});
+
+test("accepts a pasted public QR URL from the manual lookup form", async () => {
+  const token = "B".repeat(43);
+  const { elements, calls, window } = await render();
+  elements["passport-entry"].value = "https://ba-labs-product-passport.pages.dev/#/p?token=" + token;
+  elements["manual-lookup"].listeners.submit({ preventDefault() {} });
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  assert.equal(window.location.hash, "/p?token=" + token);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, new RegExp("token=" + token));
 });
