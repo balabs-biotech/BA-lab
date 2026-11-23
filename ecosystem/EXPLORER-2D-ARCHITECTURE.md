@@ -80,7 +80,7 @@ Aucune connexion ne doit être ajoutée uniquement pour remplir visuellement l�
 - Les identifiants stables sont conservés entre langues.
 - Les destinations Notion restent localisées.
 - L’arabe utilise le sens de lecture RTL.
-- Les relations transversales sont fondées sur les données disponibles ; leur preuve et leur type doivent rester traçables.
+- Les relations transversales sont fondées sur les données disponibles, y compris lorsqu’elles sont portées par des pages imbriquées ; leur preuve et leur type doivent rester traçables.
 
 ## Direction visuelle
 
