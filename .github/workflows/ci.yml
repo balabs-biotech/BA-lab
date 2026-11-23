@@ -383,3 +383,20 @@ jobs:
         run: node scripts/test-storefront-browser.mjs
         env:
           BALABS_STORE_URL: http://127.0.0.1:8767/store/index.html
+
+  product-passport-public-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check public passport page JavaScript
+        run: node --check product-passport/passport.js
+      - name: Test QR token and published snapshot rendering
+        run: node --test product-passport/tests/passport-contract.test.mjs
+      - name: Verify page assets are present
+        run: |
+          test -s product-passport/index.html
+          test -s product-passport/passport.css
+          test -s product-passport/passport.js
