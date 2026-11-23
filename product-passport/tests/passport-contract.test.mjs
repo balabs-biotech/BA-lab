@@ -133,7 +133,7 @@ test("ships restrictive response headers for both public and admin surfaces", as
   assert.match(headers, /X-Frame-Options: DENY/);
   assert.match(headers, /Referrer-Policy: strict-origin-when-cross-origin/);
   assert.match(headers, /Content-Security-Policy:/);
-  assert.match(headers, /connect-src[^\\n]*axcouwiodqsauwnsiotn\\.supabase\\.co/);
+  assert.ok(headers.includes("connect-src 'self' https://axcouwiodqsauwnsiotn.supabase.co"));
   assert.match(headers, /frame-ancestors 'none'/);
   assert.match(headers, /object-src 'none'/);
 });
