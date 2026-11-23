@@ -4,9 +4,9 @@ Cette application React/Vite est la surface interne de gestion du passeport prod
 
 ## Rôles des surfaces
 
-- `../` : page publique consultée par les clients après scan du QR.
-- `admin/` : interface interne de gestion, avec connexion Supabase, références produits, lots, contrôles qualité, incidents, publication et génération des QR.
-- `#/demo` : démonstration ouverte, limitée à des données fictives et en lecture seule.
+- `/` : page publique consultée par les clients après scan du QR.
+- `/admin/` : interface interne de gestion, avec connexion Supabase, références produits, lots, contrôles qualité, incidents, publication et génération des QR.
+- `/admin/#/demo` : démonstration ouverte, limitée à des données fictives et en lecture seule.
 
 ## Connexions
 
@@ -41,8 +41,17 @@ Build de vérification :
 npm run build
 ```
 
-Le build produit `dist/`. Le chemin de publication final sous le domaine Cloudflare doit être configuré pour servir l'administration sous `/admin/`, sans remplacer la page publique à la racine.
+Vite compile les assets avec la base `/admin/`. Le workflow de publication assemble la page publique à la racine et le build React sous `/admin/`, dans un seul artefact Pages.
+
+## Déploiement Cloudflare
+
+Le workflow manuel `.github/workflows/deploy-product-passport.yml` publie l'artefact combiné vers le projet Pages existant `ba-labs-product-passport`. Il nécessite deux secrets GitHub Actions :
+
+- `CLOUDFLARE_API_TOKEN` : jeton API Cloudflare limité à Pages Write sur le compte BA Labs.
+- `CLOUDFLARE_ACCOUNT_ID` : identifiant du compte Cloudflare.
+
+Le workflow n'est pas déclenché automatiquement par les pull requests. Il doit être lancé manuellement après fusion et vérification des changements sur `main`. Ne jamais placer un jeton Cloudflare dans le code ou dans un fichier de configuration.
 
 ## État du déploiement
 
-Le code source est maintenant migré dans le dépôt `BA-lab`. La version publique de consultation reste déployée sur Cloudflare Pages. Le déploiement de l'administration migrée est une étape distincte : ne pas considérer l'ancienne URL AppDeploy comme connectée au projet Supabase actif tant que la nouvelle build n'est pas publiée et testée.
+Le code source est migré dans le dépôt `BA-lab`. La version publique actuellement en production reste inchangée jusqu'à l'exécution et à la vérification du workflow de publication. L'ancienne URL AppDeploy n'est pas considérée comme connectée au projet Supabase actif.
