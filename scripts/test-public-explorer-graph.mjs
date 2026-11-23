@@ -46,6 +46,15 @@ for(const lang of languages){
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
   assert.ok(graph.edges.some(edge=>edge.generation>=2),lang+": recursive knowledge branches must carry their biological generation");
+  const siblingGroups=new Map();
+  for(const edge of graph.edges.filter(edge=>edge.fractal)){
+    if(!siblingGroups.has(edge.a.id))siblingGroups.set(edge.a.id,[]);
+    siblingGroups.get(edge.a.id).push(edge);
+  }
+  const branchedGroups=[...siblingGroups.entries()].filter(([,edges])=>edges.length>1);
+  assert.ok(branchedGroups.length>0,lang+": real branching junctions must exist");
+  assert.ok(branchedGroups.every(([,edges])=>edges.every(edge=>edge.branchPoint&&Number.isFinite(edge.branchPoint.x)&&Number.isFinite(edge.branchPoint.y))),lang+": sibling hyphae must share one biological branch origin instead of radiating independently from their parent");
+  assert.ok(branchedGroups.every(([parentId,edges])=>{const parent=graph.byId.get(parentId),point=edges[0].branchPoint;return Math.hypot(point.x-parent.x,point.y-parent.y)>8&&edges.every(edge=>edge.branchPoint.x===point.x&&edge.branchPoint.y===point.y);}),lang+": each branch junction must advance along a shared growth trunk before lateral bifurcation");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
