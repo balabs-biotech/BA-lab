@@ -9,6 +9,12 @@ end $$;
 create schema if not exists auth;
 create table if not exists auth.users(id uuid primary key);
 create schema if not exists storage;
+create table if not exists public.audit_events(
+  id uuid primary key default gen_random_uuid(), actor_id uuid, action text not null,
+  target_type text not null, target_id text not null, occurred_at timestamptz not null default now(),
+  outcome text not null, metadata jsonb not null default '{}'::jsonb, request_id text,
+  created_at timestamptz not null default now()
+);
 create table if not exists storage.buckets(
   id text primary key, name text not null, public boolean not null default false,
   file_size_limit bigint, allowed_mime_types text[]
@@ -46,5 +52,27 @@ begin
   if not exists(select 1 from pg_trigger where tgname='passport_versions_immutable' and not tgisinternal) then
     raise exception 'Immutable passport-version trigger missing';
   end if;
+  if (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+      where n.nspname='public' and p.proname in (
+        'approve_alert_with_audit','archive_document_with_audit','create_alert_draft_with_audit',
+        'create_incident_with_scope_with_audit','create_lot_with_audit','create_passport_draft_with_audit',
+        'create_product_with_public_info_with_audit','publish_alert_with_audit','publish_passport_with_audit',
+        'record_quality_check_with_audit','register_document_upload_with_audit','release_lot_with_audit',
+        'review_quality_check_with_audit','revoke_passport_with_audit','rotate_passport_token_with_audit',
+        'transition_lot_with_audit','update_incident_with_audit'
+      )) <> 17 then raise exception 'Expected all 17 product-passport workflow RPCs'; end if;
+  if exists(
+    select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+    where n.nspname='public' and p.proname in (
+      'approve_alert_with_audit','archive_document_with_audit','create_alert_draft_with_audit',
+      'create_incident_with_scope_with_audit','create_lot_with_audit','create_passport_draft_with_audit',
+      'create_product_with_public_info_with_audit','publish_alert_with_audit','publish_passport_with_audit',
+      'record_quality_check_with_audit','register_document_upload_with_audit','release_lot_with_audit',
+      'review_quality_check_with_audit','revoke_passport_with_audit','rotate_passport_token_with_audit',
+      'transition_lot_with_audit','update_incident_with_audit'
+    ) and (p.prosecdef or not has_function_privilege('service_role',p.oid,'EXECUTE')
+      or has_function_privilege('anon',p.oid,'EXECUTE')
+      or has_function_privilege('authenticated',p.oid,'EXECUTE'))
+  ) then raise exception 'Workflow RPC must be invoker-rights, service_role-only'; end if;
 end $$;
 rollback;
