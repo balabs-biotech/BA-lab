@@ -36,7 +36,7 @@ function buildNetwork(){
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
 function fitOverview(){
- const roots=nodes.filter(n=>n.level===0);
+ const roots=nodes.filter(n=>n.level<=1);
  if(!roots.length){targetScale=.5;targetOffset={x:0,y:0};return;}
  const minX=Math.min(...roots.map(n=>n.x)),maxX=Math.max(...roots.map(n=>n.x));
  const minY=Math.min(...roots.map(n=>n.y)),maxY=Math.max(...roots.map(n=>n.y));
