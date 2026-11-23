@@ -1,76 +1,61 @@
-# PixiJS 2D — moteur de l’organisme BA Labs
+# PixiJS 2D — moteur public BA Labs
 
-## Périmètre
+## Périmètre et séparation
 
-Ce document décrit le rendu 2D du **site public BA Labs**. Il ne redéfinit ni le moteur de l’Academy, ni CultureOps, ni les expériences 3D historiques.
+Ce document décrit exclusivement le renderer du site public BA Labs.
 
-- `../ecosystem-core/explorer-2d-pixi.js` : renderer PixiJS/WebGL partagé lorsqu’il est réutilisé par les interfaces.
-- `explorer-2d-graph.js` : topologie dédiée au graphe du site public.
-- `explorer-2d.js` : chargement des données, caméra, gestes, sélection, internationalisation et navigation accessible.
-- Les arbres Notion FR / EN / AR / PT restent la source de vérité pour les contenus et leurs identifiants.
+- `explorer-2d-pixi.js` : renderer PixiJS/WebGL autonome du site public.
+- `explorer-2d-graph.js` : topologie publique, centre mycologique, huit points d’inoculation, ramifications déterministes et relations transversales documentées.
+- `explorer-2d.js` : données, caméra, gestes, sélection, internationalisation et navigation accessible.
+- `../ecosystem-core/explorer-2d-pixi.js` et `../ecosystem-core/explorer-2d-network.js` : moteurs historiques de l’Academy, conservés indépendamment.
 
-## Modèle de l’organisme
+Le site public ne doit plus importer le renderer PixiJS de l’Academy. Les deux moteurs partagent uniquement un contrat visuel : identité BA Labs, noyau mycologique, ordre des huit territoires et leurs repères chromatiques. Leurs rendus, géométries, interactions et cycles de vie restent indépendants.
 
-Le graphe public représente BA Labs comme un organisme scientifique global composé de territoires autonomes et interconnectés.
+## Organisme et topologie
 
-1. Le symbole BA Labs est le repère central de la composition ; il doit reprendre la même identité visuelle que l’Academy.
-2. La mycologie constitue le noyau biologique au centre, intégré au signe de marque et prolongé par le réseau de filaments.
-3. Le Y du logo sert de géométrie d’inoculation, pas de classification rigide en trois bras.
-4. Les huit univers prennent leurs points d’ancrage autour du centre selon les huit repères du symbole BA Labs.
-5. Les univers sont exactement `microbiology`, `plants`, `ecology`, `bioprocesses`, `biomaterials`, `instrumentation`, `digital` et `physical`.
-6. Chaque univers développe une croissance fractale organique à partir de ses pages et sous-pages Notion.
-7. Des connexions transversales relient les territoires lorsque les relations sont étayées par les données Notion ou par des éléments de contenu vérifiables.
+L’espace public représente un organisme scientifique continu :
+- identité BA Labs au centre ;
+- mycologie comme tissu vivant de connexion ;
+- huit territoires autonomes : `microbiology`, `plants`, `ecology`, `bioprocesses`, `biomaterials`, `instrumentation`, `digital`, `physical` ;
+- un point d’inoculation stable par territoire ;
+- des ramifications déterministes dont la position dépend des contenus et de leur hiérarchie ;
+- des hyphes transversales uniquement lorsqu’une relation documentée relie deux territoires.
 
-Le centre, les huit univers, leur ordre et leur identité chromatique constituent un contrat visuel partagé avec l’Academy. Les deux expériences gardent leurs moteurs, interactions et comportements propres. Les territoires ne sont ni des satellites décoratifs ni des secteurs fermés : ils restent autonomes, identifiables et connectés au tissu mycologique.
-
-## Topologie et preuve des relations
-
-- Les liens parent-enfant suivent strictement la hiérarchie des arbres Notion.
-- Les liens transversaux conservent leur base de preuve : relation Notion explicite ou relation fondée sur le contenu.
-- Les connexions entre territoires doivent être traçables et ne doivent jamais être inventées pour améliorer la symétrie.
-- Les ramifications peuvent croître à mesure que les manifests Notion évoluent ; les identifiants stables doivent préserver la continuité.
-- La géométrie est déterministe, fractale dans sa croissance, asymétrique et non radiale.
-- Les huit points d’ancrage et les couleurs de premier niveau doivent être communs au site public et à l’Academy.
-- Les ramifications internes appartiennent à leur univers ; leur croissance ne doit pas déplacer arbitrairement les sept autres territoires.
-- Les anastomoses locales sont limitées, irrégulières et fondées sur des relations de contenu ; elles ne doivent pas créer de grille ni de toile confuse.
-- Le cadrage initial doit inclure le centre et les huit ancrages sans couper les labels sur mobile.
+L’ajout d’une ressource dans un territoire ne doit pas déplacer ni recolorer les sept autres. Les huit coordonnées actuelles sont provisoires : l’asset source du logo officiel doit encore être ajouté pour caler précisément les points d’inoculation sur le symbole de marque.
 
 ## Rendu biologique
 
-PixiJS dessine un champ continu de filaments, de nœuds et de particules :
-- hyphes primaires, secondaires et tertiaires, avec variations de longueur, courbure et épaisseur ;
-- bifurcations irrégulières qui évoquent une croissance rhizomorphique depuis chaque point d’inoculation ;
-- anastomoses locales, rares et correspondant à des relations réelles ;
-- densité qui augmente avec l’exploration et le niveau de zoom ;
-- particules qui suivent les arêtes du graphe plutôt que de dériver sans relation ;
-- niveaux de détail et labels adaptés à la caméra.
+Le renderer doit distinguer explicitement :
+- **hyphes primaires** : tissu de connexion entre le noyau mycologique et les huit points d’inoculation ;
+- **ramifications secondaires et tertiaires** : arêtes réelles de la hiérarchie Notion, avec épaisseur et intensité décroissantes selon la génération ;
+- **anastomoses transversales** : relations Notion ou relations de contenu vérifiables, plus fines et moins lumineuses que les filaments hiérarchiques ;
+- **pointes de croissance** : extrémités ouvertes et effilées, sans bille terminale.
 
-La référence visuelle est un mycélium rhizomorphique qui colonise une gélose depuis plusieurs points d’inoculation, avec une logique de croissance fractale. Le rendu doit rester maîtrisé : les territoires et leurs couleurs doivent être identifiables, les branches principales hiérarchisées et les connexions transversales moins dominantes. L’effet doit être organique, fin et lisible, sans fouillis, sans roues de satellites ni géométrie répétitive.
+Aucune branche latérale décorative ne doit être inventée par le renderer pour remplir l’espace. Une bifurcation visible doit correspondre à une ramification réelle du graphe. Les courbures, dérives et épaisseurs peuvent varier de façon déterministe pour donner une morphologie rhizomorphique, sans créer de nouveaux liens.
 
-## Interaction
+La couleur du filament doit provenir du territoire auquel il appartient, y compris pour les huit hyphes primaires issues du noyau central. Les liens transversaux restent visuellement secondaires. Le fond, les halos et les particules doivent rester sobres et ne pas concurrencer les structures biologiques.
 
-- Panoramique et zoom molette, boutons et pincement tactile.
-- La caméra se centre sur le nœud sélectionné et révèle son voisinage.
-- La sélection ne déclenche jamais automatiquement une navigation externe.
-- La fiche de sélection expose un lien Notion explicite.
-- La navigation DOM accessible et clavier doit offrir le même comportement.
-- `prefers-reduced-motion` réduit ou désactive les mouvements non essentiels.
+## Interaction et lisibilité
 
-## Performance et validation
+- Un seul champ 2D continu ; zoom et panoramique sans changement de scène.
+- Zoom molette, boutons et pincement tactile.
+- La sélection centre la caméra et révèle la fiche de ressource.
+- L’ouverture de Notion reste une action explicite dans la fiche.
+- Les labels apparaissent progressivement selon le zoom et évitent les collisions.
+- La navigation DOM/clavier expose les mêmes contenus.
+- `prefers-reduced-motion` réduit les animations non essentielles.
+- Les animations doivent être suspendues lorsque l’explorateur est hors écran ou que l’onglet est masqué.
 
-- Conserver des identifiants et une topologie déterministes.
-- Éviter les allocations répétées de Graphics à chaque frame ; privilégier les conteneurs et géométries retenus.
-- Contrôler la densité des filaments, les collisions de labels et le coût des particules sur mobile.
-- Vérifier le rendu WebGL sur desktop et mobile réel ou via un navigateur automatisé avec WebGL.
-- Ne pas augmenter la densité visuelle au détriment de la lisibilité ou de la fluidité.
+## Validation
+
+Avant toute fusion :
+1. vérifier la topologie dans FR / EN / AR / PT ;
+2. vérifier l’absence de géométrie héritée des trois bras dans le renderer public ;
+3. vérifier que les ramifications visibles correspondent aux arêtes du graphe ;
+4. exécuter les tests navigateur desktop et mobile ;
+5. contrôler les labels, le cadrage, les performances WebGL et `prefers-reduced-motion` ;
+6. confirmer que l’Academy conserve son renderer et ses comportements historiques.
 
 ## Hors périmètre
 
-- Garder les moteurs et interactions du site public et de l’Academy indépendants ; seul leur contrat visuel central (logo, huit univers, ordre, ancrages et couleurs) est commun.
-- Ne pas modifier CultureOps.
-- Ne pas modifier les moteurs 3D historiques.
-- Ne pas changer l’hébergement GitHub Pages dans le cadre de ce chantier.
-
-## État
-
-La branche `rebuild/public-mycology-constellation` porte la refonte du site public. La topologie à trois bras fixes ne correspond pas à la direction biologique fractale désormais retenue ; elle doit être remplacée par huit points d’inoculation alignés sur le symbole BA Labs, puis des ramifications contrôlées propres à chaque univers. La PR ne doit pas être fusionnée ni déployée avant validation complète.
+Aucune modification de CultureOps, des expériences 3D historiques, de l’hébergement GitHub Pages ou du moteur Academy dans le cadre de ce chantier.
