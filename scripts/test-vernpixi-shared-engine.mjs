@@ -36,7 +36,7 @@ assert.match(academySource,/\.\.\/ecosystem-core\/explorer-2d-pixi\.js/,'Academy
 assert.match(academySource,/\.\.\/ecosystem-core\/explorer-2d-network\.js/,'Academy must retain the shared Vernpixi graph geometry');
 const sharedRenderer=await readFile('ecosystem-core/explorer-2d-pixi.js','utf8');
 assert.match(sharedRenderer,/myco:0xb18fc2/,'The Academy mycology palette token must remain unchanged');
-assert.match(sharedRenderer,/if\(e\.branchPoint\)/,'The Academy renderer must retain its historical optional branch-path behavior');
+assert.doesNotMatch(sharedRenderer,/publicCore|branchPoint|drawnArms|upper-left|upper-right/,'The Academy renderer must remain free of public-only logo and branch geometry');
 const publicRenderer=await readFile('ecosystem/explorer-2d-pixi.js','utf8');
 assert.match(publicSource,/\.\/explorer-2d-pixi\.js/,'The public site must use its own renderer implementation');
 assert.doesNotMatch(publicRenderer,/branchPoint|drawnArms|upper-left|upper-right/,'The rebuilt public renderer must not contain legacy three-arm geometry');
