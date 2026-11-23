@@ -1,33 +1,70 @@
-# PixiJS 2D mycelium renderer
+# PixiJS 2D — moteur de l’organisme BA Labs
 
-## Current migration slice
+## Périmètre
 
-The 2D explorer now uses PixiJS v8 as its primary WebGL renderer. The existing graph model, eight-language tree loading, stable node IDs, hit testing, pan/zoom camera, and Notion resource links remain in the explorer controller.
+Ce document décrit le rendu 2D du **site public BA Labs**. Il ne redéfinit ni le moteur de l’Academy, ni CultureOps, ni les expériences 3D historiques.
 
-- `../ecosystem-core/explorer-2d-pixi.js`: the shared PixiJS/WebGL renderer used by both the Academy and public explorer.
-- `../ecosystem-core/explorer-2d-network.js`: the shared eight-anchor geometry, recursive branch placement, evidence-backed Notion relations and local anastomoses. Each explorer supplies its own Notion tree; the public explorer maps its eight root IDs onto the Academy's canonical anchor order.
-- `explorer-2d.js`: data loading, deterministic graph topology, camera, gestures, selection and accessible node navigation.
-- DaisyUI remains the shell/component layer; it is not used to render the biological field.
-- The historical 3D engine is outside this migration and must not be modified.
+- `../ecosystem-core/explorer-2d-pixi.js` : renderer PixiJS/WebGL partagé lorsqu’il est réutilisé par les interfaces.
+- `explorer-2d-graph.js` : topologie dédiée au graphe du site public.
+- `explorer-2d.js` : chargement des données, caméra, gestes, sélection, internationalisation et navigation accessible.
+- Les arbres Notion FR / EN / AR / PT restent la source de vérité pour les contenus et leurs identifiants.
 
-## Rendering and biological direction
+## Modèle de l’organisme
 
-PixiJS owns the field rendering. The topology remains driven by the Notion tree and stable IDs. The eight universe anchors now occupy an irregular spatial field instead of an eight-spoke ring. Cross-universe links are selected by nearest-neighbour distance, with first-generation anastomoses and within-universe branch links. Main hyphae, lateral hyphae and cross-links are rendered as seeded, asymmetrically curved filaments; deeper generations fade in with camera scale. The visual language must stay asymmetric and microscopy-inspired: no planets, radial cards, tubes, starburst hubs or decorative spheres.
+Le graphe public représente BA Labs comme un organisme scientifique global composé de territoires autonomes et interconnectés.
 
-tsParticles is not loaded as a second independent canvas. Its useful motion concepts (noise-driven drift, trails and particle flow) should be integrated only where they can follow the graph's actual edges and node IDs. OriginKit remains a visual/technique reference for field density, ribbons, glow restraint and pointer response, not a production runtime dependency.
+1. L’identité BA Labs et son logo occupent le centre visuel.
+2. Le noyau mycologique forme le tissu de connexion privilégié de l’organisme.
+3. Les huit territoires autonomes sont `microbiology`, `plants`, `ecology`, `bioprocesses`, `biomaterials`, `instrumentation`, `digital` et `physical`.
+4. Chaque territoire développe ses propres ramifications à partir de ses pages et sous-pages Notion.
+5. Des connexions transversales relient les territoires lorsque les relations sont étayées par les données Notion ou par des éléments de contenu vérifiables.
 
-## Next engineering steps
+Le noyau mycologique ne doit pas être traité comme un hub en étoile auquel huit satellites seraient suspendus. Il doit apparaître comme une structure vivante qui traverse, relie et nourrit l’organisme. Les territoires gardent néanmoins leur autonomie topologique et éditoriale.
 
-1. Browser-test PixiJS initialization and verify the actual WebGL canvas on desktop and mobile.
-2. Move repeated Graphics allocation to retained containers/geometry and use ParticleContainer or a custom shader for large spore/flow populations.
-3. Continue refining the irregular graph-aware layout and branch density while preserving eight connected universes and all descendants.
-4. Add camera-aware level-of-detail and label collision handling; labels must not grow into the viewport or obscure the hyphae.
-5. Add edge-following particle advection with bounded CPU/GPU cost and reduced-motion support.
-6. Measure frame time on a mid-range mobile device before increasing filament or particle density.
+## Topologie et preuve des relations
 
-## Constraints
+- Les liens parent-enfant suivent strictement la hiérarchie des arbres Notion.
+- Les liens transversaux conservent leur base de preuve : relation Notion explicite ou relation fondée sur le contenu.
+- Les connexions entre territoires doivent être traçables et ne doivent jamais être inventées pour améliorer la symétrie.
+- Les ramifications peuvent croître à mesure que les manifests Notion évoluent ; les identifiants stables doivent préserver la continuité.
+- La géométrie est déterministe pour un même ensemble de données, mais asymétrique et non radiale.
 
-- No navigation to another page when selecting a branch; only explicit Notion resource links open externally.
-- No obstructive side panel over the visualization.
-- Keep language tree JSON files and Notion source links intact.
-- Do not merge/deploy until browser smoke tests and visual inspection pass.
+## Rendu biologique
+
+PixiJS dessine un champ continu de filaments, de nœuds et de particules :
+- hyphes principales et secondaires ;
+- bifurcations et ramifications irrégulières ;
+- anastomoses correspondant à des connexions transversales réelles ;
+- densité qui augmente avec l’exploration et le niveau de zoom ;
+- particules qui suivent les arêtes du graphe plutôt que de dériver sans relation ;
+- niveaux de détail et labels adaptés à la caméra.
+
+La référence visuelle combine colonisation mycélienne sur gélose et réseau neuronal. L’effet doit rester organique, fin et lisible, sans tubes, anneaux de satellites, sphères décoratives, planètes ou rayons parfaitement symétriques.
+
+## Interaction
+
+- Panoramique et zoom molette, boutons et pincement tactile.
+- La caméra se centre sur le nœud sélectionné et révèle son voisinage.
+- La sélection ne déclenche jamais automatiquement une navigation externe.
+- La fiche de sélection expose un lien Notion explicite.
+- La navigation DOM accessible et clavier doit offrir le même comportement.
+- `prefers-reduced-motion` réduit ou désactive les mouvements non essentiels.
+
+## Performance et validation
+
+- Conserver des identifiants et une topologie déterministes.
+- Éviter les allocations répétées de Graphics à chaque frame ; privilégier les conteneurs et géométries retenus.
+- Contrôler la densité des filaments, les collisions de labels et le coût des particules sur mobile.
+- Vérifier le rendu WebGL sur desktop et mobile réel ou via un navigateur automatisé avec WebGL.
+- Ne pas augmenter la densité visuelle au détriment de la lisibilité ou de la fluidité.
+
+## Hors périmètre
+
+- Ne pas modifier le graphe ou le renderer propre à l’Academy.
+- Ne pas modifier CultureOps.
+- Ne pas modifier les moteurs 3D historiques.
+- Ne pas changer l’hébergement GitHub Pages dans le cadre de ce chantier.
+
+## État
+
+La branche `rebuild/public-mycology-constellation` porte la refonte du site public. La validation structurelle multilingue passe, mais le test navigateur de l’explorateur doit encore être corrigé et réussi. La PR ne doit pas être fusionnée ni déployée avant validation complète.
