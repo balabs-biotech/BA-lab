@@ -18,6 +18,59 @@ const ANCHORS=[
 const COLOR_KEYS={microbiology:"microbiology",plants:"plants",ecology:"ecology",bioprocesses:"bioprocesses",biomaterials:"biomaterials",instrumentation:"instrumentation",digital:"digital",physical:"physical"};
 const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubtree(child),0);
 
+
+function relaxPublicMorphology(nodes,edges){
+  const parentPairs=new Set(edges.filter(edge=>!edge.cross).map(edge=>[edge.a.id,edge.b.id].sort().join("|")));
+  const branchParents=new Set(edges.filter(edge=>!edge.cross).map(edge=>edge.a.id));
+  const terminalIds=new Set(nodes.filter(node=>node.level>0&&!branchParents.has(node.id)).map(node=>node.id));
+  const cellSize=104,moved=new Set();
+  for(let pass=0;pass<20;pass++){
+    const grid=new Map();
+    for(const node of nodes){
+      const key=Math.floor(node.x/cellSize)+":"+Math.floor(node.y/cellSize);
+      if(!grid.has(key))grid.set(key,[]);
+      grid.get(key).push(node);
+    }
+    const delta=new Map(nodes.map(node=>[node.id,{x:0,y:0}]));
+    for(const a of nodes){
+      const gx=Math.floor(a.x/cellSize),gy=Math.floor(a.y/cellSize);
+      for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+        const bucket=grid.get((gx+ox)+":"+(gy+oy));if(!bucket)continue;
+        for(const b of bucket){
+          if(a.id>=b.id||a.level===0&&b.level===0)continue;
+          const sameTerritory=a.rootId===b.rootId;
+          if(sameTerritory&&parentPairs.has([a.id,b.id].sort().join("|")))continue;
+          const bothTerminal=terminalIds.has(a.id)&&terminalIds.has(b.id);
+          const dx=b.x-a.x,dy=b.y-a.y;
+          let distance=Math.hypot(dx,dy);
+          const minimum=bothTerminal?(sameTerritory?76:52):(sameTerritory?Math.max(25,a.r+b.r+12):Math.max(38,a.r+b.r+24));
+          if(distance>=minimum)continue;
+          let ux,uy;
+          if(distance<.001){
+            const seed=hash(a.id+"|"+b.id),angle=(seed%6283)/1000;
+            ux=Math.cos(angle);uy=Math.sin(angle);distance=1;
+          }else{ux=dx/distance;uy=dy/distance;}
+          const force=Math.min(bothTerminal?(sameTerritory?6.5:2.8):(sameTerritory?3:1.4),(minimum-distance)*(bothTerminal?(sameTerritory?.22:.11):(sameTerritory?.15:.08)));
+          const wa=a.level===0?0:terminalIds.has(a.id)?.78:.42;
+          const wb=b.level===0?0:terminalIds.has(b.id)?.78:.42;
+          const total=wa+wb;if(!total)continue;
+          const da=delta.get(a.id),db=delta.get(b.id);
+          da.x-=ux*force*wa/total;da.y-=uy*force*wa/total;
+          db.x+=ux*force*wb/total;db.y+=uy*force*wb/total;
+        }
+      }
+    }
+    for(const node of nodes){
+      if(node.level===0)continue;
+      const shift=delta.get(node.id),length=Math.hypot(shift.x,shift.y);
+      if(!length)continue;
+      const cap=terminalIds.has(node.id)?5:2.6,scale=Math.min(1,cap/length);
+      node.x+=shift.x*scale;node.y+=shift.y*scale;moved.add(node.id);
+    }
+  }
+  return moved.size;
+}
+
 export function createPublicMycologyNetwork(tree,hub){
   if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
   if(!hub||typeof hub.id!=="string"||typeof hub.url!=="string")throw new Error("A valid public mycology hub is required.");
@@ -68,7 +121,7 @@ export function createPublicMycologyNetwork(tree,hub){
     walk(universe,root,1,anchor.angle,universe.id,index);
   });
 
-  // Give sibling hyphae a shared advancing trunk before they bifurcate.
+  // Relax spatial crowding without moving the eight fixed inoculation anchors.\n  const relaxedNodes=relaxPublicMorphology(nodes,edges);\n\n  // Give sibling hyphae a shared advancing trunk before they bifurcate.
   // The junction is geometric only: it adds no synthetic knowledge node or relation.
   const siblingEdges=new Map();
   for(const edge of edges.filter(item=>item.fractal)){
@@ -109,5 +162,5 @@ export function createPublicMycologyNetwork(tree,hub){
       addIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
     }
   }
-  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0}};
+  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0,relaxedNodes}};
 }
