@@ -1,12 +1,19 @@
-import { createPixiRenderer } from "../ecosystem-core/explorer-2d-pixi.js?v=hover-feedback-1";
-import { createVernpixiNetwork } from "../ecosystem-core/explorer-2d-network.js?v=hover-feedback-1";
+import { createPixiRenderer } from "./explorer-2d-pixi.js?v=public-mycology-renderer-1";
+import { createPublicMycologyNetwork } from "./explorer-2d-graph.js?v=mycology-constellation-1";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={microbiology:"#79a991",plants:"#8fb58c",ecology:"#c19b73",bioprocesses:"#b58d73",biomaterials:"#c88773",instrumentation:"#7eaaa3",digital:"#aa9cbb",physical:"#b5b58d"};
 const COPY={
-fr:{title:"Réseau vivant",desc:"Huit univers reliés dans un même espace vivant.",hint:"GLISSER · PINCER POUR ZOOMER · 1 CLIC POUR SÉLECTIONNER · DOUBLE-CLIC POUR OUVRIR NOTION",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
-en:{title:"Living network",desc:"Eight interconnected universes in one living space.",hint:"DRAG · PINCH TO ZOOM · CLICK TO SELECT · DOUBLE-CLICK TO OPEN NOTION",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
-ar:{title:"الشبكة الحية",desc:"ثمانية عوالم مترابطة في فضاء واحد.",hint:"اسحب · كبّر بإصبعين · نقرة للاختيار · نقرتان لفتح Notion",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
-pt:{title:"Rede viva",desc:"Oito universos interligados num único espaço vivo.",hint:"ARRASTAR · PINÇA PARA ZOOM · CLIQUE PARA SELECIONAR · DUPLO CLIQUE PARA ABRIR NOTION",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
+fr:{title:"Réseau vivant",desc:"La mycologie au cœur de BA Labs, reliée à huit univers scientifiques autonomes.",hint:"GLISSER · PINCER POUR ZOOMER · CLIQUER POUR EXPLORER",root:"UNIVERS",branch:"BRANCHE",leaf:"RESSOURCE",open:"Ouvrir la ressource ↗",children:"ramifications",home:"Vue globale",loading:"Déploiement du réseau…",error:"Impossible de charger le réseau.",focus:"Centrer",back:"Vue précédente",count:"éléments",relations:"Connexions documentées"},
+en:{title:"Living network",desc:"Mycology at the heart of BA Labs, connected to eight independent scientific universes.",hint:"DRAG · PINCH TO ZOOM · CLICK TO EXPLORE",root:"UNIVERSE",branch:"BRANCH",leaf:"RESOURCE",open:"Open resource ↗",children:"branches",home:"Overview",loading:"Growing the network…",error:"Could not load the network.",focus:"Focus",back:"Previous view",count:"items",relations:"Documented connections"},
+ar:{title:"الشبكة الحية",desc:"علم الفطريات في قلب BA Labs، مرتبط بثمانية عوالم علمية مستقلة.",hint:"اسحب · كبّر بإصبعين · انقر للاستكشاف",root:"العالم",branch:"فرع",leaf:"مورد",open:"افتح المورد ↗",children:"تفرعات",home:"نظرة عامة",loading:"جارٍ بناء الشبكة…",error:"تعذّر تحميل الشبكة.",focus:"تركيز",back:"المنظور السابق",count:"عنصر",relations:"روابط موثقة"},
+pt:{title:"Rede viva",desc:"A micologia no centro da BA Labs, ligada a oito universos científicos autónomos.",hint:"ARRASTAR · PINÇA PARA ZOOM · CLIQUE PARA EXPLORAR",root:"UNIVERSO",branch:"RAMO",leaf:"RECURSO",open:"Abrir recurso ↗",children:"ramificações",home:"Visão geral",loading:"A expandir a rede…",error:"Não foi possível carregar a rede.",focus:"Focar",back:"Vista anterior",count:"itens",relations:"Ligações documentadas"}};
+
+const HUB={
+ fr:{id:"mycology-center",title:"🍄 Mycologie",description:"Le cœur identitaire et opérationnel de BA Labs : diversité fongique, physiologie, taxonomie, cultures, multiplication, substrats, interactions, applications, production et contrôle qualité.",url:"https://app.notion.com/p/3e273152f1718161b154d8b8fc50f063"},
+ en:{id:"mycology-center",title:"🍄 Mycology",description:"The identity and operational core of BA Labs: fungal diversity, physiology, taxonomy, cultures, propagation, substrates, interactions, applications, production and quality control.",url:"https://app.notion.com/p/40173152f17181019838de83de8173f3"},
+ ar:{id:"mycology-center",title:"🍄 علم الفطريات",description:"القلب العلمي والتشغيلي لـ BA Labs: التنوع الفطري، وعلم وظائف الأعضاء، والتصنيف، والزراعة والإكثار، والركائز، والتفاعلات، والتطبيقات، والإنتاج ومراقبة الجودة.",url:"https://app.notion.com/p/40173152f171813ba690d5064844f54a"},
+ pt:{id:"mycology-center",title:"🍄 Micologia",description:"O núcleo identitário e operacional da BA Labs: diversidade fúngica, fisiologia, taxonomia, culturas, multiplicação, substratos, interações, aplicações, produção e controlo de qualidade.",url:"https://app.notion.com/p/40173152f171814dad1adcd7559c7823"}
+};
 const $=id=>document.getElementById(id),canvas=$("field"),reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
 let pixiRenderer=null,relationIndex=new Map();
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,hovered=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
@@ -15,9 +22,9 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
 function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
- canvas.dataset.engine="vernpixi-shared";
- const graph=createVernpixiNetwork(tree,{rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]});
- nodes=graph.nodes;edges=graph.edges;byId=graph.byId;relationIndex=graph.relationIndex;
+ canvas.dataset.engine="public-mycology-constellation";
+ const graph=createPublicMycologyNetwork(tree,HUB[lang]);
+ nodes=graph.nodes;edges=graph.edges;byId=graph.byId;relationIndex=graph.relationIndex;canvas.dataset.hubConnections=String(edges.filter(edge=>edge.hubLink).length);
  for(const [key,value] of Object.entries(graph.stats))canvas.dataset[key]=String(value);
  canvas.dataset.universeCount=String(graph.stats.universeCount);
  canvas.dataset.nodeCount=String(graph.stats.nodeCount);
@@ -28,7 +35,22 @@ function buildNetwork(){
  canvas.dataset.crossUniverseConnections=String(graph.stats.crossUniverseConnections);
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
-function fitOverview(){const roots=nodes.filter(n=>n.level===0),xs=roots.map(n=>n.x),ys=roots.map(n=>n.y),pad=Math.min(150,Math.max(78,w*.16));targetScale=clamp(Math.min((w-pad*2)/(Math.max(...xs)-Math.min(...xs)+250),(h-pad*2)/(Math.max(...ys)-Math.min(...ys)+250)),.26,.62);targetOffset={x:0,y:0};}
+function fitOverview(){
+ const roots=nodes.filter(n=>n.level<=1);
+ if(!roots.length){targetScale=.5;targetOffset={x:0,y:0};return;}
+ const minX=Math.min(...roots.map(n=>n.x)),maxX=Math.max(...roots.map(n=>n.x));
+ const minY=Math.min(...roots.map(n=>n.y)),maxY=Math.max(...roots.map(n=>n.y));
+ // Fit the complete central tissue and eight asymmetric inoculation territories.
+ // The camera follows their combined bounds while preserving the brand origin.
+ const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
+ // Root labels extend beyond their node coordinates, with the longest labels
+ // on the lateral arms. Reserve an explicit text-safe envelope on both axes.
+ const labelSafeEnvelope=w<600?180:280;
+ const scaleX=(w-pad*2)/(maxX-minX+labelSafeEnvelope);
+ const scaleY=(h-pad*2)/(maxY-minY+labelSafeEnvelope);
+ targetScale=clamp(Math.min(scaleX,scaleY),.14,.62);
+ targetOffset={x:-(minX+maxX)*.5*targetScale,y:-(minY+maxY)*.5*targetScale};
+}
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
 function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function syncUniverseRail(n){
@@ -40,7 +62,7 @@ function syncUniverseRail(n){
  canvas.dataset.activeUniverse=root||"";
 }
 function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}targetScale=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
-function activateNode(n){if(!n)return;focusNode(n);const url=n.data?.url;if(typeof url==="string"&&/^https:\/\/app\.notion\.com\/p\/[a-f0-9]{32}$/.test(url))window.open(url,"_blank","noopener,noreferrer");}
+function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
  const hitBoxes=JSON.parse(canvas.dataset.visibleNodeHitBoxes||"{}");
@@ -120,7 +142,7 @@ function updateSelection(){
  box.append(dock);box.hidden=false;
  renderAccessible();
 }
-function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.forEach(n=>{const b=el("button","",n.title);b.type="button";b.dataset.nodeId=n.id;b.dataset.notionTitle=n.title;b.dataset.level=String(n.level);b.setAttribute("aria-label",n.title+" · niveau "+n.level);b.onclick=()=>focusNode(n);nav.append(b);});}
+function renderAccessible(){const nav=$("accessibleNodes");nav.replaceChildren();nodes.forEach(n=>{const b=el("button","",n.title);b.type="button";b.dataset.nodeId=n.id;b.dataset.notionTitle=n.title;b.dataset.level=String(n.level);b.setAttribute("aria-label",n.title+" · niveau "+n.level);b.onclick=()=>activateNode(n);nav.append(b);});}
 function updateUI(){
  document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
  $("heading").textContent=t("title");$("description").textContent=t("desc");$("hint").textContent=t("hint");$("kicker").textContent=t("home");$("language").value=lang;
@@ -145,9 +167,9 @@ function pointerMove(e){
  else if(pointers.size===2){const p=[...pointers.values()],d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(!pointerMove.last)pointerMove.last=d;const rect=canvas.getBoundingClientRect();zoom(d/pointerMove.last,(p[0].x+p[1].x)/2-rect.left,(p[0].y+p[1].y)/2-rect.top);pointerMove.last=d;dragged=true;}
 }
 function pointerLeave(){if(pointers.size)return;if(hovered){hovered=null;draw();}canvas.style.cursor="grab";}
-function pointerUp(e){pointers.delete(e.pointerId);canvas.classList.remove("dragging");if(!pointers.size){canvas.style.cursor="grab";if(!dragged){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,n=hit(x,y),now=performance.now(),previous=pointerUp.lastClick;if(previous&&now-previous.time<650&&Math.hypot(x-previous.x,y-previous.y)<28){pointerUp.lastClick=null;}else if(n){focusNode(n);pointerUp.lastClick={node:n,time:now,x,y};}else pointerUp.lastClick=null;}gesture=null;pointerMove.last=0;}else if(pointers.size===1){const p=[...pointers.values()][0];gesture={x:p.x,y:p.y,ox:targetOffset.x,oy:targetOffset.y};pointerMove.last=0;dragged=true;}}
+function pointerUp(e){pointers.delete(e.pointerId);canvas.classList.remove("dragging");if(!pointers.size){canvas.style.cursor="grab";if(!dragged){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,n=hit(x,y);if(n)activateNode(n);}gesture=null;pointerMove.last=0;}else if(pointers.size===1){const p=[...pointers.values()][0];gesture={x:p.x,y:p.y,ox:targetOffset.x,oy:targetOffset.y};pointerMove.last=0;dragged=true;}}
 canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointermove",pointerMove);canvas.addEventListener("pointerleave",pointerLeave);canvas.addEventListener("pointerup",pointerUp);canvas.addEventListener("pointercancel",pointerUp);
-window.addEventListener("click",e=>{if(e.detail<2)return;const target=e.target;if(target!==canvas&&!target.closest?.("#selection"))return;if(selected)activateNode(selected);},true);
+
 
 canvas.addEventListener("wheel",e=>{e.preventDefault();const r=canvas.getBoundingClientRect();zoom(e.deltaY<0?1.16:.86,e.clientX-r.left,e.clientY-r.top);},{passive:false});
 $("zoomIn").onclick=()=>zoom(1.25);$("zoomOut").onclick=()=>zoom(.8);$("reset").onclick=()=>{fitOverview();selected=null;viewHistory=[];syncUniverseRail(null);updateSelection();if(reduced){scale=targetScale;offset={...targetOffset};}draw();};$("back").onclick=()=>{if(viewHistory.length){const previous=viewHistory.pop();selected=previous.selected||null;syncUniverseRail(selected);targetScale=previous.scale;targetOffset={...previous.offset};if(reduced){scale=targetScale;offset={...targetOffset};draw();}updateSelection();}else{$("reset").click();}};
@@ -163,6 +185,6 @@ function animate(){raf=0;if(!canAnimate())return;scale+=(targetScale-scale)*.12;
 const visibilityObserver="IntersectionObserver" in window?new IntersectionObserver(entries=>{inViewport=entries[0]?.isIntersecting??true;if(canAnimate())startAnimation();else stopAnimation();},{threshold:.01}):null;
 if(visibilityObserver)visibilityObserver.observe(canvas);
 document.addEventListener("visibilitychange",()=>{if(canAnimate())startAnimation();else stopAnimation();});
-async function loadTree(){try{const res=await fetch("./notion-tree."+lang+".json",{cache:"no-cache"});if(!res.ok)throw Error("Tree HTTP "+res.status);const data=await res.json();tree=data.domains||[];if(tree.length!==8)throw Error("Expected 8 universes; received "+tree.length);viewHistory=[];buildNetwork();fitOverview();scale=targetScale;offset={...targetOffset};selected=null;syncUniverseRail(null);updateUI();updateSelection();draw();const requestedDomain=new URLSearchParams(location.search).get("domain");const requestedRoot=nodes.find(n=>n.level===0&&n.id===requestedDomain);if(requestedRoot)focusNode(requestedRoot);$("loading").hidden=true;}catch(e){console.error(e);$("loading").querySelector("p").textContent=t("error");}}
+async function loadTree(){try{const res=await fetch("./notion-tree."+lang+".json",{cache:"no-cache"});if(!res.ok)throw Error("Tree HTTP "+res.status);const data=await res.json();tree=data.domains||[];if(tree.length!==8)throw Error("Expected 8 scientific universes; received "+tree.length);const expected=["microbiology","plants","ecology","bioprocesses","biomaterials","instrumentation","digital","physical"];if(expected.some(id=>!tree.some(item=>item.id===id)))throw Error("The public universe manifest does not match the approved eight-universe architecture.");viewHistory=[];buildNetwork();fitOverview();scale=targetScale;offset={...targetOffset};selected=null;syncUniverseRail(null);updateUI();updateSelection();draw();const requestedDomain=new URLSearchParams(location.search).get("domain");const requestedRoot=nodes.find(n=>n.level===0&&n.id===requestedDomain);if(requestedRoot)focusNode(requestedRoot);$("loading").hidden=true;}catch(e){console.error(e);$("loading").querySelector("p").textContent=t("error");}}
 async function init(){pixiRenderer=await createPixiRenderer(canvas);let l=new URLSearchParams(location.search).get("lang");try{if(!LANGS.includes(l))l=localStorage.getItem("balabs-language");}catch(_){}lang=LANGS.includes(l)?l:"fr";resize();await loadTree();startAnimation();}
 init().catch(error=>{console.error("PixiJS initialization failed",error);const loading=$("loading");loading.querySelector("p").textContent="Le moteur graphique WebGL n’a pas pu démarrer. Rechargez la page ou essayez un navigateur compatible.";});

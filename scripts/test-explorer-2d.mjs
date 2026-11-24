@@ -91,45 +91,63 @@ try {
     assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
-    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'vernpixi-shared',
-      'The public explorer must use the shared Academy Vernpixi engine');
-    const localAnastomoses = Number(await page.locator('#field').getAttribute('data-local-anastomoses') || 0);
-    assert.ok(localAnastomoses > 0, 'The graph must create spatially local anastomoses between separate parent branches');
+    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'public-mycology-constellation',
+      'The public explorer must use its dedicated mycology-centered graph');
+    const hubConnections = Number(await page.locator('#field').getAttribute('data-hub-connections') || 0);
+    assert.equal(hubConnections, 8, 'The mycology hub must connect directly to all eight scientific universes');
     const initialUrl = page.url();
-    const overviewVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
+    const overviewMetrics = await page.locator('#field').evaluate(el => ({count:JSON.parse(el.dataset.visibleNodeIds || '[]').length,scale:Number(el.dataset.scale||0)}));
+    const overviewVisibleCount = overviewMetrics.count;
+    const overviewGeometry = await page.locator('#field').evaluate(el => {
+      const boxes = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}');
+      const rect = el.getBoundingClientRect();
+      return { boxes:Object.keys(boxes), viewport:{width:rect.width,height:rect.height} };
+    });
+    assert.ok(overviewGeometry.boxes.includes('balabs-identity'), 'The global overview must visibly include the BA Labs identity node');
+    assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must visibly include the mycology core');
+    assert.ok(['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].every(id => overviewGeometry.boxes.includes(id)), 'All eight autonomous territories must be visible in the global overview');
+    const overviewBounds = await page.locator('#field').evaluate(el => {
+      const boxes = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}');
+      const rect = el.getBoundingClientRect();
+      return Object.entries(boxes).filter(([id]) => ['balabs-identity','mycology-center','microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].includes(id)).map(([id,b]) => ({id,...b,inside:b.left>=0&&b.top>=0&&b.right<=rect.width&&b.bottom<=rect.height}));
+    });
+    assert.equal(overviewBounds.length,10,'The global overview must expose all ten central labels');
+    assert.ok(overviewBounds.every(item=>item.inside), 'All ten central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
+    const overviewCamera = await page.locator('#field').evaluate(el => ({scale:Number(el.dataset.targetScale||0),width:Number(el.dataset.viewportWidth||0),height:Number(el.dataset.viewportHeight||0)}));
+    if(viewport.name==='mobile')assert.ok(overviewCamera.scale < .62, 'Mobile overview camera must fit the eight outer inoculation territories, not only the central identity nodes: '+JSON.stringify(overviewCamera));
+    await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
     await page.waitForTimeout(600);
     const zoomDebug = await page.locator('#field').evaluate(el => ({ scale:el.dataset.scale,targetScale:el.dataset.targetScale,width:el.dataset.viewportWidth,height:el.dataset.viewportHeight,candidates:el.dataset.labelCandidateCount,live:el.dataset.labelLiveCount,roots:el.dataset.rootCandidateCount,visible:JSON.parse(el.dataset.visibleNodeIds||'[]').length,labels:JSON.parse(el.dataset.visibleNodeIds||'[]').slice(0,20) }));
     console.log('progressive zoom diagnostic', JSON.stringify({overviewVisibleCount,zoomDebug}));
-    await page.waitForFunction(count => JSON.parse(document.querySelector('#field')?.dataset.visibleNodeIds || '[]').length > count, overviewVisibleCount, { timeout: 12000 });
-    const zoomedVisibleCount = await page.locator('#field').evaluate(el => JSON.parse(el.dataset.visibleNodeIds || '[]').length);
-    assert.ok(zoomedVisibleCount > overviewVisibleCount, `Zooming from the global overview must reveal additional network labels (${overviewVisibleCount} -> ${zoomedVisibleCount})`);
+    await page.waitForFunction(initialScale => Number(document.querySelector('#field')?.dataset.scale||0) > initialScale + .03, overviewMetrics.scale, { timeout: 12000 });
+    const zoomedMetrics = await page.locator('#field').evaluate(el => ({count:JSON.parse(el.dataset.visibleNodeIds || '[]').length,scale:Number(el.dataset.scale||0)}));
+    assert.ok(zoomedMetrics.scale > overviewMetrics.scale, `Zoom controls must increase the camera scale (${overviewMetrics.scale} -> ${zoomedMetrics.scale})`);
     await page.locator('#reset').click();
     const nav = page.locator('#accessibleNodes button');
     await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
     const visibleNodes = await nav.count();
     assert.ok(visibleNodes >= 8, 'At least the eight universe roots must be available');
-    // A real point activation must preserve the explorer and open the exact
-    // canonical Notion page in a separate tab. Use trusted Playwright clicks.
+    // Selecting a node must keep the user inside the explorer. Notion opens
+    // only through the explicit resource link in the selection panel.
     const rootButton = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.rootId + '"]');
     const rootNodeId = await rootButton.getAttribute('data-node-id');
     assert.equal(await rootButton.getAttribute('data-notion-title'), mappedTree.roots.find(root => root.id === rootNodeId).title, 'Browser navigation title must exactly match the canonical Notion manifest title');
     const rootExpectedUrl = mappedTree.nodeUrls[rootNodeId];
     await page.evaluate(() => {
       window.__openedNotionUrls = [];
-      const nativeOpen = window.open.bind(window);
-      window.open = (...args) => { window.__openedNotionUrls.push(args[0]); return nativeOpen(...args); };
+      window.open = (...args) => { window.__openedNotionUrls.push(args[0]); return null; };
     });
     await rootButton.focus();
     await rootButton.press('Enter');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Single activation must select/focus only; it must not open Notion');
-    await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(page.url(), initialUrl, 'Opening a Notion page must preserve the explorer in its original tab');
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a universe must not automatically open Notion');
+    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), rootExpectedUrl, 'The selected universe must expose its exact Notion destination');
+    assert.equal(page.url(), initialUrl, 'Selecting a universe must preserve the explorer URL');
     const selectedRoot = await page.locator('#selection').innerText();
     assert.ok(await page.locator('#selection .child-branches button').count() > 0, 'Selecting a node must expose direct child navigation controls');
-    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'vernpixi-shared',
-      'Selecting a public universe must keep the shared Academy engine active');
+    assert.equal(await page.locator('#field').getAttribute('data-engine'), 'public-mycology-constellation',
+      'Selecting a public universe must keep the dedicated public graph active');
     const firstChild = page.locator('#accessibleNodes button[data-node-id="' + navigationFixture.branchId + '"]');
     await firstChild.waitFor({ state: 'attached' });
     const childNodeId = await firstChild.getAttribute('data-node-id');
@@ -137,7 +155,8 @@ try {
     await firstChild.focus();
     await firstChild.press('Enter');
     await page.waitForFunction(() => document.querySelector('#selection')?.textContent?.length > 0);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Keyboard selection must not open Notion on first activation');
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a branch must not automatically open Notion');
+    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), childExpectedUrl, 'The selected branch must expose its exact Notion destination');
     assert.ok(await page.locator('#selection .selection-path').count(), 'The selection panel must preserve the full parent path for deep navigation, including mobile');
 
     // Regression: clicking any verified leaf label must open its exact Notion destination.
@@ -152,7 +171,8 @@ try {
     await leafButton.focus();
     await leafButton.press('Enter');
     await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf by keyboard must not open Notion');
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf must not automatically open Notion');
+    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), leafFixture.url, 'The selected leaf must expose its exact Notion destination');
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
@@ -181,10 +201,12 @@ try {
     }, leafFixture.id);
     const firstLeafPoint = await pointForLeaf();
     assert.ok(firstLeafPoint, 'Leaf label must be visible before pointer activation');
-    // Send a trusted native double-click sequence, including click detail=2.
-    await page.mouse.dblclick(firstLeafPoint.x, firstLeafPoint.y, { delay: 70 });
-    await page.waitForFunction(() => window.__openedNotionUrls?.length === 1, undefined, { timeout: 5000 });
-    assert.equal(await page.evaluate(() => window.__openedNotionUrls[0]), leafFixture.url, 'Double-clicking a visible leaf label must open its exact Notion page');
+    // A trusted pointer click selects the visible leaf but does not navigate.
+    await page.evaluate(() => { window.__openedNotionUrls = []; });
+    await page.mouse.click(firstLeafPoint.x, firstLeafPoint.y);
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
+    assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'A pointer selection must not automatically open Notion');
+    assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), leafFixture.url, 'The selected leaf must expose its exact Notion destination');
     await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(page.url(), initialUrl, 'Opening a child Notion page must stay inside the explorer scene');
     assert.ok(await page.locator('#crumbs button').count() >= 2, 'Breadcrumbs must expose the current hierarchy');
@@ -227,7 +249,7 @@ try {
     assert.deepEqual(errors, [], 'No uncaught browser errors');
     assert.deepEqual(consoleErrors, [], 'No browser console errors');
     assert.deepEqual(failedRequests, [], 'No failed network requests');
-    await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}.png`, fullPage: false });
+    await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-selected.png`, fullPage: false });
     results.push({ viewport: viewport.name, canvas: [canvasSize.width, canvasSize.height], accessibleNodes: visibleNodes, languages: 'FR/EN/AR/PT', selectionStaysInScene: true, renderer: 'PixiJS WebGL', browserErrors: errors.length });
     await page.close();
   }

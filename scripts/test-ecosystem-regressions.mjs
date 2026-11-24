@@ -7,13 +7,14 @@ const previewHtml = readFileSync('ecosystem-preview/legacy-3d-preview.html', 'ut
 const previewExplorerHtml = readFileSync('ecosystem-preview/index.html', 'utf8');
 const previewExplorerJs = readFileSync('ecosystem-preview/explorer-2d.js', 'utf8');
 const sharedPixiJs = readFileSync('ecosystem-core/explorer-2d-pixi.js', 'utf8');
+const publicPixiJs = readFileSync('ecosystem/explorer-2d-pixi.js', 'utf8');
 const sharedNetworkJs = readFileSync('ecosystem-core/explorer-2d-network.js', 'utf8');
 const publicExplorerJs = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 
 assert.ok(publicExplorerJs.includes('selection-dock') && publicExplorerJs.includes('selection-open-link'), 'Selecting a 2D node must render a compact selection dock with its direct resource action');
 assert.ok(publicExplorerJs.includes('selected.data.url') && publicExplorerJs.includes('https:'), 'The selection action must use the verified Notion URL carried by the selected manifest node');
-assert.ok(publicExplorerJs.includes('function activateNode(n)') && publicExplorerJs.includes('window.open(url,"_blank","noopener,noreferrer")'), 'Clicking a visible 2D point must open that exact node page in Notion in a new tab while preserving the explorer');
-assert.ok(publicExplorerJs.includes('function pointerUp(e)') && publicExplorerJs.includes('canvas.addEventListener("pointerup",pointerUp)') && publicExplorerJs.includes('window.addEventListener("click"') && publicExplorerJs.includes('e.detail<2'), 'Canvas navigation must select on first click and open the selected canonical Notion destination on native double-click, including when a selection overlay receives the second click');
+assert.ok(publicExplorerJs.includes('function activateNode(n){if(!n)return;focusNode(n);}'), 'Selecting a visible 2D point must focus it without navigating away');
+assert.ok(publicExplorerJs.includes('function pointerUp(e)') && publicExplorerJs.includes('canvas.addEventListener("pointerup",pointerUp)') && publicExplorerJs.includes('if(n)activateNode(n)'), 'Canvas navigation must open the selected canonical Notion destination on a single click');
 assert.ok(!html.includes('#selection{position:absolute!important;width:1px!important'), 'The public explorer must not clip the selected-node dock out of view');
 
 const engine = readFileSync('ecosystem/engine-v2.js', 'utf8');
@@ -27,8 +28,11 @@ assert.ok(sharedPixiJs.includes('pixijs-webgl') && sharedPixiJs.includes('filame
 assert.ok(sharedNetworkJs.includes('createVernpixiNetwork') && sharedNetworkJs.includes('const anchors='), 'Shared Vernpixi graph builder must own the eight organic anchors and branching geometry');
 assert.ok(html.includes('id="inlineExplorer"') && html.includes('id="field"') && /src="\.\/explorer-2d\.js\?v=[^"]+"/.test(html), 'Public homepage must mount a versioned Vernpixi 2D script directly inside the existing universe section');
 assert.ok(publicExplorerJs.includes('createPixiRenderer') && publicExplorerJs.includes('balabs:focus-domain'), 'Embedded public Vernpixi must support in-page universe focus');
-assert.ok(publicExplorerJs.includes('../ecosystem-core/explorer-2d-pixi.js') && publicExplorerJs.includes('../ecosystem-core/explorer-2d-network.js'), 'Public Vernpixi must import the exact same renderer and graph geometry as Academy');
-assert.ok(publicExplorerJs.includes('rootLayoutIds:["myco","bio","iot","soil","lab","products","work","learn"]'), 'Public universes must reuse the Academy anchor identity and ordering');
+assert.ok(publicExplorerJs.includes('./explorer-2d-pixi.js') && publicExplorerJs.includes('./explorer-2d-graph.js'), 'Public explorer must use its independent Pixi renderer and mycology-centered graph');
+assert.ok(publicPixiJs.includes('primaryHypha') && publicPixiJs.includes('generation'), 'Public renderer must distinguish primary, secondary and tertiary biological filaments');
+assert.doesNotMatch(publicPixiJs, /drawnArms|upper-left|upper-right/, 'Public renderer must not retain legacy three-arm geometry; shared advancing branch points are part of the new biological model');
+assert.equal(publicPixiJs.includes('const count=depth===1?4:depth===2?3:2'), false, 'Public renderer must not draw synthetic branches without graph data');
+assert.ok(publicExplorerJs.includes('createPublicMycologyNetwork(tree,HUB[lang])'), 'Public explorer must build the mycology hub and eight independent universes from the localized manifest');
 assert.ok(!html.includes('id="open2DExplorer"') && !html.includes("location.href='./explorer-2d.html?domain='"), 'Public homepage must not require a separate click-through page to enter the 2D engine');
 
 
@@ -82,10 +86,10 @@ for (const language of ['fr','en','ar','pt']) {
 }
 const explorer = readFileSync('ecosystem/explorer-2d.js', 'utf8');
 assert.ok(explorer.includes('createPixiRenderer') && explorer.includes('fetch("./notion-tree."+lang+".json"'), 'The existing PixiJS 2D engine must load the active language manifest');
-assert.ok(explorer.includes('Expected 8 universes') && explorer.includes('function buildNetwork()') && explorer.includes('createVernpixiNetwork'), 'The 2D engine must build the eight-universe network through the shared graph engine');
+assert.ok(explorer.includes('Expected 8 scientific universes') && explorer.includes('function buildNetwork()') && explorer.includes('createPublicMycologyNetwork'), 'The public 2D engine must build the mycology hub and eight universes through its dedicated graph module');
 assert.ok(explorer.includes('microbiology:') && explorer.includes('instrumentation:') && explorer.includes('physical:'), 'The public 2D engine must retain its canonical Notion universe identifiers');
-assert.ok(explorer.includes('function activateNode(n)') && explorer.includes('window.open(url,"_blank","noopener,noreferrer")'), 'A double-clicked point must open its exact Notion destination');
-assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('window.addEventListener("click"') && explorer.includes('e.detail<2'), 'Point activation must preserve single-click selection and double-click opening');
+assert.ok(explorer.includes('function activateNode(n){if(!n)return;focusNode(n);}'), 'Selecting a point must focus it without automatic external navigation');
+assert.ok(explorer.includes('function pointerUp(e)') && explorer.includes('if(n)activateNode(n)') && explorer.includes('selection-open-link'), 'Point activation must select the node and expose an explicit Notion action');
 const universeEntry = readFileSync('ecosystem/universe.html', 'utf8');
 for (const id of expectedExplorerDomains) assert.ok(universeEntry.includes("'" + id + "'"), 'Direct universe routing must allow ' + id);
 for (const id of expectedExplorerDomains) {
@@ -93,7 +97,7 @@ for (const id of expectedExplorerDomains) {
   assert.ok(html.includes("data-universe=\"" + id + "\""), 'Homepage quick navigation must expose ' + id);
   assert.ok(html.includes(id + ":{fr:'https://app.notion.com/p/"), 'Homepage language routing must map ' + id + ' to Notion');
 }
-assert.ok(html.includes('explorer-2d.js?v=scientific-universes-hover-2'), 'Homepage must invalidate cached 2D engine code after the universe update');
+assert.ok(html.includes('explorer-2d.js?v=mycology-constellation-1'), 'Homepage must invalidate cached 2D engine code after the mycology-centered rebuild');
 
 
 assert.ok(publicExplorerJs.includes('hovered=null') && publicExplorerJs.includes('canvas.addEventListener("pointerleave",pointerLeave)'), 'The embedded explorer must expose a lightweight pointer-hover state and clear it when the pointer leaves');

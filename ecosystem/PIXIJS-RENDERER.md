@@ -1,33 +1,65 @@
-# PixiJS 2D mycelium renderer
+# PixiJS 2D — moteur public BA Labs
 
-## Current migration slice
+## Périmètre et séparation
 
-The 2D explorer now uses PixiJS v8 as its primary WebGL renderer. The existing graph model, eight-language tree loading, stable node IDs, hit testing, pan/zoom camera, and Notion resource links remain in the explorer controller.
+Ce document décrit exclusivement le renderer du site public BA Labs.
 
-- `../ecosystem-core/explorer-2d-pixi.js`: the shared PixiJS/WebGL renderer used by both the Academy and public explorer.
-- `../ecosystem-core/explorer-2d-network.js`: the shared eight-anchor geometry, recursive branch placement, evidence-backed Notion relations and local anastomoses. Each explorer supplies its own Notion tree; the public explorer maps its eight root IDs onto the Academy's canonical anchor order.
-- `explorer-2d.js`: data loading, deterministic graph topology, camera, gestures, selection and accessible node navigation.
-- DaisyUI remains the shell/component layer; it is not used to render the biological field.
-- The historical 3D engine is outside this migration and must not be modified.
+- `explorer-2d-pixi.js` : renderer PixiJS/WebGL autonome du site public.
+- `explorer-2d-graph.js` : topologie publique, centre mycologique, huit points d’inoculation, ramifications déterministes et relations transversales documentées.
+- `explorer-2d.js` : données, caméra, gestes, sélection, internationalisation et navigation accessible.
+- `../ecosystem-core/explorer-2d-pixi.js` et `../ecosystem-core/explorer-2d-network.js` : moteurs historiques de l’Academy, conservés indépendamment.
 
-## Rendering and biological direction
+Le site public ne doit plus importer le renderer PixiJS de l’Academy. Les deux moteurs partagent uniquement un contrat visuel : identité BA Labs, noyau mycologique, ordre des huit territoires et leurs repères chromatiques. Leurs rendus, géométries, interactions et cycles de vie restent indépendants.
 
-PixiJS owns the field rendering. The topology remains driven by the Notion tree and stable IDs. The eight universe anchors now occupy an irregular spatial field instead of an eight-spoke ring. Cross-universe links are selected by nearest-neighbour distance, with first-generation anastomoses and within-universe branch links. Main hyphae, lateral hyphae and cross-links are rendered as seeded, asymmetrically curved filaments; deeper generations fade in with camera scale. The visual language must stay asymmetric and microscopy-inspired: no planets, radial cards, tubes, starburst hubs or decorative spheres.
+## Organisme et topologie
 
-tsParticles is not loaded as a second independent canvas. Its useful motion concepts (noise-driven drift, trails and particle flow) should be integrated only where they can follow the graph's actual edges and node IDs. OriginKit remains a visual/technique reference for field density, ribbons, glow restraint and pointer response, not a production runtime dependency.
+L’espace public représente un organisme scientifique continu :
+- identité BA Labs au centre ;
+- mycologie comme tissu vivant de connexion ;
+- huit territoires autonomes : `microbiology`, `plants`, `ecology`, `bioprocesses`, `biomaterials`, `instrumentation`, `digital`, `physical` ;
+- un point d’inoculation stable par territoire ;
+- des ramifications déterministes dont la position dépend des contenus et de leur hiérarchie ;
+- des hyphes transversales uniquement lorsqu’une relation documentée relie deux territoires.
 
-## Next engineering steps
+La vue globale ne doit pas afficher toutes les relations transversales en même temps : elles sont révélées à la sélection d’un nœud lié, puis en totalité au zoom rapproché. Cette progressive disclosure évite que les relations documentées forment une toile dominante qui masque les filaments hiérarchiques.
 
-1. Browser-test PixiJS initialization and verify the actual WebGL canvas on desktop and mobile.
-2. Move repeated Graphics allocation to retained containers/geometry and use ParticleContainer or a custom shader for large spore/flow populations.
-3. Continue refining the irregular graph-aware layout and branch density while preserving eight connected universes and all descendants.
-4. Add camera-aware level-of-detail and label collision handling; labels must not grow into the viewport or obscure the hyphae.
-5. Add edge-following particle advection with bounded CPU/GPU cost and reduced-motion support.
-6. Measure frame time on a mid-range mobile device before increasing filament or particle density.
+L’ajout d’une ressource dans un territoire ne doit pas déplacer ni recolorer les sept autres. Les huit coordonnées actuelles sont provisoires : l’asset source du logo officiel doit encore être ajouté pour caler précisément les points d’inoculation sur le symbole de marque.
 
-## Constraints
+## Rendu biologique
 
-- No navigation to another page when selecting a branch; only explicit Notion resource links open externally.
-- No obstructive side panel over the visualization.
-- Keep language tree JSON files and Notion source links intact.
-- Do not merge/deploy until browser smoke tests and visual inspection pass.
+Le renderer doit distinguer explicitement :
+- **hyphes primaires** : tissu de connexion entre le noyau mycologique et les huit points d’inoculation ;
+- **ramifications secondaires et tertiaires** : arêtes réelles de la hiérarchie Notion, avec épaisseur et intensité décroissantes selon la génération ;
+- **anastomoses transversales** : relations Notion ou relations de contenu vérifiables, plus fines et moins lumineuses que les filaments hiérarchiques ;
+- **pointes de croissance** : extrémités ouvertes et effilées, sans bille terminale.
+
+Aucune branche latérale décorative ne doit être inventée par le renderer pour remplir l’espace. Une bifurcation visible doit correspondre à une ramification réelle du graphe. Les courbures, dérives et épaisseurs peuvent varier de façon déterministe pour donner une morphologie rhizomorphique, sans créer de nouveaux liens. Les ramifications doivent alterner un déport latéral marqué autour de leur direction de croissance héritée. Elles dessinent des trajectoires rhizomorphiques qui se déplacent sur le côté, bifurquent et changent de direction ; elles ne doivent pas former une étoile de rayons ni des éventails réguliers autour des points d’inoculation.
+
+Les filaments sont tracés par des courbes de Bézier cubiques à deux contrôles indépendants. Le premier contrôle détermine la sortie du filament, le second son approche de la branche cible. Leurs orientations et leurs déports peuvent différer pour créer des courbures en S et des inflexions organiques. Le déplacement latéral reste une propriété de placement des nœuds du graphe ; la courbe ne doit pas créer de nœud, de branche ou de relation supplémentaire.
+
+La couleur du filament doit provenir du territoire auquel il appartient, y compris pour les huit hyphes primaires issues du noyau central. Les liens transversaux restent visuellement secondaires. Le fond, les halos et les particules doivent rester sobres et ne pas concurrencer les structures biologiques.
+
+## Interaction et lisibilité
+
+- Un seul champ 2D continu ; zoom et panoramique sans changement de scène.
+- Zoom molette, boutons et pincement tactile.
+- La sélection centre la caméra et révèle la fiche de ressource.
+- L’ouverture de Notion reste une action explicite dans la fiche.
+- Les labels apparaissent progressivement selon le zoom et évitent les collisions.
+- La navigation DOM/clavier expose les mêmes contenus.
+- `prefers-reduced-motion` réduit les animations non essentielles.
+- Les animations doivent être suspendues lorsque l’explorateur est hors écran ou que l’onglet est masqué.
+
+## Validation
+
+Avant toute fusion :
+1. vérifier la topologie dans FR / EN / AR / PT ;
+2. vérifier l’absence de géométrie héritée des trois bras dans le renderer public ;
+3. vérifier que les ramifications visibles correspondent aux arêtes du graphe ;
+4. exécuter les tests navigateur desktop et mobile ;
+5. contrôler les labels, le cadrage, les performances WebGL et `prefers-reduced-motion` ;
+6. confirmer que l’Academy conserve son renderer et ses comportements historiques.
+
+## Hors périmètre
+
+Aucune modification de CultureOps, des expériences 3D historiques, de l’hébergement GitHub Pages ou du moteur Academy dans le cadre de ce chantier.

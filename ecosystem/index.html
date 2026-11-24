@@ -7,7 +7,7 @@
 </script>
 
 <meta name="theme-color" content="#111B1D">
-<meta name="description" id="pageDescription" content="Explorez les huit univers BA Labs : microbiologie, sciences végétales, sols et environnement, bioprocédés, biomatières, instrumentation, numérique et sciences physiques.">
+<meta name="description" id="pageDescription" content="Explorez BA Labs : la mycologie au centre, reliée à huit univers scientifiques autonomes.">
 <title>BALabs — Réseau vivant</title>
 <link rel="stylesheet" href="./site-base.css?v=2">
 
@@ -43,7 +43,7 @@
 .universe-rail{position:absolute;left:clamp(10px,1.6vw,22px);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:7px;padding:8px 6px;border:1px solid #82998a26;border-radius:999px;background:#101a1ad9;backdrop-filter:blur(12px)}
 .universe-rail button{display:flex;align-items:center;gap:7px;min-width:34px;height:27px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:#aebbb1;font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:.07em;cursor:pointer;transition:background .18s,color .18s,transform .18s}
 .universe-rail button i{display:block;width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:var(--dot);box-shadow:0 0 9px color-mix(in srgb,var(--dot) 55%,transparent)}
-.universe-rail button[data-universe="myco"]{--dot:#b18fc2}.universe-rail button[data-universe="bio"]{--dot:#79a991}.universe-rail button[data-universe="iot"]{--dot:#7eaaa3}.universe-rail button[data-universe="soil"]{--dot:#c19b73}.universe-rail button[data-universe="lab"]{--dot:#80aeb8}.universe-rail button[data-universe="products"]{--dot:#c88773}.universe-rail button[data-universe="work"]{--dot:#aa9cbb}.universe-rail button[data-universe="learn"]{--dot:#b5b58d}
+.universe-rail button[data-universe="microbiology"]{--dot:#79a991}.universe-rail button[data-universe="plants"]{--dot:#8fb58c}.universe-rail button[data-universe="ecology"]{--dot:#c19b73}.universe-rail button[data-universe="bioprocesses"]{--dot:#b58d73}.universe-rail button[data-universe="biomaterials"]{--dot:#c88773}.universe-rail button[data-universe="instrumentation"]{--dot:#7eaaa3}.universe-rail button[data-universe="digital"]{--dot:#aa9cbb}.universe-rail button[data-universe="physical"]{--dot:#b5b58d}
 .universe-rail button:hover,.universe-rail button:focus-visible{background:#263b38;color:#f0eee3;transform:translateX(2px);outline:1px solid #b96b4d}
 @media(max-width:700px){.universe-rail{left:7px;gap:4px;padding:6px 4px}.universe-rail button{height:25px;min-width:26px;padding:0 5px;gap:5px;font-size:7px}.universe-rail button i{width:6px;height:6px;flex-basis:6px}}
 .inline-explorer-controls{position:absolute;right:clamp(12px,2.5vw,28px);top:clamp(14px,2.5vw,26px);z-index:3;display:grid;gap:6px}
@@ -97,6 +97,35 @@
 .inline-explorer-controls:hover,.inline-explorer-controls:focus-within{opacity:1}
 .inline-explorer-controls .btn{width:29px;height:29px;min-height:29px;font-size:14px;border-radius:50%;padding:0}
 @media(max-width:700px){.inline-explorer-title{left:10px;top:10px}.universe-rail{left:5px;gap:3px}.universe-rail button{width:30px;min-width:30px;height:30px}.universe-rail button span{left:28px}.inline-explorer-controls{right:8px;top:8px}.inline-explorer-controls .btn{width:27px;height:27px;min-height:27px}}
+
+/* Mobile selection: keep the hierarchy on one clipped, readable line.
+   The opaque dock must remain distinct from the moving biological canvas. */
+@media(max-width:700px){
+ #app.balabs-ui #selection{
+  left:56px!important;right:10px!important;width:auto!important;
+  max-height:22%!important;overflow:hidden!important;
+ }
+ #app.balabs-ui #selection .selection-dock{
+  max-height:100%;overflow:hidden;
+  background:#101b19!important;border-color:#71877b88!important;
+  box-shadow:0 8px 24px #0009!important;backdrop-filter:blur(16px);
+ }
+ #app.balabs-ui #selection .selection-path{
+  display:flex;flex-wrap:nowrap;min-width:0;max-width:100%;
+  overflow:hidden;white-space:nowrap;gap:3px;
+ }
+ #app.balabs-ui #selection .selection-path-link,
+ #app.balabs-ui #selection .selection-path-current{
+  display:block;min-width:0;max-width:34%;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;
+ }
+ #app.balabs-ui #selection .selection-path-separator{flex:0 0 auto}
+ #app.balabs-ui #selection .child-branches{
+  display:flex;flex-wrap:nowrap;max-width:100%;overflow-x:auto;
+  overscroll-behavior-x:contain;padding-bottom:2px;
+ }
+}
+
 </style>
 <style id="universe-rail-organic">
 #app.balabs-ui .inline-explorer .universe-rail{
@@ -254,7 +283,7 @@ html[dir="rtl"] body > .chapter-rail{left:auto!important;right:max(0px,env(safe-
   </nav>
   <div class="inline-explorer-controls" aria-label="Contrôles du réseau"><button class="btn" id="zoomIn" type="button" aria-label="Zoom avant">+</button><button class="btn" id="zoomOut" type="button" aria-label="Zoom arrière">−</button><button class="btn" id="reset" type="button" aria-label="Vue globale">⌖</button><button class="btn" id="back" type="button" aria-label="Vue précédente" disabled>↶</button></div>
   <section id="selection" aria-live="polite"></section>
-  <div id="hint">GLISSER · PINCER POUR ZOOMER · 1 CLIC : SÉLECTIONNER · DOUBLE-CLIC : OUVRIR DANS NOTION</div>
+  <div id="hint">GLISSER · PINCER POUR ZOOMER · GLISSER · PINCER POUR ZOOMER · 1 CLIC : EXPLORER · LIEN : OUVRIR NOTION</div>
   <nav class="inline-explorer-accessible" id="accessibleNodes" aria-label="Branches accessibles"></nav>
   <nav class="inline-explorer-accessible" id="crumbs" aria-label="Chemin dans le réseau"></nav>
   <div id="loading"><div class="card"><div class="card-body"><span class="loading-spinner"></span><p>Chargement du réseau vivant…</p></div></div></div>
@@ -680,7 +709,7 @@ const routeParams=new URLSearchParams(location.search);let initialLanguage=route
 <script src="./product-catalogue-filters.js?v=1"></script>
 <script src="./vengeance-adaptation.js?v=3"></script>
 <script type="importmap">{"imports":{"pixi.js":"https://cdn.jsdelivr.net/npm/pixi.js@8.23.0/dist/pixi.min.mjs"}}</script>
-<script type="module" src="./explorer-2d.js?v=scientific-universes-hover-2"></script>
+<script type="module" src="./explorer-2d.js?v=mycology-constellation-1"></script>
 <script src="./motion-system.js?v=14" defer></script>\n
 
 
