@@ -94,6 +94,8 @@ for(const id of expected){
   const before=original.byId.get(id),after=grown.byId.get(id);
   assert.deepEqual([after.x,after.y,after.colorKey],[before.x,before.y,before.colorKey],"Adding knowledge must not move or recolor another territory");
 }
+assert.ok(grown.byId.get("microbiology").territoryMass>original.byId.get("microbiology").territoryMass,"Adding real content must increase only that territory mass");
+assert.ok(grown.byId.get("microbiology").territoryScale>original.byId.get("microbiology").territoryScale,"Adding real content must expand its growth envelope");
 assert.deepEqual(
   original.nodes.map(node=>[node.id,node.x,node.y]),
   createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).nodes.map(node=>[node.id,node.x,node.y]),
