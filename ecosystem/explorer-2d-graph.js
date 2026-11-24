@@ -119,7 +119,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const anchor=ANCHORS[index];
     const territoryMass=countSubtree(universe)-1;
     const territoryScale=clamp(0.82+Math.sqrt(territoryMass)/15,0.9,1.62);
-    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:clamp(13+Math.sqrt(territoryMass)*0.72,15,25),level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,territoryMass,territoryScale,territoryRadius:Math.sqrt(territoryMass)*72,fractal:true};
+    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:clamp(13+Math.sqrt(territoryMass)*0.72,15,25),level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,territoryMass,territoryScale,territoryRadius:clamp(90+Math.sqrt(territoryMass)*30,150,300),fractal:true};
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
     edges.push({a:center,b:root,depth:0,generation:1,seed:hash("inoculation|"+root.id),hubLink:true,primaryHypha:true,inoculationIndex:index});
