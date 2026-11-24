@@ -114,6 +114,14 @@ assert.deepEqual(
   createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).nodes.map(node=>[node.id,node.x,node.y]),
   "The same knowledge tree must always produce the same biological morphology"
 );
+const reordered=structuredClone(fixture);
+reordered[0].children.reverse();
+const reorderedGraph=createPublicMycologyNetwork(reordered,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
+for(const node of original.nodes.filter(node=>node.rootId==="microbiology"&&node.level>0)){
+  const counterpart=reorderedGraph.byId.get(node.id);
+  assert.ok(counterpart, "Reordering source pages must not remove existing biological branches");
+  assert.ok(Math.abs(counterpart.x-node.x)<1e-9&&Math.abs(counterpart.y-node.y)<1e-9, "Branch geometry must be keyed to stable page identity, not the current order of Notion children");
+}
 
 const explorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(explorer,/if\(n\)activateNode\(n\)/,"a single click must select and focus a node");
