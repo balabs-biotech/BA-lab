@@ -36,6 +36,9 @@ for(const lang of languages){
   assert.ok(roots.every(node=>node.colorKey===node.id),lang+": each universe must use its own current taxonomy key, never a legacy color category");
   assert.ok(roots.every(node=>node.territoryMass>0),lang+": each territory must expose its real content mass");
   assert.ok(roots.every(node=>node.territoryRadius>0),lang+": each territory must receive a content-driven growth envelope");
+  for(const root of roots){
+    assert.ok(graph.nodes.filter(node=>node.rootId===root.id).every(node=>node.territoryRadius===root.territoryRadius),lang+": the content-driven territory envelope must reach every descendant that uses it for growth");
+  }
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
