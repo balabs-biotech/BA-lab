@@ -51,8 +51,8 @@ function relaxPublicMorphology(nodes,edges){
             ux=Math.cos(angle);uy=Math.sin(angle);distance=1;
           }else{ux=dx/distance;uy=dy/distance;}
           const force=Math.min(bothTerminal?(sameTerritory?6.5:2.8):(sameTerritory?3:1.4),(minimum-distance)*(bothTerminal?(sameTerritory?.22:.11):(sameTerritory?.15:.08)));
-          const wa=a.level===0?0:terminalIds.has(a.id)?.78:.42;
-          const wb=b.level===0?0:terminalIds.has(b.id)?.78:.42;
+          const wa=a.level<=1?0:terminalIds.has(a.id)?.78:.42;
+          const wb=b.level<=1?0:terminalIds.has(b.id)?.78:.42;
           const total=wa+wb;if(!total)continue;
           const da=delta.get(a.id),db=delta.get(b.id);
           da.x-=ux*force*wa/total;da.y-=uy*force*wa/total;
