@@ -47,7 +47,7 @@ export function createPublicMycologyNetwork(tree,hub){
       const lateral=side*distance*(depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20);
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
-      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex};
+      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
