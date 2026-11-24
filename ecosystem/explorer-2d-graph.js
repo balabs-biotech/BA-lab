@@ -20,10 +20,18 @@ const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubt
 
 
 function relaxPublicMorphology(nodes,edges){
-  const parentPairs=new Set(edges.filter(edge=>!edge.cross).map(edge=>[edge.a.id,edge.b.id].sort().join("|")));
-  const branchParents=new Set(edges.filter(edge=>!edge.cross).map(edge=>edge.a.id));
+  const parentEdges=edges.filter(edge=>!edge.cross);
+  const parentPairs=new Set(parentEdges.map(edge=>[edge.a.id,edge.b.id].sort().join("|")));
+  const branchParents=new Set(parentEdges.map(edge=>edge.a.id));
   const orderedNodes=[...nodes].sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
   const terminalIds=new Set(orderedNodes.filter(node=>node.level>0&&!branchParents.has(node.id)).map(node=>node.id));
+  const originalPositions=new Map(orderedNodes.map(node=>[node.id,{x:node.x,y:node.y}]));
+  const movementBudgets=new Map(orderedNodes.map(node=>[node.id,Infinity]));
+  for(const edge of parentEdges){
+    const length=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);
+    movementBudgets.set(edge.a.id,Math.min(movementBudgets.get(edge.a.id),length*.055));
+    movementBudgets.set(edge.b.id,Math.min(movementBudgets.get(edge.b.id),length*.055));
+  }
   const cellSize=104,moved=new Set();
   for(let pass=0;pass<20;pass++){
     const grid=new Map();
@@ -66,10 +74,21 @@ function relaxPublicMorphology(nodes,edges){
       const shift=delta.get(node.id),length=Math.hypot(shift.x,shift.y);
       if(!length)continue;
       const cap=terminalIds.has(node.id)?5:2.6,scale=Math.min(1,cap/length);
-      node.x+=shift.x*scale;node.y+=shift.y*scale;moved.add(node.id);
+      const origin=originalPositions.get(node.id),budget=movementBudgets.get(node.id);
+      const proposedX=node.x+shift.x*scale,proposedY=node.y+shift.y*scale;
+      const totalX=proposedX-origin.x,totalY=proposedY-origin.y,totalLength=Math.hypot(totalX,totalY);
+      const budgetScale=totalLength>budget?budget/totalLength:1;
+      node.x=origin.x+totalX*budgetScale;node.y=origin.y+totalY*budgetScale;
+      moved.add(node.id);
     }
   }
-  return moved.size;
+  const maxParentEdgeStretchRatio=parentEdges.reduce((maximum,edge)=>{
+    const originA=originalPositions.get(edge.a.id),originB=originalPositions.get(edge.b.id);
+    const originalLength=Math.hypot(originB.x-originA.x,originB.y-originA.y);
+    const currentLength=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);
+    return Math.max(maximum,currentLength/originalLength);
+  },1);
+  return {movedNodes:moved.size,maxParentEdgeStretchRatio};
 }
 
 export function createPublicMycologyNetwork(tree,hub){
@@ -129,7 +148,7 @@ export function createPublicMycologyNetwork(tree,hub){
   });
 
   // Relax spatial crowding without moving the eight fixed inoculation anchors.
-  const relaxedNodes=relaxPublicMorphology(nodes,edges);
+  const relaxation=relaxPublicMorphology(nodes,edges);
 
   // Give sibling hyphae a shared advancing trunk before they bifurcate.
   // The junction is geometric only: it adds no synthetic knowledge node or relation.
@@ -172,5 +191,5 @@ export function createPublicMycologyNetwork(tree,hub){
       addIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
     }
   }
-  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0,relaxedNodes}};
+  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0,relaxedNodes:relaxation.movedNodes,maxParentEdgeStretchRatio:relaxation.maxParentEdgeStretchRatio}};
 }
