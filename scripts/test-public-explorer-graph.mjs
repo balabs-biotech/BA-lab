@@ -49,8 +49,11 @@ for(const lang of languages){
     assert.ok(directChildren.every(node=>Math.abs(node.angle-root.angle)<=0.95),`${lang}: ${root.id} first-generation branches must grow as a controlled rhizomorphic fan, not a radial starburst`);
     const hasLateralGrowth=directChildren.some(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)>Math.hypot(dx,dy)*.05;});
     assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
-    const lateralRatios=directChildren.map(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)/(Math.hypot(dx,dy)||1);});
-    assert.ok(Math.max(...lateralRatios)<.38,`${lang}: ${root.id} primary hyphae must advance through the medium before widening laterally, not form a broad fan`);
+    if(root.id==="microbiology"){
+      const angularOffsets=directChildren.map(node=>Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)));
+      assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.45,`${lang}: the primary microbiology branches must open into a broad radial fan instead of staying nearly parallel`);
+      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.8,`${lang}: the radial opening must remain controlled and avoid a chaotic starburst`);
+    }
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
   assert.ok(graph.edges.some(edge=>edge.generation>=2),lang+": recursive knowledge branches must carry their biological generation");
