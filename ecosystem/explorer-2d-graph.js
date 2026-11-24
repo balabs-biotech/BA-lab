@@ -82,13 +82,15 @@ function relaxPublicMorphology(nodes,edges){
       moved.add(node.id);
     }
   }
-  const maxParentEdgeStretchRatio=parentEdges.reduce((maximum,edge)=>{
+  const edgeLengthRatios=parentEdges.map(edge=>{
     const originA=originalPositions.get(edge.a.id),originB=originalPositions.get(edge.b.id);
     const originalLength=Math.hypot(originB.x-originA.x,originB.y-originA.y);
     const currentLength=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);
-    return Math.max(maximum,currentLength/originalLength);
-  },1);
-  return {movedNodes:moved.size,maxParentEdgeStretchRatio};
+    return currentLength/originalLength;
+  });
+  const maxParentEdgeStretchRatio=Math.max(1,...edgeLengthRatios);
+  const minParentEdgeLengthRatio=Math.min(1,...edgeLengthRatios);
+  return {movedNodes:moved.size,maxParentEdgeStretchRatio,minParentEdgeLengthRatio};
 }
 
 export function createPublicMycologyNetwork(tree,hub){
@@ -191,5 +193,5 @@ export function createPublicMycologyNetwork(tree,hub){
       addIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
     }
   }
-  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0,relaxedNodes:relaxation.movedNodes,maxParentEdgeStretchRatio:relaxation.maxParentEdgeStretchRatio}};
+  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0,relaxedNodes:relaxation.movedNodes,maxParentEdgeStretchRatio:relaxation.maxParentEdgeStretchRatio,minParentEdgeLengthRatio:relaxation.minParentEdgeLengthRatio}};
 }
