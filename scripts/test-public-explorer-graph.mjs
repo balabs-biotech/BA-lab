@@ -37,6 +37,8 @@ for(const lang of languages){
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.primaryHypha===true),lang+": each universe must emerge from the central mycelial tissue");
+  assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.growthCurve&&Math.abs((edge.growthCurve.c1.x-edge.a.x)*(edge.b.y-edge.a.y)-(edge.growthCurve.c1.y-edge.a.y)*(edge.b.x-edge.a.x))>1000),lang+": primary hyphae must meander away from straight radial spokes");
+  assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.growthCurve&&Math.abs((edge.growthCurve.c2.x-edge.b.x)*(edge.b.y-edge.a.y)-(edge.growthCurve.c2.y-edge.b.y)*(edge.b.x-edge.a.x))>1000),lang+": primary hyphae must use an asymmetric return curve rather than a single bent spoke");
   for(const root of roots){
     const directChildren=graph.nodes.filter(node=>node.parent===root.id);
     assert.ok(directChildren.length>0,`${lang}: ${root.id} must retain its real first-generation knowledge nodes`);
