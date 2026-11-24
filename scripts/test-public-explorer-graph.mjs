@@ -33,6 +33,12 @@ for(const lang of languages){
   assert.equal(graph.stats.inoculationPoints,8,lang+": each territory must have its own inoculation point");
   const roots=expected.map(id=>graph.byId.get(id));
   assert.equal(new Set(roots.map(node=>node.colorKey)).size,8,lang+": all eight universes must have distinct color identities");
+  assert.ok(roots.every(node=>node.colorKey===node.id),lang+": each universe must use its own current taxonomy key, never a legacy color category");
+  assert.ok(roots.every(node=>node.territoryMass>0),lang+": each territory must expose its real content mass");
+  assert.ok(roots.every(node=>node.territoryRadius>0),lang+": each territory must receive a content-driven growth envelope");
+  for(const root of roots){
+    assert.ok(graph.nodes.filter(node=>node.rootId===root.id).every(node=>node.territoryRadius===root.territoryRadius),lang+": the content-driven territory envelope must reach every descendant that uses it for growth");
+  }
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
@@ -84,6 +90,10 @@ soilNode.relations=[...(soilNode.relations||[]),{target:"test-cross-territory-no
 const nestedGraph=createPublicMycologyNetwork(nestedFixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
 assert.ok(nestedGraph.edges.some(edge=>edge.verified&&edge.a.id==="soil"&&edge.b.id==="test-cross-territory-node"),"Nested documented relations must produce transverse links between knowledge nodes");
 const original=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
+assert.ok(Number.isFinite(original.stats.maxParentEdgeStretchRatio),"Spatial relaxation must report its maximum parent-child edge stretch");
+assert.ok(Number.isFinite(original.stats.minParentEdgeLengthRatio),"Spatial relaxation must report its minimum parent-child edge length ratio");
+assert.ok(original.stats.maxParentEdgeStretchRatio<=1.15,"Spatial relaxation must not stretch biological parent-child connections by more than 15 percent");
+assert.ok(original.stats.minParentEdgeLengthRatio>=0.85,"Spatial relaxation must not compress biological parent-child connections by more than 15 percent");
 const expanded=structuredClone(fixture);
 expanded[0].children.push({id:"future-knowledge-node",title:"Future knowledge",children:[]});
 const grown=createPublicMycologyNetwork(expanded,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
@@ -91,11 +101,31 @@ for(const id of expected){
   const before=original.byId.get(id),after=grown.byId.get(id);
   assert.deepEqual([after.x,after.y,after.colorKey],[before.x,before.y,before.colorKey],"Adding knowledge must not move or recolor another territory");
 }
+assert.ok(grown.byId.get("microbiology").territoryMass>original.byId.get("microbiology").territoryMass,"Adding real content must increase only that territory mass");
+assert.ok(grown.byId.get("microbiology").territoryScale>original.byId.get("microbiology").territoryScale,"Adding real content must expand its growth envelope");
+assert.ok(grown.byId.get("microbiology").territoryRadius>original.byId.get("microbiology").territoryRadius,"Adding real content must expand the actual lateral territory envelope");
+const envelopeProbe=fixture[0].children.find(node=>(node.children||[]).length);
+assert.ok(envelopeProbe,"The microbiology fixture must include a nested branch for envelope-growth verification");
+assert.notEqual(grown.byId.get(envelopeProbe.children[0].id).angle,original.byId.get(envelopeProbe.children[0].id).angle,"Increasing territory mass must widen deeper bifurcation geometry, not only branch lengths");
+const originalPrimaryIds=original.nodes.filter(node=>node.rootId==="microbiology"&&node.level===1).map(node=>node.id);
+const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).angle]);
+assert.deepEqual(primaryAngles(grown),primaryAngles(original),"Adding a new branch must not rotate the existing first-generation inoculation fan");
+assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
+assert.ok(expected.every(id=>{const a=original.byId.get(id),b=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).byId.get(id);return a.x===b.x&&a.y===b.y;}),"Spatial relaxation must preserve deterministic inoculation anchors");
+assert.ok(original.nodes.filter(node=>node.level>0).some(node=>Math.hypot(node.x-original.byId.get(node.rootId).x,node.y-original.byId.get(node.rootId).y)>0),"Spatial relaxation must operate on real descendants");
 assert.deepEqual(
   original.nodes.map(node=>[node.id,node.x,node.y]),
   createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).nodes.map(node=>[node.id,node.x,node.y]),
   "The same knowledge tree must always produce the same biological morphology"
 );
+const reordered=structuredClone(fixture);
+reordered[0].children.reverse();
+const reorderedGraph=createPublicMycologyNetwork(reordered,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
+for(const node of original.nodes.filter(node=>node.rootId==="microbiology"&&node.level>0)){
+  const counterpart=reorderedGraph.byId.get(node.id);
+  assert.ok(counterpart, "Reordering source pages must not remove existing biological branches");
+  assert.ok(Math.abs(counterpart.x-node.x)<1e-9&&Math.abs(counterpart.y-node.y)<1e-9, `Branch geometry for ${node.id} must be keyed to stable page identity, not child order (before ${node.x},${node.y}; after ${counterpart.x},${counterpart.y})`);
+}
 
 const explorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(explorer,/if\(n\)activateNode\(n\)/,"a single click must select and focus a node");
@@ -106,5 +136,6 @@ console.log("✓ public explorer single-click navigation contract");
 
 const publicRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
 assert.match(publicRenderer,/bezierCurveTo/,"Primary and secondary hyphae must use flowing cubic morphology, not single-arc spokes");
+assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eight current universe colors, not legacy taxonomy colors");
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a desktop-sized label envelope");

@@ -15,10 +15,83 @@ const ANCHORS=[
   {x:-455,y:280,angle:2.59},
   {x:-520,y:12,angle:3.12}
 ];
-const COLOR_KEYS={
-  microbiology:"bio",plants:"soil",ecology:"lab",bioprocesses:"products",
-  biomaterials:"iot",instrumentation:"work",digital:"evidence",physical:"myco"
-};
+const COLOR_KEYS={microbiology:"microbiology",plants:"plants",ecology:"ecology",bioprocesses:"bioprocesses",biomaterials:"biomaterials",instrumentation:"instrumentation",digital:"digital",physical:"physical"};
+const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubtree(child),0);
+
+
+function relaxPublicMorphology(nodes,edges){
+  const parentEdges=edges.filter(edge=>!edge.cross);
+  const parentPairs=new Set(parentEdges.map(edge=>[edge.a.id,edge.b.id].sort().join("|")));
+  const branchParents=new Set(parentEdges.map(edge=>edge.a.id));
+  const orderedNodes=[...nodes].sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+  const terminalIds=new Set(orderedNodes.filter(node=>node.level>0&&!branchParents.has(node.id)).map(node=>node.id));
+  const originalPositions=new Map(orderedNodes.map(node=>[node.id,{x:node.x,y:node.y}]));
+  const movementBudgets=new Map(orderedNodes.map(node=>[node.id,Infinity]));
+  for(const edge of parentEdges){
+    const length=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);
+    movementBudgets.set(edge.a.id,Math.min(movementBudgets.get(edge.a.id),length*.055));
+    movementBudgets.set(edge.b.id,Math.min(movementBudgets.get(edge.b.id),length*.055));
+  }
+  const cellSize=104,moved=new Set();
+  for(let pass=0;pass<20;pass++){
+    const grid=new Map();
+    for(const node of orderedNodes){
+      const key=Math.floor(node.x/cellSize)+":"+Math.floor(node.y/cellSize);
+      if(!grid.has(key))grid.set(key,[]);
+      grid.get(key).push(node);
+    }
+    const delta=new Map(orderedNodes.map(node=>[node.id,{x:0,y:0}]));
+    for(const a of orderedNodes){
+      const gx=Math.floor(a.x/cellSize),gy=Math.floor(a.y/cellSize);
+      for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+        const bucket=grid.get((gx+ox)+":"+(gy+oy));if(!bucket)continue;
+        for(const b of bucket){
+          if(a.id>=b.id||a.level===0&&b.level===0)continue;
+          const sameTerritory=a.rootId===b.rootId;
+          if(sameTerritory&&parentPairs.has([a.id,b.id].sort().join("|")))continue;
+          const bothTerminal=terminalIds.has(a.id)&&terminalIds.has(b.id);
+          const dx=b.x-a.x,dy=b.y-a.y;
+          let distance=Math.hypot(dx,dy);
+          const minimum=bothTerminal?(sameTerritory?76:52):(sameTerritory?Math.max(25,a.r+b.r+12):Math.max(38,a.r+b.r+24));
+          if(distance>=minimum)continue;
+          let ux,uy;
+          if(distance<.001){
+            const seed=hash(a.id+"|"+b.id),angle=(seed%6283)/1000;
+            ux=Math.cos(angle);uy=Math.sin(angle);distance=1;
+          }else{ux=dx/distance;uy=dy/distance;}
+          const force=Math.min(bothTerminal?(sameTerritory?6.5:2.8):(sameTerritory?3:1.4),(minimum-distance)*(bothTerminal?(sameTerritory?.22:.11):(sameTerritory?.15:.08)));
+          const wa=a.level<=1?0:terminalIds.has(a.id)?.78:.42;
+          const wb=b.level<=1?0:terminalIds.has(b.id)?.78:.42;
+          const total=wa+wb;if(!total)continue;
+          const da=delta.get(a.id),db=delta.get(b.id);
+          da.x-=ux*force*wa/total;da.y-=uy*force*wa/total;
+          db.x+=ux*force*wb/total;db.y+=uy*force*wb/total;
+        }
+      }
+    }
+    for(const node of orderedNodes){
+      if(node.level===0)continue;
+      const shift=delta.get(node.id),length=Math.hypot(shift.x,shift.y);
+      if(!length)continue;
+      const cap=terminalIds.has(node.id)?5:2.6,scale=Math.min(1,cap/length);
+      const origin=originalPositions.get(node.id),budget=movementBudgets.get(node.id);
+      const proposedX=node.x+shift.x*scale,proposedY=node.y+shift.y*scale;
+      const totalX=proposedX-origin.x,totalY=proposedY-origin.y,totalLength=Math.hypot(totalX,totalY);
+      const budgetScale=totalLength>budget?budget/totalLength:1;
+      node.x=origin.x+totalX*budgetScale;node.y=origin.y+totalY*budgetScale;
+      moved.add(node.id);
+    }
+  }
+  const edgeLengthRatios=parentEdges.map(edge=>{
+    const originA=originalPositions.get(edge.a.id),originB=originalPositions.get(edge.b.id);
+    const originalLength=Math.hypot(originB.x-originA.x,originB.y-originA.y);
+    const currentLength=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);
+    return currentLength/originalLength;
+  });
+  const maxParentEdgeStretchRatio=Math.max(1,...edgeLengthRatios);
+  const minParentEdgeLengthRatio=Math.min(1,...edgeLengthRatios);
+  return {movedNodes:moved.size,maxParentEdgeStretchRatio,minParentEdgeLengthRatio};
+}
 
 export function createPublicMycologyNetwork(tree,hub){
   if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
@@ -36,19 +109,26 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
-    const spread=depth===1?clamp(0.08+Math.log2(kids.length+1)*0.04,0.10,0.25):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
-    const distance=depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1);
+    const territoryScale=parent.territoryScale||1;
+    const territoryRadius=parent.territoryRadius||180;
+    const envelopeFactor=clamp(territoryRadius/260,0.78,1.42);
+    const baseSpread=depth===1?0.18:clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
+    // Keep the inoculation fan stable; deeper bifurcations widen with the real territory envelope.
+    const spread=baseSpread*(depth===1?1:envelopeFactor);
+    const distance=(depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1))*territoryScale;
     kids.forEach((child,index)=>{
-      const seed=hash(child.id),side=index%2===0?-1:1;
-      const fraction=kids.length===1?(((seed>>>9)&255)/255-.5)*0.3:index/(kids.length-1)-.5;
+      const seed=hash(child.id),side=(seed&1)===0?-1:1;
+      // Stable ID-derived branch placement: appending Notion content must not rotate existing hyphae.
+      const fraction=((seed>>>8)/0xffffff)-.5;
       const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?0.05:0.22);
       const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.018:0.075);
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateral=side*distance*(depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20);
+      const lateralRatio=depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20;
+      const lateral=side*Math.min(distance*lateralRatio*(depth===1?1:envelopeFactor),territoryRadius*(depth===1?0.10:0.30));
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
-      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex};
+      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale,territoryRadius};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
@@ -60,12 +140,17 @@ export function createPublicMycologyNetwork(tree,hub){
   tree.forEach((universe,index)=>{
     if(!universe.id||!universe.title)throw new Error("Every scientific universe needs an id and title.");
     const anchor=ANCHORS[index];
-    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:16,level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,fractal:true};
+    const territoryMass=countSubtree(universe)-1;
+    const territoryScale=clamp(0.82+Math.sqrt(territoryMass)/15,0.9,1.62);
+    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:clamp(13+Math.sqrt(territoryMass)*0.72,15,25),level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,territoryMass,territoryScale,territoryRadius:clamp(90+Math.sqrt(territoryMass)*30,150,300),fractal:true};
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
     edges.push({a:center,b:root,depth:0,generation:1,seed:hash("inoculation|"+root.id),hubLink:true,primaryHypha:true,inoculationIndex:index});
     walk(universe,root,1,anchor.angle,universe.id,index);
   });
+
+  // Relax spatial crowding without moving the eight fixed inoculation anchors.
+  const relaxation=relaxPublicMorphology(nodes,edges);
 
   // Give sibling hyphae a shared advancing trunk before they bifurcate.
   // The junction is geometric only: it adds no synthetic knowledge node or relation.
@@ -108,5 +193,5 @@ export function createPublicMycologyNetwork(tree,hub){
       addIndex(target.id,{target:source.id,label:relation.label,basis,evidence:relation.evidence});
     }
   }
-  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0}};
+  return {nodes,edges,byId,relationIndex,stats:{universeCount:tree.length,inoculationPoints:ANCHORS.length,nodeCount:nodes.length,edgeCount:edges.length,verifiedRelations,explicitRelations,contentRelations,crossUniverseConnections:relationPairs.size,localAnastomoses:0,relaxedNodes:relaxation.movedNodes,maxParentEdgeStretchRatio:relaxation.maxParentEdgeStretchRatio,minParentEdgeLengthRatio:relaxation.minParentEdgeLengthRatio}};
 }
