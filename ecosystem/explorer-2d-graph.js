@@ -15,10 +15,8 @@ const ANCHORS=[
   {x:-455,y:280,angle:2.59},
   {x:-520,y:12,angle:3.12}
 ];
-const COLOR_KEYS={
-  microbiology:"bio",plants:"soil",ecology:"lab",bioprocesses:"products",
-  biomaterials:"iot",instrumentation:"work",digital:"evidence",physical:"myco"
-};
+const COLOR_KEYS={microbiology:"microbiology",plants:"plants",ecology:"ecology",bioprocesses:"bioprocesses",biomaterials:"biomaterials",instrumentation:"instrumentation",digital:"digital",physical:"physical"};
+const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubtree(child),0);
 
 export function createPublicMycologyNetwork(tree,hub){
   if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
@@ -37,7 +35,8 @@ export function createPublicMycologyNetwork(tree,hub){
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
     const spread=depth===1?clamp(0.08+Math.log2(kids.length+1)*0.04,0.10,0.25):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
-    const distance=depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1);
+    const territoryScale=parent.territoryScale||1;
+    const distance=(depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1))*territoryScale;
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
       const fraction=kids.length===1?(((seed>>>9)&255)/255-.5)*0.3:index/(kids.length-1)-.5;
@@ -60,7 +59,9 @@ export function createPublicMycologyNetwork(tree,hub){
   tree.forEach((universe,index)=>{
     if(!universe.id||!universe.title)throw new Error("Every scientific universe needs an id and title.");
     const anchor=ANCHORS[index];
-    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:16,level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,fractal:true};
+    const territoryMass=countSubtree(universe)-1;
+    const territoryScale=clamp(0.82+Math.sqrt(territoryMass)/15,0.9,1.62);
+    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:clamp(13+Math.sqrt(territoryMass)*0.72,15,25),level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,territoryMass,territoryScale,territoryRadius:Math.sqrt(territoryMass)*72,fractal:true};
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
     edges.push({a:center,b:root,depth:0,generation:1,seed:hash("inoculation|"+root.id),hubLink:true,primaryHypha:true,inoculationIndex:index});
