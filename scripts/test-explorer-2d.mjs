@@ -191,7 +191,13 @@ try {
     // Focus the exact canonical leaf before reading its animated canvas hitbox.
     await leafButton.focus();
     await leafButton.press('Enter');
-    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
+    // Wait for the camera animation to settle before reading canvas-space hitboxes.
+    // Otherwise the pointer can target a stale position from the preceding frame.
+    await page.waitForFunction(() => {
+      const field = document.querySelector('#field');
+      return Math.abs(Number(field?.dataset.scale || 0) - Number(field?.dataset.targetScale || 0)) < .01;
+    }, undefined, { timeout: 15000 });
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const pointForLeaf = async () => page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
