@@ -121,7 +121,10 @@ export function createPublicMycologyNetwork(tree,hub){
     walk(universe,root,1,anchor.angle,universe.id,index);
   });
 
-  // Relax spatial crowding without moving the eight fixed inoculation anchors.\n  const relaxedNodes=relaxPublicMorphology(nodes,edges);\n\n  // Give sibling hyphae a shared advancing trunk before they bifurcate.
+  // Relax spatial crowding without moving the eight fixed inoculation anchors.
+  const relaxedNodes=relaxPublicMorphology(nodes,edges);
+
+  // Give sibling hyphae a shared advancing trunk before they bifurcate.
   // The junction is geometric only: it adds no synthetic knowledge node or relation.
   const siblingEdges=new Map();
   for(const edge of edges.filter(item=>item.fractal)){
