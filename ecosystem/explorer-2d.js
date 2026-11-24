@@ -1,5 +1,5 @@
-import { createPixiRenderer } from "./explorer-2d-pixi.js?v=public-mycology-renderer-1";
-import { createPublicMycologyNetwork } from "./explorer-2d-graph.js?v=mycology-constellation-1";
+import { createPixiRenderer } from "./explorer-2d-pixi.js?v=rhizomorphic-growth-2";
+import { createPublicMycologyNetwork } from "./explorer-2d-graph.js?v=rhizomorphic-growth-2";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={microbiology:"#79a991",plants:"#8fb58c",ecology:"#c19b73",bioprocesses:"#b58d73",biomaterials:"#c88773",instrumentation:"#7eaaa3",digital:"#aa9cbb",physical:"#b5b58d"};
 const COPY={
