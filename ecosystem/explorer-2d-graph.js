@@ -22,7 +22,7 @@ const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubt
 function relaxPublicMorphology(nodes,edges){
   const parentPairs=new Set(edges.filter(edge=>!edge.cross).map(edge=>[edge.a.id,edge.b.id].sort().join("|")));
   const branchParents=new Set(edges.filter(edge=>!edge.cross).map(edge=>edge.a.id));
-  const orderedNodes=[...nodes].sort((a,b)=>a.id.localeCompare(b.id));
+  const orderedNodes=[...nodes].sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
   const terminalIds=new Set(orderedNodes.filter(node=>node.level>0&&!branchParents.has(node.id)).map(node=>node.id));
   const cellSize=104,moved=new Set();
   for(let pass=0;pass<20;pass++){
