@@ -112,7 +112,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const territoryScale=parent.territoryScale||1;
     const territoryRadius=parent.territoryRadius||180;
     const envelopeFactor=clamp(territoryRadius/260,0.78,1.42);
-    const baseSpread=depth===1?0.18:clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
+    const baseSpread=depth===1?1.10:clamp(0.52+Math.log2(kids.length+1)*0.14,0.62,1.18);
     // Keep the inoculation fan stable; deeper bifurcations widen with the real territory envelope.
     const spread=baseSpread*(depth===1?1:envelopeFactor);
     const distance=(depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1))*territoryScale;
