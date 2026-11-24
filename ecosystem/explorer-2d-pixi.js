@@ -48,8 +48,8 @@ export async function createPixiRenderer(canvas){
    const bendLimit=e.primaryHypha?Math.min(210,len*.36):e.cross?Math.min(150,len*.31):Math.min(112,len*.29);
    const bendA=bendLimit*side*(.48+((seed>>>5)&63)/110),bendB=bendLimit*(-side)*(.22+((seed>>>13)&63)/150);
    const driftA=(((seed>>>12)&255)/255-.5)*Math.min(58,len*.18),driftB=(((seed>>>20)&255)/255-.5)*Math.min(48,len*.15);
-   const c1={x:a.x+dx*.31-dy/len*bendA+dx/len*driftA,y:a.y+dy*.31+dx/len*bendA+dy/len*driftA};
-   const c2={x:b.x-dx*.31-dy/len*bendB+dx/len*driftB,y:b.y-dy*.31+dx/len*bendB+dy/len*driftB};
+   const c1=e.growthCurve?.c1||{x:a.x+dx*.31-dy/len*bendA+dx/len*driftA,y:a.y+dy*.31+dx/len*bendA+dy/len*driftA};
+   const c2=e.growthCurve?.c2||{x:b.x-dx*.31-dy/len*bendB+dx/len*driftB,y:b.y-dy*.31+dx/len*bendB+dy/len*driftB};
    const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.15:e.cross?.55:e.primaryHypha?2.35:generation<=2?1.55:generation===3?1.12:Math.max(.42,.78-generation*.055))*(hot?1.55:1);
    const terminalTip=!e.cross&&terminalIds.has(e.b.id);
    const strokeColor=hot?0xe4e7dd:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
