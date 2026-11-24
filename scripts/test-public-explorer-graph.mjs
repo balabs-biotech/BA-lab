@@ -33,6 +33,9 @@ for(const lang of languages){
   assert.equal(graph.stats.inoculationPoints,8,lang+": each territory must have its own inoculation point");
   const roots=expected.map(id=>graph.byId.get(id));
   assert.equal(new Set(roots.map(node=>node.colorKey)).size,8,lang+": all eight universes must have distinct color identities");
+  assert.ok(roots.every(node=>node.colorKey===node.id),lang+": each universe must use its own current taxonomy key, never a legacy color category");
+  assert.ok(roots.every(node=>node.territoryMass>0),lang+": each territory must expose its real content mass");
+  assert.ok(roots.every(node=>node.territoryRadius>0),lang+": each territory must receive a content-driven growth envelope");
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
@@ -106,5 +109,6 @@ console.log("✓ public explorer single-click navigation contract");
 
 const publicRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
 assert.match(publicRenderer,/bezierCurveTo/,"Primary and secondary hyphae must use flowing cubic morphology, not single-arc spokes");
+assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eight current universe colors, not legacy taxonomy colors");
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a desktop-sized label envelope");
