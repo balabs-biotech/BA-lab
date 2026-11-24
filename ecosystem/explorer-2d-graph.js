@@ -87,8 +87,12 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
-    const spread=depth===1?clamp(0.08+Math.log2(kids.length+1)*0.04,0.10,0.25):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
     const territoryScale=parent.territoryScale||1;
+    const territoryRadius=parent.territoryRadius||180;
+    const envelopeFactor=clamp(territoryRadius/260,0.78,1.42);
+    const baseSpread=depth===1?clamp(0.08+Math.log2(kids.length+1)*0.04,0.10,0.25):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
+    // Keep the inoculation fan stable; deeper bifurcations widen with the real territory envelope.
+    const spread=baseSpread*(depth===1?1:envelopeFactor);
     const distance=(depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1))*territoryScale;
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
@@ -97,10 +101,11 @@ export function createPublicMycologyNetwork(tree,hub){
       const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.018:0.075);
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateral=side*distance*(depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20);
+      const lateralRatio=depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20;
+      const lateral=side*Math.min(distance*lateralRatio*(depth===1?1:envelopeFactor),territoryRadius*(depth===1?0.10:0.30));
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
-      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale};
+      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale,territoryRadius};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
