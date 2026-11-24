@@ -96,7 +96,8 @@ export function createPublicMycologyNetwork(tree,hub){
     const distance=(depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1))*territoryScale;
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
-      const fraction=kids.length===1?(((seed>>>9)&255)/255-.5)*0.3:index/(kids.length-1)-.5;
+      // Stable ID-derived branch placement: appending Notion content must not rotate existing hyphae.
+      const fraction=((seed>>>8)/0xffffff)-.5;
       const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?0.05:0.22);
       const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.018:0.075);
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
