@@ -63,7 +63,13 @@ export function createPublicMycologyNetwork(tree,hub){
     const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:16,level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,fractal:true};
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
-    edges.push({a:center,b:root,depth:0,generation:1,seed:hash("inoculation|"+root.id),hubLink:true,primaryHypha:true,inoculationIndex:index});
+    const pathSeed=hash("primary-hypha|"+root.id),pathSide=(pathSeed&1)?1:-1;
+    const dx=root.x-center.x,dy=root.y-center.y,length=Math.hypot(dx,dy)||1;
+    const normal={x:-dy/length,y:dx/length};
+    const amplitude=82+((pathSeed>>>8)&63)*0.72;
+    const c1={x:center.x+dx*.23+normal.x*amplitude*pathSide,y:center.y+dy*.23+normal.y*amplitude*pathSide};
+    const c2={x:center.x+dx*.76-normal.x*amplitude*(.48+((pathSeed>>>16)&31)/90)*pathSide,y:center.y+dy*.76-normal.y*amplitude*(.48+((pathSeed>>>16)&31)/90)*pathSide};
+    edges.push({a:center,b:root,depth:0,generation:1,seed:pathSeed,hubLink:true,primaryHypha:true,inoculationIndex:index,hyphaPath:[c1,c2]});
     walk(universe,root,1,anchor.angle,universe.id,index);
   });
 
