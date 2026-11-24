@@ -51,8 +51,10 @@ for(const lang of languages){
     assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
     if(root.id==="microbiology"){
       const angularOffsets=directChildren.map(node=>Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)));
-      assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.45,`${lang}: the primary microbiology branches must open into a broad radial fan instead of staying nearly parallel`);
-      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.8,`${lang}: the radial opening must remain controlled and avoid a chaotic starburst`);
+      assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.78,`${lang}: the primary microbiology branches must occupy a wide radial fan, not a narrow bouquet`);
+      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.98,`${lang}: the radial opening must remain controlled and avoid a chaotic starburst`);
+      const meanRadialReach=directChildren.reduce((sum,node)=>sum+Math.hypot(node.x-root.x,node.y-root.y),0)/directChildren.length;
+      assert.ok(meanRadialReach>=175,`${lang}: primary microbiology branches must extend outward far enough to occupy the territory`);
     }
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
