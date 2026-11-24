@@ -99,6 +99,10 @@ for(const id of expected){
 }
 assert.ok(grown.byId.get("microbiology").territoryMass>original.byId.get("microbiology").territoryMass,"Adding real content must increase only that territory mass");
 assert.ok(grown.byId.get("microbiology").territoryScale>original.byId.get("microbiology").territoryScale,"Adding real content must expand its growth envelope");
+assert.ok(grown.byId.get("microbiology").territoryRadius>original.byId.get("microbiology").territoryRadius,"Adding real content must expand the actual lateral territory envelope");
+const envelopeProbe=fixture[0].children.find(node=>(node.children||[]).length);
+assert.ok(envelopeProbe,"The microbiology fixture must include a nested branch for envelope-growth verification");
+assert.notEqual(grown.byId.get(envelopeProbe.children[0].id).angle,original.byId.get(envelopeProbe.children[0].id).angle,"Increasing territory mass must widen deeper bifurcation geometry, not only branch lengths");
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
 assert.ok(expected.every(id=>{const a=original.byId.get(id),b=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).byId.get(id);return a.x===b.x&&a.y===b.y;}),"Spatial relaxation must preserve deterministic inoculation anchors");
 assert.ok(original.nodes.filter(node=>node.level>0).some(node=>Math.hypot(node.x-original.byId.get(node.rootId).x,node.y-original.byId.get(node.rootId).y)>0),"Spatial relaxation must operate on real descendants");
