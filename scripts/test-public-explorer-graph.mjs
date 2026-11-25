@@ -147,6 +147,6 @@ assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a
 assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the complete tree, without changing the graph geometry");
 assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must include every real branch node, not only roots, so mobile territories cannot be clipped");
 
-assert.match(publicExplorer,/w<600\?\(/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
+assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
-assert.match(publicRenderer,/fontSize\+\(mobile\?1\.5:0\)/,"Mobile labels must receive a modest readable size increase");
+assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
