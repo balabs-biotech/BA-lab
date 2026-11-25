@@ -30,23 +30,11 @@ export async function createPixiRenderer(canvas){
   const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
   const terminalIds=new Set(nodes.filter(n=>n.level>0&&!branchParents.has(n.id)).map(n=>n.id));
   const bezierPoint=(a,c1,c2,b,t)=>{const u=1-t;return{x:u*u*u*a.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*b.y};};
-  const drawnTrunks=new Set();
-  for(const edge of edges){
-   if(!edge.branchPoint||drawnTrunks.has(edge.a.id))continue;
-   drawnTrunks.add(edge.a.id);
-   const parent=edge.a,p=edge.branchPoint,dx=p.x-parent.x,dy=p.y-parent.y,len=Math.hypot(dx,dy)||1;
-   const seed=(edge.seed??hash(parent.id))>>>0,side=(seed&1)?1:-1;
-   const bend=Math.min(24,len*.22)*side;
-   const c1={x:parent.x+dx*.34-dy/len*bend,y:parent.y+dy*.34+dx/len*bend};
-   const c2={x:p.x-dx*.32+dy/len*bend*.55,y:p.y-dy*.32-dx/len*bend*.55};
-   const color=PALETTE[edge.b.colorKey||edge.a.colorKey]||0x91a99b;
-   filaments.moveTo(parent.x,parent.y).bezierCurveTo(c1.x,c1.y,c2.x,c2.y,p.x,p.y).stroke({color,alpha:alphaFor(parent.level+1)*.82,width:parent.level===0?2.15:parent.level===1?1.45:1.02,cap:"round"});
-  }
   for(const e of edges){
    const selectedRelation=!!selected&&(e.a.id===selected.id||e.b.id===selected.id);
    if(e.cross&&!selectedRelation&&scale<3)continue;
    const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
-   const a=e.branchPoint?{x:e.branchPoint.x,y:e.branchPoint.y}:point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+   const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
    const bendLimit=e.primaryHypha?Math.min(210,len*.36):e.cross?Math.min(150,len*.31):Math.min(112,len*.29);
    const bendA=bendLimit*side*(.48+((seed>>>5)&63)/110),bendB=bendLimit*(-side)*(.22+((seed>>>13)&63)/150);
