@@ -3,18 +3,13 @@
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0;};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-// Eight irregular inoculation points are anchored around the central mycology tissue.
-// Unequal distances and angles avoid a radial ring while preserving stable brand positions.
-const ANCHORS=[
-  {x:-430,y:-112,angle:-2.88},
-  {x:-145,y:-355,angle:-1.97},
-  {x:310,y:-282,angle:-0.78},
-  {x:505,y:48,angle:0.10},
-  {x:285,y:385,angle:0.93},
-  {x:-72,y:485,angle:1.72},
-  {x:-455,y:280,angle:2.59},
-  {x:-520,y:12,angle:3.12}
-];
+// Eight inoculation points form a true, evenly spaced first growth ring.
+const ROOT_RING_RADIUS=430;
+const SECTOR_HALF_ANGLE=.30;
+const ANCHORS=Array.from({length:8},(_,index)=>{
+  const angle=-Math.PI/2+index*Math.PI/4;
+  return{x:Math.cos(angle)*ROOT_RING_RADIUS,y:Math.sin(angle)*ROOT_RING_RADIUS,angle};
+});
 const COLOR_KEYS={microbiology:"microbiology",plants:"plants",ecology:"ecology",bioprocesses:"bioprocesses",biomaterials:"biomaterials",instrumentation:"instrumentation",digital:"digital",physical:"physical"};
 const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubtree(child),0);
 
@@ -104,35 +99,33 @@ export function createPublicMycologyNetwork(tree,hub){
 
   // Each knowledge branch grows recursively from its own inoculation point.
   // Seeded angular drift creates a controlled fractal morphology without filler.
-  const walk=(data,parent,depth,baseAngle,rootId,inoculationIndex)=>{
+  const walk=(data,parent,depth,baseAngle,rootId,inoculationIndex,sectorCenter)=>{
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
     const territoryScale=parent.territoryScale||1;
     const territoryRadius=parent.territoryRadius||180;
     const envelopeFactor=clamp(territoryScale,0.78,1.42);
-    const baseSpread=depth===1?1.55:clamp(0.70+Math.log2(kids.length+1)*0.16,0.78,1.42);
-    // Keep the inoculation fan stable; deeper bifurcations widen with the real territory envelope.
-    const spread=baseSpread*(depth===1?1:envelopeFactor);
-    const distance=(depth===1?190+Math.sqrt(kids.length)*20:depth===2?154+Math.sqrt(kids.length)*21:depth===3?108:Math.max(36,58-depth*2.0))*territoryScale;
+    // Each universe owns a 45-degree wedge. Branches fan within that wedge,
+    // then advance through concentric growth rings instead of wandering into neighbours.
+    const spread=depth===1?.56:clamp(.24+Math.log2(kids.length+1)*.035,.24,.34)*envelopeFactor;
+    const ringRadius=ROOT_RING_RADIUS+depth*155;
     kids.forEach((child,index)=>{
-      const seed=hash(child.id),side=(seed&1)===0?-1:1;
-      // Stable ID-derived branch placement: appending Notion content must not rotate existing hyphae.
+      const seed=hash(child.id);
+      // ID-derived drift keeps existing branches stable when Notion children are reordered or appended.
       const fraction=((seed>>>8)/0xffffff)-.5;
-      const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?0.05:0.22);
-      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.018:0.075);
-      const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
-      const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateralRatio=depth===1?0.10+((seed>>>2)&255)/255*0.14:0.20+((seed>>>2)&255)/255*0.22;
-      const lateral=side*Math.min(distance*lateralRatio*(depth===1?1:envelopeFactor),territoryRadius*(depth===1?0.16:0.34));
-      const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
-      const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
+      const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?.035:.085);
+      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*.79)*(depth===1?.008:.022);
+      const angle=clamp(baseAngle+fraction*spread+localDrift+inheritedDrift,sectorCenter-SECTOR_HALF_ANGLE,sectorCenter+SECTOR_HALF_ANGLE);
+      const radialJitter=(((seed>>>16)&63)/63-.5)*(depth===1?7:15);
+      const radial=ringRadius+radialJitter;
+      const x=Math.cos(angle)*radial;
+      const y=Math.sin(angle)*radial;
       const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale,territoryRadius};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
-      const inheritedSplit=side*(depth===1?0.04+((seed>>>20)&31)/220:0.12+((seed>>>20)&31)/120);
-      walk(child,node,depth+1,angle+inheritedSplit,rootId,inoculationIndex);
+      walk(child,node,depth+1,angle,rootId,inoculationIndex,sectorCenter);
     });
   };
 
@@ -145,7 +138,7 @@ export function createPublicMycologyNetwork(tree,hub){
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
     edges.push({a:center,b:root,depth:0,generation:1,seed:hash("inoculation|"+root.id),hubLink:true,primaryHypha:true,inoculationIndex:index});
-    walk(universe,root,1,anchor.angle,universe.id,index);
+    walk(universe,root,1,anchor.angle,universe.id,index,anchor.angle);
   });
 
   // Relax spatial crowding without moving the eight fixed inoculation anchors.
