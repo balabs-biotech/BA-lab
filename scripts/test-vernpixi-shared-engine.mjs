@@ -44,6 +44,7 @@ assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'Th
 assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
 assert.doesNotMatch(publicRenderer,/junctions\.poly\(polygon\)/,'Cell junctions must not be rendered as polygonal markers');
 assert.match(publicRenderer,/const cellOffsets=/,'Knowledge points must use organic cell clusters rather than geometric badges');
+assert.ok(publicRenderer.indexOf("const mobile=width<600")<publicRenderer.indexOf("const candidates=[]"),"Mobile zoom thresholds must be initialized before they are used to reveal deeper labels");
 assert.match(publicRenderer,/junctions\.circle\(cx,cy,cellRadius\)/,'Cell clusters must be built from overlapping membrane-like lobes');
 assert.match(publicRenderer,/const dishRadius=.*Math\.hypot\(n\.x,n\.y\).*64/,'The public graph must be enclosed by a circular Petri-dish rim sized around the actual mycelial growth');
 assert.match(publicRenderer,/field\.circle\(width\/2\+offset\.x,height\/2\+offset\.y,dishRadius\*scale\)\.stroke/,'The public renderer must draw a camera-aware circular Petri-dish boundary around the mycelial colony');
