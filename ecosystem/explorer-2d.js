@@ -38,10 +38,10 @@ function buildNetwork(){
 function fitOverview(){
  const bounds=nodes.filter(n=>Number.isFinite(n.x)&&Number.isFinite(n.y));
  if(!bounds.length){targetScale=.5;targetOffset={x:0,y:0};return;}
- // Keep the BA Labs identity at the visual origin while fitting every real
+ // Keep the mycology core at the visual origin while fitting every real
  // hypha, not just the eight inoculation anchors. This prevents edge clipping
  // on narrow screens and keeps the complete biological tissue in view.
- const origin=nodes.find(n=>n.identity)||nodes.find(n=>n.id==="balabs-identity")||{x:0,y:0};
+ const origin=nodes.find(n=>n.id==="mycology-center")||{x:0,y:0};
  const extentX=Math.max(...bounds.map(n=>Math.abs(n.x-origin.x)));
  const extentY=Math.max(...bounds.map(n=>Math.abs(n.y-origin.y)));
  const mobile=w<600;
