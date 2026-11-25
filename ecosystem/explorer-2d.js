@@ -62,7 +62,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];targetScale=zoomTo??(mobile?defaultZoom*.72:defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.40:h/2;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];targetScale=zoomTo??(mobile?Math.min(defaultZoom*.31,1.2):defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.40:h/2;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
