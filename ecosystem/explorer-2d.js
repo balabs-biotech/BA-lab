@@ -62,7 +62,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const defaultZoom=n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?3.4:3.6;targetScale=zoomTo??(mobile?defaultZoom*.31:defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.40:h/2;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];targetScale=zoomTo??(mobile?defaultZoom*.72:defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.40:h/2;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
@@ -81,8 +81,9 @@ function hit(x,y){
  if(labelHit)return labelHit;
  let found=null,best=22;
  const labelZoom=[0,1.2,2.0,3.0,4.2,5.5,7.0,8.6,10.2];
+ const mobile=w<600;
  for(const n of nodes){
-  const threshold=labelZoom[Math.min(n.level,labelZoom.length-1)]||0;
+  const threshold=(labelZoom[Math.min(n.level,labelZoom.length-1)]||0)*(mobile?.68:1);
   if(!visibleLabels.has(n.id)||scale<threshold||levelOpacity(n.level)<.5)continue;
   const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);
   if(d<limit){best=d;found=n;}
