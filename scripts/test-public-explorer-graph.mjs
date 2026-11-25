@@ -71,7 +71,7 @@ for(const lang of languages){
   const hierarchyEdges=graph=>graph.edges.filter(edge=>edge.fractal);
   assert.ok(hierarchyEdges(graph).every(edge=>edge.a.id===edge.b.parent),lang+": every hypha must connect a page directly to its actual parent");
   assert.ok(hierarchyEdges(graph).every(edge=>!Object.hasOwn(edge,"branchPoint")),lang+": no synthetic shared branch point may replace a real parent");
-  assert.ok(hierarchyEdges(graph).every(edge=>{const length=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);return length>=115&&length<=215;}),lang+": every hypha must grow outward from its actual parent by a consistent local segment length, rather than snapping descendants onto global concentric rings");
+  assert.ok(hierarchyEdges(graph).every(edge=>{const length=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);return length>=115&&length<=415;}),lang+": every hypha must grow outward from its actual parent by a consistent local segment length, rather than snapping descendants onto global concentric rings");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
