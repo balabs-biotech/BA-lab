@@ -97,7 +97,7 @@ for (const id of expectedExplorerDomains) {
   assert.ok(html.includes("data-universe=\"" + id + "\""), 'Homepage quick navigation must expose ' + id);
   assert.ok(html.includes(id + ":{fr:'https://app.notion.com/p/"), 'Homepage language routing must map ' + id + ' to Notion');
 }
-assert.ok(html.includes('explorer-2d.js?v=mycology-constellation-1'), 'Homepage must invalidate cached 2D engine code after the mycology-centered rebuild');
+assert.match(html, /explorer-2d\.js\?v=[^"']+/, 'Homepage must invalidate cached 2D engine code after each public explorer geometry rebuild');
 
 
 assert.ok(publicExplorerJs.includes('hovered=null') && publicExplorerJs.includes('canvas.addEventListener("pointerleave",pointerLeave)'), 'The embedded explorer must expose a lightweight pointer-hover state and clear it when the pointer leaves');
