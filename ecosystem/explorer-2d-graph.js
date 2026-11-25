@@ -119,7 +119,7 @@ export function createPublicMycologyNetwork(tree,hub){
     candidates.forEach((entry,index)=>{
       const leftBoundary=index===0?parentMin:(candidates[index-1].angle+entry.angle)/2;
       const rightBoundary=index===candidates.length-1?parentMax:(entry.angle+candidates[index+1].angle)/2;
-      const halfLane=Math.max(.00025,Math.min(entry.angle-leftBoundary,rightBoundary-entry.angle)*.94);
+      const halfLane=Math.max(.00025,Math.min(entry.angle-leftBoundary,rightBoundary-entry.angle)*.48);
       const sectorMin=Math.max(parentMin,entry.angle-halfLane);
       const sectorMax=Math.min(parentMax,entry.angle+halfLane);
       const {child,seed,angle}=entry;
