@@ -106,7 +106,7 @@ export function createPublicMycologyNetwork(tree,hub){
     // Hyphae advance from the real parent, not from the global origin.
     // This preserves a constant local growth step while allowing each generation
     // to form a genuinely branching, tree-like colony instead of concentric fans.
-    const growthLength=165;
+    const growthLength=Math.max(165,22/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2)));
     const parentMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
     const parentMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
     // Allocate space by actual subtree complexity: a dense colony receives a wider
