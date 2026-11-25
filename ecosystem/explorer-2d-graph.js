@@ -136,19 +136,15 @@ export function createPublicMycologyNetwork(tree,hub){
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
       created.push(node);
     });
-    // Give each inoculation branch the angular territory between its neighbours.
-    // Its descendants can then fan around their real parent instead of inheriting
-    // a tiny subtree-weighted wedge that compresses generations into a knot.
-    const boundary=[];
-    for(let index=0;index<created.length-1;index++){
-      const left=created[index],right=created[index+1];
-      const leftDemand=1+Math.pow((left.data.children||[]).length,.8);
-      const rightDemand=1+Math.pow((right.data.children||[]).length,.8);
-      boundary.push(left.angle+(right.angle-left.angle)*leftDemand/(leftDemand+rightDemand));
-    }
-    created.forEach((node,index)=>{
-      node.sectorMin=index===0?parentMin:boundary[index-1];
-      node.sectorMax=index===created.length-1?parentMax:boundary[index];
+    // Each child inherits a local growth fan around its own axis, not the
+    // narrow midpoint lane between siblings. This lets every generation branch
+    // laterally while keeping the colony inside a bounded territory.
+    const territoryCenter=ANCHORS[inoculationIndex].angle;
+    const territoryHalfAngle=.62;
+    const localFanHalfAngle=.46;
+    created.forEach(node=>{
+      node.sectorMin=Math.max(territoryCenter-territoryHalfAngle,node.angle-localFanHalfAngle);
+      node.sectorMax=Math.min(territoryCenter+territoryHalfAngle,node.angle+localFanHalfAngle);
     });
     for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
