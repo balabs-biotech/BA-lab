@@ -137,9 +137,16 @@ export function createPublicMycologyNetwork(tree,hub){
     // Give each inoculation branch the angular territory between its neighbours.
     // Its descendants can then fan around their real parent instead of inheriting
     // a tiny subtree-weighted wedge that compresses generations into a knot.
+    const boundary=[];
+    for(let index=0;index<created.length-1;index++){
+      const left=created[index],right=created[index+1];
+      const leftDemand=1+Math.pow((left.data.children||[]).length,.8);
+      const rightDemand=1+Math.pow((right.data.children||[]).length,.8);
+      boundary.push(left.angle+(right.angle-left.angle)*leftDemand/(leftDemand+rightDemand));
+    }
     created.forEach((node,index)=>{
-      node.sectorMin=index===0?parentMin:(created[index-1].angle+node.angle)/2;
-      node.sectorMax=index===created.length-1?parentMax:(node.angle+created[index+1].angle)/2;
+      node.sectorMin=index===0?parentMin:boundary[index-1];
+      node.sectorMax=index===created.length-1?parentMax:boundary[index];
     });
     for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
