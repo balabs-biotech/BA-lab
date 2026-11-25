@@ -156,7 +156,7 @@ function updateUI(){
  if(!document.getElementById("inlineExplorer"))document.title="BA Labs — "+t("title");
 
 }
-function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,selected?12:.82),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
+function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,selected?12:3.2),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
 function pointerDown(e){hovered=null;canvas.style.cursor="grabbing";canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragged=false;gesture={x:e.clientX,y:e.clientY,ox:targetOffset.x,oy:targetOffset.y};canvas.classList.add("dragging");}
 function pointerMove(e){
  if(!pointers.has(e.pointerId)){
