@@ -113,7 +113,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const usable=Math.max(0,parentMax-parentMin-gap*(kids.length-1));
     // Keep the eight inoculation fans stable; below that first ring, use a
     // sublinear branch-mass law so one dense subtree cannot starve smaller siblings.
-    const masses=kids.map(child=>parent.level===0?countSubtree(child):Math.sqrt(countSubtree(child)));
+    const masses=kids.map(child=>parent.level===0?countSubtree(child):Math.pow(countSubtree(child),0.35));
     const totalMass=masses.reduce((sum,mass)=>sum+mass,0)||1;
     let cursor=parentMin;
     kids.forEach((child,index)=>{
