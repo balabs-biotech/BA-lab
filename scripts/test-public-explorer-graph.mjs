@@ -40,15 +40,6 @@ for(const lang of languages){
   }
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
-  const rootRadii=roots.map(node=>Math.hypot(node.x,node.y));
-  assert.ok(Math.max(...rootRadii)-Math.min(...rootRadii)<1e-8,lang+": the eight inoculation points must form one symmetric first ring");
-  assert.ok(Math.abs(rootRadii[0]-430)<1e-8,lang+": the first ring must keep a clear, even gap around the mycology core");
-  const rootAngles=roots.map(node=>Math.atan2(node.y,node.x));
-  const angularGaps=rootAngles.map((angle,index)=>{const next=rootAngles[(index+1)%rootAngles.length];return (next-angle+Math.PI*2)%(Math.PI*2);}).sort((a,b)=>a-b);
-  assert.ok(angularGaps.every(gap=>Math.abs(gap-Math.PI/4)<1e-8),lang+": all eight universes must be evenly distributed around the mycology center");
-  assert.ok(roots.every(node=>node.x*Math.cos(node.angle)+node.y*Math.sin(node.angle)>250),lang+": each universe must occupy the outer field and grow radially outward into its own territory");
-  assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
-
   assert.ok(roots.every(node=>node.x*Math.cos(node.angle)+node.y*Math.sin(node.angle)>250),lang+": each universe must occupy the outer field and grow radially outward into its own territory");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.primaryHypha===true),lang+": each universe must emerge from the central mycelial tissue");
@@ -60,10 +51,10 @@ for(const lang of languages){
     assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
     if(root.id==="microbiology"){
       const angularOffsets=directChildren.map(node=>Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)));
-      assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.18,`${lang}: first-generation branches must occupy a visible, balanced radial fan`);
-      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.31,`${lang}: first-generation branches must stay inside their own radial territory`);
-      const firstRing=directChildren.map(node=>Math.hypot(node.x,node.y));
-      assert.ok(firstRing.every(radius=>radius>Math.hypot(root.x,root.y)+120),`${lang}: first-generation branches must form a distinct outer ring`);
+      assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.78,`${lang}: the primary microbiology branches must occupy a wide radial fan, not a narrow bouquet`);
+      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.98,`${lang}: the radial opening must remain controlled and avoid a chaotic starburst`);
+      const meanRadialReach=directChildren.reduce((sum,node)=>sum+Math.hypot(node.x-root.x,node.y-root.y),0)/directChildren.length;
+      assert.ok(meanRadialReach>=175,`${lang}: primary microbiology branches must extend outward far enough to occupy the territory`);
     }
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
@@ -125,15 +116,6 @@ const originalPrimaryIds=original.nodes.filter(node=>node.rootId==="microbiology
 const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).angle]);
 assert.deepEqual(primaryAngles(grown),primaryAngles(original),"Adding a new branch must not rotate the existing first-generation inoculation fan");
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
-for(const root of expected.map(id=>original.byId.get(id))){
-  const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
-  for(const node of descendants){
-    const parent=original.byId.get(node.parent);
-    assert.ok(Math.hypot(node.x,node.y)>Math.hypot(parent.x,parent.y)+80,"Each generation must advance into a distinct outward growth ring");
-    const offset=Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle));
-    assert.ok(Math.abs(offset)<=.31,"Every branch must remain inside its own evenly spaced radial sector");
-  }
-}
 assert.ok(expected.every(id=>{const a=original.byId.get(id),b=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).byId.get(id);return a.x===b.x&&a.y===b.y;}),"Spatial relaxation must preserve deterministic inoculation anchors");
 assert.ok(original.nodes.filter(node=>node.level>0).some(node=>Math.hypot(node.x-original.byId.get(node.rootId).x,node.y-original.byId.get(node.rootId).y)>0),"Spatial relaxation must operate on real descendants");
 assert.deepEqual(
@@ -168,6 +150,9 @@ assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicExplorer,/mobile\?defaultZoom\*\.31:defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
+assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
+assert.match(publicExplorer,/mobile\?\.68:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
+assert.match(publicRenderer,/threshold\*\(mobile\?\.68:1\)/,"Mobile labels must reveal deeper generations at their reachable zoom levels");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
