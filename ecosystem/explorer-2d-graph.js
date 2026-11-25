@@ -102,25 +102,25 @@ export function createPublicMycologyNetwork(tree,hub){
   const walk=(data,parent,depth,baseAngle,rootId,inoculationIndex,sectorCenter)=>{
     const kids=data.children||[];
     if(!kids.length)return;
-    const parentSeed=hash(parent.id);
-    const territoryScale=parent.territoryScale||1;
     const territoryRadius=parent.territoryRadius||180;
-    // Each universe owns a 45-degree wedge. Branches fan within that wedge,
-    // then advance through concentric growth rings instead of wandering into neighbours.
+    // Every page is a new growth front: its children fan around that page's
+    // own axis, while the sector clamp keeps the whole colony in its universe.
     const spread=.74;
-    const ringRadius=ROOT_RING_RADIUS+depth*155;
+    const parentRadius=Math.hypot(parent.x,parent.y);
+    const ringRadius=parentRadius+155;
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
       // ID-derived drift keeps existing branches stable when Notion children are reordered or appended.
       const fraction=((seed>>>8)/0xffffff)-.5;
-      // Stable identity-derived angular placement fills the complete local territory.
-      // Every child remains a direct descendant of its real Notion parent.
-      const angle=sectorCenter+fraction*spread;
+      const sectorMin=sectorCenter-SECTOR_HALF_ANGLE+.015;
+      const sectorMax=sectorCenter+SECTOR_HALF_ANGLE-.015;
+      // Local parent-relative branching replaces the old global spoke layout.
+      const angle=clamp(parent.angle+fraction*spread,sectorMin,sectorMax);
       const radialJitter=(((seed>>>16)&63)/63-.5)*(depth===1?7:15);
       const radial=ringRadius+radialJitter;
       const x=Math.cos(angle)*radial;
       const y=Math.sin(angle)*radial;
-      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale,territoryRadius};
+      const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryRadius};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
