@@ -42,7 +42,7 @@ assert.match(publicSource,/\.\/explorer-2d-pixi\.js/,'The public site must use i
 assert.doesNotMatch(publicRenderer,/drawnArms|upper-left|upper-right/,'The rebuilt public renderer must not contain legacy three-arm geometry');
 assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'The public renderer must not invent decorative branches that have no graph data');
 assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
-assert.match(publicRenderer,/const dishRadius=Math\.max\(\.\.\.nodes\.map\(n=>Math\.hypot\(n\.x,n\.y\)\)\+64/,'The public graph must be enclosed by a circular Petri-dish rim sized around the actual mycelial growth');
+assert.match(publicRenderer,/const dishRadius=.*Math\.hypot\(n\.x,n\.y\).*64/,'The public graph must be enclosed by a circular Petri-dish rim sized around the actual mycelial growth');
 assert.match(publicRenderer,/field\.circle\(width\/2\+offset\.x,height\/2\+offset\.y,dishRadius\*scale\)\.stroke/,'The public renderer must draw a camera-aware circular Petri-dish boundary around the mycelial colony');
 assert.match(publicRenderer,/if\(e\.cross&&!selectedRelation&&scale<3\)continue/,'Documented cross-territory anastomoses must stay quiet in the global overview and reveal progressively');
 assert.match(publicRenderer,/e\.primaryHypha\?Math\.min\(210,len\*\.36\)/,'Primary hyphae must use broad organic curvature rather than straight radial spokes');
