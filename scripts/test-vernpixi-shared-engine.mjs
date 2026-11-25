@@ -42,6 +42,10 @@ assert.match(publicSource,/\.\/explorer-2d-pixi\.js/,'The public site must use i
 assert.doesNotMatch(publicRenderer,/drawnArms|upper-left|upper-right/,'The rebuilt public renderer must not contain legacy three-arm geometry');
 assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'The public renderer must not invent decorative branches that have no graph data');
 assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
+assert.match(publicRenderer,/const lineageWidth=level=>level<=0\?4\.1:level===1\?2\.75:level===2\?1\.8:level===3\?1\.15:\.72;/,'Public hyphae must use a strictly decreasing five-generation lineage width scale');
+assert.match(publicRenderer,/e\.primaryHypha\?lineageWidth\(0\):lineageWidth\(e\.b\.level\)/,'Each hierarchy edge must inherit the width of the generation it introduces');
+assert.match(publicRenderer,/lineageWidth\(parent\.level\+1\)/,'Shared pre-bifurcation trunks must retain the thickness of their child generation');
+assert.match(publicRenderer,/e\.verified\?\.82:e\.cross\?\.48/,'Documented transverse relations must remain thinner than every hierarchical branch');
 assert.match(publicRenderer,/if\(e\.cross&&!selectedRelation&&scale<3\)continue/,'Documented cross-territory anastomoses must stay quiet in the global overview and reveal progressively');
 assert.match(publicRenderer,/e\.primaryHypha\?Math\.min\(210,len\*\.36\)/,'Primary hyphae must use broad organic curvature rather than straight radial spokes');
 assert.match(publicSource,/\.\/explorer-2d-graph\.js/,'The public site must use its dedicated mycology-centered graph');
