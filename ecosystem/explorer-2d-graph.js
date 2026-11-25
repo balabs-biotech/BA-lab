@@ -5,7 +5,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // Eight inoculation points form a true, evenly spaced first growth ring.
 const ROOT_RING_RADIUS=430;
-const SECTOR_HALF_ANGLE=.30;
+const SECTOR_HALF_ANGLE=.39;
 const ANCHORS=Array.from({length:8},(_,index)=>{
   const angle=-Math.PI/2+index*Math.PI/4;
   return{x:Math.cos(angle)*ROOT_RING_RADIUS,y:Math.sin(angle)*ROOT_RING_RADIUS,angle};
@@ -108,15 +108,15 @@ export function createPublicMycologyNetwork(tree,hub){
     const envelopeFactor=clamp(territoryScale,0.78,1.42);
     // Each universe owns a 45-degree wedge. Branches fan within that wedge,
     // then advance through concentric growth rings instead of wandering into neighbours.
-    const spread=depth===1?.52:clamp(.20+Math.log2(kids.length+1)*.025,.20,.28)*envelopeFactor;
+    const spread=clamp(.68+Math.log2(kids.length+1)*.015,.68,.76)*Math.min(1.02,envelopeFactor);
     const ringRadius=ROOT_RING_RADIUS+depth*155;
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
       // ID-derived drift keeps existing branches stable when Notion children are reordered or appended.
       const fraction=((seed>>>8)/0xffffff)-.5;
-      const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?.035:.085);
-      const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*.79)*(depth===1?.008:.022);
-      const angle=sectorCenter+fraction*spread+localDrift+inheritedDrift;
+      // Stable identity-derived angular placement fills the complete local territory.
+      // Every child remains a direct descendant of its real Notion parent.
+      const angle=sectorCenter+fraction*spread;
       const radialJitter=(((seed>>>16)&63)/63-.5)*(depth===1?7:15);
       const radial=ringRadius+radialJitter;
       const x=Math.cos(angle)*radial;
@@ -143,27 +143,6 @@ export function createPublicMycologyNetwork(tree,hub){
 
   // Relax spatial crowding without moving the eight fixed inoculation anchors.
   const relaxation=relaxPublicMorphology(nodes,edges);
-
-  // Give sibling hyphae a shared advancing trunk before they bifurcate.
-  // The junction is geometric only: it adds no synthetic knowledge node or relation.
-  const siblingEdges=new Map();
-  for(const edge of edges.filter(item=>item.fractal)){
-    if(!siblingEdges.has(edge.a.id))siblingEdges.set(edge.a.id,[]);
-    siblingEdges.get(edge.a.id).push(edge);
-  }
-  for(const [parentId,group] of siblingEdges){
-    if(group.length<2)continue;
-    const parent=byId.get(parentId);
-    const children=group.map(edge=>edge.b);
-    const centroid=children.reduce((sum,node)=>({x:sum.x+node.x/children.length,y:sum.y+node.y/children.length}),{x:0,y:0});
-    let dx=centroid.x-parent.x,dy=centroid.y-parent.y;
-    let magnitude=Math.hypot(dx,dy);
-    if(magnitude<1){dx=Math.cos(parent.angle||0);dy=Math.sin(parent.angle||0);magnitude=1;}
-    const averageLength=group.reduce((sum,edge)=>sum+Math.hypot(edge.b.x-parent.x,edge.b.y-parent.y),0)/group.length;
-    const advance=averageLength*.58;
-    const branchPoint={x:parent.x+dx/magnitude*advance,y:parent.y+dy/magnitude*advance};
-    for(const edge of group)edge.branchPoint=branchPoint;
-  }
 
   // Transverse hyphae may connect any two knowledge nodes in different territories.
   // Relations are read recursively; no decorative or nearest-neighbour edges are invented.
