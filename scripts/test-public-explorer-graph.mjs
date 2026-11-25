@@ -44,6 +44,7 @@ for(const lang of languages){
   }
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
+  assert.ok(roots.every(node=>node.x*Math.cos(node.angle)+node.y*Math.sin(node.angle)<-250),lang+": each inoculation front must advance inward across the Petri-dish field, not radiate away from its circular colony");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.primaryHypha===true),lang+": each universe must emerge from the central mycelial tissue");
   for(const root of roots){
