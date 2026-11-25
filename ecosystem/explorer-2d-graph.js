@@ -111,7 +111,9 @@ export function createPublicMycologyNetwork(tree,hub){
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
     const usable=Math.max(0,parentMax-parentMin-gap*(kids.length-1));
-    const masses=kids.map(child=>countSubtree(child));
+    // Use a sublinear branch-mass law: raw node counts let one dense subtree
+    // starve its smaller siblings of angular clearance, collapsing them into a knot.
+    const masses=kids.map(child=>Math.sqrt(countSubtree(child)));
     const totalMass=masses.reduce((sum,mass)=>sum+mass,0)||1;
     let cursor=parentMin;
     kids.forEach((child,index)=>{
