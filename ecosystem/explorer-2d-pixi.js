@@ -102,6 +102,7 @@ export async function createPixiRenderer(canvas){
    ar:{bio:"حيوية",myco:"فطريات",soil:"تربة",lab:"مختبر",products:"منتجات",iot:"إنترنت",work:"مشاريع",evidence:"الأدلة",microbiology:"أحياء دقيقة",plants:"نباتات",ecology:"بيئة",bioprocesses:"عمليات حيوية",biomaterials:"مواد حيوية",instrumentation:"هندسة",digital:"رقمي",physical:"فيزياء"},
    pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS",microbiology:"MICROBIO",plants:"PLANTAS",ecology:"ECOLOGIA",bioprocesses:"BIOPROCESSOS",biomaterials:"BIOMATERIAIS",instrumentation:"ENGENHARIA",digital:"DIGITAL",physical:"FÍSICA"}
   };
+  const mobile=width<600;
   const candidates=[];
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
@@ -117,7 +118,7 @@ export async function createPixiRenderer(canvas){
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
   const rootCount=candidates.filter(c=>c.n.level===0).length;
   const labelBudget=rootCount+Math.min(34,Math.max(8,Math.round(10+scale*5)));
-  const occupied=[];const hitBoxes={};let drawn=0;const mobile=width<600;
+  const occupied=[];const hitBoxes={};let drawn=0;
   for(const {n,alpha} of candidates){
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
