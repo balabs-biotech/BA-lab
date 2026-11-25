@@ -21,6 +21,9 @@ export async function createPixiRenderer(canvas){
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
+  const dishRadius=Math.max(...nodes.map(n=>Math.hypot(n.x,n.y)))+64;
+  field.circle(width/2+offset.x,height/2+offset.y,dishRadius*scale).stroke({color:0xa9c4b1,alpha:.24,width:1.35});
+  field.circle(width/2+offset.x,height/2+offset.y,Math.max(0,dishRadius-5)*scale).stroke({color:0xa9c4b1,alpha:.075,width:1});
   for(let i=0;i<110;i++){const x=(i*137.51)%width,y=(i*83.71)%height;field.circle(x,y,i%9===0?1.1:.6).fill({color:i%7===0?0xb96b4d:0xd1d0c5,alpha:i%5===0?.16:.055});}
   filaments.clear();junctions.clear();
   const point=n=>({x:n.x,y:n.y});
