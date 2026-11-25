@@ -141,10 +141,17 @@ export function createPublicMycologyNetwork(tree,hub){
     // laterally while keeping the colony inside a bounded territory.
     const territoryCenter=ANCHORS[inoculationIndex].angle;
     const territoryHalfAngle=.62;
-    const localFanHalfAngle=.46;
-    created.forEach(node=>{
-      node.sectorMin=Math.max(territoryCenter-territoryHalfAngle,node.angle-localFanHalfAngle);
-      node.sectorMax=Math.min(territoryCenter+territoryHalfAngle,node.angle+localFanHalfAngle);
+    const orderedFan=[...created].sort((a,b)=>a.angle-b.angle);
+    orderedFan.forEach((node,index)=>{
+      // Give every child a parent-centred fan, but divide the available
+      // territory at the midpoints between sibling axes so descendant
+      // subtrees remain disjoint instead of growing into one another.
+      const previous=orderedFan[index-1];
+      const next=orderedFan[index+1];
+      const lower=previous?(previous.angle+node.angle)/2:territoryCenter-territoryHalfAngle;
+      const upper=next?(node.angle+next.angle)/2:territoryCenter+territoryHalfAngle;
+      node.sectorMin=Math.max(territoryCenter-territoryHalfAngle,lower);
+      node.sectorMax=Math.min(territoryCenter+territoryHalfAngle,upper);
     });
     for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
