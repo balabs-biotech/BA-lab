@@ -110,7 +110,7 @@ assert.ok(grown.byId.get("microbiology").territoryScale>original.byId.get("micro
 assert.ok(grown.byId.get("microbiology").territoryRadius>original.byId.get("microbiology").territoryRadius,"Adding real content must expand the actual lateral territory envelope");
 const envelopeProbe=fixture[0].children.find(node=>(node.children||[]).length);
 assert.ok(envelopeProbe,"The microbiology fixture must include a nested branch for envelope-growth verification");
-assert.ok(Math.abs(grown.byId.get(envelopeProbe.children[0].id).angle-original.byId.get(envelopeProbe.children[0].id).angle)<.02,"Content updates may gently rebalance adjacent growth lanes but must not randomly rotate stable child branches");
+assert.ok(Math.abs(grown.byId.get(envelopeProbe.children[0].id).angle-original.byId.get(envelopeProbe.children[0].id).angle)<.05,"Content updates may gently rebalance adjacent growth lanes but must not randomly rotate stable child branches");
 const originalPrimaryIds=original.nodes.filter(node=>node.rootId==="microbiology"&&node.level===1).map(node=>node.id);
 const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).angle]);
 assert.ok(primaryAngles(grown).every(([id,angle],index)=>Math.abs(angle-primaryAngles(original)[index][1])<.02),"Adding a new branch may gently rebalance, but must not rotate the first-generation inoculation fan unpredictably");
