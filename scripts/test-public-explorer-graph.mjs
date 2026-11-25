@@ -148,7 +148,7 @@ const publicRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",imp
 assert.match(publicRenderer,/bezierCurveTo/,"Primary and secondary hyphae must use flowing cubic morphology, not single-arc spokes");
 assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eight current universe colors, not legacy taxonomy colors");
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
-assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a desktop-sized label envelope");
+assert.match(publicExplorer,/const labelSafeEnvelope=mobile\?92:280/,"Mobile overview must reserve a compact label envelope while preserving desktop breathing room");
 assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the complete tree, without changing the graph geometry");
 assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must include every real branch node, not only roots, so mobile territories cannot be clipped");
 
