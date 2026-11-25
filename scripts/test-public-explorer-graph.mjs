@@ -151,5 +151,8 @@ assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.1
 assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must include every real branch node, not only roots, so mobile territories cannot be clipped");
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
+assert.match(publicExplorer,/mobile\?defaultZoom\*\.48:defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
+const publicPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
+assert.match(publicPage,/#app\.balabs-ui #selection \.selection-context\{display:none!important\}/,"Mobile selection dock must hide long context trails that collide with the canvas and dock title");
