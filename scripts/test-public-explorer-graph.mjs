@@ -183,3 +183,7 @@ assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must d
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
 const publicPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
 assert.match(publicPage,/#app\.balabs-ui #selection \.selection-context\{display:none!important\}/,"Mobile selection dock must hide long context trails that collide with the canvas and dock title");
+
+const angularRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
+assert.match(angularRenderer,/const angularDeflection=/,"Hyphal curves must follow the actual parent-to-child angular deflection so sibling segments fan apart instead of crossing");
+assert.match(angularRenderer,/const branchSign=Math\.sign\(angularDeflection\)/,"Sibling curve direction must be derived from its own biological growth lane, not random seed direction");
