@@ -187,3 +187,18 @@ assert.match(publicPage,/#app\.balabs-ui #selection \.selection-context\{display
 const angularRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
 assert.match(angularRenderer,/const angularDeflection=/,"Hyphal curves must follow the actual parent-to-child angular deflection so sibling segments fan apart instead of crossing");
 assert.match(angularRenderer,/const branchSign=Math\.sign\(angularDeflection\)/,"Sibling curve direction must be derived from its own biological growth lane, not random seed direction");
+
+// Crowded second/third-generation branches must retain visible physical clearance,
+// not merely non-overlapping abstract angular intervals.
+const crowdedSiblingGroups=original.nodes
+  .filter(parent=>parent.level>=1)
+  .map(parent=>original.nodes.filter(node=>node.parent===parent.id))
+  .filter(children=>children.length>=3);
+assert.ok(crowdedSiblingGroups.length>0,"The real taxonomy must include multi-branch descendants for crowding verification");
+for(const children of crowdedSiblingGroups){
+  let nearest=Infinity;
+  for(let i=0;i<children.length;i++)for(let j=i+1;j<children.length;j++){
+    nearest=Math.min(nearest,Math.hypot(children[i].x-children[j].x,children[i].y-children[j].y));
+  }
+  assert.ok(nearest>=14, `Sibling hyphae must retain at least 14px of junction clearance; ${children[0].parent} has ${nearest.toFixed(2)}px`);
+}
