@@ -44,8 +44,9 @@ function fitOverview(){
  const origin=nodes.find(n=>n.identity)||nodes.find(n=>n.id==="balabs-identity")||{x:0,y:0};
  const extentX=Math.max(...bounds.map(n=>Math.abs(n.x-origin.x)));
  const extentY=Math.max(...bounds.map(n=>Math.abs(n.y-origin.y)));
- const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
- const labelSafeEnvelope=w<600?180:280;
+ const mobile=w<600;
+ const pad=mobile?18:Math.min(88,Math.max(28,Math.min(w,h)*.075));
+ const labelSafeEnvelope=mobile?92:280;
  const scaleX=(w-pad*2)/(extentX*2+labelSafeEnvelope);
  const scaleY=(h-pad*2)/(extentY*2+labelSafeEnvelope);
  targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72);
