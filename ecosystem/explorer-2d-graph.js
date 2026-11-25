@@ -103,8 +103,10 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=[...(data.children||[])].sort((a,b)=>a.id.localeCompare(b.id));
     if(!kids.length)return;
     const territoryRadius=parent.territoryRadius||180;
-    const parentRadius=Math.hypot(parent.x,parent.y);
-    const ringRadius=parentRadius+165;
+    // Hyphae advance from the real parent, not from the global origin.
+    // This preserves a constant local growth step while allowing each generation
+    // to form a genuinely branching, tree-like colony instead of concentric fans.
+    const growthLength=165;
     const parentMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
     const parentMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
     // Allocate space by actual subtree complexity: a dense colony receives a wider
@@ -125,9 +127,9 @@ export function createPublicMycologyNetwork(tree,hub){
       const angle=(sectorMin+sectorMax)/2;
       cursor=sectorMax+gap;
       const radialJitter=(((seed>>>16)&63)/63-.5)*(depth===1?5:depth===2?8:11);
-      const radial=ringRadius+radialJitter;
-      const x=Math.cos(angle)*radial;
-      const y=Math.sin(angle)*radial;
+      const radial=growthLength+radialJitter;
+      const x=parent.x+Math.cos(angle)*radial;
+      const y=parent.y+Math.sin(angle)*radial;
       const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,sectorMin,sectorMax,inoculationIndex,territoryRadius};
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
