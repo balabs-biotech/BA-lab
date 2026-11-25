@@ -113,7 +113,7 @@ begin
   v_passport_id := public.create_passport_draft_with_audit(lot_id,token_hash,actor_operator);
   v_version_no := public.publish_passport_with_audit(v_passport_id,actor_reviewer);
 
-  select pv.v_snapshot into v_snapshot
+  select pv.snapshot into v_snapshot
   from public.passport_versions pv
   where pv.passport_id=v_passport_id and pv.version=v_version_no;
 
@@ -127,7 +127,7 @@ begin
     select 1 from public.passports p
     join public.passport_versions pv on pv.passport_id=p.id and pv.version=p.current_version
     where p.id=v_passport_id and p.qr_token_hash=token_hash and p.status='published'
-      and pv.v_snapshot=v_snapshot
+      and pv.snapshot=v_snapshot
   ) then raise exception 'QR hash does not resolve to the current published v_snapshot'; end if;
 end $$;
 
