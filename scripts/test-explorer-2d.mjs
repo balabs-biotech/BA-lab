@@ -103,7 +103,7 @@ try {
       const rect = el.getBoundingClientRect();
       return { boxes:Object.keys(boxes), viewport:{width:rect.width,height:rect.height} };
     });
-    assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must not insert a separate BA Labs identity node');
+    assert.ok(!overviewGeometry.boxes.includes('balabs-identity'), 'The global overview must not include a separate BA Labs identity node');
     assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must visibly include the sole mycology core');
     assert.ok(['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].every(id => overviewGeometry.boxes.includes(id)), 'All eight autonomous territories must be visible in the global overview');
     const overviewBounds = await page.locator('#field').evaluate(el => {
