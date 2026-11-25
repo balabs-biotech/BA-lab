@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142d29">
+  <meta name="description" content="Passeport produit BA Labs : informations publiques de traçabilité et de vérification du lot.">
+  <title>Passeport produit — BA Labs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./passport.css">
+  <script defer src="./passport.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="masthead">
+      <a class="brand" href="https://balabs-biotech.github.io/BA-lab/" aria-label="BA Labs — site principal">
+        <span class="brand-mark" aria-hidden="true">BA</span>
+        <span class="brand-name">BA LABS <small>APPLIED BIOTECHNOLOGY</small></span>
+      </a>
+      <span class="masthead-label">PRODUCT PASSPORT <i></i> TRACEABILITY</span>
+    </header>
+
+    <main id="main" class="main-content" aria-live="polite">
+      <section id="loading" class="state-panel">
+        <span class="loader" aria-hidden="true"></span>
+        <p class="micro-label">VÉRIFICATION EN COURS</p>
+        <h1>Lecture du passeport</h1>
+        <p class="state-copy">Le jeton QR est vérifié auprès du registre BA Labs.</p>
+      </section>
+
+      <section id="missing" class="state-panel" hidden>
+        <span class="state-symbol" aria-hidden="true">⌁</span>
+        <p class="micro-label">ACCÈS PAR QR CODE</p>
+        <h1>Votre produit, son historique vérifiable.</h1>
+        <p class="state-copy">Scannez le QR code avec l’appareil photo de votre téléphone : le passeport s’ouvrira automatiquement. Sur ordinateur, collez ci-dessous le lien du QR code ou son jeton.</p>
+        <form id="manual-lookup" class="manual-lookup">
+          <label for="passport-entry">Lien du QR code ou jeton</label>
+          <div class="manual-lookup-row">
+            <input id="passport-entry" name="passport-entry" type="text" autocomplete="off" spellcheck="false" placeholder="Coller le lien ou le jeton…" required>
+            <button type="submit">Consulter</button>
+          </div>
+          <p id="lookup-error" class="lookup-error" hidden>Le lien ou le jeton ne semble pas valide.</p>
+        </form>
+        <a class="text-link" href="https://balabs-biotech.github.io/BA-lab/">Découvrir BA Labs <span aria-hidden="true">↗</span></a>
+      </section>
+
+      <section id="error" class="state-panel" hidden>
+        <span class="state-symbol warning" aria-hidden="true">!</span>
+        <p class="micro-label">VÉRIFICATION IMPOSSIBLE</p>
+        <h1 id="error-title">Passeport indisponible</h1>
+        <p id="error-copy" class="state-copy">Ce passeport est introuvable, non publié ou a été révoqué.</p>
+        <p class="support-note">Si vous pensez qu’il s’agit d’une erreur, contactez BA Labs en indiquant le code du lot figurant sur l’étiquette.</p>
+      </section>
+
+      <article id="passport" class="passport" hidden>
+        <div class="passport-topline">
+          <span class="micro-label">REGISTRE DE TRAÇABILITÉ <span class="slash">/</span> ALGÉRIE</span>
+          <span class="verification"><span class="verification-dot"></span> PASSEPORT VÉRIFIÉ</span>
+        </div>
+
+        <div class="passport-heading">
+          <div>
+            <p class="micro-label">FICHE PRODUIT <span id="product-code" class="code-inline"></span></p>
+            <h1 id="product-name">—</h1>
+            <p id="product-category" class="category-line"></p>
+          </div>
+          <div class="seal" aria-label="Passeport publié et vérifié">
+            <span>BA</span><small>VERIFIED<br>RECORD</small>
+          </div>
+        </div>
+
+        <div class="lot-strip">
+          <div><span class="micro-label">IDENTIFIANT DU LOT</span><strong id="lot-code">—</strong></div>
+          <div class="lot-state"><span class="status-dot"></span><span>Enregistrement publié</span></div>
+        </div>
+
+        <section class="facts-section" aria-labelledby="facts-title">
+          <div class="section-heading"><span class="section-index">01</span><h2 id="facts-title">Repères de production</h2></div>
+          <div id="facts" class="facts-grid"></div>
+        </section>
+
+        <section id="description-section" class="content-section" hidden>
+          <div class="section-heading"><span class="section-index">02</span><h2>À propos du produit</h2></div>
+          <p id="product-description" class="body-copy"></p>
+        </section>
+
+        <section id="usage-section" class="content-section" hidden>
+          <div class="section-heading"><span class="section-index">03</span><h2>Conseils d’utilisation</h2></div>
+          <p id="product-usage" class="body-copy"></p>
+        </section>
+
+        <section id="alerts-section" class="content-section" hidden>
+          <div class="section-heading"><span class="section-index">04</span><h2>Informations importantes</h2></div>
+          <div id="alerts-list" class="alerts-list"></div>
+        </section>
+
+        <footer class="passport-footer">
+          <div class="footer-brand"><span class="brand-mark small-mark">BA</span><span>BA LABS <small>SÉTIF · ALGÉRIE</small></span></div>
+          <p>Les informations affichées correspondent à la version publique du passeport publiée par BA Labs. Les données internes de production et de contrôle ne sont pas exposées sur cette page.</p>
+          <span class="footer-code">PUBLIC RECORD <span id="published-date"></span></span>
+        </footer>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span>BA LABS · BIOTECHNOLOGIE APPLIQUÉE</span>
+      <span>TRAÇABILITÉ <i></i> INTÉGRITÉ DES DONNÉES</span>
+    </footer>
+  </div>
+</body>
+</html>

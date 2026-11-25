@@ -178,6 +178,14 @@ jobs:
         run: node scripts/test-store-order-notion-retry.mjs
       - name: Check store-catalogue Edge Function TypeScript syntax
         run: node --experimental-strip-types --check supabase/functions/store-catalogue/index.ts
+      - name: Check product passport Edge Function TypeScript syntax
+        run: |
+          node --experimental-strip-types --check supabase/functions/passport-admin/index.ts
+          node --experimental-strip-types --check supabase/functions/public-passport/index.ts
+      - name: Test product passport Edge Function security contract
+        run: node --test supabase/tests/product-passport-functions.test.mjs
+      - name: Test reconstructed product passport schema on PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/product_passport_schema_reconstruction.test.sql
       - name: Test public catalogue privacy contract
         run: node scripts/test-store-catalogue-contract.mjs
       - name: Test sync-culture-to-notion (mocked Supabase and Notion, no network)
@@ -385,3 +393,51 @@ jobs:
         run: node scripts/test-storefront-browser.mjs
         env:
           BALABS_STORE_URL: http://127.0.0.1:8767/store/index.html
+
+  product-passport-admin-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install administration dependencies
+        run: npm install --no-package-lock
+        working-directory: product-passport/admin
+      - name: Build administration and demonstration
+        run: npm run build
+        working-directory: product-passport/admin
+      - name: Verify generated administration entry point
+        run: test -s dist/index.html
+        working-directory: product-passport/admin
+      - name: Assemble and verify combined Cloudflare Pages artifact
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/passport-pages/admin"
+          cp product-passport/index.html "$RUNNER_TEMP/passport-pages/index.html"
+          cp product-passport/passport.css "$RUNNER_TEMP/passport-pages/passport.css"
+          cp product-passport/passport.js "$RUNNER_TEMP/passport-pages/passport.js"
+          cp product-passport/_headers "$RUNNER_TEMP/passport-pages/_headers"
+          cp -R product-passport/admin/dist/. "$RUNNER_TEMP/passport-pages/admin/"
+          test -s "$RUNNER_TEMP/passport-pages/index.html"
+          test -s "$RUNNER_TEMP/passport-pages/_headers"
+          test -s "$RUNNER_TEMP/passport-pages/admin/index.html"
+          grep -q 'src="/admin/' "$RUNNER_TEMP/passport-pages/admin/index.html"
+          echo "✓ Public passport and administration assembled in one Pages artifact"
+
+  product-passport-public-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check public passport page JavaScript
+        run: node --check product-passport/passport.js
+      - name: Test QR token and published snapshot rendering
+        run: node --test product-passport/tests/passport-contract.test.mjs
+      - name: Verify page assets are present
+        run: |
+          test -s product-passport/index.html
+          test -s product-passport/passport.css
+          test -s product-passport/passport.js
