@@ -89,7 +89,7 @@ declare
   check_id uuid;
   v_passport_id uuid;
   v_version_no integer;
-  snapshot jsonb;
+  v_snapshot jsonb;
 begin
   insert into auth.users(id) values(actor_operator),(actor_reviewer) on conflict do nothing;
   insert into public.product_categories(code,name_fr) values('TEST','Catégorie test') returning id into category_id;
@@ -113,22 +113,22 @@ begin
   v_passport_id := public.create_passport_draft_with_audit(lot_id,token_hash,actor_operator);
   v_version_no := public.publish_passport_with_audit(v_passport_id,actor_reviewer);
 
-  select pv.snapshot into snapshot
+  select pv.v_snapshot into v_snapshot
   from public.passport_versions pv
   where pv.passport_id=v_passport_id and pv.version=v_version_no;
 
   if v_version_no <> 1 then raise exception 'Expected first passport version, got %',v_version_no; end if;
-  if snapshot #>> '{product,name}' <> 'Produit fixture' then raise exception 'Published snapshot product name mismatch'; end if;
-  if snapshot #>> '{lot,code}' <> 'LOT-TEST-001' then raise exception 'Published snapshot lot code mismatch'; end if;
-  if snapshot #>> '{quality,status}' <> 'released' then raise exception 'Published snapshot quality state mismatch'; end if;
-  if snapshot->'alerts' <> '[]'::jsonb then raise exception 'Unexpected fixture alerts'; end if;
-  if snapshot ? 'internal_notes' then raise exception 'Internal lot notes leaked into public snapshot'; end if;
+  if v_snapshot #>> '{product,name}' <> 'Produit fixture' then raise exception 'Published v_snapshot product name mismatch'; end if;
+  if v_snapshot #>> '{lot,code}' <> 'LOT-TEST-001' then raise exception 'Published v_snapshot lot code mismatch'; end if;
+  if v_snapshot #>> '{quality,status}' <> 'released' then raise exception 'Published v_snapshot quality state mismatch'; end if;
+  if v_snapshot->'alerts' <> '[]'::jsonb then raise exception 'Unexpected fixture alerts'; end if;
+  if v_snapshot ? 'internal_notes' then raise exception 'Internal lot notes leaked into public v_snapshot'; end if;
   if not exists(
     select 1 from public.passports p
     join public.passport_versions pv on pv.passport_id=p.id and pv.version=p.current_version
     where p.id=v_passport_id and p.qr_token_hash=token_hash and p.status='published'
-      and pv.snapshot=snapshot
-  ) then raise exception 'QR hash does not resolve to the current published snapshot'; end if;
+      and pv.v_snapshot=v_snapshot
+  ) then raise exception 'QR hash does not resolve to the current published v_snapshot'; end if;
 end $$;
 
 rollback;
