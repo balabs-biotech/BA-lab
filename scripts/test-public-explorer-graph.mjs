@@ -145,3 +145,4 @@ assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eig
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/w<600\?180:280/,"Mobile overview must not reserve a desktop-sized label envelope");
 assert.match(publicExplorer,/targetScale=clamp\(Math\.min\(scaleX,scaleY\),\.14,\.72\)/,"Desktop overview must use the available viewport instead of capping the graph too early");
+assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must include every real branch node, not only roots, so mobile territories cannot be clipped");
