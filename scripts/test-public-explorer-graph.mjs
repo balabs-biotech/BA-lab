@@ -152,6 +152,7 @@ assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicExplorer,/mobile\?defaultZoom\*\.31:defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
+assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
 const publicPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
