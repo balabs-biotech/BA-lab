@@ -36,20 +36,20 @@ function buildNetwork(){
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
 function fitOverview(){
- const roots=nodes.filter(n=>n.level<=1);
- if(!roots.length){targetScale=.5;targetOffset={x:0,y:0};return;}
- const minX=Math.min(...roots.map(n=>n.x)),maxX=Math.max(...roots.map(n=>n.x));
- const minY=Math.min(...roots.map(n=>n.y)),maxY=Math.max(...roots.map(n=>n.y));
- // Fit the complete central tissue and eight asymmetric inoculation territories.
- // The camera follows their combined bounds while preserving the brand origin.
+ const bounds=nodes.filter(n=>Number.isFinite(n.x)&&Number.isFinite(n.y));
+ if(!bounds.length){targetScale=.5;targetOffset={x:0,y:0};return;}
+ // Keep the BA Labs identity at the visual origin while fitting every real
+ // hypha, not just the eight inoculation anchors. This prevents edge clipping
+ // on narrow screens and keeps the complete biological tissue in view.
+ const origin=nodes.find(n=>n.identity)||nodes.find(n=>n.id==="balabs-identity")||{x:0,y:0};
+ const extentX=Math.max(...bounds.map(n=>Math.abs(n.x-origin.x)));
+ const extentY=Math.max(...bounds.map(n=>Math.abs(n.y-origin.y)));
  const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
- // Root labels extend beyond their node coordinates, with the longest labels
- // on the lateral arms. Reserve an explicit text-safe envelope on both axes.
  const labelSafeEnvelope=w<600?180:280;
- const scaleX=(w-pad*2)/(maxX-minX+labelSafeEnvelope);
- const scaleY=(h-pad*2)/(maxY-minY+labelSafeEnvelope);
- targetScale=clamp(Math.min(scaleX,scaleY),.14,.72);
- targetOffset={x:-(minX+maxX)*.5*targetScale,y:-(minY+maxY)*.5*targetScale};
+ const scaleX=(w-pad*2)/(extentX*2+labelSafeEnvelope);
+ const scaleY=(h-pad*2)/(extentY*2+labelSafeEnvelope);
+ targetScale=clamp(Math.min(scaleX,scaleY),.08,.72);
+ targetOffset={x:-origin.x*targetScale,y:-origin.y*targetScale};
 }
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
 function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
