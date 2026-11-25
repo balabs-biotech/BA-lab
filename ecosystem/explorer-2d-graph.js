@@ -108,7 +108,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const envelopeFactor=clamp(territoryScale,0.78,1.42);
     // Each universe owns a 45-degree wedge. Branches fan within that wedge,
     // then advance through concentric growth rings instead of wandering into neighbours.
-    const spread=depth===1?.56:clamp(.24+Math.log2(kids.length+1)*.035,.24,.34)*envelopeFactor;
+    const spread=depth===1?.52:clamp(.20+Math.log2(kids.length+1)*.025,.20,.28)*envelopeFactor;
     const ringRadius=ROOT_RING_RADIUS+depth*155;
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
@@ -116,7 +116,7 @@ export function createPublicMycologyNetwork(tree,hub){
       const fraction=((seed>>>8)/0xffffff)-.5;
       const localDrift=(((seed>>>8)&255)/255-.5)*(depth===1?.035:.085);
       const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*.79)*(depth===1?.008:.022);
-      const angle=clamp(baseAngle+fraction*spread+localDrift+inheritedDrift,sectorCenter-SECTOR_HALF_ANGLE,sectorCenter+SECTOR_HALF_ANGLE);
+      const angle=sectorCenter+fraction*spread+localDrift+inheritedDrift;
       const radialJitter=(((seed>>>16)&63)/63-.5)*(depth===1?7:15);
       const radial=ringRadius+radialJitter;
       const x=Math.cos(angle)*radial;
