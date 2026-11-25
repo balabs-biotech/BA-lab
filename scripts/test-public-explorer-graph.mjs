@@ -180,7 +180,7 @@ assert.match(publicExplorer,/mobile\?Math\.min\(defaultZoom\*\.31,1\.2\):default
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
-assert.match(publicRenderer,/threshold\*\(mobile\?\.25:1\)/,"Mobile labels must reveal deeper generations at their reachable zoom levels");
+assert.match(publicRenderer,/scale>threshold\*mobileLabelScaleFactor/,"Mobile labels must require deliberate zoom before revealing deeper generations");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
