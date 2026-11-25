@@ -48,7 +48,7 @@ function fitOverview(){
  const labelSafeEnvelope=w<600?180:280;
  const scaleX=(w-pad*2)/(extentX*2+labelSafeEnvelope);
  const scaleY=(h-pad*2)/(extentY*2+labelSafeEnvelope);
- targetScale=clamp(Math.min(scaleX,scaleY),.08,.72);
+ targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72);
  targetOffset={x:-origin.x*targetScale,y:-origin.y*targetScale};
 }
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
