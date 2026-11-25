@@ -53,7 +53,7 @@ function fitOverview(){
  targetOffset={x:-origin.x*targetScale,y:-origin.y*targetScale};
 }
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
-function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
+function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);canvas.dataset.targetFocusY=String(selected?h/2+targetOffset.y+selected.y*targetScale:h/2);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function syncUniverseRail(n){
  const root=n?(n.level===0?n.id:n.rootId):null;
  document.querySelectorAll(".universe-rail [data-universe]").forEach(button=>{
@@ -62,7 +62,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const defaultZoom=n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2;targetScale=zoomTo??(mobile?defaultZoom*.34:defaultZoom);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const defaultZoom=n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2;targetScale=zoomTo??(mobile?defaultZoom*.24:defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.40:h/2;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
