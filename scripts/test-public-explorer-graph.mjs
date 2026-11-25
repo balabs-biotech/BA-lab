@@ -2,6 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createPublicMycologyNetwork } from "../ecosystem/explorer-2d-graph.js";
 
+const explorerPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
+assert.match(explorerPage,/#app\\.balabs-ui #selection \\.selection-path[^}]*display:\\s*none/s,"Mobile selection must hide the ancestry trail to preserve canvas space");
+assert.match(explorerPage,/#app\\.balabs-ui #selection \\.selection-description[^}]*display:\\s*none/s,"Mobile selection must hide long descriptions while a node is focused");
+assert.match(explorerPage,/#app\\.balabs-ui #selection \\.child-branches[^}]*display:\\s*none/s,"Mobile selection must not stack child lists over the graph");
+
 const languages=["fr","en","ar","pt"];
 const expected=["microbiology","plants","ecology","bioprocesses","biomaterials","instrumentation","digital","physical"];
 const indexOfUniverse=id=>expected.indexOf(id);
