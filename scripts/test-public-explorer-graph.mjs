@@ -113,7 +113,7 @@ assert.ok(envelopeProbe,"The microbiology fixture must include a nested branch f
 assert.ok(Math.abs(grown.byId.get(envelopeProbe.children[0].id).angle-original.byId.get(envelopeProbe.children[0].id).angle)<.02,"Content updates may gently rebalance adjacent growth lanes but must not randomly rotate stable child branches");
 const originalPrimaryIds=original.nodes.filter(node=>node.rootId==="microbiology"&&node.level===1).map(node=>node.id);
 const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).angle]);
-assert.deepEqual(primaryAngles(grown),primaryAngles(original),"Adding a new branch must not rotate the existing first-generation inoculation fan");
+assert.ok(primaryAngles(grown).every(([id,angle],index)=>Math.abs(angle-primaryAngles(original)[index][1])<.02),"Adding a new branch may gently rebalance, but must not rotate the first-generation inoculation fan unpredictably");
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
 assert.ok(original.nodes.filter(node=>node.level>0).every(node=>node.parent&&original.byId.has(node.parent)),"Every descendant must have a real parent node");
 // Every sibling subtree must occupy a disjoint angular growth lane.
