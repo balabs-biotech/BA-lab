@@ -24,7 +24,7 @@ function relaxPublicMorphology(nodes,edges){
   const movementBudgets=new Map(orderedNodes.map(node=>[node.id,Infinity]));
   for(const edge of parentEdges){
     const length=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);
-    movementBudgets.set(edge.a.id,Math.min(movementBudgets.get(edge.a.id),length*.055));
+    movementBudgets.set(edge.a.id,Math.min(movementBudgets.get(edge.a.id),length*.07));
     movementBudgets.set(edge.b.id,Math.min(movementBudgets.get(edge.b.id),length*.055));
   }
   const cellSize=104,moved=new Set();
@@ -68,7 +68,7 @@ function relaxPublicMorphology(nodes,edges){
       if(node.level===0)continue;
       const shift=delta.get(node.id),length=Math.hypot(shift.x,shift.y);
       if(!length)continue;
-      const cap=terminalIds.has(node.id)?5:2.6,scale=Math.min(1,cap/length);
+      const cap=terminalIds.has(node.id)?7:4.2,scale=Math.min(1,cap/length);
       const origin=originalPositions.get(node.id),budget=movementBudgets.get(node.id);
       const proposedX=node.x+shift.x*scale,proposedY=node.y+shift.y*scale;
       const totalX=proposedX-origin.x,totalY=proposedY-origin.y,totalLength=Math.hypot(totalX,totalY);
