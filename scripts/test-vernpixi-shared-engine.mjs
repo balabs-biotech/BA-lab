@@ -39,6 +39,7 @@ assert.match(sharedRenderer,/myco:0xb18fc2/,'The Academy mycology palette token 
 assert.doesNotMatch(sharedRenderer,/publicCore|branchPoint|drawnArms|upper-left|upper-right/,'The Academy renderer must remain free of public-only logo and branch geometry');
 const publicRenderer=await readFile('ecosystem/explorer-2d-pixi.js','utf8');
 assert.match(publicSource,/\.\/explorer-2d-pixi\.js/,'The public site must use its own renderer implementation');
+assert.match(publicSource,/explorer-2d-pixi\.js\?v=public-mycology-renderer-2/,'The public renderer cache token must change when its implementation changes');
 assert.doesNotMatch(publicRenderer,/drawnArms|upper-left|upper-right/,'The rebuilt public renderer must not contain legacy three-arm geometry');
 assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'The public renderer must not invent decorative branches that have no graph data');
 assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
