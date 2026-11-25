@@ -21,15 +21,11 @@ for(const lang of languages){
   const graph=createPublicMycologyNetwork(manifest.domains,{
     id:"mycology-center",title:"Mycology",description:"The BA Labs mycology hub",url:hubUrls[lang]
   });
-  const brand=graph.byId.get("balabs-identity");
-  assert.ok(brand,"BA Labs identity must occupy the visual center");
-  assert.equal(brand.title,"BA Labs");
   const center=graph.byId.get("mycology-center");
   assert.ok(center,"mycology hub must exist");
-  assert.notDeepEqual([brand.x,brand.y],[center.x,center.y],"The BA Labs logo and mycology tissue must have distinct positions");
-  assert.equal(center.parent,brand.id);
-  assert.ok(graph.edges.some(edge=>edge.identityLink&&edge.a.id===brand.id&&edge.b.id===center.id),"BA Labs identity must connect to the mycology core");
   assert.equal(center.level,0);
+  assert.deepEqual([center.x,center.y],[0,0],"Mycology itself must occupy the exact center of the circular ecosystem");
+  assert.equal(graph.byId.has("balabs-identity"),false,"BA Labs must not be inserted as an extra node above or beside the mycology center");
   assert.equal(center.data.url,hubUrls[lang]);
   assert.equal(graph.stats.universeCount,8);
   assert.equal(new Set(graph.nodes.map(node=>node.id)).size,graph.nodes.length,"node IDs must be unique");
@@ -44,7 +40,7 @@ for(const lang of languages){
   }
   assert.equal(new Set(roots.map(node=>node.inoculationIndex)).size,8,lang+": all eight inoculation anchors must be distinct");
   assert.ok(roots.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)),lang+": each universe must have a stable spatial anchor");
-  assert.ok(roots.every(node=>node.x*Math.cos(node.angle)+node.y*Math.sin(node.angle)<-250),lang+": each inoculation front must advance inward across the Petri-dish field, not radiate away from its circular colony");
+  assert.ok(roots.every(node=>node.x*Math.cos(node.angle)+node.y*Math.sin(node.angle)>250),lang+": each universe must occupy the outer field and grow radially outward into its own territory");
   assert.ok(roots.every(node=>node.x!==0||node.y!==center.y),lang+": universe anchors must grow beyond the central mycology tissue");
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>edge.primaryHypha===true),lang+": each universe must emerge from the central mycelial tissue");
   for(const root of roots){
@@ -154,7 +150,7 @@ assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicExplorer,/mobile\?defaultZoom\*\.31:defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
-assert.match(publicRenderer,/if\(n\.identity\)continue/,"The central identity marker must not add an unsolicited BA Labs text label above the mycology core");
+assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
 const publicPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
