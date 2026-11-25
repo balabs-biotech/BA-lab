@@ -116,6 +116,12 @@ const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).ang
 assert.deepEqual(primaryAngles(grown),primaryAngles(original),"Adding a new branch must not rotate the existing first-generation inoculation fan");
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
 assert.ok(original.nodes.filter(node=>node.level>0).every(node=>node.parent&&original.byId.has(node.parent)),"Every descendant must have a real parent node");
+for(const parent of original.nodes.filter(node=>node.level>0)){
+  const children=original.nodes.filter(node=>node.parent===parent.id);
+  if(children.length<2)continue;
+  const offsets=children.map(child=>Math.atan2(Math.sin(child.angle-parent.angle),Math.cos(child.angle-parent.angle)));
+  assert.ok(offsets.every(offset=>Math.abs(offset)<=.401),`Children of ${parent.id} must fan locally around their actual parent, not around a distant shared sector axis`);
+}
 for(const root of expected.map(id=>original.byId.get(id))){
   const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
   for(const node of descendants){
