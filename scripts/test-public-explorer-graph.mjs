@@ -163,11 +163,11 @@ assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.1
 assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must include every real branch node, not only roots, so mobile territories cannot be clipped");
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
-assert.match(publicExplorer,/mobile\?defaultZoom\*\.72:defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
+assert.match(publicExplorer,/mobile\?Math\.min\(defaultZoom\*\.31,1\.2\):defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
-assert.match(publicExplorer,/mobile\?\.68:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
-assert.match(publicRenderer,/threshold\*\(mobile\?\.68:1\)/,"Mobile labels must reveal deeper generations at their reachable zoom levels");
+assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
+assert.match(publicRenderer,/threshold\*\(mobile\?\.25:1\)/,"Mobile labels must reveal deeper generations at their reachable zoom levels");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
