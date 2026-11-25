@@ -4,6 +4,9 @@ import { createPublicMycologyNetwork } from "../ecosystem/explorer-2d-graph.js";
 
 const explorerPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
 assert.match(explorerPage,/@media\(max-width:700px\)\{[\s\S]*?\.selection-path,[\s\S]*?\.selection-description,[\s\S]*?\.child-branches\{display:none!important\}/,"Mobile selection must hide ancestry, long descriptions, and child lists to preserve canvas space");
+const pixiRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
+assert.match(pixiRenderer,/const mobileLabelScaleFactor=mobile\?\.68:1/,"Mobile labels must require a later zoom threshold instead of exposing the full hierarchy in the overview");
+assert.match(pixiRenderer,/const labelBudget=rootCount\+\(mobile\?3:Math\.min\(34,Math\.max\(8,Math\.round\(10\+scale\*5\)\)\)\)/,"Mobile overview must cap non-root labels to three at a time");
 
 const languages=["fr","en","ar","pt"];
 const expected=["microbiology","plants","ecology","bioprocesses","biomaterials","instrumentation","digital","physical"];
