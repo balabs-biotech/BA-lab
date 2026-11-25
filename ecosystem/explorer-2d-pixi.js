@@ -75,10 +75,20 @@ export async function createPixiRenderer(canvas){
   }
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
-   const r=Math.max(1.25,n.r),color=PALETTE[n.colorKey||n.rootId]||0xd1d0c5,seed=hash(n.id),lobes=n.level===0?11:n.level===1?7:5;
+   const r=Math.max(1.25,n.r),color=PALETTE[n.colorKey||n.rootId]||0xd1d0c5,seed=hash(n.id);
    if(n.level<=1)junctions.circle(n.x,n.y,r*3.3).fill({color,alpha:alpha*.07});
-   const polygon=[];for(let k=0;k<lobes;k++){const a=k/lobes*Math.PI*2,v=.78+(((seed>>>((k%4)*5))&31)/31)*.42;polygon.push(n.x+Math.cos(a)*r*v,n.y+Math.sin(a)*r*v);}
-   junctions.poly(polygon).fill({color:0x111b1d,alpha}).stroke({color,alpha:alpha*(n.level===0?.88:n.level===1?.68:.42),width:n.level===0?1.6:.9});
+   // A junction is a tiny coenocytic cell cluster: overlapping rounded lobes,
+   // with a slightly irregular membrane and no polygonal badge silhouette.
+   const rotation=(seed%6283)/1000;
+   const cellOffsets=n.level===0?[[0,0,.76],[.66,0,.43],[-.58,.18,.39],[.12,.62,.40],[-.08,-.63,.42],[.58,-.48,.31],[-.62,-.43,.30]]:n.level===1?[[0,0,.72],[.62,.08,.39],[-.55,.30,.34],[.08,-.61,.36]]:[[0,0,.72],[.54,.20,.34],[-.48,-.26,.31]];
+   for(let i=0;i<cellOffsets.length;i++){
+    const [ox,oy,size]=cellOffsets[i],a=rotation+i*2.3999632297;
+    const wobble=1+Math.sin(a*2+rotation)*.055;
+    const cx=n.x+(ox*Math.cos(rotation)-oy*Math.sin(rotation))*r;
+    const cy=n.y+(ox*Math.sin(rotation)+oy*Math.cos(rotation))*r;
+    const cellRadius=r*size*wobble;
+    junctions.circle(cx,cy,cellRadius).fill({color:0x111b1d,alpha}).stroke({color,alpha:alpha*(n.level===0?.82:n.level===1?.64:.38),width:n.level===0?1.45:.82});
+   }
    if(hovered?.id===n.id){junctions.circle(n.x,n.y,r+10/scale).fill({color,alpha:.18});junctions.circle(n.x,n.y,r+7/scale).stroke({color:0xe4e7dd,alpha:.96,width:1.35/scale});}
    if(selected?.id===n.id)junctions.circle(n.x,n.y,r+7/scale+5/scale).stroke({color:0xe4e7dd,alpha:.9,width:1/scale});
   }
@@ -101,7 +111,7 @@ export async function createPixiRenderer(canvas){
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
    const threshold=n.level===0?0:n.level===1?.6:n.level===2?1.3:n.level===3?2.55:4.3;
-   const show=n.level===0||(alpha>.5&&scale>threshold)||lineage.has(n.id);
+   const show=n.level===0||(alpha>.5&&scale>threshold*(mobile?.68:1))||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
