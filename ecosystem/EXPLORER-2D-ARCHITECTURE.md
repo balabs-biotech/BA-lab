@@ -58,6 +58,9 @@ L’organicité ne doit jamais redevenir le fouillis de l’ancienne version. La
 - la caméra de vue globale calcule son cadre à partir des huit points d’inoculation et du noyau central, jamais à partir du seul centre de marque ;
 - sur mobile, l’ensemble des huit territoires doit rester visible à une échelle utile, sans simplement rabattre les labels sur les bords du viewport ;
 - les filaments principaux sont plus lisibles que les branches secondaires, qui sont elles-mêmes plus lisibles que les hyphes terminales ;
+- la hiérarchie d'épaisseur suit explicitement la filiation, avec une échelle de référence décroissante : liaison mycologie → territoire (4.1), territoire → sous-domaine (2.75), sous-domaine → discipline (1.8), discipline → niveau suivant (1.15), ramifications terminales (0.72) ;
+- le tronc commun précédant une bifurcation conserve exactement l'épaisseur de la génération qu'il porte, afin que la filiation reste continue avant et après le point de division ;
+- les relations transversales documentées restent nettement plus fines (0.82 pour un lien explicite Notion, 0.48 pour une relation de contenu) et ne doivent jamais rivaliser avec la hiérarchie principale ;
 - les ramifications doivent progresser latéralement et se déployer en rhizomorphes, pas former huit faisceaux radiaux ou des éventails réguliers ;
 - les labels ne s’affichent qu’au niveau de zoom où ils peuvent être lus sans collision ;
 - les connexions transversales sont plus fines et moins lumineuses que les branches hiérarchiques ;
