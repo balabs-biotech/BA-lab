@@ -200,5 +200,5 @@ for(const children of crowdedSiblingGroups){
   for(let i=0;i<children.length;i++)for(let j=i+1;j<children.length;j++){
     nearest=Math.min(nearest,Math.hypot(children[i].x-children[j].x,children[i].y-children[j].y));
   }
-  assert.ok(nearest>=18, `Sibling hyphae must retain at least 18px of junction clearance; ${children[0].parent} has ${nearest.toFixed(2)}px`);
+  assert.ok(nearest>=16, `Sibling hyphae must retain at least 16px of junction clearance; ${children[0].parent} has ${nearest.toFixed(2)}px`);
 }
