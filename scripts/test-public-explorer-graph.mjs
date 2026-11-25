@@ -72,6 +72,9 @@ for(const lang of languages){
   assert.ok(hierarchyEdges(graph).every(edge=>edge.a.id===edge.b.parent),lang+": every hypha must connect a page directly to its actual parent");
   assert.ok(hierarchyEdges(graph).every(edge=>!Object.hasOwn(edge,"branchPoint")),lang+": no synthetic shared branch point may replace a real parent");
   assert.ok(hierarchyEdges(graph).every(edge=>{const length=Math.hypot(edge.b.x-edge.a.x,edge.b.y-edge.a.y);return length>=115&&length<=415;}),lang+": every hypha must grow outward from its actual parent by a consistent local segment length, rather than snapping descendants onto global concentric rings");
+  const microbiologyParents=graph.nodes.filter(node=>node.rootId==="microbiology"&&node.level>=1);
+  const openLocalFan=microbiologyParents.map(parent=>graph.nodes.filter(node=>node.parent===parent.id).map(node=>node.angle)).filter(angles=>angles.length>=3).some(angles=>Math.max(...angles)-Math.min(...angles)>=.28);
+  assert.ok(openLocalFan,lang+": deeper microbiology generations must open into a visible parent-centered fan instead of parallel filaments");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
