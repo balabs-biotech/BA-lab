@@ -105,22 +105,24 @@ export function createPublicMycologyNetwork(tree,hub){
     const territoryRadius=parent.territoryRadius||180;
     const parentRadius=Math.hypot(parent.x,parent.y);
     const ringRadius=parentRadius+165;
-    // Divide each parent's own angular territory into exclusive daughter lanes.
-    // Subtree mass gives complex branches room without allowing sibling sectors to overlap.
     const parentMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
     const parentMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
-    const gap=kids.length>1?Math.min(.018,(parentMax-parentMin)/(kids.length*2)):0;
-    const usable=Math.max(0,parentMax-parentMin-gap*(kids.length-1));
-    const masses=kids.map(child=>Math.sqrt(countSubtree(child)));
-    const totalMass=masses.reduce((sum,mass)=>sum+mass,0)||1;
-    let cursor=parentMin;
-    kids.forEach((child,index)=>{
+    // Stable ID-derived angles keep existing branches fixed when content is appended.
+    // A Voronoi-like envelope around each growth tip gives sibling colonies exclusive lanes.
+    const candidates=kids.map(child=>{
       const seed=hash(child.id);
-      const laneWidth=usable*masses[index]/totalMass;
-      const sectorMin=cursor;
-      const sectorMax=cursor+laneWidth;
-      const angle=(sectorMin+sectorMax)/2;
-      cursor=sectorMax+gap;
+      const fraction=(seed>>>0)/0xffffffff;
+      const halfSpan=(parentMax-parentMin)*.44;
+      const angle=clamp(parent.angle+(fraction-.5)*2*halfSpan,parentMin+.0005,parentMax-.0005);
+      return{child,seed,angle};
+    }).sort((a,b)=>a.angle-b.angle||a.child.id.localeCompare(b.child.id));
+    candidates.forEach((entry,index)=>{
+      const leftBoundary=index===0?parentMin:(candidates[index-1].angle+entry.angle)/2;
+      const rightBoundary=index===candidates.length-1?parentMax:(entry.angle+candidates[index+1].angle)/2;
+      const halfLane=Math.max(.00025,Math.min(entry.angle-leftBoundary,rightBoundary-entry.angle)*.94);
+      const sectorMin=Math.max(parentMin,entry.angle-halfLane);
+      const sectorMax=Math.min(parentMax,entry.angle+halfLane);
+      const {child,seed,angle}=entry;
       const radialJitter=(((seed>>>16)&63)/63-.5)*(depth===1?5:depth===2?8:11);
       const radial=ringRadius+radialJitter;
       const x=Math.cos(angle)*radial;
