@@ -103,16 +103,16 @@ try {
       const rect = el.getBoundingClientRect();
       return { boxes:Object.keys(boxes), viewport:{width:rect.width,height:rect.height} };
     });
-    assert.ok(overviewGeometry.boxes.includes('balabs-identity'), 'The global overview must visibly include the BA Labs identity node');
-    assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must visibly include the mycology core');
+    assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must not insert a separate BA Labs identity node');
+    assert.ok(overviewGeometry.boxes.includes('mycology-center'), 'The global overview must visibly include the sole mycology core');
     assert.ok(['microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].every(id => overviewGeometry.boxes.includes(id)), 'All eight autonomous territories must be visible in the global overview');
     const overviewBounds = await page.locator('#field').evaluate(el => {
       const boxes = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}');
       const rect = el.getBoundingClientRect();
-      return Object.entries(boxes).filter(([id]) => ['balabs-identity','mycology-center','microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].includes(id)).map(([id,b]) => ({id,...b,inside:b.left>=0&&b.top>=0&&b.right<=rect.width&&b.bottom<=rect.height}));
+      return Object.entries(boxes).filter(([id]) => ['mycology-center','microbiology','plants','ecology','bioprocesses','biomaterials','instrumentation','digital','physical'].includes(id)).map(([id,b]) => ({id,...b,inside:b.left>=0&&b.top>=0&&b.right<=rect.width&&b.bottom<=rect.height}));
     });
-    assert.equal(overviewBounds.length,10,'The global overview must expose all ten central labels');
-    assert.ok(overviewBounds.every(item=>item.inside), 'All ten central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
+    assert.equal(overviewBounds.length,9,'The global overview must expose the mycology core and eight universe labels');
+    assert.ok(overviewBounds.every(item=>item.inside), 'All nine central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
     const overviewCamera = await page.locator('#field').evaluate(el => ({scale:Number(el.dataset.targetScale||0),width:Number(el.dataset.viewportWidth||0),height:Number(el.dataset.viewportHeight||0)}));
     if(viewport.name==='mobile')assert.ok(overviewCamera.scale < .62, 'Mobile overview camera must fit the eight outer inoculation territories, not only the central identity nodes: '+JSON.stringify(overviewCamera));
     await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
