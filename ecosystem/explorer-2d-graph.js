@@ -112,7 +112,7 @@ export function createPublicMycologyNetwork(tree,hub){
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
     const usable=Math.max(0,parentMax-parentMin-gap*(kids.length-1));
-    const growthLength=Math.max(165,22/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2)));
+    const growthLength=Math.max(165,Math.min(320,22/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2))));
     // Keep the eight inoculation fans stable; below that first ring, use a
     // sublinear branch-mass law so one dense subtree cannot starve smaller siblings.
     const masses=kids.map(child=>parent.level===0?countSubtree(child):Math.pow(countSubtree(child),0.35));
