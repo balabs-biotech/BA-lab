@@ -1,4 +1,4 @@
-import { createPixiRenderer } from "./explorer-2d-pixi.js?v=mobile-zoom-fix-20261125";
+import { createPixiRenderer } from "./explorer-2d-pixi.js?v=direct-parent-colonization-20261125";
 import { createPublicMycologyNetwork } from "./explorer-2d-graph.js?v=radial-petri-sectors-20261125";
 const LANGS=["fr","en","ar","pt"];
 const PALETTE={microbiology:"#79a991",plants:"#8fb58c",ecology:"#c19b73",bioprocesses:"#b58d73",biomaterials:"#c88773",instrumentation:"#7eaaa3",digital:"#aa9cbb",physical:"#b5b58d"};
