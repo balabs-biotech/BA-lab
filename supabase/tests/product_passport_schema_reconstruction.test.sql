@@ -87,8 +87,8 @@ declare
   product_id uuid;
   lot_id uuid;
   check_id uuid;
-  passport_id uuid;
-  version_no integer;
+  v_passport_id uuid;
+  v_version_no integer;
   snapshot jsonb;
 begin
   insert into auth.users(id) values(actor_operator),(actor_reviewer) on conflict do nothing;
@@ -110,14 +110,14 @@ begin
   perform public.review_quality_check_with_audit(check_id,actor_reviewer);
   perform public.release_lot_with_audit(lot_id,actor_reviewer);
 
-  passport_id := public.create_passport_draft_with_audit(lot_id,token_hash,actor_operator);
-  version_no := public.publish_passport_with_audit(passport_id,actor_reviewer);
+  v_passport_id := public.create_passport_draft_with_audit(lot_id,token_hash,actor_operator);
+  v_version_no := public.publish_passport_with_audit(v_passport_id,actor_reviewer);
 
   select pv.snapshot into snapshot
   from public.passport_versions pv
-  where pv.passport_id=passport_id and pv.version=version_no;
+  where pv.passport_id=v_passport_id and pv.version=v_version_no;
 
-  if version_no <> 1 then raise exception 'Expected first passport version, got %',version_no; end if;
+  if v_version_no <> 1 then raise exception 'Expected first passport version, got %',v_version_no; end if;
   if snapshot #>> '{product,name}' <> 'Produit fixture' then raise exception 'Published snapshot product name mismatch'; end if;
   if snapshot #>> '{lot,code}' <> 'LOT-TEST-001' then raise exception 'Published snapshot lot code mismatch'; end if;
   if snapshot #>> '{quality,status}' <> 'released' then raise exception 'Published snapshot quality state mismatch'; end if;
@@ -126,7 +126,7 @@ begin
   if not exists(
     select 1 from public.passports p
     join public.passport_versions pv on pv.passport_id=p.id and pv.version=p.current_version
-    where p.id=passport_id and p.qr_token_hash=token_hash and p.status='published'
+    where p.id=v_passport_id and p.qr_token_hash=token_hash and p.status='published'
       and pv.snapshot=snapshot
   ) then raise exception 'QR hash does not resolve to the current published snapshot'; end if;
 end $$;
