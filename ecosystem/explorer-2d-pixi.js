@@ -106,6 +106,7 @@ export async function createPixiRenderer(canvas){
   const labelBudget=rootCount+Math.min(34,Math.max(8,Math.round(10+scale*5)));
   const occupied=[];const hitBoxes={};let drawn=0;const mobile=width<600;
   for(const {n,alpha} of candidates){
+   if(n.identity)continue;
    if(n.level!==0&&drawn>=labelBudget)continue;
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
