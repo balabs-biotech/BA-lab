@@ -105,10 +105,9 @@ export function createPublicMycologyNetwork(tree,hub){
     const parentSeed=hash(parent.id);
     const territoryScale=parent.territoryScale||1;
     const territoryRadius=parent.territoryRadius||180;
-    const envelopeFactor=clamp(territoryScale,0.78,1.42);
     // Each universe owns a 45-degree wedge. Branches fan within that wedge,
     // then advance through concentric growth rings instead of wandering into neighbours.
-    const spread=clamp(.68+Math.log2(kids.length+1)*.015,.68,.76)*Math.min(1.02,envelopeFactor);
+    const spread=.74;
     const ringRadius=ROOT_RING_RADIUS+depth*155;
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
