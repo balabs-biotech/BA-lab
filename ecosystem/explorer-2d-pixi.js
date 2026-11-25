@@ -36,12 +36,15 @@ export async function createPixiRenderer(canvas){
    const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
    const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
+   const parentAngle=e.a.angle??Math.atan2(dy,dx),childAngle=e.b.angle??Math.atan2(dy,dx);
+   const angularDeflection=e.fractal?Math.atan2(Math.sin(childAngle-parentAngle),Math.cos(childAngle-parentAngle)):0;
+   const branchSign=Math.sign(angularDeflection)||side;
    const parentSectorWidth=e.fractal?Math.max(.012,(e.a.sectorMax??e.a.angle+.39)-(e.a.sectorMin??e.a.angle-.39)):0;
-   const laneBend=e.fractal?Math.min(34,len*Math.tan(Math.min(.38,parentSectorWidth*.46))*.62):0;
+   const laneBend=e.fractal?clamp(Math.max(Math.abs(angularDeflection)*len*.78,len*Math.tan(Math.min(.38,parentSectorWidth*.46))*.38),Math.min(13,len*.09),Math.min(104,len*.34)):0;
    const bendLimit=e.fractal?laneBend:e.primaryHypha?Math.min(210,len*.36):e.cross?Math.min(150,len*.31):Math.min(112,len*.29);
-   const bendA=bendLimit*side*(.48+((seed>>>5)&63)/110),bendB=bendLimit*(-side)*(.22+((seed>>>13)&63)/150);
+   const bendA=e.fractal?laneBend*branchSign*.72:bendLimit*side*(.48+((seed>>>5)&63)/110),bendB=e.fractal?laneBend*branchSign*.48:bendLimit*(-side)*(.22+((seed>>>13)&63)/150);
    const driftLimit=e.fractal?Math.min(12,len*Math.tan(Math.min(.38,parentSectorWidth*.46))*.24):0;
-   const driftA=(((seed>>>12)&255)/255-.5)*(e.fractal?driftLimit:Math.min(58,len*.18)),driftB=(((seed>>>20)&255)/255-.5)*(e.fractal?driftLimit:Math.min(48,len*.15));
+   const driftA=e.fractal?branchSign*driftLimit*.18:(((seed>>>12)&255)/255-.5)*Math.min(58,len*.18),driftB=e.fractal?branchSign*driftLimit*.12:(((seed>>>20)&255)/255-.5)*Math.min(48,len*.15);
    const c1={x:a.x+dx*.31-dy/len*bendA+dx/len*driftA,y:a.y+dy*.31+dx/len*bendA+dy/len*driftA};
    const c2={x:b.x-dx*.31-dy/len*bendB+dx/len*driftB,y:b.y-dy*.31+dx/len*bendB+dy/len*driftB};
    const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.15:e.cross?.55:e.primaryHypha?2.35:generation<=2?1.55:generation===3?1.12:Math.max(.42,.78-generation*.055))*(hot?1.55:1);
