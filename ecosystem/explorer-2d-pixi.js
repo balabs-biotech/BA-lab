@@ -27,6 +27,10 @@ export async function createPixiRenderer(canvas){
   const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
   const terminalIds=new Set(nodes.filter(n=>n.level>0&&!branchParents.has(n.id)).map(n=>n.id));
   const bezierPoint=(a,c1,c2,b,t)=>{const u=1-t;return{x:u*u*u*a.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*b.y};};
+  // Hierarchical edge widths are keyed to the child generation, not the
+  // parent's depth. This keeps every lineage visually continuous:
+  // mycology → universe → subdomain → discipline → terminal detail.
+  const lineageWidth=level=>level<=0?4.1:level===1?2.75:level===2?1.8:level===3?1.15:.72;
   const drawnTrunks=new Set();
   for(const edge of edges){
    if(!edge.branchPoint||drawnTrunks.has(edge.a.id))continue;
@@ -37,7 +41,7 @@ export async function createPixiRenderer(canvas){
    const c1={x:parent.x+dx*.34-dy/len*bend,y:parent.y+dy*.34+dx/len*bend};
    const c2={x:p.x-dx*.32+dy/len*bend*.55,y:p.y-dy*.32-dx/len*bend*.55};
    const color=PALETTE[edge.b.colorKey||edge.a.colorKey]||0x91a99b;
-   filaments.moveTo(parent.x,parent.y).bezierCurveTo(c1.x,c1.y,c2.x,c2.y,p.x,p.y).stroke({color,alpha:alphaFor(parent.level+1)*.82,width:parent.level===0?2.15:parent.level===1?1.45:1.02,cap:"round"});
+   filaments.moveTo(parent.x,parent.y).bezierCurveTo(c1.x,c1.y,c2.x,c2.y,p.x,p.y).stroke({color,alpha:alphaFor(parent.level+1)*.9,width:lineageWidth(parent.level+1),cap:"round"});
   }
   for(const e of edges){
    const selectedRelation=!!selected&&(e.a.id===selected.id||e.b.id===selected.id);
@@ -50,7 +54,7 @@ export async function createPixiRenderer(canvas){
    const driftA=(((seed>>>12)&255)/255-.5)*Math.min(58,len*.18),driftB=(((seed>>>20)&255)/255-.5)*Math.min(48,len*.15);
    const c1={x:a.x+dx*.31-dy/len*bendA+dx/len*driftA,y:a.y+dy*.31+dx/len*bendA+dy/len*driftA};
    const c2={x:b.x-dx*.31-dy/len*bendB+dx/len*driftB,y:b.y-dy*.31+dx/len*bendB+dy/len*driftB};
-   const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.15:e.cross?.55:e.primaryHypha?2.35:generation<=2?1.55:generation===3?1.12:Math.max(.42,.78-generation*.055))*(hot?1.55:1);
+   const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?.82:e.cross?.48:e.primaryHypha?lineageWidth(0):lineageWidth(e.b.level))*(hot?1.5:1);
    const terminalTip=!e.cross&&terminalIds.has(e.b.id);
    const strokeColor=hot?0xe4e7dd:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
    const strokeAlpha=hot?Math.max(.88,alpha):e.cross?(selectedRelation?.78:.13)*alpha:alpha*(depth>=3?.42:depth===2?.62:.78);
@@ -64,7 +68,7 @@ export async function createPixiRenderer(canvas){
      filaments.moveTo(p0.x,p0.y).bezierCurveTo(p0.x+(mid.x-p0.x)*1.35,p0.y+(mid.y-p0.y)*1.35,p1.x+(mid.x-p1.x)*1.35,p1.y+(mid.y-p1.y)*1.35,p1.x,p1.y).stroke({color:strokeColor,alpha:strokeAlpha*(s===3?.72:1),width:widths[s],cap:"round"});
     }
    }else{
-    if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).bezierCurveTo(c1.x,c1.y,c2.x,c2.y,b.x,b.y).stroke({color,alpha:alpha*.12,width:widthBase*3.1,cap:"round"});
+    if(!e.cross&&depth<=2&&len>34)filaments.moveTo(a.x,a.y).bezierCurveTo(c1.x,c1.y,c2.x,c2.y,b.x,b.y).stroke({color,alpha:alpha*.10,width:widthBase*2.1,cap:"round"});
     filaments.moveTo(a.x,a.y).bezierCurveTo(c1.x,c1.y,c2.x,c2.y,b.x,b.y).stroke({color:strokeColor,alpha:strokeAlpha,width:widthBase,cap:"round"});
    }
    if(e.verified&&(selectedRelation||scale>=3))junctions.circle(bezierPoint(a,c1,c2,b,.5).x,bezierPoint(a,c1,c2,b,.5).y,Math.max(1.1,1.45/Math.sqrt(scale))).fill({color:e.basis==="notion-link"?0xb96b4d:0x7eaaa3,alpha:selectedRelation?.8:.48});
