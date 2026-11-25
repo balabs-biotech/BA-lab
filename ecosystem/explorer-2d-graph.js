@@ -97,11 +97,10 @@ export function createPublicMycologyNetwork(tree,hub){
   if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
   if(!hub||typeof hub.id!=="string"||typeof hub.url!=="string")throw new Error("A valid public mycology hub is required.");
   const nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
-  // The logo is the identity origin; mycology is a distinct tissue immediately around it.
-  const brand={id:"balabs-identity",title:"BA Labs",x:0,y:0,r:29,level:0,data:{kind:"identity"},rootId:"balabs-identity",colorKey:"publicCore",parent:null,identity:true};
-  const center={id:"mycology-center",title:hub.title,x:0,y:78,r:23,level:0,generation:0,data:{...hub,children:tree},rootId:"mycology-center",colorKey:"publicCore",parent:brand.id};
-  nodes.push(brand,center);byId.set(brand.id,brand);byId.set(center.id,center);
-  edges.push({a:brand,b:center,depth:0,generation:0,seed:hash("identity|mycology"),identityLink:true,primaryHypha:true});
+  // Mycology is the sole biological center. BA Labs remains the site identity,
+  // not an extra graph node or a label competing with the central organism.
+  const center={id:"mycology-center",title:hub.title,x:0,y:0,r:28,level:0,generation:0,data:{...hub,children:tree},rootId:"mycology-center",colorKey:"publicCore",parent:null};
+  nodes.push(center);byId.set(center.id,center);
 
   // Each knowledge branch grows recursively from its own inoculation point.
   // Seeded angular drift creates a controlled fractal morphology without filler.
@@ -142,8 +141,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const anchor=ANCHORS[index];
     const territoryMass=countSubtree(universe)-1;
     const territoryScale=clamp(0.82+Math.sqrt(territoryMass)/15,0.9,1.62);
-    const inwardAngle=Math.atan2(-anchor.y,-anchor.x);
-    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:clamp(13+Math.sqrt(territoryMass)*0.72,15,25),level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:inwardAngle,inoculationIndex:index,territoryMass,territoryScale,territoryRadius:clamp(90+Math.sqrt(territoryMass)*30,150,300),fractal:true};
+    const root={id:universe.id,title:universe.title,x:anchor.x,y:anchor.y,r:clamp(13+Math.sqrt(territoryMass)*0.72,15,25),level:0,generation:0,data:universe,rootId:universe.id,parent:center.id,colorKey:COLOR_KEYS[universe.id],angle:anchor.angle,inoculationIndex:index,territoryMass,territoryScale,territoryRadius:clamp(90+Math.sqrt(territoryMass)*30,150,300),fractal:true};
     if(byId.has(root.id))throw new Error("Duplicate public explorer universe id: "+root.id);
     nodes.push(root);byId.set(root.id,root);
     edges.push({a:center,b:root,depth:0,generation:1,seed:hash("inoculation|"+root.id),hubLink:true,primaryHypha:true,inoculationIndex:index});
