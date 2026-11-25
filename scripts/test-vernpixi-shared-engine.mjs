@@ -44,6 +44,11 @@ assert.doesNotMatch(publicRenderer,/drawnArms|upper-left|upper-right/,'The rebui
 assert.doesNotMatch(publicRenderer,/const count=depth===1\?4:depth===2\?3:2/,'The public renderer must not invent decorative branches that have no graph data');
 assert.match(publicRenderer,/primaryHypha|generation/,'The public renderer must distinguish biological filament generations');
 assert.match(publicRenderer,/const lineageWidth=level=>level<=0\?4\.1:level===1\?2\.75:level===2\?1\.8:level===3\?1\.15:\.72;/,'Public hyphae must use a strictly decreasing five-generation lineage width scale');
+const widthScaleMatch=publicRenderer.match(/const lineageWidth=level=>level<=0\\?([0-9.]+):level===1\\?([0-9.]+):level===2\\?([0-9.]+):level===3\\?([0-9.]+):([0-9.]+);/);
+assert.ok(widthScaleMatch,'The public renderer must expose its explicit generation width scale');
+const lineageWidths=widthScaleMatch.slice(1).map(Number);
+assert.deepEqual(lineageWidths,[4.1,2.75,1.8,1.15,.72],'Each successive lineage generation must be visibly thinner than its parent');
+assert.ok(lineageWidths.every((width,index)=>index===0||width<lineageWidths[index-1]),'Lineage connection thickness must decrease monotonically with depth');
 assert.match(publicRenderer,/e\.primaryHypha\?lineageWidth\(0\):lineageWidth\(e\.b\.level\)/,'Each hierarchy edge must inherit the width of the generation it introduces');
 assert.match(publicRenderer,/lineageWidth\(parent\.level\+1\)/,'Shared pre-bifurcation trunks must retain the thickness of their child generation');
 assert.match(publicRenderer,/e\.verified\?\.82:e\.cross\?\.48/,'Documented transverse relations must remain thinner than every hierarchical branch');
