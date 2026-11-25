@@ -173,6 +173,17 @@ try {
     await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf must not automatically open Notion');
     assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), leafFixture.url, 'The selected leaf must expose its exact Notion destination');
+    if (viewport.name === 'mobile') {
+      const mobileFocus = await page.locator('#field').evaluate(el => ({
+        focusY: Number(el.dataset.targetFocusY || 0),
+        height: Number(el.dataset.viewportHeight || 0),
+        scale: Number(el.dataset.targetScale || 0)
+      }));
+      assert.ok(mobileFocus.focusY > 0 && mobileFocus.focusY < mobileFocus.height * .46,
+        'Mobile selection camera must place the focused node above the bottom selection dock: ' + JSON.stringify(mobileFocus));
+      assert.ok(mobileFocus.scale <= 1.6,
+        'Mobile deep selection must retain enough surrounding hyphal context: ' + JSON.stringify(mobileFocus));
+    }
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
