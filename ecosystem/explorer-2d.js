@@ -83,7 +83,7 @@ function hit(x,y){
  const labelZoom=[0,1.2,2.0,3.0,4.2,5.5,7.0,8.6,10.2];
  const mobile=w<600;
  for(const n of nodes){
-  const threshold=(labelZoom[Math.min(n.level,labelZoom.length-1)]||0)*(mobile?.68:1);
+  const threshold=(labelZoom[Math.min(n.level,labelZoom.length-1)]||0)*(mobile?.25:1);
   if(!visibleLabels.has(n.id)||scale<threshold||levelOpacity(n.level)<.5)continue;
   const p=screen(n),d=Math.hypot(p.x-x,p.y-y),limit=Math.max(best,n.r*Math.sqrt(scale)+7);
   if(d<limit){best=d;found=n;}
