@@ -198,6 +198,16 @@ html[dir="rtl"] body > .chapter-rail{left:auto!important;right:max(0px,env(safe-
  html[dir="rtl"] body > .chapter-rail{left:auto!important;right:max(0px,env(safe-area-inset-right))!important}
  #app.balabs-ui #selection{left:56px!important;right:10px!important;width:auto!important;max-width:none!important}
 }
+/* Mobile focus card: keep only identity and the direct source action visible. */
+@media(max-width:700px){
+ #app.balabs-ui #selection .selection-dock{padding:8px 10px!important;gap:3px!important}
+ #app.balabs-ui #selection .selection-path,
+ #app.balabs-ui #selection .selection-description,
+ #app.balabs-ui #selection .child-branches{display:none!important}
+ #app.balabs-ui #selection .selection-title{font-size:12px!important;line-height:1.2!important}
+ #app.balabs-ui #selection .selection-context{display:none!important}
+ #app.balabs-ui #selection .selection-open-link{margin-top:2px!important;font-size:8px!important}
+}
 </style>
 </head>
 <body>

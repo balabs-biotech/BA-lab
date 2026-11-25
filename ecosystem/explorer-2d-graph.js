@@ -97,11 +97,10 @@ export function createPublicMycologyNetwork(tree,hub){
   if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
   if(!hub||typeof hub.id!=="string"||typeof hub.url!=="string")throw new Error("A valid public mycology hub is required.");
   const nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
-  // The logo is the identity origin; mycology is a distinct tissue immediately around it.
-  const brand={id:"balabs-identity",title:"BA Labs",x:0,y:0,r:29,level:0,data:{kind:"identity"},rootId:"balabs-identity",colorKey:"publicCore",parent:null,identity:true};
-  const center={id:"mycology-center",title:hub.title,x:0,y:78,r:23,level:0,generation:0,data:{...hub,children:tree},rootId:"mycology-center",colorKey:"publicCore",parent:brand.id};
-  nodes.push(brand,center);byId.set(brand.id,brand);byId.set(center.id,center);
-  edges.push({a:brand,b:center,depth:0,generation:0,seed:hash("identity|mycology"),identityLink:true,primaryHypha:true});
+  // Mycology is the sole biological center. BA Labs remains the site identity,
+  // not an extra graph node or a label competing with the central organism.
+  const center={id:"mycology-center",title:hub.title,x:0,y:0,r:28,level:0,generation:0,data:{...hub,children:tree},rootId:"mycology-center",colorKey:"publicCore",parent:null};
+  nodes.push(center);byId.set(center.id,center);
 
   // Each knowledge branch grows recursively from its own inoculation point.
   // Seeded angular drift creates a controlled fractal morphology without filler.
@@ -112,10 +111,10 @@ export function createPublicMycologyNetwork(tree,hub){
     const territoryScale=parent.territoryScale||1;
     const territoryRadius=parent.territoryRadius||180;
     const envelopeFactor=clamp(territoryRadius/260,0.78,1.42);
-    const baseSpread=depth===1?0.18:clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
+    const baseSpread=depth===1?1.55:clamp(0.70+Math.log2(kids.length+1)*0.16,0.78,1.42);
     // Keep the inoculation fan stable; deeper bifurcations widen with the real territory envelope.
     const spread=baseSpread*(depth===1?1:envelopeFactor);
-    const distance=(depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1))*territoryScale;
+    const distance=(depth===1?190+Math.sqrt(kids.length)*20:depth===2?154+Math.sqrt(kids.length)*21:depth===3?108:Math.max(36,58-depth*2.0))*territoryScale;
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=(seed&1)===0?-1:1;
       // Stable ID-derived branch placement: appending Notion content must not rotate existing hyphae.
@@ -124,8 +123,8 @@ export function createPublicMycologyNetwork(tree,hub){
       const inheritedDrift=Math.sin((parentSeed%10000)*0.00071+depth*0.79)*(depth===1?0.018:0.075);
       const angle=baseAngle+fraction*spread+localDrift+inheritedDrift;
       const length=distance*(0.76+((seed>>>16)&63)/160);
-      const lateralRatio=depth===1?0.03+((seed>>>2)&255)/255*0.07:0.16+((seed>>>2)&255)/255*0.20;
-      const lateral=side*Math.min(distance*lateralRatio*(depth===1?1:envelopeFactor),territoryRadius*(depth===1?0.10:0.30));
+      const lateralRatio=depth===1?0.10+((seed>>>2)&255)/255*0.14:0.20+((seed>>>2)&255)/255*0.22;
+      const lateral=side*Math.min(distance*lateralRatio*(depth===1?1:envelopeFactor),territoryRadius*(depth===1?0.16:0.34));
       const x=parent.x+Math.cos(angle)*length-Math.sin(angle)*lateral;
       const y=parent.y+Math.sin(angle)*length+Math.cos(angle)*lateral;
       const node={id:child.id,title:child.title,x,y,r:Math.max(1.8,7.6-depth*1.08),level:depth,generation:depth,data:child,rootId,parent:parent.id,colorKey:COLOR_KEYS[rootId],angle,inoculationIndex,territoryScale,territoryRadius};

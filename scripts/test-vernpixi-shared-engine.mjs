@@ -16,8 +16,8 @@ const hub={id:'mycology-center',title:'Mycology',description:'BA Labs mycology h
 const publicSpace=createPublicMycologyNetwork(publicTree,hub);
 assert.equal(publicSpace.stats.universeCount,8);
 assert.equal(publicSpace.byId.get('mycology-center').data.url,hub.url);
-assert.equal(publicSpace.byId.get('balabs-identity').title,'BA Labs','The BA Labs identity node must be the geometric center');
-assert.ok(publicSpace.edges.some(edge=>edge.identityLink&&edge.a.id==='balabs-identity'&&edge.b.id==='mycology-center'),'The brand identity must connect directly to the mycology core');
+assert.deepEqual([publicSpace.byId.get('mycology-center').x,publicSpace.byId.get('mycology-center').y],[0,0],'Mycology must be the geometric center of the public ecosystem');
+assert.equal(publicSpace.byId.has('balabs-identity'),false,'BA Labs must not be an extra graph node competing with the mycology center');
 assert.equal(publicSpace.stats.inoculationPoints,8,'The public network must expose eight independent inoculation points');
 assert.equal(publicSpace.edges.filter(edge=>edge.hubLink&&edge.primaryHypha).length,8,'The mycology tissue must connect to all eight universes through primary hyphae');
 assert.ok(publicSpace.edges.filter(edge=>edge.hubLink).every(edge=>!('arm' in edge)),'The public graph must not partition territories into fixed arms');

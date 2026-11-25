@@ -36,23 +36,24 @@ function buildNetwork(){
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
 function fitOverview(){
- const roots=nodes.filter(n=>n.level<=1);
- if(!roots.length){targetScale=.5;targetOffset={x:0,y:0};return;}
- const minX=Math.min(...roots.map(n=>n.x)),maxX=Math.max(...roots.map(n=>n.x));
- const minY=Math.min(...roots.map(n=>n.y)),maxY=Math.max(...roots.map(n=>n.y));
- // Fit the complete central tissue and eight asymmetric inoculation territories.
- // The camera follows their combined bounds while preserving the brand origin.
- const pad=Math.min(88,Math.max(28,Math.min(w,h)*.075));
- // Root labels extend beyond their node coordinates, with the longest labels
- // on the lateral arms. Reserve an explicit text-safe envelope on both axes.
- const labelSafeEnvelope=w<600?180:280;
- const scaleX=(w-pad*2)/(maxX-minX+labelSafeEnvelope);
- const scaleY=(h-pad*2)/(maxY-minY+labelSafeEnvelope);
- targetScale=clamp(Math.min(scaleX,scaleY),.14,.62);
- targetOffset={x:-(minX+maxX)*.5*targetScale,y:-(minY+maxY)*.5*targetScale};
+ const bounds=nodes.filter(n=>Number.isFinite(n.x)&&Number.isFinite(n.y));
+ if(!bounds.length){targetScale=.5;targetOffset={x:0,y:0};return;}
+ // Keep the mycology core at the visual origin while fitting every real
+ // hypha, not just the eight inoculation anchors. This prevents edge clipping
+ // on narrow screens and keeps the complete biological tissue in view.
+ const origin=nodes.find(n=>n.id==="mycology-center")||{x:0,y:0};
+ const extentX=Math.max(...bounds.map(n=>Math.abs(n.x-origin.x)));
+ const extentY=Math.max(...bounds.map(n=>Math.abs(n.y-origin.y)));
+ const mobile=w<600;
+ const pad=mobile?18:Math.min(88,Math.max(28,Math.min(w,h)*.075));
+ const labelSafeEnvelope=mobile?32:280;
+ const scaleX=(w-pad*2)/(extentX*2+labelSafeEnvelope);
+ const scaleY=(h-pad*2)/(extentY*2+labelSafeEnvelope);
+ targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72);
+ targetOffset={x:-origin.x*targetScale,y:-origin.y*targetScale};
 }
 function resize(){const r=canvas.parentElement.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);if(pixiRenderer)pixiRenderer.resize(w,h);if(nodes.length){fitOverview();scale=targetScale;offset={...targetOffset};draw();}}
-function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
+function draw(){if(!pixiRenderer)return;canvas.dataset.scale=String(scale);canvas.dataset.targetScale=String(targetScale);canvas.dataset.viewportWidth=String(w);canvas.dataset.viewportHeight=String(h);canvas.dataset.targetFocusY=String(selected?h/2+targetOffset.y+selected.y*targetScale:h/2);pixiRenderer.render({nodes,edges,selected,hovered,scale,offset,width:w,height:h,reduced,lang,time:performance.now()});}
 function syncUniverseRail(n){
  const root=n?(n.level===0?n.id:n.rootId):null;
  document.querySelectorAll(".universe-rail [data-universe]").forEach(button=>{
@@ -61,7 +62,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}targetScale=zoomTo??(n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const defaultZoom=n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?3.4:3.6;targetScale=zoomTo??(mobile?defaultZoom*.31:defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.40:h/2;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
@@ -155,7 +156,7 @@ function updateUI(){
  if(!document.getElementById("inlineExplorer"))document.title="BA Labs — "+t("title");
 
 }
-function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,selected?12:.82),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
+function zoom(f,x=w/2,y=h/2){const next=clamp(targetScale*f,.26,selected?12:3.2),ratio=next/targetScale;targetOffset.x=(x-w/2)-(x-w/2-targetOffset.x)*ratio;targetOffset.y=(y-h/2)-(y-h/2-targetOffset.y)*ratio;targetScale=next;if(reduced){scale=targetScale;offset={...targetOffset};draw();renderAccessible();}}
 function pointerDown(e){hovered=null;canvas.style.cursor="grabbing";canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragged=false;gesture={x:e.clientX,y:e.clientY,ox:targetOffset.x,oy:targetOffset.y};canvas.classList.add("dragging");}
 function pointerMove(e){
  if(!pointers.has(e.pointerId)){

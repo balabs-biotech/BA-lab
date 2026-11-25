@@ -173,6 +173,20 @@ try {
     await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
     assert.equal(await page.evaluate(() => window.__openedNotionUrls.length), 0, 'Selecting a leaf must not automatically open Notion');
     assert.equal(await page.locator('#selection .selection-open-link').getAttribute('href'), leafFixture.url, 'The selected leaf must expose its exact Notion destination');
+    const selectedCamera = await page.locator('#field').evaluate(el => ({
+      focusY: Number(el.dataset.targetFocusY || 0),
+      height: Number(el.dataset.viewportHeight || 0),
+      scale: Number(el.dataset.targetScale || 0)
+    }));
+    if (viewport.name === 'mobile') {
+      assert.ok(selectedCamera.focusY > 0 && selectedCamera.focusY < selectedCamera.height * .46,
+        'Mobile selection camera must place the focused node above the bottom selection dock: ' + JSON.stringify(selectedCamera));
+      assert.ok(selectedCamera.scale <= 1.2,
+        'Mobile deep selection must preserve a readable surrounding territory instead of magnifying one isolated node: ' + JSON.stringify(selectedCamera));
+    } else {
+      assert.ok(selectedCamera.scale <= 3.8,
+        'Desktop deep selection must preserve adjacent branches and avoid clipping the selected territory: ' + JSON.stringify(selectedCamera));
+    }
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
@@ -191,7 +205,13 @@ try {
     // Focus the exact canonical leaf before reading its animated canvas hitbox.
     await leafButton.focus();
     await leafButton.press('Enter');
-    await page.waitForFunction(title => document.querySelector('#selection')?.textContent?.includes(title), leafFixture.title);
+    await page.waitForFunction(title => document.querySelector('#selection .selection-title')?.textContent === title, leafFixture.title);
+    // Wait for the camera animation to settle before reading canvas-space hitboxes.
+    // Otherwise the pointer can target a stale position from the preceding frame.
+    await page.waitForFunction(() => {
+      const field = document.querySelector('#field');
+      return Math.abs(Number(field?.dataset.scale || 0) - Number(field?.dataset.targetScale || 0)) < .01;
+    }, undefined, { timeout: 15000 });
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const pointForLeaf = async () => page.locator('#field').evaluate((el,id) => {
       const box = JSON.parse(el.dataset.visibleNodeHitBoxes || '{}')[id];
