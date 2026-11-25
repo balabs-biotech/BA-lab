@@ -78,7 +78,7 @@ begin
 end $$;
 
 -- Exercise the complete synthetic lifecycle without touching live BA Labs data.
-do $
+do $$
 declare
   actor_operator uuid := '00000000-0000-4000-8000-000000000001';
   actor_reviewer uuid := '00000000-0000-4000-8000-000000000002';
@@ -129,6 +129,6 @@ begin
     where p.id=passport_id and p.qr_token_hash=token_hash and p.status='published'
       and pv.snapshot=snapshot
   ) then raise exception 'QR hash does not resolve to the current published snapshot'; end if;
-end $;
+end $$;
 
 rollback;
