@@ -116,6 +116,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const masses=kids.map(child=>parent.level===0?countSubtree(child):Math.pow(countSubtree(child),0.35));
     const totalMass=masses.reduce((sum,mass)=>sum+mass,0)||1;
     let cursor=parentMin;
+    const created=[];
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
       const laneWidth=usable*masses[index]/totalMass;
@@ -131,8 +132,16 @@ export function createPublicMycologyNetwork(tree,hub){
       if(byId.has(node.id))throw new Error("Duplicate public explorer node id: "+node.id);
       nodes.push(node);byId.set(node.id,node);
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
-      walk(child,node,depth+1,rootId,inoculationIndex);
+      created.push(node);
     });
+    // Give each inoculation branch the angular territory between its neighbours.
+    // Its descendants can then fan around their real parent instead of inheriting
+    // a tiny subtree-weighted wedge that compresses generations into a knot.
+    created.forEach((node,index)=>{
+      node.sectorMin=index===0?parentMin:(created[index-1].angle+node.angle)/2;
+      node.sectorMax=index===created.length-1?parentMax:(node.angle+created[index+1].angle)/2;
+    });
+    for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
 
   tree.forEach((universe,index)=>{
