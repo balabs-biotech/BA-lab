@@ -116,6 +116,16 @@ const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).ang
 assert.deepEqual(primaryAngles(grown),primaryAngles(original),"Adding a new branch must not rotate the existing first-generation inoculation fan");
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
 assert.ok(original.nodes.filter(node=>node.level>0).every(node=>node.parent&&original.byId.has(node.parent)),"Every descendant must have a real parent node");
+// Every sibling subtree must occupy a disjoint angular growth lane.
+for(const parent of original.nodes.filter(node=>node.level>=0)){
+  const children=original.nodes.filter(node=>node.parent===parent.id);
+  if(children.length<2)continue;
+  const lanes=children.map(child=>({id:child.id,min:child.sectorMin,max:child.sectorMax,angle:child.angle})).sort((a,b)=>a.min-b.min);
+  assert.ok(lanes.every(lane=>Number.isFinite(lane.min)&&Number.isFinite(lane.max)&&lane.min<lane.max),`Children of ${parent.id} must carry bounded biological growth lanes`);
+  for(let i=1;i<lanes.length;i++)assert.ok(lanes[i-1].max<=lanes[i].min+1e-8,`Sibling subtrees ${lanes[i-1].id} and ${lanes[i].id} must not occupy overlapping angular lanes`);
+  assert.ok(lanes.every(lane=>lane.angle>=lane.min&&lane.angle<=lane.max),`Each branch of ${parent.id} must grow inside its own assigned lane`);
+}
+
 for(const parent of original.nodes.filter(node=>node.level>0)){
   const children=original.nodes.filter(node=>node.parent===parent.id);
   if(children.length<2)continue;
