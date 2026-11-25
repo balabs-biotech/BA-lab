@@ -62,7 +62,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const defaultZoom=n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2;targetScale=zoomTo??(mobile?defaultZoom*.48:defaultZoom);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const defaultZoom=n.level===0?1.05:n.level===1?1.65:n.level===2?2.8:n.level===3?4.5:6.2;targetScale=zoomTo??(mobile?defaultZoom*.34:defaultZoom);targetScale=clamp(targetScale,.3,12);targetOffset={x:-n.x*targetScale,y:-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
