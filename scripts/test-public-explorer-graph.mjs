@@ -122,7 +122,7 @@ for(const parent of original.nodes.filter(node=>node.level>=0)){
   if(children.length<2)continue;
   const lanes=children.map(child=>({id:child.id,min:child.sectorMin,max:child.sectorMax,angle:child.angle})).sort((a,b)=>a.min-b.min);
   assert.ok(lanes.every(lane=>Number.isFinite(lane.min)&&Number.isFinite(lane.max)&&lane.min<lane.max),`Children of ${parent.id} must carry bounded biological growth lanes`);
-  for(let i=1;i<lanes.length;i++)assert.ok(lanes[i-1].max<=lanes[i].min+1e-8,`Sibling subtrees ${lanes[i-1].id} and ${lanes[i].id} must not occupy overlapping angular lanes`);
+  for(let i=1;i<lanes.length;i++)assert.ok(lanes[i-1].max<=lanes[i].min+1e-8,`Sibling subtrees ${lanes[i-1].id} [${lanes[i-1].min},${lanes[i-1].max}] and ${lanes[i].id} [${lanes[i].min},${lanes[i].max}] must not occupy overlapping angular lanes`);
   assert.ok(lanes.every(lane=>lane.angle>=lane.min&&lane.angle<=lane.max),`Each branch of ${parent.id} must grow inside its own assigned lane`);
 }
 
