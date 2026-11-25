@@ -110,7 +110,7 @@ export async function createPixiRenderer(canvas){
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    let label=labelPool.get(n.id);if(!label){label=new Text({text:n.title,style:style.clone()});labelPool.set(n.id,label);labels.addChild(label);}
    const title=n.level===0&&scale<1.2?(shortRoots[lang]||shortRoots.fr)[n.rootId]||n.title:n.title;
-   const fontSize=n.level===0?clamp(9+Math.log2(Math.max(.5,scale))*1.1,8,10.5):clamp(7.5+Math.log2(Math.max(.7,scale))*.65,7,9.5);
+   let fontSize=n.level===0?clamp(9+Math.log2(Math.max(.5,scale))*1.1,8,10.5):clamp(7.5+Math.log2(Math.max(.7,scale))*.65,7,9.5);if(width<600&&n.level>0)fontSize=Math.min(11,fontSize+1.5);
    label.text=title;label.style.fontSize=fontSize;label.style.fontWeight=n.level===0?"650":"500";
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
