@@ -46,7 +46,7 @@ function fitOverview(){
  const extentY=Math.max(...bounds.map(n=>Math.abs(n.y-origin.y)));
  const mobile=w<600;
  const pad=mobile?18:Math.min(88,Math.max(28,Math.min(w,h)*.075));
- const labelSafeEnvelope=mobile?92:280;
+ const labelSafeEnvelope=mobile?32:280;
  const scaleX=(w-pad*2)/(extentX*2+labelSafeEnvelope);
  const scaleY=(h-pad*2)/(extentY*2+labelSafeEnvelope);
  targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72);
