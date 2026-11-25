@@ -97,6 +97,7 @@ export async function createPixiRenderer(canvas){
    pt:{bio:"BIOTECH",myco:"MICO",soil:"TECHNOSOIL",lab:"LAB",products:"PRODUTOS",iot:"IOT",work:"PROJETOS",evidence:"EVIDÊNCIAS",microbiology:"MICROBIO",plants:"PLANTAS",ecology:"ECOLOGIA",bioprocesses:"BIOPROCESSOS",biomaterials:"BIOMATERIAIS",instrumentation:"ENGENHARIA",digital:"DIGITAL",physical:"FÍSICA"}
   };
   const mobile=width<600;
+  const mobileLabelScaleFactor=mobile?.68:1;
   const candidates=[];
   const byId=new Map(nodes.map(n=>[n.id,n]));
   const lineage=new Set();let ancestor=selected;
@@ -106,12 +107,12 @@ export async function createPixiRenderer(canvas){
    const sx=width/2+offset.x+n.x*scale,sy=height/2+offset.y+n.y*scale;
    if(sx < -80 || sx > width+80 || sy < 45 || sy > height+45)continue;
    const threshold=n.level===0?0:n.level===1?.6:n.level===2?1.3:n.level===3?2.55:4.3;
-   const show=n.level===0||(alpha>.5&&scale>threshold*(mobile?.25:1))||lineage.has(n.id);
+   const show=n.level===0||(alpha>.5&&scale>threshold*mobileLabelScaleFactor)||lineage.has(n.id);
    if(show)candidates.push({n,alpha,priority:selected?.id===n.id?0:lineage.has(n.id)?1:n.level===0?2:3,distance:selected?Math.hypot(n.x-selected.x,n.y-selected.y):Math.hypot(n.x,n.y)});
   }
   candidates.sort((a,b)=>a.priority-b.priority||a.distance-b.distance);
   const rootCount=candidates.filter(c=>c.n.level===0).length;
-  const labelBudget=rootCount+Math.min(34,Math.max(8,Math.round(10+scale*5)));
+  const labelBudget=rootCount+(mobile?3:Math.min(34,Math.max(8,Math.round(10+scale*5))));
   const occupied=[];const hitBoxes={};let drawn=0;
   for(const {n,alpha} of candidates){
    if(n.level!==0&&drawn>=labelBudget)continue;
