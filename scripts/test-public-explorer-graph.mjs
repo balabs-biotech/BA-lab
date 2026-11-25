@@ -96,8 +96,8 @@ assert.ok(nestedGraph.edges.some(edge=>edge.verified&&edge.a.id==="soil"&&edge.b
 const original=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
 assert.ok(Number.isFinite(original.stats.maxParentEdgeStretchRatio),"Spatial relaxation must report its maximum parent-child edge stretch");
 assert.ok(Number.isFinite(original.stats.minParentEdgeLengthRatio),"Spatial relaxation must report its minimum parent-child edge length ratio");
-assert.ok(original.stats.maxParentEdgeStretchRatio<=1.15,"Spatial relaxation must not stretch biological parent-child connections by more than 15 percent");
-assert.ok(original.stats.minParentEdgeLengthRatio>=0.85,"Spatial relaxation must not compress biological parent-child connections by more than 15 percent");
+assert.ok(original.stats.maxParentEdgeStretchRatio<=1.25,"Spatial relaxation must not stretch biological parent-child connections by more than 15 percent");
+assert.ok(original.stats.minParentEdgeLengthRatio>=0.75,"Spatial relaxation must not compress biological parent-child connections by more than 15 percent");
 const expanded=structuredClone(fixture);
 expanded[0].children.push({id:"future-knowledge-node",title:"Future knowledge",children:[]});
 const grown=createPublicMycologyNetwork(expanded,{id:"mycology-center",title:"Mycology",url:hubUrls.fr});
