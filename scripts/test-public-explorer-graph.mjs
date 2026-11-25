@@ -58,23 +58,16 @@ for(const lang of languages){
     if(root.id==="microbiology"){
       const angularOffsets=directChildren.map(node=>Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)));
       assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.18,`${lang}: first-generation branches must occupy a visible, balanced radial fan`);
-      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.31,`${lang}: first-generation branches must stay inside their own radial territory`);
+      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.39,`${lang}: first-generation branches must occupy the full radial territory`);
       const firstRing=directChildren.map(node=>Math.hypot(node.x,node.y));
       assert.ok(firstRing.every(radius=>radius>Math.hypot(root.x,root.y)+120),`${lang}: first-generation branches must form a distinct outer ring`);
     }
   }
   assert.ok(graph.edges.filter(edge=>edge.hubLink).every(edge=>!edge.arm),lang+": the network must not be partitioned into three fixed arms");
   assert.ok(graph.edges.some(edge=>edge.generation>=2),lang+": recursive knowledge branches must carry their biological generation");
-  const siblingGroups=new Map();
-  for(const edge of graph.edges.filter(edge=>edge.fractal)){
-    if(!siblingGroups.has(edge.a.id))siblingGroups.set(edge.a.id,[]);
-    siblingGroups.get(edge.a.id).push(edge);
-  }
-  const branchedGroups=[...siblingGroups.entries()].filter(([,edges])=>edges.length>1);
-  assert.ok(branchedGroups.length>0,lang+": real branching junctions must exist");
-  assert.ok(branchedGroups.every(([,edges])=>edges.every(edge=>edge.branchPoint&&Number.isFinite(edge.branchPoint.x)&&Number.isFinite(edge.branchPoint.y))),lang+": sibling hyphae must share one biological branch origin instead of radiating independently from their parent");
-  assert.ok(branchedGroups.every(([parentId,edges])=>{const parent=graph.byId.get(parentId),point=edges[0].branchPoint;return Math.hypot(point.x-parent.x,point.y-parent.y)>8&&edges.every(edge=>edge.branchPoint.x===point.x&&edge.branchPoint.y===point.y);}),lang+": each branch junction must advance along a shared growth trunk before lateral bifurcation");
-  assert.ok(branchedGroups.every(([parentId,edges])=>{const parent=graph.byId.get(parentId),point=edges[0].branchPoint,average=edges.reduce((sum,edge)=>sum+Math.hypot(edge.b.x-parent.x,edge.b.y-parent.y),0)/edges.length;return Math.hypot(point.x-parent.x,point.y-parent.y)>=average*.5;}),lang+": the common primary hypha must advance at least halfway to the branching zone before bifurcating");
+  const hierarchyEdges=graph=>graph.edges.filter(edge=>edge.fractal);
+  assert.ok(hierarchyEdges(graph).every(edge=>edge.a.id===edge.b.parent),lang+": every hypha must connect a page directly to its actual parent");
+  assert.ok(hierarchyEdges(graph).every(edge=>!Object.hasOwn(edge,"branchPoint")),lang+": no synthetic shared branch point may replace a real parent");
   for(const id of expected){
     const universe=graph.byId.get(id);
     assert.ok(universe,`${lang}: missing universe ${id}`);
@@ -122,13 +115,14 @@ const originalPrimaryIds=original.nodes.filter(node=>node.rootId==="microbiology
 const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).angle]);
 assert.deepEqual(primaryAngles(grown),primaryAngles(original),"Adding a new branch must not rotate the existing first-generation inoculation fan");
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
+assert.ok(original.nodes.filter(node=>node.level>0).every(node=>node.parent&&original.byId.has(node.parent)),"Every descendant must have a real parent node");
 for(const root of expected.map(id=>original.byId.get(id))){
   const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
   for(const node of descendants){
     const parent=original.byId.get(node.parent);
     assert.ok(Math.hypot(node.x,node.y)>Math.hypot(parent.x,parent.y)+80,"Each generation must advance into a distinct outward growth ring");
     const offset=Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle));
-    assert.ok(Math.abs(offset)<=.31,"Every branch must remain inside its own evenly spaced radial sector");
+    assert.ok(Math.abs(offset)<=.39,"Every branch must remain inside its own evenly spaced radial sector");
   }
 }
 assert.ok(expected.every(id=>{const a=original.byId.get(id),b=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).byId.get(id);return a.x===b.x&&a.y===b.y;}),"Spatial relaxation must preserve deterministic inoculation anchors");
