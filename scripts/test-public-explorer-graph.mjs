@@ -7,6 +7,7 @@ assert.match(explorerPage,/@media\(max-width:700px\)\{[\s\S]*?\.selection-path,[
 const explorer2dPage=readFileSync(new URL("../ecosystem/explorer-2d.html",import.meta.url),"utf8");
 assert.match(explorer2dPage,/#selection \.selection-dock\{[^}]*background:[^;}]+/,"The 2D selection dock must have a visible card surface instead of rendering unstyled text over the graph");
 assert.match(explorer2dPage,/@media\(max-width:700px\)[\s\S]*?#selection \.selection-dock\{[^}]*padding:/,"The mobile selection dock must have its own compact layout and padding");
+assert.match(explorer2dPage,/#selection\{[^}]*max-height:40%/,"The mobile selection dock must stay compact and leave most of the viewport available to explore the graph");
 const pixiRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
 assert.match(pixiRenderer,/const mobileLabelScaleFactor=mobile\?\.68:1/,"Mobile labels must require a later zoom threshold instead of exposing the full hierarchy in the overview");
 assert.match(pixiRenderer,/const labelBudget=rootCount\+\(mobile\?3:Math\.min\(34,Math\.max\(8,Math\.round\(10\+scale\*5\)\)\)\)/,"Mobile overview must cap non-root labels to three at a time");
