@@ -587,3 +587,11 @@ html body[data-domain] .card :is(.bio-operation-form,#plantCultureForm,.observat
     transition:none !important;
   }
 }
+
+
+/* Keep the overview anchor clear of the sticky toolbar.
+   This shared sheet loads after the legacy tracker stylesheet. */
+html body[data-domain] #overviewCard {
+  scroll-margin-top:112px !important;
+  scroll-margin-block-start:112px !important;
+}
