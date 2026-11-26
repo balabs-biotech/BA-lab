@@ -89,7 +89,11 @@
   }
 
   function buildPrompt() {
-    const workspace = domain === "mycology"\n      ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification"\n      : domain === "agronomy"\n        ? "GREEN TECH — cultures végétales, semis, croissance, micropropagation, substrats, irrigation, serre et paramètres environnementaux"\n        : "LABORATORY — géloses, cultures liquides, grain, milieux, lots et opérations de laboratoire";
+    const workspace = domain === "mycology"
+      ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification"
+      : domain === "agronomy"
+        ? "GREEN TECH — cultures végétales, semis, croissance, micropropagation, substrats, irrigation, serre et paramètres environnementaux"
+        : "LABORATORY — géloses, cultures liquides, grain, milieux, lots et opérations de laboratoire";
     return `# BA Labs CultureOps — assistant de structuration BAL-JSON
 
 Organisation active CultureOps : ${currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.
