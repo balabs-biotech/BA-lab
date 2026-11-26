@@ -15,7 +15,7 @@ export async function createPixiRenderer(canvas){
  const style=new TextStyle({fontFamily:"Inter, system-ui, sans-serif",fontSize:12,fill:0xe4e7dd,fontWeight:"500",stroke:{color:0x111b1d,width:3},align:"center"});
  let lastWidth=0,lastHeight=0;
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
- const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.65,1.05,1.5],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
+ const alphaFor=level=>{const thresholds=[0,.10,.22,.85,1.2,1.8,2.5,3.5],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
 // Width is keyed to the child generation: mycology → universe → first branch → deeper branches.
 const lineageWidth=generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generation-1)));
  let cameraScale=1;
