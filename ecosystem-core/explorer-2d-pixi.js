@@ -103,7 +103,12 @@ export async function createPixiRenderer(canvas){
    const angle=Number.isFinite(n.angle)?n.angle:Math.atan2(n.y,n.x),dx=Math.cos(angle),dy=Math.sin(angle);
    const anchorX=dx>.32?0:dx<-.32?1:.5,anchorY=dy>.48?0:dy<-.48?1:.5;
    const radius=n.level===0?Math.max(15,n.r*scale+10):Math.max(7,n.r*scale+5);
-   const x=clamp(sx+dx*radius,5,width-5),y=clamp(sy+dy*radius,64,height-18);
+   const xMin=anchorX===1?label.width+5:anchorX===.5?label.width/2+5:5;
+   const xMax=anchorX===0?width-label.width-5:anchorX===.5?width-label.width/2-5:width-5;
+   const yMin=anchorY===1?label.height+64:anchorY===.5?label.height/2+64:64;
+   const yMax=anchorY===0?height-18-label.height:anchorY===.5?height-18-label.height/2:height-18;
+   const x=clamp(sx+dx*radius,Math.min(xMin,width/2),Math.max(xMax,width/2));
+   const y=clamp(sy+dy*radius,Math.min(yMin,height/2),Math.max(yMax,height/2));
    label.anchor.set(anchorX,anchorY);label.position.set(x,y);label.alpha=alpha;label.visible=true;
    const box={left:x-(anchorX===1?label.width:anchorX===.5?label.width/2:0),right:x+(anchorX===0?label.width:anchorX===.5?label.width/2:0),top:y-(anchorY===1?label.height:anchorY===.5?label.height/2:0),bottom:y+(anchorY===0?label.height:anchorY===.5?label.height/2:0)};
    const collides=occupied.some(o=>box.left<o.right+7&&box.right>o.left-7&&box.top<o.bottom+5&&box.bottom>o.top-5);
