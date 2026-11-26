@@ -21,13 +21,22 @@ function canonicalizeNotionTree(tree){
   const canonicalByNotionId=new Map();
   const collect=(items)=>{
     for(const item of items||[]){
-      if(item.kind!=="reference"&&item.notionId&&!canonicalByNotionId.has(item.notionId))canonicalByNotionId.set(item.notionId,item.id);
+      if(item.kind!=="reference"&&item.kind!=="label"&&item.notionId&&!canonicalByNotionId.has(item.notionId))canonicalByNotionId.set(item.notionId,item.id);
       collect(item.children);
     }
   };
   collect(tree);
   const seen=new Set();
   const prune=(item,parent=null)=>{
+    if(item.kind==="label"){
+      // Labels are visual section headings in the source tree, not Notion pages.
+      // Flatten their real children into the nearest canonical page.
+      for(const child of item.children||[]){
+        const kept=prune(child,parent);
+        if(kept&&parent)parent.children.push(kept);
+      }
+      return null;
+    }
     if(item.kind==="reference"){
       const target=canonicalByNotionId.get(item.notionId);
       if(parent&&target&&target!==parent.id){
