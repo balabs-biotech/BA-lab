@@ -4,9 +4,9 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import Ajv2020 from "npm:ajv@8.17.1/dist/2020.js";
 import addFormats from "npm:ajv-formats@3.0.1";
-import recordSchema from "../../../schemas/bal-json/v1/record.schema.json" with { type: "json" };
-import measurementSchema from "../../../schemas/bal-json/v1/measurement.schema.json" with { type: "json" };
-import observationSchema from "../../../schemas/bal-json/v1/observation.schema.json" with { type: "json" };
+import recordSchema from "./schemas/v1/record.schema.json" with { type: "json" };
+import measurementSchema from "./schemas/v1/measurement.schema.json" with { type: "json" };
+import observationSchema from "./schemas/v1/observation.schema.json" with { type: "json" };
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
