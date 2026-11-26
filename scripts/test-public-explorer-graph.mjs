@@ -164,7 +164,7 @@ for(const parent of original.nodes.filter(node=>node.level>0)){
   const children=original.nodes.filter(node=>node.parent===parent.id);
   if(children.length<2)continue;
   const offsets=children.map(child=>Math.atan2(Math.sin(child.angle-parent.angle),Math.cos(child.angle-parent.angle)));
-  assert.ok(offsets.every(offset=>Math.abs(offset)<=.701),`Children of ${parent.id} must fan locally around their actual parent with a wider lateral opening`);
+  assert.ok(offsets.every(offset=>Math.abs(offset)<=.841),`Children of ${parent.id} must fan locally around their actual parent with the expanded lateral opening`);
 }
 for(const root of expected.map(id=>original.byId.get(id))){
   const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
