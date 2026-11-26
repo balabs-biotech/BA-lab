@@ -160,12 +160,13 @@ export function createPublicMycologyNetwork(sourceTree,hub){
     // Hyphae advance from the real parent, not from the global origin.
     // This preserves a constant local growth step while allowing each generation
     // to form a genuinely branching, tree-like colony instead of concentric fans.
-    const territoryCenter=ANCHORS[inoculationIndex].angle;
-    // Each parent receives its own broad lateral growth fan. Do not inherit
-    // the narrow midpoint lane between siblings: that repeatedly halves the
-    // available angle at every generation and creates a one-directional plume.
-    const parentMin=Math.max(territoryCenter-SECTOR_HALF_ANGLE,parent.angle-LOCAL_FAN_HALF_ANGLE);
-    const parentMax=Math.min(territoryCenter+SECTOR_HALF_ANGLE,parent.angle+LOCAL_FAN_HALF_ANGLE);
+    // Only the eight inoculation points use the initial radial sectors.
+    // Once a hypha has grown, its descendants fan around that real parent and
+    // may spread beyond the original wedge, like a colony leaving its inoculation
+    // point. The territory remains identifiable by lineage and colour, not walls.
+    const fanHalfAngle=parent.level===0?SECTOR_HALF_ANGLE:LOCAL_FAN_HALF_ANGLE;
+    const parentMin=parent.angle-fanHalfAngle;
+    const parentMax=parent.angle+fanHalfAngle;
     // Allocate space by actual subtree complexity: a dense colony receives a wider
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
