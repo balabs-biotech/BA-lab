@@ -36,7 +36,7 @@ html body[data-domain] .app-hero {
   border-radius:var(--ba-radius-lg) !important;
   background:
     radial-gradient(ellipse at 82% 42%,color-mix(in srgb,var(--workspace-accent) 13%,transparent),transparent 44%),
-    linear-gradient(120deg,#263633 0%,#1b2525 64%,#172020 100%) !important;
+    linear-gradient(120deg,#263B38 0%,#1D2B24 58%,#17221D 100%) !important;
   box-shadow:0 18px 42px rgba(0,0,0,.18) !important;
 }
 html body[data-domain] .hero-copy { position:relative !important; z-index:2 !important; max-width:720px !important; }
