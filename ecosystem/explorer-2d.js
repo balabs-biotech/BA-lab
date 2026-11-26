@@ -36,7 +36,7 @@ function buildNetwork(){
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
 function fitOverview(){
- const bounds=nodes.filter(n=>n.level<=1&&Number.isFinite(n.x)&&Number.isFinite(n.y));
+ const bounds=nodes.filter(n=>n.level<=2&&Number.isFinite(n.x)&&Number.isFinite(n.y));
  if(!bounds.length){targetScale=.5;targetOffset={x:0,y:0};return;}
  // The overview fits the mycology core, eight inoculation points and their
  // first real Notion pages. Deeper generations are intentionally revealed by
@@ -63,7 +63,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];const focusNodes=nodes.filter(candidate=>candidate.id===n.id||candidate.parent===n.id);const extentX=Math.max(0,...focusNodes.map(candidate=>Math.abs(candidate.x-n.x)));const extentY=Math.max(0,...focusNodes.map(candidate=>Math.abs(candidate.y-n.y)));const availableHeight=Math.max(180,h-(mobile?260:150));const fitX=(w-72)/(extentX*2+80);const fitY=availableHeight/(extentY*2+80);const fittedZoom=Math.min(defaultZoom,fitX,fitY);targetScale=zoomTo??clamp(fittedZoom,.38,defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.31:h*.34;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];const focusNodes=nodes.filter(candidate=>candidate.id===n.id||candidate.parent===n.id);const extentX=Math.max(0,...focusNodes.map(candidate=>Math.abs(candidate.x-n.x)));const extentY=Math.max(0,...focusNodes.map(candidate=>Math.abs(candidate.y-n.y)));const availableHeight=Math.max(180,h-(mobile?260:150));const fitX=(w-72)/(extentX*2+80);const fitY=availableHeight/(extentY*2+80);const fittedZoom=Math.min(defaultZoom,fitX,fitY);targetScale=zoomTo??clamp(fittedZoom,.38,defaultZoom);targetScale=clamp(targetScale,.3,mobile?1.2:12);const focusY=mobile?h*.31:h*.34;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
