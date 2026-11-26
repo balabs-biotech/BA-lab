@@ -7,7 +7,12 @@ assert.match(explorerPage,/@media\(max-width:700px\)\{[\s\S]*?\.selection-path,[
 const pixiRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
 assert.match(pixiRenderer,/const mobileLabelScaleFactor=mobile\?\.68:1/,"Mobile labels must require a later zoom threshold instead of exposing the full hierarchy in the overview");
 assert.match(pixiRenderer,/const labelBudget=rootCount\+\(mobile\?3:Math\.min\(34,Math\.max\(8,Math\.round\(10\+scale\*5\)\)\)\)/,"Mobile overview must cap non-root labels to three at a time");
-assert.match(pixiRenderer,/e\.hubLink\?5\.2:e\.primaryHypha\?3\.2:e\.fractal\?Math\.max\(\.48,3\.2\*Math\.pow\(\.68,Math\.max\(0,generation-1\)\)\)/,"Hyphal connection thickness must encode lineage: hub-to-universe thickest, then progressively thinner generations");
+assert.match(pixiRenderer,/e\.hubLink\?5\.2:e\.primaryHypha\?3\.2:e\.fractal\?lineageWidth\(generation\)/,"Hyphal connection thickness must encode lineage: hub-to-universe thickest, then progressively thinner generations");
+const widthScaleMatch=pixiRenderer.match(/const lineageWidth=generation=>Math\.max\(\.48,3\.2\*Math\.pow\(\.64,Math\.max\(0,generation-1\)\)\);/);
+assert.ok(widthScaleMatch,"The renderer must expose a deliberate generation-based hypha width scale");
+const lineageWidths=[1,2,3,4,5].map(generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generation-1))));
+assert.deepEqual(lineageWidths.slice(0,3),[3.2,2.048,1.31072],"First-, second-, and third-generation hyphae must have distinct measurable thicknesses");
+assert.ok(lineageWidths.every((width,index)=>index===0||width<lineageWidths[index-1]),"Every successive hypha generation must become thinner");
 
 const languages=["fr","en","ar","pt"];
 const expected=["microbiology","plants","ecology","bioprocesses","biomaterials","instrumentation","digital","physical"];
