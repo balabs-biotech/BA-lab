@@ -36,11 +36,12 @@ function buildNetwork(){
  canvas.dataset.localAnastomoses=String(graph.stats.localAnastomoses);
 }
 function fitOverview(){
- const bounds=nodes.filter(n=>Number.isFinite(n.x)&&Number.isFinite(n.y));
+ const bounds=nodes.filter(n=>n.level<=1&&Number.isFinite(n.x)&&Number.isFinite(n.y));
  if(!bounds.length){targetScale=.5;targetOffset={x:0,y:0};return;}
- // Keep the mycology core at the visual origin while fitting every real
- // hypha, not just the eight inoculation anchors. This prevents edge clipping
- // on narrow screens and keeps the complete biological tissue in view.
+ // The overview fits the mycology core, eight inoculation points and their
+ // first real Notion pages. Deeper generations are intentionally revealed by
+ // zoom: letting the deepest territory dictate the global camera would shrink
+ // the seven shallower universes into the centre of an otherwise empty field.
  const origin=nodes.find(n=>n.id==="mycology-center")||{x:0,y:0};
  const extentX=Math.max(...bounds.map(n=>Math.abs(n.x-origin.x)));
  const extentY=Math.max(...bounds.map(n=>Math.abs(n.y-origin.y)));
