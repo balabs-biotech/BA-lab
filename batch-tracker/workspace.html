@@ -795,6 +795,31 @@
     <h2 id="measurementTitle">Mesures &amp; observations instrumentales</h2>
     <p class="muted">Enregistrez une mesure numérique avec son unité, son horodatage et sa méthode. Les mesures de lot sont reliées à la traçabilité par un événement, sans ajouter de table parallèle.</p>
 
+    <section id="balJsonImportPanel" class="bal-json-panel" aria-labelledby="balJsonImportTitle">
+      <div class="bal-json-heading">
+        <div><span class="context-eyebrow">PASSERELLE IA / INTEROPÉRABILITÉ</span><h3 id="balJsonImportTitle">Importer une analyse IA — BAL-JSON</h3>
+        <p class="muted">Faites analyser vos notes par ChatGPT, Gemini, Claude ou un autre LLM généraliste. Collez ensuite le JSON structuré ici : aperçu, contrôle du contexte, puis import explicite.</p></div>
+        <span class="bal-json-version">BAL-JSON v1</span>
+      </div>
+      <div class="bal-json-actions">
+        <button id="balJsonCopyPromptButton" type="button" class="secondary-button">Copier le prompt CultureOps</button>
+        <button id="balJsonDownloadPromptButton" type="button" class="secondary-button">Télécharger le prompt</button>
+        <button id="balJsonCopySchemaButton" type="button" class="secondary-button">Copier le contrat JSON</button>
+      </div>
+      <label for="balJsonImportSource">Réponse JSON du LLM</label>
+      <textarea id="balJsonImportSource" rows="7" maxlength="64000" spellcheck="false" placeholder='{"contract":"BA-LABS/JSON","contract_version":"1.0.0", ...}'></textarea>
+      <div class="bal-json-actions">
+        <button id="balJsonPreviewButton" type="button" class="secondary-button">Vérifier et prévisualiser</button>
+        <button id="balJsonImportButton" type="button" disabled>Importer dans CultureOps</button>
+      </div>
+      <div id="balJsonPreview" class="bal-json-preview" aria-live="polite">Aucun JSON vérifié pour le moment.</div>
+      <p id="balJsonImportStatus" class="muted" role="status" aria-live="polite">L’import ne démarre qu’après vérification et clic explicite. Les données importées restent au statut brut / non vérifié.</p>
+      <details class="bal-json-help"><summary>Comment fonctionne la passerelle ?</summary>
+        <ol><li>Copiez le prompt, puis collez-le dans votre LLM généraliste avec vos notes d’observation.</li><li>Demandez une sortie JSON stricte conforme au contrat BAL-JSON.</li><li>Copiez uniquement l’objet JSON retourné et collez-le ici.</li><li>Vérifiez l’aperçu et le rattachement à la culture ou au lot, puis importez.</li></ol>
+        <p>Le LLM ne se connecte jamais à votre base. Il prépare une proposition ; CultureOps valide le contrat, l’identité de l’organisation, les variables et les unités avant l’écriture atomique.</p>
+      </details>
+    </section>
+
     <div class="quick-capture" aria-label="Saisie rapide">
       <div class="quick-capture-heading"><div><span class="context-eyebrow">SAISIE EXPRESS</span><h3>Qu’est-ce que tu veux noter ?</h3><p>Un clic prépare la fiche. Choisis ensuite la culture et complète seulement ce qui manque.</p></div><span class="quick-capture-spark" aria-hidden="true">✳</span></div>
       <div class="quick-capture-grid">
