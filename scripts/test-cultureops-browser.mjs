@@ -8,7 +8,7 @@ fs.mkdirSync(artifactDir, { recursive: true });
 
 const workspaces = [
   { slug: "green-tech", domain: "agronomy", accent: "#b5d38b", cover: "universe-soil.jpg" },
-  { slug: "mycology", domain: "mycology", accent: "#b96b4d", cover: "universe-myco.jpg" },
+  { slug: "mycology", domain: "mycology", accent: "#be7658", cover: "universe-myco.jpg" },
   { slug: "laboratory", domain: "laboratory", accent: "#78b8e8", cover: "chapter-research.jpg" },
 ];
 const viewports = [
