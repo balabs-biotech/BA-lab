@@ -795,6 +795,19 @@
     <h2 id="measurementTitle">Mesures &amp; observations instrumentales</h2>
     <p class="muted">Enregistrez une mesure numérique avec son unité, son horodatage et sa méthode. Les mesures de lot sont reliées à la traçabilité par un événement, sans ajouter de table parallèle.</p>
 
+    <style>
+      .bal-json-panel{margin:22px 0;padding:20px;border:1px solid var(--line,#34453a);border-radius:16px;background:var(--surface,#17201b)}
+      .bal-json-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+      .bal-json-heading h3{margin:5px 0;font-size:20px}
+      .bal-json-version{padding:5px 9px;border:1px solid var(--line,#526657);border-radius:999px;font-size:11px;white-space:nowrap}
+      .bal-json-panel textarea{box-sizing:border-box;width:100%;margin-top:8px;font:13px/1.5 ui-monospace,monospace}
+      .bal-json-actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+      .bal-json-preview{min-height:48px;padding:12px;border-radius:9px;background:var(--surface-raised,#0d1110);white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 ui-monospace,monospace}
+      #balJsonImportStatus[data-state="error"]{color:#ef9c91}
+      #balJsonImportStatus[data-state="success"]{color:#a8d4a5}
+      .bal-json-help{margin-top:12px;font-size:13px}
+      @media(max-width:600px){.bal-json-panel{padding:14px}.bal-json-actions button{flex:1 1 100%}}
+    </style>
     <section id="balJsonImportPanel" class="bal-json-panel" aria-labelledby="balJsonImportTitle">
       <div class="bal-json-heading">
         <div><span class="context-eyebrow">PASSERELLE IA / INTEROPÉRABILITÉ</span><h3 id="balJsonImportTitle">Importer une analyse IA — BAL-JSON</h3>
