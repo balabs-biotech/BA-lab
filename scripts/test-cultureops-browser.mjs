@@ -7,9 +7,9 @@ const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops
 fs.mkdirSync(artifactDir, { recursive: true });
 
 const workspaces = [
-  { slug: "green-tech", domain: "agronomy", accent: "#b5d38b" },
-  { slug: "mycology", domain: "mycology", accent: "#be7658" },
-  { slug: "laboratory", domain: "laboratory", accent: "#78b8e8" },
+  { slug: "green-tech", domain: "agronomy", accent: "#b5d38b", cover: "universe-soil.jpg" },
+  { slug: "mycology", domain: "mycology", accent: "#b96b4d", cover: "universe-myco.jpg" },
+  { slug: "laboratory", domain: "laboratory", accent: "#78b8e8", cover: "chapter-research.jpg" },
 ];
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
@@ -147,6 +147,8 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          organicField: !!hero?.querySelector("canvas.ba-organic-field"),
+          heroCoverImage: getComputedStyle(hero, "::before").backgroundImage,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
             const rect = element.getBoundingClientRect();
@@ -172,6 +174,8 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
+      if (!metrics.organicField) failures.push(`${workspace.slug}/${viewport.name}: shared organic mycelium canvas missing`);
+      if (!metrics.heroCoverImage.includes(workspace.cover)) failures.push(`${workspace.slug}/${viewport.name}: expected BA Labs cover image ${workspace.cover} missing (${metrics.heroCoverImage})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
