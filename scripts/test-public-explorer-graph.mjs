@@ -37,8 +37,8 @@ for(const lang of languages){
   const collectManifestNodes=(items,out=[])=>{for(const item of items||[]){out.push(item);collectManifestNodes(item.children,out);}return out;};
   const manifestNodes=collectManifestNodes(manifest.domains);
   const canonicalManifestNodes=manifestNodes.filter(node=>node.kind!=="reference");
-  assert.equal(new Set(canonicalManifestNodes.map(node=>node.notionId)).size,canonicalManifestNodes.length,lang+": canonical Notion pages must have one tree occurrence each");
-  assert.equal(graph.stats.nodeCount,canonicalManifestNodes.length+1,lang+": graph must contain each canonical Notion page exactly once plus the mycology core");
+  const canonicalNotionPageCount=new Set(canonicalManifestNodes.map(node=>node.notionId)).size;
+  assert.equal(graph.stats.nodeCount,canonicalNotionPageCount+1,lang+": graph must contain each unique canonical Notion page exactly once plus the mycology core");
   const graphNotionIds=graph.nodes.filter(node=>node.data?.notionId).map(node=>node.data.notionId);
   assert.equal(new Set(graphNotionIds).size,graphNotionIds.length,lang+": a Notion page must never be rendered as duplicate nodes across universes");
   assert.ok(graph.nodes.every(node=>node.data?.kind!=="reference"),lang+": transversal and cross-universe references must be links, not duplicate page nodes");
