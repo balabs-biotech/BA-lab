@@ -171,7 +171,8 @@ for(const root of expected.map(id=>original.byId.get(id))){
   for(const node of descendants){
     const parent=original.byId.get(node.parent);
     assert.ok(Math.hypot(node.x-parent.x,node.y-parent.y)>115,"Each hypha must advance by a real local segment from its parent, even when its growth turns laterally");
-    assert.ok(Math.hypot(node.x-parent.x,node.y-parent.y)>=295, "Every generation must occupy a substantial radial growth step so shallow universes are not visually compressed");
+    const segmentLength=Math.hypot(node.x-parent.x,node.y-parent.y);
+    assert.ok(segmentLength>=295, `Every generation must occupy a substantial radial growth step; ${node.id} = ${segmentLength.toFixed(2)}`);
     const localOffset=Math.atan2(Math.sin(node.angle-parent.angle),Math.cos(node.angle-parent.angle));
     assert.ok(Math.abs(localOffset)<=1.041,"Every descendant must fan from its actual parent within the expanded biological lateral-growth envelope");
   }
