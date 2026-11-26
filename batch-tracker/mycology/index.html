@@ -53,7 +53,7 @@
             const assisted = document.createElement("script");
             assisted.src = "../smart-entry.js?v=20261029-assisted-entry-1";
             assisted.onerror = () => console.error("Le module de saisie assistée n’a pas pu être chargé.");
-            document.body.appendChild(assisted);
+            document.body.appendChild(assisted);\n            const balJsonBridge = document.createElement("script");\n            balJsonBridge.src = "../bal-json-import.js?v=20261126-bal-json-bridge-1";\n            balJsonBridge.onerror = () => console.error("La passerelle BAL-JSON n’a pas pu être chargée.");\n            document.body.appendChild(balJsonBridge);
           };
           document.body.appendChild(script);
         };
