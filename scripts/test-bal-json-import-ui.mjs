@@ -188,6 +188,11 @@ assert.match(edgeFunction, /from\("cultures"\)[\s\S]*?\.eq\("organization_id", o
 assert.match(edgeFunction, /from\("environments"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "environment IDs must be tenant scoped");
 assert.match(edgeFunction, /from\("locations"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "location IDs must be tenant scoped");
 assert.match(edgeFunction, /environment_location_mismatch/, "environment and location references must be consistent");
+assert.match(edgeFunction, /conflicting_biological_context/, "server must reject simultaneous culture and plant-culture anchors");
+assert.match(edgeFunction, /plant_culture_batch_context_not_supported/, "server must reject plant-culture plus batch context");
+assert.ok(measurementSchema.properties.data.properties.context.not, "measurement schema must reject conflicting biological anchors");
+assert.ok(observationSchema.properties.data.properties.context.not, "observation schema must reject conflicting biological anchors");
+assert.match(source, /Choisissez un seul ancrage biologique/, "client preview must reject conflicting biological anchors");
 assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
 assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
 assert.match(atomicMigration, /record_manual_observation\(p_event, p_data\)/, "observation must use the existing observation RPC");
