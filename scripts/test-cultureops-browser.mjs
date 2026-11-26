@@ -207,6 +207,24 @@ try {
       if (metrics.navigationOverflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: section navigation is not horizontally scrollable (${metrics.navigationOverflowX})`);
       if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
+      const keyboardNavigation = await page.evaluate(() => {
+        const nav = document.querySelector(".section-nav");
+        if (!nav) return { ltr: false, rtl: false };
+        nav.hidden = false;
+        const links = [...nav.querySelectorAll("a")].filter(link => !link.hidden);
+        if (links.length < 2) return { ltr: false, rtl: false };
+        links[0].focus();
+        links[0].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }));
+        const ltr = document.activeElement === links[1];
+        document.documentElement.dir = "rtl";
+        links[1].focus();
+        links[1].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }));
+        const rtl = document.activeElement === links[0];
+        document.documentElement.dir = "ltr";
+        nav.hidden = true;
+        return { ltr, rtl };
+      });
+      if (!keyboardNavigation.ltr || !keyboardNavigation.rtl) failures.push(`${workspace.slug}/${viewport.name}: keyboard module navigation did not respect LTR/RTL direction (${JSON.stringify(keyboardNavigation)})`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
       const compactHero = await page.evaluate(() => {
         const hero = document.querySelector(".app-hero");
