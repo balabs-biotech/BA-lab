@@ -39,8 +39,8 @@ assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS l
 assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
-assert.ok(greenTechEntry.includes("20261117-sector-interaction-160"), "GreenTech must load the interactive sector particle runtime");
-assert.ok(laboratoryEntry.includes("20261117-sector-interaction-160"), "Laboratory must load the interactive sector particle runtime");
+assert.ok(greenTechEntry.includes("20261126-organic-mycelium-cover-1"), "GreenTech must load the shared BA Labs organic visual runtime");
+assert.ok(laboratoryEntry.includes("20261126-organic-mycelium-cover-1"), "Laboratory must load the shared BA Labs organic visual runtime");
 
 const laboratoryProcess = fs.readFileSync("batch-tracker/laboratory-process-visuals.js", "utf8");
 const laboratoryStyles = fs.readFileSync("batch-tracker/styles/laboratory-process-map.css", "utf8");
