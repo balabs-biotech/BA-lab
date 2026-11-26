@@ -349,3 +349,26 @@ html body[data-domain] .card:not(.app-hero) #batchEvents {
     width:100% !important;
   }
 }
+
+
+/* Explicit record-detail surface contract for every workspace.
+   The detail panel is shared markup but its legacy sector selectors differ. */
+html body[data-domain] #trackerCard #cultureDetailPanel {
+  box-sizing:border-box !important;
+  border:1px solid var(--workspace-accent-border) !important;
+  border-radius:14px !important;
+  background:
+    linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent) 7%,transparent),transparent 48%),
+    linear-gradient(180deg,#1a2925,#121e1c) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 12px 28px rgba(0,0,0,.12) !important;
+}
+html body[data-domain] #trackerCard #cultureDetailSummary {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr)) !important;
+  gap:9px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #trackerCard .culture-detail-field {
+  min-width:0 !important;
+  overflow-wrap:anywhere !important;
+}
