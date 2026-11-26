@@ -23,6 +23,16 @@ const supabaseClient =
 
 let organizationId = null;
 
+// Narrow integration surface for the BAL-JSON bridge. These getters expose
+// only the current tenant context and an existing UI refresh action; no keys
+// or privileged credentials are exposed to the browser module.
+window.BA_LABS_SUPABASE_CLIENT = supabaseClient;
+window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
+  const reload = document.getElementById("reloadMeasurementsButton");
+  if (reload && !reload.disabled) reload.click();
+};
+
 let organization = null;
 
 let strainOptions = [];
