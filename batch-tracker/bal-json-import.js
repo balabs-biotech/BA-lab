@@ -30,7 +30,7 @@
     created_at: "date ISO-8601 UTC",
     data: {
       variable_code: "code exact d'une variable existante",
-      context: { culture_id: "UUID culture", plant_culture_id: "UUID culture végétale", batch_id: "UUID lot — au moins un ancrage" },
+      context: { culture_id: "UUID culture", plant_culture_id: "UUID culture végétale", batch_id: "UUID lot — culture + lot autorisés, mais culture végétale exclusive" },
       raw_value: "number — obligatoire pour measurement",
       raw_unit_code: "code unité existant — obligatoire pour measurement",
       measured_at: "date ISO-8601 — obligatoire pour measurement",
@@ -76,6 +76,8 @@
     if (!isObject(record.data) || !isObject(record.data.context)) throw new Error("data et data.context sont obligatoires.");
     const context = record.data.context;
     if (![context.culture_id, context.plant_culture_id, context.batch_id].some(uuid)) throw new Error("Ajoutez un culture_id, plant_culture_id ou batch_id valide dans data.context.");
+    if (uuid(context.culture_id) && uuid(context.plant_culture_id)) throw new Error("Choisissez un seul ancrage biologique : culture ou culture végétale.");
+    if (uuid(context.plant_culture_id) && uuid(context.batch_id)) throw new Error("Un lot ne peut pas être combiné avec une culture végétale dans BAL-JSON v1.");
     if (!/^[a-z0-9][a-z0-9_]{1,79}$/i.test(String(record.data.variable_code || ""))) throw new Error("variable_code est obligatoire et doit être un code, pas un libellé.");
     if (!isObject(record.provenance) || record.provenance.review_status !== "unreviewed") throw new Error("provenance.review_status doit rester unreviewed : l’IA ne peut pas valider une observation.");
     if (record.record_type === "measurement") {
