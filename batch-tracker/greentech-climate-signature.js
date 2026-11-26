@@ -116,7 +116,7 @@
             .fill({ color: Number.isFinite(stroke) ? stroke : 0x8ed16d, alpha: pointIndex === item.points.length - 1 ? 1 : 0.62 });
           card.addChild(marker);
         });
-        const count = new Text({ text: item.points.length + " dates · " + (item.latest || "dernière valeur"), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 8, fill: 0xa9b9ae } });
+        const count = new Text({ text: item.points.length + " dates · " + (item.latest || "dernière valeur"), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xa9b9ae } });
         count.position.set(12, 91); card.addChild(count);
         root.addChild(card);
       });
