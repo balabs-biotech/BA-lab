@@ -153,6 +153,48 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 
 {
   const { elements, calls } = harness();
+  const record = makeRecord({
+    data: {
+      variable_code: "temperature",
+      raw_value: 24,
+      raw_unit_code: "degC",
+      measured_at: "2026-11-11T10:00:00.000Z",
+      context: {
+        culture_id: "b0b0b0b0-0000-4000-8000-000000000001",
+        plant_culture_id: "c0c0c0c0-0000-4000-8000-000000000001"
+      }
+    }
+  });
+  elements.get("balJsonImportSource").value = JSON.stringify(record);
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, true);
+  assert.equal(calls.length, 0);
+  assert.match(elements.get("balJsonImportStatus").textContent, /un seul ancrage biologique/i);
+}
+
+{
+  const { elements, calls } = harness();
+  const record = makeRecord({
+    data: {
+      variable_code: "temperature",
+      raw_value: 24,
+      raw_unit_code: "degC",
+      measured_at: "2026-11-11T10:00:00.000Z",
+      context: {
+        plant_culture_id: "b0b0b0b0-0000-4000-8000-000000000001",
+        batch_id: "c0c0c0c0-0000-4000-8000-000000000001"
+      }
+    }
+  });
+  elements.get("balJsonImportSource").value = JSON.stringify(record);
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, true);
+  assert.equal(calls.length, 0);
+  assert.match(elements.get("balJsonImportStatus").textContent, /ne peut pas être combiné/i);
+}
+
+{
+  const { elements, calls } = harness();
   elements.get("balJsonImportSource").value = JSON.stringify(makeRecord({ organization_id: "c0c0c0c0-0000-4000-8000-000000000001" }));
   elements.get("balJsonPreviewButton").click();
   assert.equal(elements.get("balJsonImportButton").disabled, true);
@@ -188,6 +230,11 @@ assert.match(edgeFunction, /from\("cultures"\)[\s\S]*?\.eq\("organization_id", o
 assert.match(edgeFunction, /from\("environments"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "environment IDs must be tenant scoped");
 assert.match(edgeFunction, /from\("locations"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "location IDs must be tenant scoped");
 assert.match(edgeFunction, /environment_location_mismatch/, "environment and location references must be consistent");
+assert.match(edgeFunction, /conflicting_biological_context/, "server must reject simultaneous culture and plant-culture anchors");
+assert.match(edgeFunction, /plant_culture_batch_context_not_supported/, "server must reject plant-culture plus batch context");
+assert.ok(measurementSchema.properties.data.properties.context.not, "measurement schema must reject conflicting biological anchors");
+assert.ok(observationSchema.properties.data.properties.context.not, "observation schema must reject conflicting biological anchors");
+assert.match(source, /Choisissez un seul ancrage biologique/, "client preview must reject conflicting biological anchors");
 assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
 assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
 assert.match(atomicMigration, /record_manual_observation\(p_event, p_data\)/, "observation must use the existing observation RPC");

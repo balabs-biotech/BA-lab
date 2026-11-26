@@ -117,6 +117,15 @@ Deno.serve(async (req: Request) => {
     const plantCultureId = context.plant_culture_id ?? null;
     const batchId = context.batch_id ?? null;
 
+    // A record must resolve to one biological anchor. A culture may be
+    // paired with its batch; a plant culture cannot be combined with either.
+    if (cultureId && plantCultureId) {
+      return response(422, { error: "conflicting_biological_context" });
+    }
+    if (plantCultureId && batchId) {
+      return response(422, { error: "plant_culture_batch_context_not_supported" });
+    }
+
     if (batchId) {
       const { data: batch, error } = await supabase
         .from("batches")
