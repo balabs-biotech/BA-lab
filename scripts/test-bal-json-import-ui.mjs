@@ -5,7 +5,7 @@ import vm from "node:vm";
 const source = fs.readFileSync("batch-tracker/bal-json-import.js", "utf8");
 const workspace = fs.readFileSync("batch-tracker/workspace.html", "utf8");
 const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
-for (const page of ["batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
+for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
   assert.match(html, /20261126-bal-json-bridge-1/, page + " must invalidate cached workspace assets");
@@ -61,7 +61,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
-  const navigator = { clipboard: { async writeText(value) { clipboard.text = value;
+  const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };
   vm.runInNewContext(source, { document, window, navigator, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
   return { elements, calls, clipboard, get refreshCalls() { return refreshCalls; } };
 }
@@ -77,8 +77,11 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 }
 
 {
-  const { elements } = harness({ domain: "agronomy" });
-  assert.equal(elements.get("balJsonImportPanel").hidden, true);
+  const h = harness({ domain: "agronomy" });
+  assert.equal(h.elements.get("balJsonImportPanel").hidden, false);
+  await h.elements.get("balJsonCopyPromptButton").click();
+  assert.match(h.clipboard.text, /GREEN TECH/);
+  assert.match(h.clipboard.text, /plant_culture_id/);
 }
 
 {
