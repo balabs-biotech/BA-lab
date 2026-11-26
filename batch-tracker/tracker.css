@@ -13904,7 +13904,8 @@ body[data-domain] #authCard #authStatus[aria-busy="true"] {
 }
 body[data-domain] .workspace-inactive {display:none!important}
 body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
-  scroll-margin-top:18px;
+  scroll-margin-top:112px !important;
+  scroll-margin-block-start:112px !important;
 }
 @media(max-width:1120px) {
   body[data-domain] .app-toolbar {flex-wrap:wrap; align-items:center}
