@@ -94,6 +94,9 @@
       : domain === "agronomy"
         ? "GREEN TECH — cultures végétales, semis, croissance, micropropagation, substrats, irrigation, serre et paramètres environnementaux"
         : "LABORATORY — géloses, cultures liquides, grain, milieux, lots et opérations de laboratoire";
+    const contextExample = domain === "agronomy"
+      ? '"plant_culture_id": "<UUID_CULTURE_VÉGÉTALE_FOURNI>"'
+      : '"culture_id": "<UUID_CULTURE_FOURNI>"';
     return `# BA Labs CultureOps — assistant de structuration BAL-JSON
 
 Organisation active CultureOps : ${currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.
@@ -129,7 +132,7 @@ Utilise exactement les UUID fournis par l'utilisateur pour organization_id et un
     "variable_code": "<CODE_VARIABLE_EXISTANT>",
     "value_text": "Description strictement factuelle fournie dans les notes.",
     "observed_at": "2026-11-26T12:00:00.000Z",
-    "context": { "culture_id": "<UUID_CULTURE_FOURNI>" },
+    "context": { ${contextExample} },
     "metadata": {}
   },
   "provenance": { "source": "ai_assisted", "model": "<NOM_MODELE>", "review_status": "unreviewed" }
