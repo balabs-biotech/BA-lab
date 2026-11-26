@@ -16,6 +16,8 @@ export async function createPixiRenderer(canvas){
  let lastWidth=0,lastHeight=0;
  function resize(width,height){lastWidth=width;lastHeight=height;app.renderer.resize(width,height);}
  const alphaFor=level=>{const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((cameraScale-t*.72)/(t*.42),0,1);};
+// Width is keyed to the child generation: mycology → universe → first branch → deeper branches.
+const lineageWidth=generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generation-1)));
  let cameraScale=1;
  function render({nodes,edges,selected,hovered=null,scale,offset,width,height,reduced,lang="fr",time=performance.now()}){
   cameraScale=scale;
@@ -47,7 +49,7 @@ export async function createPixiRenderer(canvas){
    const driftA=e.fractal?branchSign*driftLimit*.18:(((seed>>>12)&255)/255-.5)*Math.min(58,len*.18),driftB=e.fractal?branchSign*driftLimit*.12:(((seed>>>20)&255)/255-.5)*Math.min(48,len*.15);
    const c1={x:a.x+dx*.31-dy/len*bendA+dx/len*driftA,y:a.y+dy*.31+dx/len*bendA+dy/len*driftA};
    const c2={x:b.x-dx*.31-dy/len*bendB+dx/len*driftB,y:b.y-dy*.31+dx/len*bendB+dy/len*driftB};
-   const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.15:e.cross?.55:e.hubLink?5.2:e.primaryHypha?3.2:e.fractal?Math.max(.48,3.2*Math.pow(.68,Math.max(0,generation-1))):Math.max(.42,.78-generation*.055))*(hot?1.55:1);
+   const generation=e.generation??Math.max(e.a.level,e.b.level),color=PALETTE[e.b.colorKey||e.a.colorKey||e.b.rootId||e.a.rootId]||0x91a99b,hot=!!hovered&&(e.a.id===hovered.id||e.b.id===hovered.id),widthBase=(e.verified?1.15:e.cross?.55:e.hubLink?5.2:e.primaryHypha?3.2:e.fractal?lineageWidth(generation):Math.max(.42,.78-generation*.055))*(hot?1.55:1);
    const terminalTip=!e.cross&&terminalIds.has(e.b.id);
    const strokeColor=hot?0xe4e7dd:e.verified?(e.basis==="notion-link"?0xb96b4d:0x7eaaa3):e.cross?0xb96b4d:color;
    const strokeAlpha=hot?Math.max(.88,alpha):e.cross?(selectedRelation?.78:.13)*alpha:alpha*(depth>=3?.42:depth===2?.62:.78);
