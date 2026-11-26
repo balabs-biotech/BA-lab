@@ -234,6 +234,10 @@ assert.match(edgeFunction, /conflicting_biological_context/, "server must reject
 assert.match(edgeFunction, /plant_culture_batch_context_not_supported/, "server must reject plant-culture plus batch context");
 assert.ok(measurementSchema.properties.data.properties.context.not, "measurement schema must reject conflicting biological anchors");
 assert.ok(observationSchema.properties.data.properties.context.not, "observation schema must reject conflicting biological anchors");
+const edgeMeasurementSchema = JSON.parse(readFileSync(resolve(root, "supabase/functions/bal-json-ingest/schemas/v1/measurement.schema.json"), "utf8"));
+const edgeObservationSchema = JSON.parse(readFileSync(resolve(root, "supabase/functions/bal-json-ingest/schemas/v1/observation.schema.json"), "utf8"));
+assert.ok(edgeMeasurementSchema.properties.data.properties.context.not, "deployed edge measurement schema must reject conflicting biological anchors");
+assert.ok(edgeObservationSchema.properties.data.properties.context.not, "deployed edge observation schema must reject conflicting biological anchors");
 assert.match(source, /Choisissez un seul ancrage biologique/, "client preview must reject conflicting biological anchors");
 assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
 assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
