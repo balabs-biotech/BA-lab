@@ -58,6 +58,7 @@
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       paths = [];
+      const mainPaths = [];
       const count = compact ? 6 : 9;
       const step = Math.min(width, height) * .105;
       for (let i = 0; i < count; i++) {
@@ -69,6 +70,7 @@
         const angle = Math.atan2(height * (.5 - band), width * (side ? -1 : 1));
         const main = makePath(root, angle, 7, step, 41 + i * 31, 0, i % 4 === 0 ? 0 : 1);
         paths.push(main);
+        mainPaths.push(main);
         [2, 4].forEach((at, branchIndex) => {
           const node = main.nodes[at];
           const before = main.nodes[at - 1], after = main.nodes[at + 1];
@@ -94,6 +96,33 @@
           });
         });
       }
+      // Sparse curved anastomoses reconnect neighbouring fronts without
+      // turning the field into a straight-line constellation.
+      const bridges = [];
+      for (let i = 0; i < mainPaths.length; i++) {
+        for (let j = i + 1; j < mainPaths.length; j++) {
+          for (let a = 2; a < 6; a += 2) {
+            for (let b = 2; b < 6; b += 2) {
+              const p = mainPaths[i].nodes[a], q = mainPaths[j].nodes[b];
+              const distance = Math.hypot(q.x - p.x, q.y - p.y);
+              if (distance > Math.min(width, height) * .035 &&
+                  distance < Math.min(width, height) * .28) bridges.push({ p, q, distance, index: bridges.length });
+            }
+          }
+        }
+      }
+      bridges.sort((a, b) => a.distance - b.distance);
+      bridges.slice(0, compact ? 7 : 14).forEach((bridge, index) => {
+        const dx = bridge.q.x - bridge.p.x, dy = bridge.q.y - bridge.p.y;
+        const bend = (index % 2 ? 1 : -1) * Math.min(12, bridge.distance * .12);
+        const middle = {
+          x: (bridge.p.x + bridge.q.x) / 2 - dy / (bridge.distance || 1) * bend,
+          y: (bridge.p.y + bridge.q.y) / 2 + dx / (bridge.distance || 1) * bend,
+          phase: random(index + 901) * 6.28,
+          amp: .7
+        };
+        paths.push({ nodes: [bridge.p, middle, bridge.q], depth: 2, colour: 1 });
+      });
     };
     const drawPath = (path, time) => {
       const points = path.nodes.map(node => ({
