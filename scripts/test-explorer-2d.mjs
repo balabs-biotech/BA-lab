@@ -187,8 +187,8 @@ try {
       assert.ok(selectedCamera.scale <= 1.2,
         'Mobile deep selection must preserve a readable surrounding territory instead of magnifying one isolated node: ' + JSON.stringify(selectedCamera));
     } else {
-      assert.ok(selectedCamera.scale <= 3.8,
-        'Desktop deep selection must preserve adjacent branches and avoid clipping the selected territory: ' + JSON.stringify(selectedCamera));
+      assert.ok(selectedCamera.scale <= 2.5,
+        'Desktop deep selection must retain the parent branch and nearby sibling context instead of magnifying an isolated leaf: ' + JSON.stringify(selectedCamera));
     }
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
