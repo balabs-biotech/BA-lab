@@ -57,7 +57,7 @@ html body[data-domain="agronomy"] {
 }
 
 html body[data-domain="mycology"] {
-  --workspace-accent:var(--ba-copper) !important;
+  --workspace-accent:#BE7658 !important;
   --workspace-accent-soft:rgba(185,107,77,.13) !important;
   --workspace-accent-border:rgba(185,107,77,.46) !important;
 }
