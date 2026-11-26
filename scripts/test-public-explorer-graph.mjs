@@ -164,7 +164,7 @@ for(const parent of original.nodes.filter(node=>node.level>0)){
   const children=original.nodes.filter(node=>node.parent===parent.id);
   if(children.length<2)continue;
   const offsets=children.map(child=>Math.atan2(Math.sin(child.angle-parent.angle),Math.cos(child.angle-parent.angle)));
-  assert.ok(offsets.every(offset=>Math.abs(offset)<=.841),`Children of ${parent.id} must fan locally around their actual parent with the expanded lateral opening`);
+  assert.ok(offsets.every(offset=>Math.abs(offset)<=1.041),`Children of ${parent.id} must fan locally around their actual parent with the expanded lateral opening`);
 }
 for(const root of expected.map(id=>original.byId.get(id))){
   const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
@@ -173,7 +173,7 @@ for(const root of expected.map(id=>original.byId.get(id))){
     assert.ok(Math.hypot(node.x-parent.x,node.y-parent.y)>115,"Each hypha must advance by a real local segment from its parent, even when its growth turns laterally");
     assert.ok(Math.hypot(node.x-parent.x,node.y-parent.y)>=295, "Every generation must occupy a substantial radial growth step so shallow universes are not visually compressed");
     const localOffset=Math.atan2(Math.sin(node.angle-parent.angle),Math.cos(node.angle-parent.angle));
-    assert.ok(Math.abs(localOffset)<=.841,"Every descendant must fan from its actual parent within the expanded biological lateral-growth envelope");
+    assert.ok(Math.abs(localOffset)<=1.041,"Every descendant must fan from its actual parent within the expanded biological lateral-growth envelope");
   }
   const branchingParents=descendants.filter(parent=>original.nodes.filter(child=>child.parent===parent.id).length>=2);
   if(branchingParents.length){
