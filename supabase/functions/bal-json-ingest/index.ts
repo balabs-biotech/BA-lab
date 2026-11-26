@@ -190,6 +190,19 @@ Deno.serve(async (req: Request) => {
       Object.assign(recordData, {
         value_text: data.value_text,
         observed_at: data.observed_at,
+        metadata: {
+          ...(isObject(data.metadata) ? data.metadata : {}),
+          ...(data.method ? { method: data.method } : {}),
+          ...(data.instrument ? { instrument: data.instrument } : {}),
+          bal_json: {
+            record_id: record.record_id,
+            contract_version: record.contract_version,
+            quality_state: data.quality_state ?? "raw",
+            context,
+            provenance: record.provenance,
+            extensions: record.extensions ?? {},
+          },
+        },
       });
     }
 
