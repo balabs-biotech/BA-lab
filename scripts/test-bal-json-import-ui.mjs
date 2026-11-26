@@ -51,6 +51,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   const ids = ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
+  const clipboard = { text: "" };
   let refreshCalls = 0;
   const importBalJson = async (record) => { calls.push({ name: "bal-json-ingest", options: { body: record } }); return { data: result, error: null }; };
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
@@ -60,8 +61,18 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
-  vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
-  return { elements, calls, get refreshCalls() { return refreshCalls; } };
+  const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };\n  vm.runInNewContext(source, { document, window, navigator, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
+  return { elements, calls, clipboard, get refreshCalls() { return refreshCalls; } };
+}
+
+{
+  const h = harness({ domain: "laboratory" });
+  await h.elements.get("balJsonCopyPromptButton").click();
+  assert.match(h.clipboard.text, /BA Labs CultureOps/);
+  assert.match(h.clipboard.text, /Organisation active CultureOps : a0a0a0a0-0000-4000-8000-000000000001/);
+  assert.match(h.clipboard.text, /LABORATORY/);
+  assert.match(h.clipboard.text, /BA-LABS\\/JSON/);
+  assert.match(h.elements.get("balJsonImportStatus").textContent, /copié/i);
 }
 
 {
