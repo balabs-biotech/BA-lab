@@ -106,6 +106,69 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: BAL-JSON bridge UI incomplete ${JSON.stringify(balJsonUi)}`);
       }
 
+      if (viewport.name === "desktop") {
+        await page.evaluate(domain => {
+          const organizationId = "a0a0a0a0-0000-4000-8000-000000000001";
+          const cultureId = "b0b0b0b0-0000-4000-8000-000000000001";
+          const plantCultureId = "c0c0c0c0-0000-4000-8000-000000000001";
+          window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+          window.BA_LABS_GET_BAL_JSON_CONTEXT = () => ({
+            organization_id: organizationId,
+            workspace: domain,
+            targets: domain === "agronomy"
+              ? [{ type: "plant_culture", id: plantCultureId, code: "TOM-01", label: "Tomate" }]
+              : [{ type: "culture", id: cultureId, code: "PLE-01", label: "Pleurotus" }],
+            variables: [{ code: "temperature", label: "Température", dimension: "temperature" }],
+            units: [{ code: "degC", label: "°C", dimension: "temperature" }]
+          });
+          window.__balPromptCopied = "";
+          Object.defineProperty(navigator, "clipboard", {
+            configurable: true,
+            value: { writeText: async value => { window.__balPromptCopied = value; } }
+          });
+        }, workspace.domain);
+        await page.locator("#balJsonCopyPromptButton").click();
+        const copiedPrompt = await page.evaluate(() => window.__balPromptCopied);
+        if (!copiedPrompt.includes("BA Labs CultureOps") || !copiedPrompt.includes(workspace.domain === "agronomy" ? "GREEN TECH" : workspace.domain.toUpperCase())) {
+          failures.push(`${workspace.slug}: copied BAL-JSON prompt is missing the active workspace context`);
+        }
+        if (!copiedPrompt.includes("a0a0a0a0-0000-4000-8000-000000000001") || !copiedPrompt.includes("temperature")) {
+          failures.push(`${workspace.slug}: copied BAL-JSON prompt is missing the live tenant catalogue`);
+        }
+        const downloadPromise = page.waitForEvent("download");
+        await page.locator("#balJsonDownloadPromptButton").click();
+        const promptDownload = await downloadPromise;
+        if (promptDownload.suggestedFilename() !== "BA-Labs-CultureOps-prompt-BAL-JSON.md") {
+          failures.push(`${workspace.slug}: BAL-JSON prompt download has an unexpected filename (${promptDownload.suggestedFilename()})`);
+        }
+        const biologicalContext = workspace.domain === "agronomy"
+          ? { plant_culture_id: "c0c0c0c0-0000-4000-8000-000000000001" }
+          : { culture_id: "b0b0b0b0-0000-4000-8000-000000000001" };
+        const record = {
+          contract: "BA-LABS/JSON",
+          contract_version: "1.0.0",
+          record_type: "measurement",
+          record_id: "d0d0d0d0-0000-4000-8000-000000000001",
+          organization_id: "a0a0a0a0-0000-4000-8000-000000000001",
+          created_at: "2026-11-27T10:00:00.000Z",
+          data: {
+            variable_code: "temperature",
+            raw_value: 24.5,
+            raw_unit_code: "degC",
+            measured_at: "2026-11-27T09:59:00.000Z",
+            context: biologicalContext
+          },
+          provenance: { source: "ai_assisted", model: "Browser QA", review_status: "unreviewed" }
+        };
+        await page.locator("#balJsonImportSource").fill(JSON.stringify(record));
+        await page.locator("#balJsonPreviewButton").click();
+        await page.waitForFunction(() => document.querySelector("#balJsonImportButton")?.disabled === false);
+        const importPreview = await page.locator("#balJsonPreview").textContent();
+        if (!importPreview.includes("measurement") || !importPreview.includes("temperature") || !importPreview.includes("24.5")) {
+          failures.push(`${workspace.slug}: pasted BAL-JSON payload did not produce the expected preview (${importPreview})`);
+        }
+      }
+
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
