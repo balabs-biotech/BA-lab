@@ -187,6 +187,7 @@ assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicExplorer,/mobile\?Math\.min\(defaultZoom\*\.31,1\.2\):defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
+assert.match(publicExplorer,/const focusY=mobile\?h\*\.34:h\*\.38/,"Selected-node framing must leave a clear lower viewport zone for the selection dock instead of centring the graph behind it");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
