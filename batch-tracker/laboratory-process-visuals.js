@@ -134,14 +134,14 @@
         number.position.set(15, 12); card.addChild(number);
         const title = new Text({ text: item.name.length > 23 ? item.name.slice(0, 21) + "…" : item.name, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 12, fontWeight: "700", fill: 0xe9eee7, wordWrap: true, wordWrapWidth: 158 } });
         title.position.set(15, 36); card.addChild(title);
-        const code = new Text({ text: item.code.length > 25 ? item.code.slice(0, 23) + "…" : item.code, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fill: 0xa8b9b4 } });
+        const code = new Text({ text: item.code.length > 25 ? item.code.slice(0, 23) + "…" : item.code, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xa8b9b4 } });
         code.position.set(15, 63); card.addChild(code);
-        const status = new Text({ text: item.statusText.toUpperCase().slice(0, 24), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 8, fontWeight: "700", fill: colors.badge, letterSpacing: 0.7 } });
+        const status = new Text({ text: item.statusText.toUpperCase().slice(0, 24), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "700", fill: colors.badge, letterSpacing: 0.7 } });
         status.position.set(15, 83); card.addChild(status);
         scene.addChild(card);
       });
 
-      const legend = new Text({ text: "STATUTS DU LOT  ·  " + stages.filter(item => item.status === "completed").length + " / " + stages.length + " étapes terminées", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fontWeight: "600", fill: 0xa8b9b4, letterSpacing: 1 } });
+      const legend = new Text({ text: "STATUTS DU LOT  ·  " + stages.filter(item => item.status === "completed").length + " / " + stages.length + " étapes terminées", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "600", fill: 0xa8b9b4, letterSpacing: 1 } });
       legend.position.set(left, 12); scene.addChild(legend);
       next.render();
       next.stop();
