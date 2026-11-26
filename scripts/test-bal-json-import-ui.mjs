@@ -107,6 +107,26 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 }
 
 {
+  const h = harness({ domain: "agronomy" });
+  const record = makeRecord({
+    record_type: "observation",
+    data: {
+      variable_code: "plant_height",
+      value_text: "Deux nouvelles feuilles observées.",
+      observed_at: "2026-11-11T10:00:00.000Z",
+      context: { plant_culture_id: "b0b0b0b0-0000-4000-8000-000000000001" }
+    }
+  });
+  h.elements.get("balJsonImportSource").value = JSON.stringify(record);
+  h.elements.get("balJsonPreviewButton").click();
+  assert.equal(h.elements.get("balJsonImportButton").disabled, false);
+  await h.elements.get("balJsonImportButton").click();
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.calls[0].options.body.record_type, "observation");
+  assert.ok(h.calls[0].options.body.data.context.plant_culture_id);
+}
+
+{
   const { elements, calls } = harness();
   elements.get("balJsonImportSource").value = JSON.stringify(makeRecord({ organization_id: "c0c0c0c0-0000-4000-8000-000000000001" }));
   elements.get("balJsonPreviewButton").click();
