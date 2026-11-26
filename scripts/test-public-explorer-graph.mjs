@@ -222,7 +222,9 @@ assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
 assert.match(publicRenderer,/scale>threshold\*mobileLabelScaleFactor/,"Mobile labels must require deliberate zoom before revealing deeper generations");
 assert.match(publicRenderer,/const thresholds=\[0,\.10,\.22,\.85,1\.2,1\.8,2\.5,3\.5\]/,"The overview must progressively fade deep generations so distant filaments do not spill beyond the first-generation frame");
-assert.match(publicExplorer,/const focusNodes=nodes\.filter\(candidate=>candidate\.id===n\.id\|\|candidate\.parent===n\.id\)/,"Node focus must frame the selected page and its real immediate children instead of using a fixed zoom that clips the local branch");
+assert.match(publicExplorer,/const focusIds=new Set\(\[n\.id,\.\.\.\(parent\?\[parent\.id\]:\[\]\)\]\)/,"Node focus must include the selected page and its parent in the local camera bounds");
+assert.match(publicExplorer,/if\(sibling\.parent===parent\.id\)focusIds\.add\(sibling\.id\)/,"Node focus must retain nearby sibling branches as context");
+assert.match(publicExplorer,/if\(child\.parent===n\.id\)focusIds\.add\(child\.id\)/,"Node focus must include the selected page’s immediate children");
 assert.match(publicExplorer,/const availableHeight=Math\.max\(180,h-\(mobile\?260:150\)\)/,"Selected-node framing must reserve the selection dock and controls before calculating its local zoom");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
