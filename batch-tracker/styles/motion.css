@@ -335,3 +335,71 @@ html body[data-domain].workspace-authenticated .hero-tags {
     display:none !important;
   }
 }
+
+
+/* BA Labs shared cover treatment + living mycelial signature.
+   Image assets are reused from the public brand library; no site files are modified. */
+html body[data-domain] .app-hero::before {
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(90deg,rgba(17,27,29,.96) 0%,rgba(17,27,29,.82) 48%,rgba(17,27,29,.55) 100%),
+    linear-gradient(0deg,rgba(17,27,29,.46),rgba(17,27,29,.16)),
+    url("../../ecosystem/assets/chapter-research.jpg");
+  background-size:cover;
+  background-position:center 46%;
+  opacity:.62;
+  filter:saturate(.72);
+}
+html body[data-domain="mycology"] .app-hero::before {
+  background-image:
+    linear-gradient(90deg,rgba(17,27,29,.97) 0%,rgba(17,27,29,.82) 50%,rgba(17,27,29,.52) 100%),
+    linear-gradient(0deg,rgba(17,27,29,.48),rgba(17,27,29,.12)),
+    url("../../ecosystem/assets/universe-myco.jpg");
+  background-position:center 48%;
+}
+html body[data-domain="agronomy"] .app-hero::before {
+  background-image:
+    linear-gradient(90deg,rgba(17,27,29,.97) 0%,rgba(17,27,29,.84) 52%,rgba(17,27,29,.55) 100%),
+    linear-gradient(0deg,rgba(17,27,29,.5),rgba(17,27,29,.14)),
+    url("../../ecosystem/assets/universe-soil.jpg");
+  background-position:center 54%;
+}
+html body[data-domain="laboratory"] .app-hero::before {
+  background-image:
+    linear-gradient(90deg,rgba(17,27,29,.97) 0%,rgba(17,27,29,.84) 52%,rgba(17,27,29,.55) 100%),
+    linear-gradient(0deg,rgba(17,27,29,.5),rgba(17,27,29,.14)),
+    url("../../ecosystem/assets/chapter-research.jpg");
+  background-position:center 42%;
+}
+html body[data-domain] .ba-organic-field {
+  position:absolute !important;
+  z-index:1 !important;
+  inset:0 !important;
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  opacity:.76 !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .app-hero .hero-copy,
+html body[data-domain] .app-hero .hero-art {
+  position:relative !important;
+  z-index:2 !important;
+}
+html body[data-domain].workspace-authenticated .app-hero::before {
+  opacity:.46;
+}
+@media(max-width:640px) {
+  html body[data-domain] .app-hero::before {
+    background-position:58% center;
+    opacity:.48;
+  }
+  html body[data-domain] .ba-organic-field { opacity:.52 !important; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .ba-organic-field { opacity:.42 !important; }
+}
