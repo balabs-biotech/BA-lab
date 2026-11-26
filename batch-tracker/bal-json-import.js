@@ -176,7 +176,7 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
         "Provenance : " + (record.provenance.model || "modèle non précisé") + " — non vérifié",
         "Aperçu : " + (record.record_type === "measurement" ? record.data.raw_value + " " + record.data.raw_unit_code : record.data.value_text)
       ].join("\n");
-      status.textContent = "JSON valide au niveau du contrat. Les références, variables et unités seront revérifiées côté serveur avant écriture.";
+      status.textContent = "JSON valide et prêt pour vérification serveur. Les références, variables et unités seront revérifiées avant écriture.";
       status.dataset.state = "success";
     } catch (error) { fail(error.message || "JSON invalide."); preview.textContent = "Aucun aperçu : corrigez le JSON."; }
   });
