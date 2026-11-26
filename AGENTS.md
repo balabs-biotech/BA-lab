@@ -8,7 +8,9 @@ Do not default to generic AI-generated SaaS templates. First understand the prod
 
 Do not add motion unless it has a clear purpose. Respect reduced-motion settings, accessibility, keyboard and touch behavior, and performance. Do not add dependencies or replace the existing stack without a concrete reason.
 
-Preserve project architecture and deployment choices. The public BA Labs website is hosted on GitHub Pages; do not migrate it to Vercel or another provider unless the user explicitly asks.
+Preserve project architecture and hosting choices. The public BA Labs website is published through the repository's GitHub Pages workflow. Do not configure or assume any other hosting provider unless the user explicitly asks.
+
+Deployment truth rules (mandatory): a successful GitHub Actions CI check proves only that the named checks passed. A third-party commit status, check run, badge, or dashboard link is not proof that a site was built, deployed, or is reachable. Call a change published only after the GitHub Pages deployment workflow for the relevant commit succeeds and the public URL is independently verified. If either condition is missing, say that publication is unverified. Never infer the active hosting provider from stale commit statuses or old integrations.
 
 See `.agents/skills/README.md` for the installed Emil Kowalski skill pack, references, and BA Labs usage guidance.
 
