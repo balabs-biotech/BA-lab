@@ -4,13 +4,15 @@ import vm from "node:vm";
 
 const source = fs.readFileSync("batch-tracker/bal-json-import.js", "utf8");
 const workspace = fs.readFileSync("batch-tracker/workspace.html", "utf8");
+const edgeFunction = fs.readFileSync("supabase/functions/bal-json-ingest/index.ts", "utf8");
+const atomicMigration = fs.readFileSync("supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql", "utf8");
 const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
   assert.match(html, /20261126-bal-json-bridge-1/, page + " must invalidate cached workspace assets");
 }
-for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
+for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
 }
 assert.match(tracker, /window\.BA_LABS_IMPORT_BAL_JSON\s*=\s*\(record\)\s*=>\s*supabaseClient\.functions\.invoke/, "tracker must expose only the authenticated BAL-JSON import operation");
@@ -155,6 +157,12 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 const recordSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/record.schema.json", "utf8"));
 const measurementSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/measurement.schema.json", "utf8"));
 const observationSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/observation.schema.json", "utf8"));
+assert.match(edgeFunction, /req\.headers\.get\("authorization"\)/, "ingest endpoint must require a bearer token");
+assert.match(edgeFunction, /supabase\.auth\.getUser\(\)/, "ingest endpoint must resolve the authenticated user");
+assert.match(edgeFunction, /\.eq\("organization_id", organizationId\)/, "context lookup must be tenant scoped");
+assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
+assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
+assert.match(atomicMigration, /record_manual_observation\(p_event, p_data\)/, "observation must use the existing observation RPC");
 assert.equal(recordSchema.oneOf.length, 2, "record contract must discriminate the two supported record types");
 assert.ok(recordSchema.oneOf.some(ref => ref.$ref === measurementSchema.$id), "measurement schema must be registered by id");
 assert.ok(recordSchema.oneOf.some(ref => ref.$ref === observationSchema.$id), "observation schema must be registered by id");
