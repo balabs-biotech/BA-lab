@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://balabs-biotech.github.io/BA-lab/schemas/bal-json/v1/record.schema.json",
+  "title": "BA Labs BAL-JSON v1 record",
+  "oneOf": [
+    {
+      "$ref": "https://balabs-biotech.github.io/BA-lab/schemas/bal-json/v1/measurement.schema.json"
+    },
+    {
+      "$ref": "https://balabs-biotech.github.io/BA-lab/schemas/bal-json/v1/observation.schema.json"
+    }
+  ]
+}

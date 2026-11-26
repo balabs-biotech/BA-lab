@@ -4,16 +4,19 @@ import vm from "node:vm";
 
 const source = fs.readFileSync("batch-tracker/bal-json-import.js", "utf8");
 const workspace = fs.readFileSync("batch-tracker/workspace.html", "utf8");
+const edgeFunction = fs.readFileSync("supabase/functions/bal-json-ingest/index.ts", "utf8");
+const atomicMigration = fs.readFileSync("supabase/migrations/20261111160000_add_bal_json_atomic_ingestion.sql", "utf8");
 const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
-for (const page of ["batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
+for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
-  assert.match(html, /20261111-bal-json-import-1/, page + " must invalidate cached workspace assets");
+  assert.match(html, /20261126-bal-json-bridge-1/, page + " must invalidate cached workspace assets");
 }
-for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
+for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
 }
-assert.match(tracker, /window\.BA_LABS_SUPABASE_CLIENT\s*=\s*supabaseClient/, "tracker must expose its authenticated Supabase client");
+assert.match(tracker, /window\.BA_LABS_IMPORT_BAL_JSON\s*=\s*\(record\)\s*=>\s*supabaseClient\.functions\.invoke/, "tracker must expose only the authenticated BAL-JSON import operation");
+assert.doesNotMatch(tracker, /window\.BA_LABS_SUPABASE_CLIENT/, "tracker must not expose the whole Supabase client to the bridge");
 assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
 
 function element(id) {
@@ -47,25 +50,40 @@ function makeRecord(overrides = {}) {
 }
 
 function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" } } = {}) {
-  const ids = ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
+  const ids = ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
+  const clipboard = { text: "" };
   let refreshCalls = 0;
-  const client = { functions: { async invoke(name, options) { calls.push({ name, options }); return { data: result, error: null }; } } };
+  const importBalJson = async (record) => { calls.push({ name: "bal-json-ingest", options: { body: record } }); return { data: result, error: null }; };
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
   const window = {
     BA_LABS_DOMAIN: domain,
-    BA_LABS_SUPABASE_CLIENT: client,
+    BA_LABS_IMPORT_BAL_JSON: importBalJson,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
-  vm.runInNewContext(source, { document, window, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
-  return { elements, calls, get refreshCalls() { return refreshCalls; } };
+  const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };
+  vm.runInNewContext(source, { document, window, navigator, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
+  return { elements, calls, clipboard, get refreshCalls() { return refreshCalls; } };
 }
 
 {
-  const { elements } = harness({ domain: "agronomy" });
-  assert.equal(elements.get("balJsonImportPanel").hidden, true);
+  const h = harness({ domain: "laboratory" });
+  await h.elements.get("balJsonCopyPromptButton").click();
+  assert.match(h.clipboard.text, /BA Labs CultureOps/);
+  assert.match(h.clipboard.text, /Organisation active CultureOps : a0a0a0a0-0000-4000-8000-000000000001/);
+  assert.match(h.clipboard.text, /LABORATORY/);
+  assert.match(h.clipboard.text, /BA-LABS\/JSON/);
+  assert.match(h.elements.get("balJsonImportStatus").textContent, /copié/i);
+}
+
+{
+  const h = harness({ domain: "agronomy" });
+  assert.equal(h.elements.get("balJsonImportPanel").hidden, false);
+  await h.elements.get("balJsonCopyPromptButton").click();
+  assert.match(h.clipboard.text, /GREEN TECH/);
+  assert.match(h.clipboard.text, /plant_culture_id/);
 }
 
 {
@@ -88,6 +106,45 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(calls[0].options.body.record_id, "d0d0d0d0-0000-4000-8000-000000000001");
   assert.match(elements.get("balJsonImportStatus").textContent, /enregistré/i);
   assert.equal(h.refreshCalls, 1, "successful import must refresh the experimental history");
+}
+
+{
+  const h = harness({ domain: "agronomy" });
+  const record = makeRecord({
+    data: {
+      variable_code: "temperature",
+      raw_value: 23.7,
+      raw_unit_code: "degC",
+      measured_at: "2026-11-11T10:00:00.000Z",
+      context: { plant_culture_id: "b0b0b0b0-0000-4000-8000-000000000001" }
+    }
+  });
+  h.elements.get("balJsonImportSource").value = JSON.stringify(record);
+  h.elements.get("balJsonPreviewButton").click();
+  await h.elements.get("balJsonImportButton").click();
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.calls[0].options.body.record_type, "measurement");
+  assert.equal(h.calls[0].options.body.data.context.plant_culture_id, "b0b0b0b0-0000-4000-8000-000000000001");
+}
+
+{
+  const h = harness({ domain: "agronomy" });
+  const record = makeRecord({
+    record_type: "observation",
+    data: {
+      variable_code: "plant_height",
+      value_text: "Deux nouvelles feuilles observées.",
+      observed_at: "2026-11-11T10:00:00.000Z",
+      context: { plant_culture_id: "b0b0b0b0-0000-4000-8000-000000000001" }
+    }
+  });
+  h.elements.get("balJsonImportSource").value = JSON.stringify(record);
+  h.elements.get("balJsonPreviewButton").click();
+  assert.equal(h.elements.get("balJsonImportButton").disabled, false);
+  await h.elements.get("balJsonImportButton").click();
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.calls[0].options.body.record_type, "observation");
+  assert.ok(h.calls[0].options.body.data.context.plant_culture_id);
 }
 
 {
@@ -115,5 +172,27 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(elements.get("balJsonImportButton").disabled, true);
   assert.equal(calls.length, 0);
 }
+
+const recordSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/record.schema.json", "utf8"));
+const measurementSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/measurement.schema.json", "utf8"));
+const observationSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/observation.schema.json", "utf8"));
+assert.match(edgeFunction, /req\.headers\.get\("authorization"\)/, "ingest endpoint must require a bearer token");
+assert.match(edgeFunction, /supabase\.auth\.getUser\(\)/, "ingest endpoint must resolve the authenticated user");
+assert.match(edgeFunction, /\.eq\("organization_id", organizationId\)/, "context lookup must be tenant scoped");
+assert.match(edgeFunction, /from\("plant_cultures"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "GreenTech plant culture IDs must be tenant scoped");
+assert.match(edgeFunction, /from\("cultures"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "mycology culture IDs must be tenant scoped");
+assert.match(edgeFunction, /from\("environments"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "environment IDs must be tenant scoped");
+assert.match(edgeFunction, /from\("locations"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "location IDs must be tenant scoped");
+assert.match(edgeFunction, /environment_location_mismatch/, "environment and location references must be consistent");
+assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
+assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
+assert.match(atomicMigration, /record_manual_observation\(p_event, p_data\)/, "observation must use the existing observation RPC");
+assert.equal(recordSchema.oneOf.length, 2, "record contract must discriminate the two supported record types");
+assert.ok(recordSchema.oneOf.some(ref => ref.$ref === measurementSchema.$id), "measurement schema must be registered by id");
+assert.ok(recordSchema.oneOf.some(ref => ref.$ref === observationSchema.$id), "observation schema must be registered by id");
+assert.ok(measurementSchema.properties.data.required.includes("raw_value"), "measurement contract must require a flat data.raw_value");
+assert.ok(observationSchema.properties.data.required.includes("value_text"), "observation contract must require a flat data.value_text");
+assert.match(source, /raw_value:\s*"number/, "copyable prompt contract must match the flat measurement payload");
+assert.match(source, /value_text:\s*"description factuelle/, "copyable prompt contract must match the flat observation payload");
 
 console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");

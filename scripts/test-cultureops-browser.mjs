@@ -91,6 +91,21 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: workspace shell or authentication panel did not render`);
       }
 
+      const balJsonUi = await page.evaluate(() => ({
+        panel: !!document.querySelector("#balJsonImportPanel"),
+        promptCopy: !!document.querySelector("#balJsonCopyPromptButton"),
+        promptDownload: !!document.querySelector("#balJsonDownloadPromptButton"),
+        schemaCopy: !!document.querySelector("#balJsonCopySchemaButton"),
+        jsonInput: !!document.querySelector("#balJsonImportSource"),
+        preview: !!document.querySelector("#balJsonPreviewButton"),
+        import: !!document.querySelector("#balJsonImportButton"),
+        status: !!document.querySelector("#balJsonImportStatus"),
+        bridgeScript: [...document.scripts].some(script => script.src.includes("bal-json-import.js")),
+      }));
+      if (Object.values(balJsonUi).some(value => !value)) {
+        failures.push(`${workspace.slug}/${viewport.name}: BAL-JSON bridge UI incomplete ${JSON.stringify(balJsonUi)}`);
+      }
+
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
