@@ -88,7 +88,7 @@ try {
     assert.ok(navigationFixture?.rootId && navigationFixture?.branchId && navigationFixture?.leafId,
       'The manifest must expose one complete canonical root -> branch -> leaf path');
 
-    assert.ok(topology.nodes >= 100, 'Every language must expose the full verified Notion hierarchy, not a shallow subset');
+    assert.ok(topology.nodes >= 85, 'Every language must expose the full canonical Notion hierarchy without inflating the count with duplicate cross-universe references');
     assert.ok(topology.nodes > topology.universes, 'The graph must expose nested branches, not only universe roots');
     assert.ok(topology.edges > topology.nodes / 2, 'The mycelium must include cross-links and branch connections');
     assert.equal(await page.locator('#field').getAttribute('data-engine'), 'public-mycology-constellation',
@@ -115,6 +115,9 @@ try {
     assert.ok(overviewBounds.every(item=>item.inside), 'All nine central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
     const overviewCamera = await page.locator('#field').evaluate(el => ({scale:Number(el.dataset.targetScale||0),width:Number(el.dataset.viewportWidth||0),height:Number(el.dataset.viewportHeight||0)}));
     if(viewport.name==='mobile')assert.ok(overviewCamera.scale < .62, 'Mobile overview camera must fit the eight outer inoculation territories, not only the central identity nodes: '+JSON.stringify(overviewCamera));
+    const overviewEdgeDepths = await page.locator('#field').getAttribute('data-visible-edge-depths');
+    assert.ok(overviewEdgeDepths, 'The renderer must expose the generations actually drawn in the overview');
+    assert.ok(JSON.parse(overviewEdgeDepths).every(depth => depth <= 2), 'The overview must not draw deep generations outside the fitted first-page envelope');
     await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
     await page.waitForTimeout(600);
@@ -184,8 +187,8 @@ try {
       assert.ok(selectedCamera.scale <= 1.2,
         'Mobile deep selection must preserve a readable surrounding territory instead of magnifying one isolated node: ' + JSON.stringify(selectedCamera));
     } else {
-      assert.ok(selectedCamera.scale <= 3.8,
-        'Desktop deep selection must preserve adjacent branches and avoid clipping the selected territory: ' + JSON.stringify(selectedCamera));
+      assert.ok(selectedCamera.scale <= 2.5,
+        'Desktop deep selection must retain the parent branch and nearby sibling context instead of magnifying an isolated leaf: ' + JSON.stringify(selectedCamera));
     }
     await page.waitForFunction(id => Boolean(JSON.parse(document.querySelector('#field')?.dataset.visibleNodeHitBoxes || '{}')[id]), leafFixture.id, { timeout: 15000 });
     const labelPoint = await page.locator('#field').evaluate((el,id) => {
@@ -255,7 +258,7 @@ try {
       await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
       assert.equal(await page.locator('#language').inputValue(), language);
       const languageNodeCount = Number(await page.locator('#field').getAttribute('data-node-count') || 0);
-      assert.ok(languageNodeCount >= 100, `The ${language} tree must retain at least 100 mapped Notion nodes (got ${languageNodeCount})`);
+      assert.ok(languageNodeCount >= 85, `The ${language} tree must retain the canonical Notion hierarchy without duplicate reference nodes (got ${languageNodeCount})`);
       // Verify that the in-panel hierarchy path is generated from the active
       // language's canonical tree, not only from the French fixture.
       const localizedBranch = page.locator('#accessibleNodes button[data-level="1"]').first();

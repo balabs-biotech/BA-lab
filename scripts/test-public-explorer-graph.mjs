@@ -34,6 +34,20 @@ for(const lang of languages){
   const graph=createPublicMycologyNetwork(manifest.domains,{
     id:"mycology-center",title:"Mycology",description:"The BA Labs mycology hub",url:hubUrls[lang]
   });
+  const collectManifestNodes=(items,out=[])=>{for(const item of items||[]){out.push(item);collectManifestNodes(item.children,out);}return out;};
+  const manifestNodes=collectManifestNodes(manifest.domains);
+  const canonicalManifestNodes=manifestNodes.filter(node=>node.kind!=="reference"&&node.kind!=="label");
+  const canonicalNotionPageCount=new Set(canonicalManifestNodes.map(node=>node.notionId)).size;
+  assert.equal(graph.stats.nodeCount,canonicalNotionPageCount+1,lang+": graph must contain each unique canonical Notion page exactly once plus the mycology core");
+  const graphNotionIds=graph.nodes.filter(node=>node.data?.notionId).map(node=>node.data.notionId);
+  assert.equal(new Set(graphNotionIds).size,graphNotionIds.length,lang+": a Notion page must never be rendered as duplicate nodes across universes");
+  assert.ok(graph.nodes.every(node=>node.data?.kind!=="reference"&&node.data?.kind!=="label"),lang+": transversal references and section labels must not become duplicate or synthetic page nodes");
+  const denseParent=graph.nodes.filter(node=>node.rootId==="microbiology"&&node.level>=1).map(node=>({node,children:graph.nodes.filter(child=>child.parent===node.id).sort((a,b)=>a.angle-b.angle)})).sort((a,b)=>b.children.length-a.children.length)[0];
+  assert.ok(denseParent&&denseParent.children.length>=8,lang+": the densest microbiology branch must preserve its Notion child pages");
+  const denseAngles=denseParent.children.map(node=>node.angle);
+  assert.ok(denseAngles.at(-1)-denseAngles[0]>=.48,lang+": dense sibling branches must spread across a wide angular fan instead of a narrow forward continuation");
+  const denseGaps=denseAngles.slice(1).map((angle,index)=>angle-denseAngles[index]);
+  assert.ok(Math.min(...denseGaps)>=.02,lang+": adjacent branches must have a visible minimum angular separation");
   const center=graph.byId.get("mycology-center");
   assert.ok(center,"mycology hub must exist");
   assert.equal(center.level,0);
@@ -56,6 +70,8 @@ for(const lang of languages){
   const rootRadii=roots.map(node=>Math.hypot(node.x,node.y));
   assert.ok(Math.max(...rootRadii)-Math.min(...rootRadii)<1e-8,lang+": the eight inoculation points must form one symmetric first ring");
   assert.ok(Math.abs(rootRadii[0]-430)<1e-8,lang+": the first ring must keep an even gap around the mycology core");
+  const outermostDescendantRadius=Math.max(...graph.nodes.filter(node=>node.level>0).map(node=>Math.hypot(node.x,node.y)));
+  assert.ok(outermostDescendantRadius>=rootRadii[0]*2.6,lang+": recursive branches must colonize the available outer field instead of clustering around the inoculation ring");
   const rootAngles=roots.map(node=>Math.atan2(node.y,node.x));
   const angularGaps=rootAngles.map((angle,index)=>{const next=rootAngles[(index+1)%rootAngles.length];return(next-angle+Math.PI*2)%(Math.PI*2);});
   assert.ok(angularGaps.every(gap=>Math.abs(gap-Math.PI/4)<1e-8),lang+": all eight universes must be evenly distributed around the mycology center");
@@ -71,7 +87,7 @@ for(const lang of languages){
     if(root.id==="microbiology"){
       const angularOffsets=directChildren.map(node=>Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)));
       assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.18,`${lang}: first-generation branches must occupy a visible, balanced radial fan`);
-      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.39,`${lang}: first-generation branches must occupy the full radial territory`);
+      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.72,`${lang}: first-generation branches must occupy the expanded radial territory`);
       const firstRing=directChildren.map(node=>Math.hypot(node.x,node.y));
       assert.ok(firstRing.every(radius=>radius>Math.hypot(root.x,root.y)+120),`${lang}: first-generation branches must form a distinct outer ring`);
     }
@@ -130,7 +146,8 @@ assert.ok(envelopeProbe,"The microbiology fixture must include a nested branch f
 assert.ok(Math.abs(grown.byId.get(envelopeProbe.children[0].id).angle-original.byId.get(envelopeProbe.children[0].id).angle)<.05,"Content updates may gently rebalance adjacent growth lanes but must not randomly rotate stable child branches");
 const originalPrimaryIds=original.nodes.filter(node=>node.rootId==="microbiology"&&node.level===1).map(node=>node.id);
 const primaryAngles=graph=>originalPrimaryIds.map(id=>[id,graph.byId.get(id).angle]);
-assert.ok(primaryAngles(grown).every(([id,angle],index)=>Math.abs(angle-primaryAngles(original)[index][1])<.02),"Adding a new branch may gently rebalance, but must not rotate the first-generation inoculation fan unpredictably");
+const primaryDrift=primaryAngles(grown).map(([id,angle],index)=>({id,drift:Math.abs(angle-primaryAngles(original)[index][1])}));
+assert.ok(primaryDrift.every(item=>item.drift<.08),"Adding a new branch may gently rebalance, but must not rotate the first-generation inoculation fan unpredictably: "+JSON.stringify(primaryDrift));
 assert.ok(original.stats.relaxedNodes>0,"Territory packing must relax actual branch coordinates, not only scale branch lengths");
 assert.ok(original.nodes.filter(node=>node.level>0).every(node=>node.parent&&original.byId.has(node.parent)),"Every descendant must have a real parent node");
 // Every sibling subtree must occupy a disjoint angular growth lane.
@@ -147,15 +164,22 @@ for(const parent of original.nodes.filter(node=>node.level>0)){
   const children=original.nodes.filter(node=>node.parent===parent.id);
   if(children.length<2)continue;
   const offsets=children.map(child=>Math.atan2(Math.sin(child.angle-parent.angle),Math.cos(child.angle-parent.angle)));
-  assert.ok(offsets.every(offset=>Math.abs(offset)<=.401),`Children of ${parent.id} must fan locally around their actual parent, not around a distant shared sector axis`);
+  assert.ok(offsets.every(offset=>Math.abs(offset)<=1.041),`Children of ${parent.id} must fan locally around their actual parent with the expanded lateral opening`);
 }
 for(const root of expected.map(id=>original.byId.get(id))){
   const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
   for(const node of descendants){
     const parent=original.byId.get(node.parent);
-    assert.ok(Math.hypot(node.x,node.y)>Math.hypot(parent.x,parent.y)+80,"Each generation must advance into a distinct outward growth ring");
-    const offset=Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle));
-    assert.ok(Math.abs(offset)<=.39,"Every branch must remain inside its own evenly spaced radial sector");
+    assert.ok(Math.hypot(node.x-parent.x,node.y-parent.y)>115,"Each hypha must advance by a real local segment from its parent, even when its growth turns laterally");
+    const segmentLength=Math.hypot(node.x-parent.x,node.y-parent.y);
+    assert.ok(segmentLength>=240, `Every generation must retain a substantial radial growth step after collision relaxation; ${node.id} = ${segmentLength.toFixed(2)}`);
+    const localOffset=Math.atan2(Math.sin(node.angle-parent.angle),Math.cos(node.angle-parent.angle));
+    assert.ok(Math.abs(localOffset)<=1.041,"Every descendant must fan from its actual parent within the expanded biological lateral-growth envelope");
+  }
+  const branchingParents=descendants.filter(parent=>original.nodes.filter(child=>child.parent===parent.id).length>=2);
+  if(branchingParents.length){
+    const escapesRootSector=descendants.some(node=>Math.abs(Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)))>.39);
+    assert.ok(escapesRootSector,root.id+": branching hyphae must expand beyond the initial inoculation sector instead of remaining trapped in fixed radial wedges");
   }
 }
 assert.ok(expected.every(id=>{const a=original.byId.get(id),b=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).byId.get(id);return a.x===b.x&&a.y===b.y;}),"Spatial relaxation must preserve deterministic inoculation anchors");
@@ -186,16 +210,22 @@ assert.match(publicRenderer,/bezierCurveTo/,"Primary and secondary hyphae must u
 assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eight current universe colors, not legacy taxonomy colors");
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/const labelSafeEnvelope=mobile\?32:280/,"Mobile overview must reserve a compact label envelope while preserving desktop breathing room");
-assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the complete tree, without changing the graph geometry");
-assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must include every real branch node, not only roots, so mobile territories cannot be clipped");
+assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the first-generation colony, without changing the graph geometry");
+assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>n\.level<=2&&Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must fit the central hub, eight inoculation points and real first-generation pages; deeper branches should be revealed by zoom rather than shrinking the whole colony");
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
-assert.match(publicExplorer,/mobile\?Math\.min\(defaultZoom\*\.31,1\.2\):defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
-assert.match(publicExplorer,/const focusY=mobile\?h\*\.34:h\*\.38/,"Selected-node framing must leave a clear lower viewport zone for the selection dock instead of centring the graph behind it");
+assert.match(publicExplorer,/const fittedZoom=Math\.min\(defaultZoom,fitX,fitY\)/,"Desktop and mobile focus zoom must fit the selected node and its immediate children to the available viewport");
+assert.match(publicExplorer,/targetScale=clamp\(targetScale,\.3,mobile\?1\.2:12\)/,"Mobile deep selection must cap magnification to preserve surrounding context");
+assert.match(publicExplorer,/const focusY=mobile\?h\*\.31:h\*\.34/,"Selected-node framing must leave a clear lower viewport zone for the selection dock instead of centring the graph behind it");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
 assert.match(publicRenderer,/scale>threshold\*mobileLabelScaleFactor/,"Mobile labels must require deliberate zoom before revealing deeper generations");
+assert.match(publicRenderer,/const thresholds=\[0,\.10,\.22,\.85,1\.2,1\.8,2\.5,3\.5\]/,"The overview must progressively fade deep generations so distant filaments do not spill beyond the first-generation frame");
+assert.match(publicExplorer,/const focusIds=new Set\(\[n\.id,\.\.\.\(parent\?\[parent\.id\]:\[\]\)\]\)/,"Node focus must include the selected page and its parent in the local camera bounds");
+assert.match(publicExplorer,/if\(sibling\.parent===parent\.id\)focusIds\.add\(sibling\.id\)/,"Node focus must retain nearby sibling branches as context");
+assert.match(publicExplorer,/if\(child\.parent===n\.id\)focusIds\.add\(child\.id\)/,"Node focus must include the selected page’s immediate children");
+assert.match(publicExplorer,/const availableHeight=Math\.max\(180,h-\(mobile\?260:150\)\)/,"Selected-node framing must reserve the selection dock and controls before calculating its local zoom");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");

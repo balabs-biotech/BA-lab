@@ -6,12 +6,65 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // Eight inoculation points form a true, evenly spaced first growth ring.
 const ROOT_RING_RADIUS=430;
 const SECTOR_HALF_ANGLE=.39;
+const LOCAL_FAN_HALF_ANGLE=1.02;
 const ANCHORS=Array.from({length:8},(_,index)=>{
   const angle=-Math.PI/2+index*Math.PI/4;
   return{x:Math.cos(angle)*ROOT_RING_RADIUS,y:Math.sin(angle)*ROOT_RING_RADIUS,angle};
 });
 const COLOR_KEYS={microbiology:"microbiology",plants:"plants",ecology:"ecology",bioprocesses:"bioprocesses",biomaterials:"biomaterials",instrumentation:"instrumentation",digital:"digital",physical:"physical"};
 const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubtree(child),0);
+
+// Notion reference entries are navigation links to canonical pages, not new
+// pages in the knowledge tree. Collapse them into explicit cross-universe
+// relations so every Notion page has one spatial identity.
+function canonicalizeNotionTree(tree){
+  const canonicalByNotionId=new Map();
+  const collect=(items)=>{
+    for(const item of items||[]){
+      if(item.kind!=="reference"&&item.kind!=="label"&&item.notionId&&!canonicalByNotionId.has(item.notionId))canonicalByNotionId.set(item.notionId,item.id);
+      collect(item.children);
+    }
+  };
+  collect(tree);
+  const seen=new Set();
+  const prune=(item,parent=null)=>{
+    if(item.kind==="label"){
+      // Labels are visual section headings in the source tree, not Notion pages.
+      // Flatten their real children into the nearest canonical page.
+      for(const child of item.children||[]){
+        const kept=prune(child,parent);
+        if(kept&&parent)parent.children.push(kept);
+      }
+      return null;
+    }
+    if(item.kind==="reference"){
+      const target=canonicalByNotionId.get(item.notionId);
+      if(parent&&target&&target!==parent.id){
+        const relations=[...(parent.relations||[])];
+        if(!relations.some(relation=>relation.target===target))relations.push({target,label:"Notion reference",basis:"notion-link"});
+        parent.relations=relations;
+      }
+      return null;
+    }
+    if(item.notionId&&seen.has(item.notionId)){
+      const target=canonicalByNotionId.get(item.notionId);
+      if(parent&&target&&target!==parent.id){
+        const relations=[...(parent.relations||[])];
+        if(!relations.some(relation=>relation.target===target))relations.push({target,label:"Notion page link",basis:"notion-link"});
+        parent.relations=relations;
+      }
+      return null;
+    }
+    if(item.notionId)seen.add(item.notionId);
+    const copy={...item,children:[]};
+    for(const child of item.children||[]){
+      const kept=prune(child,copy);
+      if(kept)copy.children.push(kept);
+    }
+    return copy;
+  };
+  return tree.map(item=>prune(item)).filter(Boolean);
+}
 
 
 function relaxPublicMorphology(nodes,edges){
@@ -88,8 +141,9 @@ function relaxPublicMorphology(nodes,edges){
   return {movedNodes:moved.size,maxParentEdgeStretchRatio,minParentEdgeLengthRatio};
 }
 
-export function createPublicMycologyNetwork(tree,hub){
-  if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
+export function createPublicMycologyNetwork(sourceTree,hub){
+  if(!Array.isArray(sourceTree)||sourceTree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
+  const tree=canonicalizeNotionTree(sourceTree);
   if(!hub||typeof hub.id!=="string"||typeof hub.url!=="string")throw new Error("A valid public mycology hub is required.");
   const nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
   // Mycology is the sole biological center. BA Labs remains the site identity,
@@ -106,27 +160,28 @@ export function createPublicMycologyNetwork(tree,hub){
     // Hyphae advance from the real parent, not from the global origin.
     // This preserves a constant local growth step while allowing each generation
     // to form a genuinely branching, tree-like colony instead of concentric fans.
-    const inheritedMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
-    const inheritedMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
-    const territoryCenter=ANCHORS[inoculationIndex].angle;
-    // Keep every child fan centred on its actual parent, inside both its
-    // inherited sibling lane and the fixed radial sector of its universe.
-    const parentMin=Math.max(inheritedMin,parent.angle-.39,territoryCenter-.39);
-    const parentMax=Math.min(inheritedMax,parent.angle+.39,territoryCenter+.39);
+    // Only the eight inoculation points use the initial radial sectors.
+    // Once a hypha has grown, its descendants fan around that real parent and
+    // may spread beyond the original wedge, like a colony leaving its inoculation
+    // point. The territory remains identifiable by lineage and colour, not walls.
+    const fanHalfAngle=parent.level===0?SECTOR_HALF_ANGLE:LOCAL_FAN_HALF_ANGLE;
+    const parentMin=parent.angle-fanHalfAngle;
+    const parentMax=parent.angle+fanHalfAngle;
     // Allocate space by actual subtree complexity: a dense colony receives a wider
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
     const usable=Math.max(0,parentMax-parentMin-gap*(kids.length-1));
-    const growthLength=Math.max(165,Math.min(320,22/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2))));
+    const growthLength=Math.max(300,Math.min(360,42/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2))));
     // Keep the eight inoculation fans stable; below that first ring, use a
     // sublinear branch-mass law so one dense subtree cannot starve smaller siblings.
-    const masses=kids.map(child=>parent.level===0?countSubtree(child):Math.pow(countSubtree(child),0.35));
+    const masses=kids.map(child=>parent.level===0?1:Math.pow(countSubtree(child),0.35));
     const totalMass=masses.reduce((sum,mass)=>sum+mass,0)||1;
     let cursor=parentMin;
     const created=[];
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
-      const laneWidth=usable*masses[index]/totalMass;
+      const equalLane=usable/kids.length;
+      const laneWidth=equalLane*.9+(usable*.1)*masses[index]/totalMass;
       const sectorMin=cursor;
       const sectorMax=cursor+laneWidth;
       const angle=(sectorMin+sectorMax)/2;
@@ -141,22 +196,9 @@ export function createPublicMycologyNetwork(tree,hub){
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
       created.push(node);
     });
-    // Each child inherits a local growth fan around its own axis, not the
-    // narrow midpoint lane between siblings. This lets every generation branch
-    // laterally while keeping the colony inside a bounded territory.
-    const territoryHalfAngle=.62;
-    const orderedFan=[...created].sort((a,b)=>a.angle-b.angle);
-    orderedFan.forEach((node,index)=>{
-      // Give every child a parent-centred fan, but divide the available
-      // territory at the midpoints between sibling axes so descendant
-      // subtrees remain disjoint instead of growing into one another.
-      const previous=orderedFan[index-1];
-      const next=orderedFan[index+1];
-      const lower=previous?(previous.angle+node.angle)/2:territoryCenter-territoryHalfAngle;
-      const upper=next?(node.angle+next.angle)/2:territoryCenter+territoryHalfAngle;
-      node.sectorMin=Math.max(territoryCenter-territoryHalfAngle,lower);
-      node.sectorMax=Math.min(territoryCenter+territoryHalfAngle,upper);
-    });
+    // Keep the assigned sibling lanes as topology metadata for stable ownership.
+    // The next generation's actual fan is recentered locally and is no longer
+    // clipped to this lane, preventing repeated angular narrowing.
     for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
 
