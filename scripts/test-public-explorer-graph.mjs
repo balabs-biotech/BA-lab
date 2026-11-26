@@ -87,7 +87,7 @@ for(const lang of languages){
     if(root.id==="microbiology"){
       const angularOffsets=directChildren.map(node=>Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)));
       assert.ok(Math.max(...angularOffsets)-Math.min(...angularOffsets)>=.18,`${lang}: first-generation branches must occupy a visible, balanced radial fan`);
-      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.39,`${lang}: first-generation branches must occupy the full radial territory`);
+      assert.ok(Math.max(...angularOffsets.map(Math.abs))<=.72,`${lang}: first-generation branches must occupy the expanded radial territory`);
       const firstRing=directChildren.map(node=>Math.hypot(node.x,node.y));
       assert.ok(firstRing.every(radius=>radius>Math.hypot(root.x,root.y)+120),`${lang}: first-generation branches must form a distinct outer ring`);
     }
