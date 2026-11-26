@@ -175,6 +175,9 @@ try {
             .sort((a, b) => b.right - a.right).slice(0, 12),
           navLinks: document.querySelectorAll(".section-nav a").length,
           navigationHidden: document.querySelector(".section-nav")?.hidden ?? false,
+          navigationOverflowX: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).overflowX : null,
+          navigationMinWidth: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).minWidth : null,
+          moduleScrollMargin: document.querySelector("#overviewCard") ? getComputedStyle(document.querySelector("#overviewCard")).scrollMarginTop : null,
         };
       });
 
@@ -201,6 +204,8 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (viewport.name !== "desktop" && metrics.signInButtonBottom > viewport.height) failures.push(`${workspace.slug}/${viewport.name}: sign-in action falls below the first viewport (${metrics.signInButtonBottom}px > ${viewport.height}px)`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
+      if (metrics.navigationOverflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: section navigation is not horizontally scrollable (${metrics.navigationOverflowX})`);
+      if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
       const compactHero = await page.evaluate(() => {
