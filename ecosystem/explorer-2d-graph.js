@@ -5,13 +5,57 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // Eight inoculation points form a true, evenly spaced first growth ring.
 const ROOT_RING_RADIUS=430;
-const SECTOR_HALF_ANGLE=.39;
+const SECTOR_HALF_ANGLE=.72;
+const LOCAL_FAN_HALF_ANGLE=.68;
 const ANCHORS=Array.from({length:8},(_,index)=>{
   const angle=-Math.PI/2+index*Math.PI/4;
   return{x:Math.cos(angle)*ROOT_RING_RADIUS,y:Math.sin(angle)*ROOT_RING_RADIUS,angle};
 });
 const COLOR_KEYS={microbiology:"microbiology",plants:"plants",ecology:"ecology",bioprocesses:"bioprocesses",biomaterials:"biomaterials",instrumentation:"instrumentation",digital:"digital",physical:"physical"};
 const countSubtree=node=>1+(node.children||[]).reduce((sum,child)=>sum+countSubtree(child),0);
+
+// Notion reference entries are navigation links to canonical pages, not new
+// pages in the knowledge tree. Collapse them into explicit cross-universe
+// relations so every Notion page has one spatial identity.
+function canonicalizeNotionTree(tree){
+  const canonicalByNotionId=new Map();
+  const collect=(items)=>{
+    for(const item of items||[]){
+      if(item.kind!=="reference"&&item.notionId&&!canonicalByNotionId.has(item.notionId))canonicalByNotionId.set(item.notionId,item.id);
+      collect(item.children);
+    }
+  };
+  collect(tree);
+  const seen=new Set();
+  const prune=(item,parent=null)=>{
+    if(item.kind==="reference"){
+      const target=canonicalByNotionId.get(item.notionId);
+      if(parent&&target&&target!==parent.id){
+        const relations=[...(parent.relations||[])];
+        if(!relations.some(relation=>relation.target===target))relations.push({target,label:"Notion reference",basis:"notion-link"});
+        parent.relations=relations;
+      }
+      return null;
+    }
+    if(item.notionId&&seen.has(item.notionId)){
+      const target=canonicalByNotionId.get(item.notionId);
+      if(parent&&target&&target!==parent.id){
+        const relations=[...(parent.relations||[])];
+        if(!relations.some(relation=>relation.target===target))relations.push({target,label:"Notion page link",basis:"notion-link"});
+        parent.relations=relations;
+      }
+      return null;
+    }
+    if(item.notionId)seen.add(item.notionId);
+    const copy={...item,children:[]};
+    for(const child of item.children||[]){
+      const kept=prune(child,copy);
+      if(kept)copy.children.push(kept);
+    }
+    return copy;
+  };
+  return tree.map(item=>prune(item)).filter(Boolean);
+}
 
 
 function relaxPublicMorphology(nodes,edges){
@@ -88,8 +132,9 @@ function relaxPublicMorphology(nodes,edges){
   return {movedNodes:moved.size,maxParentEdgeStretchRatio,minParentEdgeLengthRatio};
 }
 
-export function createPublicMycologyNetwork(tree,hub){
-  if(!Array.isArray(tree)||tree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
+export function createPublicMycologyNetwork(sourceTree,hub){
+  if(!Array.isArray(sourceTree)||sourceTree.length!==8)throw new Error("The public explorer requires exactly eight scientific universes.");
+  const tree=canonicalizeNotionTree(sourceTree);
   if(!hub||typeof hub.id!=="string"||typeof hub.url!=="string")throw new Error("A valid public mycology hub is required.");
   const nodes=[],edges=[],byId=new Map(),relationIndex=new Map();
   // Mycology is the sole biological center. BA Labs remains the site identity,
@@ -106,13 +151,12 @@ export function createPublicMycologyNetwork(tree,hub){
     // Hyphae advance from the real parent, not from the global origin.
     // This preserves a constant local growth step while allowing each generation
     // to form a genuinely branching, tree-like colony instead of concentric fans.
-    const inheritedMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
-    const inheritedMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
     const territoryCenter=ANCHORS[inoculationIndex].angle;
-    // Keep every child fan centred on its actual parent, inside both its
-    // inherited sibling lane and the fixed radial sector of its universe.
-    const parentMin=Math.max(inheritedMin,parent.angle-.39,territoryCenter-.39);
-    const parentMax=Math.min(inheritedMax,parent.angle+.39,territoryCenter+.39);
+    // Each parent receives its own broad lateral growth fan. Do not inherit
+    // the narrow midpoint lane between siblings: that repeatedly halves the
+    // available angle at every generation and creates a one-directional plume.
+    const parentMin=Math.max(territoryCenter-SECTOR_HALF_ANGLE,parent.angle-LOCAL_FAN_HALF_ANGLE);
+    const parentMax=Math.min(territoryCenter+SECTOR_HALF_ANGLE,parent.angle+LOCAL_FAN_HALF_ANGLE);
     // Allocate space by actual subtree complexity: a dense colony receives a wider
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
@@ -141,22 +185,12 @@ export function createPublicMycologyNetwork(tree,hub){
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
       created.push(node);
     });
-    // Each child inherits a local growth fan around its own axis, not the
-    // narrow midpoint lane between siblings. This lets every generation branch
-    // laterally while keeping the colony inside a bounded territory.
-    const territoryHalfAngle=.62;
-    const orderedFan=[...created].sort((a,b)=>a.angle-b.angle);
-    orderedFan.forEach((node,index)=>{
-      // Give every child a parent-centred fan, but divide the available
-      // territory at the midpoints between sibling axes so descendant
-      // subtrees remain disjoint instead of growing into one another.
-      const previous=orderedFan[index-1];
-      const next=orderedFan[index+1];
-      const lower=previous?(previous.angle+node.angle)/2:territoryCenter-territoryHalfAngle;
-      const upper=next?(node.angle+next.angle)/2:territoryCenter+territoryHalfAngle;
-      node.sectorMin=Math.max(territoryCenter-territoryHalfAngle,lower);
-      node.sectorMax=Math.min(territoryCenter+territoryHalfAngle,upper);
-    });
+    // Descendants inherit the universe envelope, not a sibling's narrow
+    // midpoint lane. Their next fan is recentered on their own branch axis.
+    for(const node of created){
+      node.sectorMin=territoryCenter-SECTOR_HALF_ANGLE;
+      node.sectorMax=territoryCenter+SECTOR_HALF_ANGLE;
+    }
     for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
 
