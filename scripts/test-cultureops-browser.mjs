@@ -228,12 +228,12 @@ try {
       if (movementSurface.length !== 3 || movementSurface.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: batch movement status is not using the shared dark surface (${metrics.movementStatusBackground})`);
       if (metrics.movementStatusColorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: batch movement status should inherit dark color scheme (${metrics.movementStatusColorScheme})`);
       for (const control of metrics.movementSelects) {
-        if (control.missing) failures.push(`${workspace.slug}/${viewport.name}: batch movement control missing (`${control.selector}`)`);
+        if (control.missing) failures.push(`${workspace.slug}/${viewport.name}: batch movement control missing: ${control.selector}`);
         else {
           const channels = control.background.match(/\d+/g)?.slice(0,3).map(Number) || [];
-          if (channels.length !== 3 || channels.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: `${control.selector}` is not using a dark surface (`${control.background}`)`);
-          if (control.colorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: `${control.selector}` is not using dark native controls (`${control.colorScheme}`)`);
-          if (Number.parseFloat(control.minHeight) < 40) failures.push(`${workspace.slug}/${viewport.name}: `${control.selector}` is below 40px touch height (`${control.minHeight}`)`);
+          if (channels.length !== 3 || channels.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: ${control.selector} is not using a dark surface (${control.background})`);
+          if (control.colorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: ${control.selector} is not using dark native controls (${control.colorScheme})`);
+          if (Number.parseFloat(control.minHeight) < 40) failures.push(`${workspace.slug}/${viewport.name}: ${control.selector} is below 40px touch height (${control.minHeight})`);
         }
       }
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
