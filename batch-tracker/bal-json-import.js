@@ -135,9 +135,7 @@ ${JSON.stringify(schema, null, 2)}
 ## Catalogue réel extrait de l’espace CultureOps actif
 Ce catalogue est fourni par l’application au moment de la copie du prompt. Il contient uniquement les références de l’organisation connectée et les variables/unités de l’espace actif. N’utilise aucune référence absente de ce catalogue.
 
-```json
 ${contextCatalogue}
-```
 
 ## Identifiants de contexte
 Utilise exactement organization_id et les UUID de cible du catalogue. Pour un lot rattaché à une culture, inclus batch_id et le culture_id associé. Pour une culture simple, utilise culture_id ; pour Green Tech, plant_culture_id. N’associe jamais culture_id et plant_culture_id. Si la cible ou la variable ne peut pas être déterminée sans ambiguïté, pose une question. record_id est le seul UUID que tu peux générer : crée-le une seule fois pour cette proposition et conserve-le lors des nouvelles tentatives du même enregistrement.
