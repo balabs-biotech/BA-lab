@@ -194,12 +194,9 @@ export function createPublicMycologyNetwork(sourceTree,hub){
       edges.push({a:parent,b:node,depth,generation:depth,branchOrder:index,fractal:true,seed});
       created.push(node);
     });
-    // Descendants inherit the universe envelope, not a sibling's narrow
-    // midpoint lane. Their next fan is recentered on their own branch axis.
-    for(const node of created){
-      node.sectorMin=territoryCenter-SECTOR_HALF_ANGLE;
-      node.sectorMax=territoryCenter+SECTOR_HALF_ANGLE;
-    }
+    // Keep the assigned sibling lanes as topology metadata for stable ownership.
+    // The next generation's actual fan is recentered locally and is no longer
+    // clipped to this lane, preventing repeated angular narrowing.
     for(const node of created)walk(node.data,node,depth+1,rootId,inoculationIndex);
   };
 
