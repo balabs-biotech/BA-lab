@@ -74,6 +74,10 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.match(h.clipboard.text, /BA Labs CultureOps/);
   assert.match(h.clipboard.text, /Organisation active CultureOps : a0a0a0a0-0000-4000-8000-000000000001/);
   assert.match(h.clipboard.text, /LABORATORY/);
+  assert.match(h.clipboard.text, /Seul record_id peut être généré/);
+  assert.match(h.clipboard.text, /plant_culture_id/);
+  assert.match(h.clipboard.text, /UUID_V4_GÉNÉRÉ_UNIQUE/);
+  assert.doesNotMatch(h.clipboard.text, /d0d0d0d0-0000-4000-8000-000000000001/);
   assert.match(h.clipboard.text, /BA-LABS\/JSON/);
   assert.match(h.elements.get("balJsonImportStatus").textContent, /copié/i);
 }
