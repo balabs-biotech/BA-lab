@@ -71,7 +71,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.match(h.clipboard.text, /BA Labs CultureOps/);
   assert.match(h.clipboard.text, /Organisation active CultureOps : a0a0a0a0-0000-4000-8000-000000000001/);
   assert.match(h.clipboard.text, /LABORATORY/);
-  assert.match(h.clipboard.text, /BA-LABS\\/JSON/);
+  assert.match(h.clipboard.text, /BA-LABS\/JSON/);
   assert.match(h.elements.get("balJsonImportStatus").textContent, /copié/i);
 }
 
