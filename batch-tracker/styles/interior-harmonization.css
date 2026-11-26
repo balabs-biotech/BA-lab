@@ -372,3 +372,29 @@ html body[data-domain] #trackerCard .culture-detail-field {
   min-width:0 !important;
   overflow-wrap:anywhere !important;
 }
+
+
+/* Shared batch-movement controls: disabled native selects must remain dark
+   in every workspace and browser color scheme. */
+html body[data-domain] :is(#moveBatchLocation,#moveBatchEnvironment) {
+  box-sizing:border-box !important;
+  width:100% !important;
+  min-height:42px !important;
+  color:#e8eee9 !important;
+  color-scheme:dark !important;
+  background:#101b19 !important;
+  background-color:#101b19 !important;
+  border:1px solid rgba(169,192,179,.28) !important;
+  border-radius:9px !important;
+}
+html body[data-domain] :is(#moveBatchLocation,#moveBatchEnvironment) option {
+  color:#e8eee9 !important;
+  background:#172321 !important;
+}
+html body[data-domain] :is(#moveBatchLocation,#moveBatchEnvironment):disabled {
+  color:#aab9b0 !important;
+  background:#172321 !important;
+  background-color:#172321 !important;
+  opacity:1 !important;
+  cursor:not-allowed !important;
+}
