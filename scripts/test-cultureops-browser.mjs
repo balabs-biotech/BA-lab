@@ -7,8 +7,8 @@ const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops
 fs.mkdirSync(artifactDir, { recursive: true });
 
 const workspaces = [
-  { slug: "green-tech", domain: "agronomy", accent: "#b4f477" },
-  { slug: "mycology", domain: "mycology", accent: "#c98259" },
+  { slug: "green-tech", domain: "agronomy", accent: "#b5d38b" },
+  { slug: "mycology", domain: "mycology", accent: "#be7658" },
   { slug: "laboratory", domain: "laboratory", accent: "#78b8e8" },
 ];
 const viewports = [
@@ -179,6 +179,8 @@ try {
       const labelContrast = contrastRatio(metrics.labelColor, metrics.surfaceToken);
       if (descriptionContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth description contrast ${descriptionContrast.toFixed(2)}:1 is below 4.5:1`);
       if (labelContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth label contrast ${labelContrast.toFixed(2)}:1 is below 4.5:1`);
+      const accentContrast = contrastRatio(metrics.workspaceAccent, metrics.surfaceToken);
+      if (accentContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: workspace accent contrast ${accentContrast.toFixed(2)}:1 is below 4.5:1`);
       if (viewport.name === "desktop" && (metrics.toolbarPosition !== "sticky" || metrics.heroTop < metrics.toolbarBottom + 8)) failures.push(`${workspace.slug}/${viewport.name}: desktop toolbar should remain sticky above the workspace content (position=${metrics.toolbarPosition}, toolbarBottom=${metrics.toolbarBottom}, heroTop=${metrics.heroTop})`);
       if (viewport.name === "desktop" && metrics.heroTop > 220) failures.push(`${workspace.slug}/${viewport.name}: workspace hero starts too far below the top navigation (${metrics.heroTop}px > 220px)`);
       if (viewport.name === "mobile" && metrics.languageLabelWraps) failures.push(`${workspace.slug}/${viewport.name}: language label wraps unexpectedly`);
