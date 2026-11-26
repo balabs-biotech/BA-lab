@@ -178,6 +178,8 @@ try {
           navigationOverflowX: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).overflowX : null,
           navigationMinWidth: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).minWidth : null,
           moduleScrollMargin: document.querySelector("#overviewCard") ? getComputedStyle(document.querySelector("#overviewCard")).scrollMarginTop : null,
+          cultureDetailBackground: document.querySelector("#cultureDetailPanel") ? getComputedStyle(document.querySelector("#cultureDetailPanel")).backgroundImage : null,
+          cultureDetailSummaryDisplay: document.querySelector("#cultureDetailSummary") ? getComputedStyle(document.querySelector("#cultureDetailSummary")).display : null,
         };
       });
 
@@ -206,6 +208,8 @@ try {
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (metrics.navigationOverflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: section navigation is not horizontally scrollable (${metrics.navigationOverflowX})`);
       if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
+      if (!metrics.cultureDetailBackground?.includes("linear-gradient")) failures.push(`${workspace.slug}/${viewport.name}: scientific culture detail surface styling is missing`);
+      if (metrics.cultureDetailSummaryDisplay !== "grid") failures.push(`${workspace.slug}/${viewport.name}: culture detail summary is not rendered as a responsive grid (${metrics.cultureDetailSummaryDisplay})`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
       const keyboardNavigation = await page.evaluate(() => {
         const nav = document.querySelector(".section-nav");
