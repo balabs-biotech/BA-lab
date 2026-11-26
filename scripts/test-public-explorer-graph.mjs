@@ -210,7 +210,7 @@ assert.match(publicRenderer,/bezierCurveTo/,"Primary and secondary hyphae must u
 assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eight current universe colors, not legacy taxonomy colors");
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/const labelSafeEnvelope=mobile\?32:280/,"Mobile overview must reserve a compact label envelope while preserving desktop breathing room");
-assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the complete tree, without changing the graph geometry");
+assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the first-generation colony, without changing the graph geometry");
 assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>n\.level<=1&&Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must fit the central hub, eight inoculation points and real first-generation pages; deeper branches should be revealed by zoom rather than shrinking the whole colony");
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
