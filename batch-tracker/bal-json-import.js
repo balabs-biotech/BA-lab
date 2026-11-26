@@ -25,30 +25,25 @@
     contract: "BA-LABS/JSON",
     contract_version: "1.0.0",
     record_type: "measurement | observation",
-    record_id: "UUID unique et stable pour cette proposition",
+    record_id: "UUID unique généré pour cette proposition",
     organization_id: "UUID de l'organisation CultureOps connectée",
     created_at: "date ISO-8601 UTC",
     data: {
       variable_code: "code exact d'une variable existante",
-      context: { culture_id: "UUID culture OU batch_id / plant_culture_id" },
-      measurement: {
-        raw_value: "number",
-        raw_unit_code: "code unité existant",
-        measured_at: "date ISO-8601",
-        method: "string facultatif",
-        instrument: "string facultatif"
-      },
-      observation: {
-        value_text: "description factuelle",
-        observed_at: "date ISO-8601",
-        method: "string facultatif",
-        instrument: "string facultatif"
-      },
-      metadata: "objet facultatif"
+      context: { culture_id: "UUID culture", batch_id: "UUID lot ou plant_culture_id : au moins un ancrage" },
+      raw_value: "number — obligatoire pour measurement",
+      raw_unit_code: "code unité existant — obligatoire pour measurement",
+      measured_at: "date ISO-8601 — obligatoire pour measurement",
+      value_text: "description factuelle — obligatoire pour observation",
+      observed_at: "date ISO-8601 — obligatoire pour observation",
+      method: "string facultatif",
+      instrument: "string facultatif",
+      metadata: "objet facultatif",
+      quality_state: "raw"
     },
     provenance: {
       source: "ai_assisted",
-      model: "nom du LLM ou unknown",
+      model: "nom du LLM",
       review_status: "unreviewed"
     }
   };
@@ -199,7 +194,7 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
         ? "Ce record était déjà enregistré : aucun doublon créé."
         : "Record importé et enregistré dans CultureOps. Il reste non vérifié et doit être contrôlé dans l’historique.";
       status.dataset.state = "success"; approvedRecord = null; approvedOrganization = null;
-      if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
+      if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") {\n        const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();\n        if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";\n      }
     } catch (error) {
       status.textContent = "Import non effectué : " + (error.message || "erreur inconnue");
       status.dataset.state = "error"; importButton.disabled = false;
