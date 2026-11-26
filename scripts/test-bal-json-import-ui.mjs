@@ -116,4 +116,15 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.equal(calls.length, 0);
 }
 
+const recordSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/record.schema.json", "utf8"));
+const measurementSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/measurement.schema.json", "utf8"));
+const observationSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/observation.schema.json", "utf8"));
+assert.equal(recordSchema.oneOf.length, 2, "record contract must discriminate the two supported record types");
+assert.ok(recordSchema.oneOf.some(ref => ref.$ref === measurementSchema.$id), "measurement schema must be registered by id");
+assert.ok(recordSchema.oneOf.some(ref => ref.$ref === observationSchema.$id), "observation schema must be registered by id");
+assert.ok(measurementSchema.properties.data.required.includes("raw_value"), "measurement contract must require a flat data.raw_value");
+assert.ok(observationSchema.properties.data.required.includes("value_text"), "observation contract must require a flat data.value_text");
+assert.match(source, /raw_value:\s*"number"/, "copyable prompt contract must match the flat measurement payload");
+assert.match(source, /value_text:\s*"description factuelle"/, "copyable prompt contract must match the flat observation payload");
+
 console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");
