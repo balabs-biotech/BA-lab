@@ -134,6 +134,36 @@ Deno.serve(async (req: Request) => {
       return response(422, { error: "biological_context_required" });
     }
 
+    // Every biological and environmental reference must belong to the active
+    // tenant. UUID format validation alone is not an authorization check.
+    if (cultureId) {
+      const { data: culture, error } = await supabase.from("cultures")
+        .select("id").eq("organization_id", organizationId).eq("id", cultureId).maybeSingle();
+      if (error || !culture) return response(422, { error: "culture_not_found_or_access_denied" });
+    }
+    if (plantCultureId) {
+      const { data: plantCulture, error } = await supabase.from("plant_cultures")
+        .select("id").eq("organization_id", organizationId).eq("id", plantCultureId).maybeSingle();
+      if (error || !plantCulture) return response(422, { error: "plant_culture_not_found_or_access_denied" });
+    }
+    const environmentId = context.environment_id ?? null;
+    const locationId = context.location_id ?? null;
+    let environmentLocationId: string | null = null;
+    if (environmentId) {
+      const { data: environment, error } = await supabase.from("environments")
+        .select("id, location_id").eq("organization_id", organizationId).eq("id", environmentId).maybeSingle();
+      if (error || !environment) return response(422, { error: "environment_not_found_or_access_denied" });
+      environmentLocationId = environment.location_id ?? null;
+    }
+    if (locationId) {
+      const { data: location, error } = await supabase.from("locations")
+        .select("id").eq("organization_id", organizationId).eq("id", locationId).maybeSingle();
+      if (error || !location) return response(422, { error: "location_not_found_or_access_denied" });
+    }
+    if (locationId && environmentLocationId && environmentLocationId !== locationId) {
+      return response(422, { error: "environment_location_mismatch" });
+    }
+
     if (record.record_type === "measurement") {
       const { data: variable, error: variableError } = await supabase
         .from("variables").select("code, dimension").eq("code", data.variable_code).maybeSingle();
