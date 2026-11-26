@@ -27,6 +27,49 @@ let organizationId = null;
 // only the current tenant context and an existing UI refresh action; no keys
 // or privileged credentials are exposed to the browser module.
 window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+window.BA_LABS_GET_BAL_JSON_CONTEXT = () => {
+  const domain = document.body?.dataset.domain || window.BA_LABS_DOMAIN || "mycology";
+  const targets = domain === "agronomy"
+    ? plantCultureOptions.map(plant => ({
+        type: "plant_culture",
+        id: plant.id,
+        code: plant.code,
+        label: [plant.species_name, plant.cultivar_name].filter(Boolean).join(" · ")
+      }))
+    : [
+        ...cultureOptions.map(culture => ({
+          type: "culture",
+          id: culture.id,
+          code: culture.code,
+          label: culture.culture_type || "culture"
+        })),
+        ...latestBatches.map(batch => ({
+          type: "batch",
+          id: batch.id,
+          code: batch.batch_code,
+          label: batch.name || batch.batch_type || "lot",
+          culture_id: batch.culture_id || null
+        }))
+      ];
+  const variables = workspaceMeasurementVariables(measurementVariables, domain).map(variable => ({
+    code: variable.code,
+    label: variable.label,
+    dimension: variable.dimension,
+    canonical_unit_code: variable.canonical_unit_code || null,
+    description: variable.description || null
+  }));
+  return {
+    organization_id: organizationId,
+    workspace: domain,
+    targets,
+    variables,
+    units: measurementUnits.map(unit => ({
+      code: unit.code,
+      label: unit.label,
+      dimension: unit.dimension
+    }))
+  };
+};
 window.BA_LABS_IMPORT_BAL_JSON = (record) =>
   supabaseClient.functions.invoke("bal-json-ingest", { body: record });
 window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
