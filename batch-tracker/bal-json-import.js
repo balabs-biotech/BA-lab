@@ -30,7 +30,7 @@
     created_at: "date ISO-8601 UTC",
     data: {
       variable_code: "code exact d'une variable existante",
-      context: { culture_id: "UUID culture", batch_id: "UUID lot ou plant_culture_id : au moins un ancrage" },
+      context: { culture_id: "UUID culture", plant_culture_id: "UUID culture végétale", batch_id: "UUID lot — au moins un ancrage" },
       raw_value: "number — obligatoire pour measurement",
       raw_unit_code: "code unité existant — obligatoire pour measurement",
       measured_at: "date ISO-8601 — obligatoire pour measurement",
@@ -106,7 +106,8 @@ Espace actif : ${workspace}.
 
 ## Règles impératives
 - Tu n'as aucun accès à la base CultureOps et tu ne dois jamais prétendre avoir enregistré une donnée.
-- N'invente jamais une souche, un identifiant UUID, un code de variable, une unité, une date, une valeur ou un lien de filiation.
+- N'invente jamais un UUID d'organisation, de culture, de culture végétale, de lot ou de souche, ni un code de variable, une unité, une date, une valeur ou un lien de filiation. Utilise uniquement les identifiants fournis.
+- Seul record_id peut être généré : crée un UUID v4 unique pour cette proposition et conserve-le pour toute nouvelle tentative du même record.
 - Sépare strictement observation factuelle, interprétation et hypothèse. N'enregistre dans value_text que les faits explicitement rapportés.
 - Si une information obligatoire manque, pose une question au lieu de fabriquer une valeur.
 - Le record doit rester non vérifié : provenance.review_status = "unreviewed".
@@ -118,20 +119,20 @@ Espace actif : ${workspace}.
 ${JSON.stringify(schema, null, 2)}
 
 ## Identifiants de contexte
-Utilise exactement les UUID fournis par l'utilisateur pour organization_id et un seul ancrage valide dans data.context (culture_id, plant_culture_id ou batch_id). Si l'un manque, demande-le. record_id doit être un UUID généré une seule fois pour cette proposition et conservé lors des nouvelles tentatives du même enregistrement.
+Utilise exactement les UUID fournis par l'utilisateur pour organization_id et un seul ancrage valide dans data.context (culture_id, plant_culture_id ou batch_id). Si l'un manque, demande-le. record_id est le seul UUID que tu peux générer : crée-le une seule fois pour cette proposition et conserve-le lors des nouvelles tentatives du même enregistrement.
 
 ## Exemple de forme — observation
 {
   "contract": "BA-LABS/JSON",
   "contract_version": "1.0.0",
   "record_type": "observation",
-  "record_id": "d0d0d0d0-0000-4000-8000-000000000001",
+  "record_id": "<UUID_V4_GÉNÉRÉ_UNIQUE>",
   "organization_id": "<UUID_ORGANISATION_FOURNI>",
-  "created_at": "2026-11-26T12:00:00.000Z",
+  "created_at": "<DATE_HEURE_ISO_8601_DE_CRÉATION>",
   "data": {
     "variable_code": "<CODE_VARIABLE_EXISTANT>",
     "value_text": "Description strictement factuelle fournie dans les notes.",
-    "observed_at": "2026-11-26T12:00:00.000Z",
+    "observed_at": "<DATE_HEURE_ISO_8601_RÉELLE_DE_L_OBSERVATION>",
     "context": { ${contextExample} },
     "metadata": {}
   },
