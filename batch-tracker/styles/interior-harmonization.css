@@ -236,3 +236,116 @@ html body[data-domain] .card[id]:not(.hidden):not(.workspace-inactive) {
     transition:none !important;
   }
 }
+
+
+/* Scientific record views: distinguish the selected culture, its linked lots and its evidence trail. */
+html body[data-domain] .card:not(.app-hero) .culture-detail {
+  margin-top:16px !important;
+  padding:clamp(14px,2vw,22px) !important;
+  border:1px solid var(--workspace-accent-border) !important;
+  border-radius:14px !important;
+  background:
+    linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent) 7%,transparent),transparent 48%),
+    linear-gradient(180deg,#1a2925,#121e1c) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 12px 28px rgba(0,0,0,.12) !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  padding-bottom:14px !important;
+  border-bottom:1px solid rgba(169,192,179,.16) !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-heading h3 {
+  margin:5px 0 4px !important;
+  padding:0 !important;
+  border:0 !important;
+  font-size:clamp(19px,2vw,25px) !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-summary {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr)) !important;
+  gap:9px !important;
+  margin:14px 0 18px !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-field {
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:space-between !important;
+  gap:7px !important;
+  min-width:0 !important;
+  min-height:74px !important;
+  padding:11px 12px !important;
+  border:1px solid rgba(169,192,179,.15) !important;
+  border-radius:10px !important;
+  background:rgba(8,17,15,.35) !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-field span {
+  color:#a8b8ad !important;
+  font-size:9px !important;
+  font-weight:760 !important;
+  letter-spacing:.065em !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-field strong {
+  color:#eef3ed !important;
+  font-size:15px !important;
+  font-weight:740 !important;
+  overflow-wrap:anywhere !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-linked-batches {
+  margin:16px 0 !important;
+  padding-top:14px !important;
+  border-top:1px solid rgba(169,192,179,.16) !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-linked-batches > h3 {
+  margin:0 0 10px !important;
+  padding:0 !important;
+  border:0 !important;
+  color:var(--workspace-accent) !important;
+  font-size:14px !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-timeline-entry {
+  display:grid !important;
+  grid-template-columns:minmax(110px,.34fr) minmax(0,1fr) auto !important;
+  align-items:start !important;
+  gap:12px !important;
+  padding:12px 13px !important;
+  border-radius:10px !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-timeline-date {
+  color:var(--workspace-accent) !important;
+  font-size:10px !important;
+  font-weight:730 !important;
+  line-height:1.5 !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-timeline-entry p {
+  margin:5px 0 0 !important;
+  color:#aab9af !important;
+  line-height:1.55 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] .card:not(.app-hero) .measurement-history {
+  display:grid !important;
+  gap:8px !important;
+}
+html body[data-domain] .card:not(.app-hero) #batchEvents {
+  margin-top:16px !important;
+  border-color:rgba(169,192,179,.18) !important;
+  background:linear-gradient(180deg,#1b2a26,#14201d) !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] .card:not(.app-hero) .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:6px !important;
+  }
+  html body[data-domain] .card:not(.app-hero) .culture-detail-heading {
+    flex-direction:column !important;
+  }
+  html body[data-domain] .card:not(.app-hero) .culture-detail-heading > button {
+    width:100% !important;
+  }
+}
