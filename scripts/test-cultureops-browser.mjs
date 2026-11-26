@@ -148,6 +148,14 @@ try {
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
           organicField: !!hero?.querySelector("canvas.ba-organic-field"),
+          organicFieldInk: (() => {
+            const canvas = hero?.querySelector("canvas.ba-organic-field");
+            const context = canvas?.getContext("2d");
+            if (!context || !canvas.width || !canvas.height) return false;
+            const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+            for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) return true;
+            return false;
+          })(),
           heroCoverImage: getComputedStyle(hero, "::before").backgroundImage,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
@@ -175,6 +183,7 @@ try {
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
       if (!metrics.organicField) failures.push(`${workspace.slug}/${viewport.name}: shared organic mycelium canvas missing`);
+      if (!metrics.organicFieldInk) failures.push(`${workspace.slug}/${viewport.name}: organic mycelium canvas rendered no visible filaments`);
       if (!metrics.heroCoverImage.includes(workspace.cover)) failures.push(`${workspace.slug}/${viewport.name}: expected BA Labs cover image ${workspace.cover} missing (${metrics.heroCoverImage})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
