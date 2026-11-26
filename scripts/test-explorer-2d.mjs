@@ -115,6 +115,9 @@ try {
     assert.ok(overviewBounds.every(item=>item.inside), 'All nine central labels must fit inside the viewport without clipping: '+JSON.stringify(overviewBounds));
     const overviewCamera = await page.locator('#field').evaluate(el => ({scale:Number(el.dataset.targetScale||0),width:Number(el.dataset.viewportWidth||0),height:Number(el.dataset.viewportHeight||0)}));
     if(viewport.name==='mobile')assert.ok(overviewCamera.scale < .62, 'Mobile overview camera must fit the eight outer inoculation territories, not only the central identity nodes: '+JSON.stringify(overviewCamera));
+    const overviewEdgeDepths = await page.locator('#field').getAttribute('data-visible-edge-depths');
+    assert.ok(overviewEdgeDepths, 'The renderer must expose the generations actually drawn in the overview');
+    assert.ok(JSON.parse(overviewEdgeDepths).every(depth => depth <= 2), 'The overview must not draw deep generations outside the fitted first-page envelope');
     await page.screenshot({ path: `artifacts/explorer-2d-${viewport.name}-overview.png`, fullPage: false });
     await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click(); await page.locator('#zoomIn').click();
     await page.waitForTimeout(600);
