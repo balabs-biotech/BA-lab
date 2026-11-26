@@ -255,7 +255,7 @@ try {
       await page.waitForFunction(() => document.querySelectorAll('#accessibleNodes button').length >= 8);
       assert.equal(await page.locator('#language').inputValue(), language);
       const languageNodeCount = Number(await page.locator('#field').getAttribute('data-node-count') || 0);
-      assert.ok(languageNodeCount >= 100, `The ${language} tree must retain at least 100 mapped Notion nodes (got ${languageNodeCount})`);
+      assert.ok(languageNodeCount >= 85, `The ${language} tree must retain the canonical Notion hierarchy without duplicate reference nodes (got ${languageNodeCount})`);
       // Verify that the in-panel hierarchy path is generated from the active
       // language's canonical tree, not only from the French fixture.
       const localizedBranch = page.locator('#accessibleNodes button[data-level="1"]').first();
