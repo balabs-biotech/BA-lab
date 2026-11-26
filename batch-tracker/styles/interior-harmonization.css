@@ -398,3 +398,19 @@ html body[data-domain] :is(#moveBatchLocation,#moveBatchEnvironment):disabled {
   opacity:1 !important;
   cursor:not-allowed !important;
 }
+
+
+/* Empty movement state is a status panel, not a native select. */
+html body[data-domain] #moveBatchStatus {
+  box-sizing:border-box !important;
+  min-height:42px !important;
+  padding:11px 13px !important;
+  color:#aab9b0 !important;
+  background:#172321 !important;
+  background-color:#172321 !important;
+  border:1px solid rgba(169,192,179,.2) !important;
+  border-inline-start:2px solid var(--workspace-accent) !important;
+  border-radius:9px !important;
+  font-size:11px !important;
+  line-height:1.5 !important;
+}
