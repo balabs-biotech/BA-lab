@@ -402,6 +402,7 @@ html body[data-domain] :is(#moveBatchLocation,#moveBatchEnvironment):disabled {
 
 /* Empty movement state is a status panel, not a native select. */
 html body[data-domain] #moveBatchStatus {
+  color-scheme:dark !important;
   box-sizing:border-box !important;
   min-height:42px !important;
   padding:11px 13px !important;
