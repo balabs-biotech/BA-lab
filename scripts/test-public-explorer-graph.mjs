@@ -211,16 +211,17 @@ assert.match(publicRenderer,/microbiology:0x/i,"The renderer must define the eig
 const publicExplorer=readFileSync(new URL("../ecosystem/explorer-2d.js",import.meta.url),"utf8");
 assert.match(publicExplorer,/const labelSafeEnvelope=mobile\?32:280/,"Mobile overview must reserve a compact label envelope while preserving desktop breathing room");
 assert.ok(publicExplorer.includes("targetScale=clamp(Math.min(scaleX,scaleY)*1.12,.08,.72)"),"Overview must use the available viewport more fully after fitting the first-generation colony, without changing the graph geometry");
-assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>n\.level<=1&&Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must fit the central hub, eight inoculation points and real first-generation pages; deeper branches should be revealed by zoom rather than shrinking the whole colony");
+assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>n\.level<=2&&Number\.isFinite\(n\.x\)&&Number\.isFinite\(n\.y\)\)/,"Overview framing must fit the central hub, eight inoculation points and real first-generation pages; deeper branches should be revealed by zoom rather than shrinking the whole colony");
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicExplorer,/const fittedZoom=Math\.min\(defaultZoom,fitX,fitY\)/,"Desktop and mobile focus zoom must fit the selected node and its immediate children to the available viewport");
+assert.match(publicExplorer,/targetScale=clamp\(targetScale,\.3,mobile\?1\.2:12\)/,"Mobile deep selection must cap magnification to preserve surrounding context");
 assert.match(publicExplorer,/const focusY=mobile\?h\*\.31:h\*\.34/,"Selected-node framing must leave a clear lower viewport zone for the selection dock instead of centring the graph behind it");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
 assert.match(publicRenderer,/scale>threshold\*mobileLabelScaleFactor/,"Mobile labels must require deliberate zoom before revealing deeper generations");
-assert.match(publicRenderer,/const thresholds=\[0,\.10,\.16,\.24,\.65,1\.05,1\.5\]/,"The overview must progressively fade deep generations so distant filaments do not spill beyond the first-generation frame");
+assert.match(publicRenderer,/const thresholds=\[0,\.10,\.22,\.85,1\.2,1\.8,2\.5,3\.5\]/,"The overview must progressively fade deep generations so distant filaments do not spill beyond the first-generation frame");
 assert.match(publicExplorer,/const focusNodes=nodes\.filter\(candidate=>candidate\.id===n\.id\|\|candidate\.parent===n\.id\)/,"Node focus must frame the selected page and its real immediate children instead of using a fixed zoom that clips the local branch");
 assert.match(publicExplorer,/const availableHeight=Math\.max\(180,h-\(mobile\?260:150\)\)/,"Selected-node framing must reserve the selection dock and controls before calculating its local zoom");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
