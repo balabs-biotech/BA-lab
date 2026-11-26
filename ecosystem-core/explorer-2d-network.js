@@ -10,7 +10,8 @@ const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charC
  * The knowledge graph is immutable here: only visual coordinates are adjusted.
  */
 function packRootTerritories(nodes,tree,options={}){
- const roots=nodes.filter(n=>n.level===0);
+ const fixedRootIds=new Set(options.fixedRootIds||[]);
+ const roots=nodes.filter(n=>n.level===0&&!fixedRootIds.has(n.id));
  if(roots.length<2)return;
  const original=new Map(roots.map(r=>[r.id,{x:r.x,y:r.y}]));
  // Keep root territories identical across the public and Academy trees.
@@ -107,11 +108,12 @@ export function createVernpixiNetwork(tree,options={}){
   // Uneven biological field anchors: deliberately not an eight-spoke radial layout.
   // Stable per-universe jitter keeps positions deterministic across reloads.
   const anchors=options.rootAnchors||[[-.62,-.34],[-.17,-.62],[.39,-.48],[.68,.08],[.24,.53],[-.34,.57],[-.70,.19],[.02,-.02]];
+  const fixedRootIds=new Set(options.fixedRootIds||[]);
   tree.forEach((root,i)=>{
-   const anchor=anchors[i%anchors.length],layoutId=rootLayoutIds[i%rootLayoutIds.length],seed=hash(layoutId);
-   const rx=anchor[0]*510+((seed&255)/255-.5)*58;
-   const ry=anchor[1]*430+(((seed>>>8)&255)/255-.5)*54;
-   const angle=Math.atan2(ry,rx)+(((seed>>>16)&255)/255-.5)*.34;
+   const anchor=anchors[i%anchors.length],layoutId=rootLayoutIds[i%rootLayoutIds.length],seed=hash(layoutId),fixed=fixedRootIds.has(root.id);
+   const rx=anchor[0]*510+(fixed?0:((seed&255)/255-.5)*58);
+   const ry=anchor[1]*430+(fixed?0:(((seed>>>8)&255)/255-.5)*54);
+   const angle=fixed?0:Math.atan2(ry,rx)+(((seed>>>16)&255)/255-.5)*.34;
    const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,colorKey:layoutId,parent:null,angle};
    nodes.push(rootNode);byId.set(root.id,rootNode);
    const walk=(data,parent,depth,branchAngle,path)=>{
