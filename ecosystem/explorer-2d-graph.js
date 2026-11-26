@@ -36,7 +36,7 @@ export function createPublicMycologyNetwork(tree,hub){
     const kids=data.children||[];
     if(!kids.length)return;
     const parentSeed=hash(parent.id);
-    const spread=depth===1?clamp(0.08+Math.log2(kids.length+1)*0.04,0.10,0.25):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
+    const spread=depth===1?clamp(0.26+Math.log2(kids.length+1)*0.075,0.34,0.72):clamp(0.34+Math.log2(kids.length+1)*0.12,0.40,0.92);
     const distance=depth===1?154+Math.sqrt(kids.length)*17:depth===2?126+Math.sqrt(kids.length)*19:depth===3?86:Math.max(30,48-depth*2.1);
     kids.forEach((child,index)=>{
       const seed=hash(child.id),side=index%2===0?-1:1;
