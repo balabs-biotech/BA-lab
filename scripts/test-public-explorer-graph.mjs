@@ -34,6 +34,22 @@ for(const lang of languages){
   const graph=createPublicMycologyNetwork(manifest.domains,{
     id:"mycology-center",title:"Mycology",description:"The BA Labs mycology hub",url:hubUrls[lang]
   });
+  const collectManifestNodes=(items,out=[])=>{for(const item of items||[]){out.push(item);collectManifestNodes(item.children,out);}return out;};
+  const manifestNodes=collectManifestNodes(manifest.domains);
+  const canonicalManifestNodes=manifestNodes.filter(node=>node.kind!=="reference");
+  assert.equal(new Set(canonicalManifestNodes.map(node=>node.notionId)).size,canonicalManifestNodes.length,lang+": canonical Notion pages must have one tree occurrence each");
+  assert.equal(graph.stats.nodeCount,canonicalManifestNodes.length+1,lang+": graph must contain each canonical Notion page exactly once plus the mycology core");
+  const graphNotionIds=graph.nodes.filter(node=>node.data?.notionId).map(node=>node.data.notionId);
+  assert.equal(new Set(graphNotionIds).size,graphNotionIds.length,lang+": a Notion page must never be rendered as duplicate nodes across universes");
+  assert.ok(graph.nodes.every(node=>node.data?.kind!=="reference"),lang+": transversal and cross-universe references must be links, not duplicate page nodes");
+  const bacillus=graph.byId.get("bio-organism-bacillus");
+  assert.ok(bacillus,lang+": the canonical Bacillus page must remain in the microbiology hierarchy");
+  const bacillusChildren=graph.nodes.filter(node=>node.parent===bacillus.id).sort((a,b)=>a.angle-b.angle);
+  const bacillusAngles=bacillusChildren.map(node=>node.angle);
+  assert.ok(bacillusAngles.length>=8,lang+": Bacillus child pages must preserve the full Notion page count");
+  assert.ok(bacillusAngles.at(-1)-bacillusAngles[0]>=.75,lang+": dense sibling branches must spread across a wide angular fan instead of a narrow forward continuation");
+  const bacillusGaps=bacillusAngles.slice(1).map((angle,index)=>angle-bacillusAngles[index]);
+  assert.ok(Math.min(...bacillusGaps)>=.045,lang+": adjacent branches must have a visible minimum angular separation");
   const center=graph.byId.get("mycology-center");
   assert.ok(center,"mycology hub must exist");
   assert.equal(center.level,0);
