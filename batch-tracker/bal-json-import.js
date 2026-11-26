@@ -194,8 +194,8 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
       if (error) throw new Error(error.message || "Le serveur a refusé l’import.");
       if (data?.error) throw new Error(data.message || data.error);
       status.textContent = data?.status === "duplicate"
-        ? "Ce record était déjà importé : aucun doublon créé."
-        : "Record importé dans CultureOps. Il reste non vérifié et doit être contrôlé dans l’historique.";
+        ? "Ce record était déjà enregistré : aucun doublon créé."
+        : "Record importé et enregistré dans CultureOps. Il reste non vérifié et doit être contrôlé dans l’historique.";
       status.dataset.state = "success"; approvedRecord = null; approvedOrganization = null;
       if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
     } catch (error) {
