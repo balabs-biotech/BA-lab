@@ -36,12 +36,12 @@ for(const lang of languages){
   });
   const collectManifestNodes=(items,out=[])=>{for(const item of items||[]){out.push(item);collectManifestNodes(item.children,out);}return out;};
   const manifestNodes=collectManifestNodes(manifest.domains);
-  const canonicalManifestNodes=manifestNodes.filter(node=>node.kind!=="reference");
+  const canonicalManifestNodes=manifestNodes.filter(node=>node.kind!=="reference"&&node.kind!=="label");
   const canonicalNotionPageCount=new Set(canonicalManifestNodes.map(node=>node.notionId)).size;
   assert.equal(graph.stats.nodeCount,canonicalNotionPageCount+1,lang+": graph must contain each unique canonical Notion page exactly once plus the mycology core");
   const graphNotionIds=graph.nodes.filter(node=>node.data?.notionId).map(node=>node.data.notionId);
   assert.equal(new Set(graphNotionIds).size,graphNotionIds.length,lang+": a Notion page must never be rendered as duplicate nodes across universes");
-  assert.ok(graph.nodes.every(node=>node.data?.kind!=="reference"),lang+": transversal and cross-universe references must be links, not duplicate page nodes");
+  assert.ok(graph.nodes.every(node=>node.data?.kind!=="reference"&&node.data?.kind!=="label"),lang+": transversal references and section labels must not become duplicate or synthetic page nodes");
   const denseParent=graph.nodes.filter(node=>node.rootId==="microbiology"&&node.level>=1).map(node=>({node,children:graph.nodes.filter(child=>child.parent===node.id).sort((a,b)=>a.angle-b.angle)})).sort((a,b)=>b.children.length-a.children.length)[0];
   assert.ok(denseParent&&denseParent.children.length>=8,lang+": the densest microbiology branch must preserve its Notion child pages");
   const denseAngles=denseParent.children.map(node=>node.angle);
