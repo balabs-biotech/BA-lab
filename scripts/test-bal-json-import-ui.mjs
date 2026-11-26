@@ -160,6 +160,11 @@ const observationSchema = JSON.parse(fs.readFileSync("schemas/bal-json/v1/observ
 assert.match(edgeFunction, /req\.headers\.get\("authorization"\)/, "ingest endpoint must require a bearer token");
 assert.match(edgeFunction, /supabase\.auth\.getUser\(\)/, "ingest endpoint must resolve the authenticated user");
 assert.match(edgeFunction, /\.eq\("organization_id", organizationId\)/, "context lookup must be tenant scoped");
+assert.match(edgeFunction, /from\("plant_cultures"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "GreenTech plant culture IDs must be tenant scoped");
+assert.match(edgeFunction, /from\("cultures"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "mycology culture IDs must be tenant scoped");
+assert.match(edgeFunction, /from\("environments"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "environment IDs must be tenant scoped");
+assert.match(edgeFunction, /from\("locations"\)[\s\S]*?\.eq\("organization_id", organizationId\)/, "location IDs must be tenant scoped");
+assert.match(edgeFunction, /environment_location_mismatch/, "environment and location references must be consistent");
 assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
 assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
 assert.match(atomicMigration, /record_manual_observation\(p_event, p_data\)/, "observation must use the existing observation RPC");
