@@ -6,7 +6,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 // Eight inoculation points form a true, evenly spaced first growth ring.
 const ROOT_RING_RADIUS=430;
 const SECTOR_HALF_ANGLE=.39;
-const LOCAL_FAN_HALF_ANGLE=.82;
+const LOCAL_FAN_HALF_ANGLE=1.02;
 const ANCHORS=Array.from({length:8},(_,index)=>{
   const angle=-Math.PI/2+index*Math.PI/4;
   return{x:Math.cos(angle)*ROOT_RING_RADIUS,y:Math.sin(angle)*ROOT_RING_RADIUS,angle};
@@ -171,7 +171,7 @@ export function createPublicMycologyNetwork(sourceTree,hub){
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
     const usable=Math.max(0,parentMax-parentMin-gap*(kids.length-1));
-    const growthLength=Math.max(235,Math.min(330,33/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2))));
+    const growthLength=Math.max(300,Math.min(400,42/(2*Math.sin(Math.max(.001,usable/Math.max(1,kids.length))/2))));
     // Keep the eight inoculation fans stable; below that first ring, use a
     // sublinear branch-mass law so one dense subtree cannot starve smaller siblings.
     const masses=kids.map(child=>parent.level===0?1:Math.pow(countSubtree(child),0.35));
