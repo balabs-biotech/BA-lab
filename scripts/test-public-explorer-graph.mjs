@@ -220,6 +220,9 @@ assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaning
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");
 assert.match(publicRenderer,/scale>threshold\*mobileLabelScaleFactor/,"Mobile labels must require deliberate zoom before revealing deeper generations");
+assert.match(publicRenderer,/const thresholds=\[0,\.10,\.16,\.24,\.65,1\.05,1\.5\]/,"The overview must progressively fade deep generations so distant filaments do not spill beyond the first-generation frame");
+assert.match(publicExplorer,/const focusNodes=nodes\.filter\(candidate=>candidate\.id===n\.id\|\|candidate\.parent===n\.id\)/,"Node focus must frame the selected page and its real immediate children instead of using a fixed zoom that clips the local branch");
+assert.match(publicExplorer,/const availableHeight=Math\.max\(180,h-\(mobile\?260:150\)\)/,"Selected-node framing must reserve the selection dock and controls before calculating its local zoom");
 assert.doesNotMatch(publicRenderer,/n\.identity\)continue/,"The renderer must not rely on a separate BA Labs identity node above the central mycology hub");
 assert.match(publicRenderer,/const mobile=width<600/,"The public renderer must detect mobile width for readable selected labels");
 assert.match(publicRenderer,/fontSize=Math.min\(11,fontSize\+1.5\)/,"Mobile labels must receive a modest readable size increase");
