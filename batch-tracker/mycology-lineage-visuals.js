@@ -197,7 +197,7 @@
         const title = new Text({ text: node.title.length > 24 ? node.title.slice(0, 22) + "…" : node.title, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 12, fontWeight: "700", fill: colors.text } });
         title.position.set(14, 14);
         card.addChild(title);
-        const subtitle = new Text({ text: node.subtitle.length > 30 ? node.subtitle.slice(0, 28) + "…" : node.subtitle, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fill: colors.muted } });
+        const subtitle = new Text({ text: node.subtitle.length > 30 ? node.subtitle.slice(0, 28) + "…" : node.subtitle, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: colors.muted } });
         subtitle.position.set(14, 39);
         card.addChild(subtitle);
         card.on("pointertap", () => node.button.click());
