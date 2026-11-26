@@ -162,3 +162,77 @@ html body[data-domain] .card:not(.app-hero) :is(button,.button,.primary-button) 
     transition:none !important;
   }
 }
+
+
+/* Module navigation: compact, persistent and horizontally navigable on touch screens. */
+html body[data-domain] .app-toolbar .section-nav {
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  overscroll-behavior-inline:contain !important;
+  scrollbar-width:none !important;
+  white-space:nowrap !important;
+}
+html body[data-domain] .app-toolbar .section-nav::-webkit-scrollbar {
+  display:none !important;
+}
+html body[data-domain] .section-nav a {
+  position:relative !important;
+  flex:0 0 auto !important;
+  min-width:max-content !important;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease !important;
+}
+html body[data-domain] .section-nav a::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:auto 11px 3px !important;
+  height:2px !important;
+  border-radius:2px !important;
+  background:var(--workspace-accent) !important;
+  transform:scaleX(0) !important;
+  transform-origin:center !important;
+  transition:transform .2s ease !important;
+}
+html body[data-domain] .section-nav a[aria-current="page"]::after {
+  transform:scaleX(1) !important;
+}
+html body[data-domain] .section-nav a:active {
+  transform:scale(.98) !important;
+}
+html body[data-domain] .card[id] {
+  scroll-margin-top:104px !important;
+}
+html body[data-domain] .card[id]:not(.hidden):not(.workspace-inactive) {
+  animation:ba-workspace-panel-in .24s cubic-bezier(.2,.72,.24,1) both !important;
+}
+@keyframes ba-workspace-panel-in {
+  from { opacity:0; transform:translateY(9px) scale(.997); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@media(max-width:760px) {
+  html body[data-domain] .app-toolbar {
+    flex-wrap:wrap !important;
+    gap:9px !important;
+  }
+  html body[data-domain] .app-toolbar .section-nav {
+    order:3 !important;
+    flex:1 1 100% !important;
+    width:100% !important;
+    padding:3px !important;
+  }
+  html body[data-domain] .section-nav a {
+    min-height:40px !important;
+    padding:9px 12px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .card[id]:not(.hidden):not(.workspace-inactive) {
+    animation:none !important;
+  }
+  html body[data-domain] .section-nav a,
+  html body[data-domain] .section-nav a::after {
+    transition:none !important;
+  }
+}
