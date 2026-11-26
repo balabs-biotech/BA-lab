@@ -114,7 +114,8 @@ export function createVernpixiNetwork(tree,options={}){
    const rx=anchor[0]*510+(fixed?0:((seed&255)/255-.5)*58);
    const ry=anchor[1]*430+(fixed?0:(((seed>>>8)&255)/255-.5)*54);
    const angle=fixed?0:Math.atan2(ry,rx)+(((seed>>>16)&255)/255-.5)*.34;
-   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:12,level:0,data:root,rootId:root.id,colorKey:layoutId,parent:null,angle};
+   const rootRadius=Number.isFinite(root.data?.r)?Math.max(12,root.data.r):Number.isFinite(root.r)?Math.max(12,root.r):12;
+   const rootNode={id:root.id,title:root.title,x:rx,y:ry,r:rootRadius,level:0,data:root,rootId:root.id,colorKey:layoutId,parent:null,angle};
    nodes.push(rootNode);byId.set(root.id,rootNode);
    const walk=(data,parent,depth,branchAngle,path)=>{
     const kids=data.children||[];if(!kids.length)return;
