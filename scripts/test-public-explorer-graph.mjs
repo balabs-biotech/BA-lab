@@ -41,6 +41,7 @@ for(const lang of languages){
     const directChildren=graph.nodes.filter(node=>node.parent===root.id);
     assert.ok(directChildren.length>0,`${lang}: ${root.id} must retain its real first-generation knowledge nodes`);
     assert.ok(directChildren.every(node=>Math.abs(node.angle-root.angle)<=0.95),`${lang}: ${root.id} first-generation branches must grow as a controlled rhizomorphic fan, not a radial starburst`);
+    if(directChildren.length>=3){const angles=directChildren.map(node=>node.angle);assert.ok(Math.max(...angles)-Math.min(...angles)>=0.32,`${lang}: ${root.id} first-generation branches must open into a visible fan instead of a narrow bundle`);}
     const hasLateralGrowth=directChildren.some(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)>Math.hypot(dx,dy)*.05;});
     assert.ok(hasLateralGrowth,`${lang}: ${root.id} must show lateral rhizomorphic growth, not only radial spokes`);
     const lateralRatios=directChildren.map(node=>{const dx=node.x-root.x,dy=node.y-root.y;return Math.abs(-Math.sin(root.angle)*dx+Math.cos(root.angle)*dy)/(Math.hypot(dx,dy)||1);});
