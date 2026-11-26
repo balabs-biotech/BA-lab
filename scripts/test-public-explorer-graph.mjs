@@ -70,6 +70,8 @@ for(const lang of languages){
   const rootRadii=roots.map(node=>Math.hypot(node.x,node.y));
   assert.ok(Math.max(...rootRadii)-Math.min(...rootRadii)<1e-8,lang+": the eight inoculation points must form one symmetric first ring");
   assert.ok(Math.abs(rootRadii[0]-430)<1e-8,lang+": the first ring must keep an even gap around the mycology core");
+  const outermostDescendantRadius=Math.max(...graph.nodes.filter(node=>node.level>0).map(node=>Math.hypot(node.x,node.y)));
+  assert.ok(outermostDescendantRadius>=rootRadii[0]*2.6,lang+": recursive branches must colonize the available outer field instead of clustering around the inoculation ring");
   const rootAngles=roots.map(node=>Math.atan2(node.y,node.x));
   const angularGaps=rootAngles.map((angle,index)=>{const next=rootAngles[(index+1)%rootAngles.length];return(next-angle+Math.PI*2)%(Math.PI*2);});
   assert.ok(angularGaps.every(gap=>Math.abs(gap-Math.PI/4)<1e-8),lang+": all eight universes must be evenly distributed around the mycology center");
