@@ -44,7 +44,7 @@ A lookup skill. When invoked with a task ("I need toasts", "what should I use fo
 | Animating numbers (counters, prices, stats) | [NumberFlow](https://number-flow.barvian.me) |
 | Animated text components | [torph](https://torph.lochie.me/) |
 | 3D globes | [Cobe](https://github.com/shuding/cobe) |
-| Dynamic OG images (HTML/CSS → SVG) | [Satori](https://github.com/vercel/satori) |
+| Dynamic OG images (HTML/CSS → SVG) | [Satori](https://www.npmjs.com/package/satori) |
 | Syntax highlighting | [shiki](https://shiki.style) |
 
 Reach for motion when you need springs, layout animations, exit animations, or gesture-driven values. A simple hover or fade doesn't need it — plain CSS transitions are the right tool there.
