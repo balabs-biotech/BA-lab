@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "contract",
+    "contract_version",
+    "record_type",
+    "record_id",
+    "organization_id",
+    "created_at",
+    "data",
+    "provenance"
+  ],
+  "properties": {
+    "contract": {
+      "const": "BA-LABS/JSON"
+    },
+    "contract_version": {
+      "const": "1.0.0"
+    },
+    "record_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source",
+        "review_status"
+      ],
+      "properties": {
+        "source": {
+          "const": "ai_assisted"
+        },
+        "model": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "review_status": {
+          "const": "unreviewed"
+        }
+      },
+      "additionalProperties": false
+    },
+    "extensions": {
+      "type": "object"
+    },
+    "record_type": {
+      "const": "observation"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "variable_code",
+        "value_text",
+        "observed_at",
+        "context"
+      ],
+      "properties": {
+        "variable_code": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_]{1,79}$"
+        },
+        "value_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "instrument": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "context": {
+          "type": "object",
+          "properties": {
+            "culture_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "plant_culture_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "batch_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "environment_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "location_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "culture_id"
+              ]
+            },
+            {
+              "required": [
+                "plant_culture_id"
+              ]
+            },
+            {
+              "required": [
+                "batch_id"
+              ]
+            }
+          ],
+          "additionalProperties": false
+        },
+        "metadata": {
+          "type": "object"
+        },
+        "quality_state": {
+          "const": "raw"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$id": "https://balabs-biotech.github.io/BA-lab/schemas/bal-json/v1/observation.schema.json",
+  "title": "BAL-JSON observation"
+}
