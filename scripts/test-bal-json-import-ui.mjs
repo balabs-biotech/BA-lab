@@ -153,6 +153,48 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 
 {
   const { elements, calls } = harness();
+  const record = makeRecord({
+    data: {
+      variable_code: "temperature",
+      raw_value: 24,
+      raw_unit_code: "degC",
+      measured_at: "2026-11-11T10:00:00.000Z",
+      context: {
+        culture_id: "b0b0b0b0-0000-4000-8000-000000000001",
+        plant_culture_id: "c0c0c0c0-0000-4000-8000-000000000001"
+      }
+    }
+  });
+  elements.get("balJsonImportSource").value = JSON.stringify(record);
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, true);
+  assert.equal(calls.length, 0);
+  assert.match(elements.get("balJsonImportStatus").textContent, /un seul ancrage biologique/i);
+}
+
+{
+  const { elements, calls } = harness();
+  const record = makeRecord({
+    data: {
+      variable_code: "temperature",
+      raw_value: 24,
+      raw_unit_code: "degC",
+      measured_at: "2026-11-11T10:00:00.000Z",
+      context: {
+        plant_culture_id: "b0b0b0b0-0000-4000-8000-000000000001",
+        batch_id: "c0c0c0c0-0000-4000-8000-000000000001"
+      }
+    }
+  });
+  elements.get("balJsonImportSource").value = JSON.stringify(record);
+  elements.get("balJsonPreviewButton").click();
+  assert.equal(elements.get("balJsonImportButton").disabled, true);
+  assert.equal(calls.length, 0);
+  assert.match(elements.get("balJsonImportStatus").textContent, /ne peut pas être combiné/i);
+}
+
+{
+  const { elements, calls } = harness();
   elements.get("balJsonImportSource").value = JSON.stringify(makeRecord({ organization_id: "c0c0c0c0-0000-4000-8000-000000000001" }));
   elements.get("balJsonPreviewButton").click();
   assert.equal(elements.get("balJsonImportButton").disabled, true);
