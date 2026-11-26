@@ -201,8 +201,8 @@ html body[data-domain] .section-nav a[aria-current="page"]::after {
 html body[data-domain] .section-nav a:active {
   transform:scale(.98) !important;
 }
-html body[data-domain] .card[id] {
-  scroll-margin-top:104px !important;
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
+  scroll-margin-top:112px !important;
 }
 html body[data-domain] .card[id]:not(.hidden):not(.workspace-inactive) {
   animation:ba-workspace-panel-in .24s cubic-bezier(.2,.72,.24,1) both !important;
