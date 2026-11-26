@@ -51,11 +51,11 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
   let refreshCalls = 0;
-  const client = { functions: { async invoke(name, options) { calls.push({ name, options }); return { data: result, error: null }; } } };
+  const importBalJson = async (record) => { calls.push({ name: "bal-json-ingest", options: { body: record } }); return { data: result, error: null }; };
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
   const window = {
     BA_LABS_DOMAIN: domain,
-    BA_LABS_SUPABASE_CLIENT: client,
+    BA_LABS_IMPORT_BAL_JSON: importBalJson,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
