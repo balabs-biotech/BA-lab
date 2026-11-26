@@ -18,7 +18,7 @@
       document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
     } else {
       window.BA_LABS_DOMAIN = "mycology";
-    fetch("../workspace.html?v=20261117-sector-interaction-160")
+    fetch("../workspace.html?v=20261126-bal-json-bridge-1")
       .then(response => {
         if (!response.ok) throw new Error("Impossible de charger l’interface commune.");
         return response.text();
