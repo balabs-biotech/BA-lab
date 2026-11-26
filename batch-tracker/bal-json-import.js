@@ -194,7 +194,10 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
         ? "Ce record était déjà enregistré : aucun doublon créé."
         : "Record importé et enregistré dans CultureOps. Il reste non vérifié et doit être contrôlé dans l’historique.";
       status.dataset.state = "success"; approvedRecord = null; approvedOrganization = null;
-      if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") {\n        const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();\n        if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";\n      }
+      if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") {
+        const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
+        if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+      }
     } catch (error) {
       status.textContent = "Import non effectué : " + (error.message || "erreur inconnue");
       status.dataset.state = "error"; importButton.disabled = false;
