@@ -19,7 +19,7 @@ let pixiRenderer=null,relationIndex=new Map();
 let lang="fr",tree=[],nodes=[],edges=[],byId=new Map(),selected=null,hovered=null,w=0,h=0,dpr=1,scale=1,targetScale=1,offset={x:0,y:0},targetOffset={x:0,y:0},pointers=new Map(),gesture=null,dragged=false,raf=0,viewHistory=[];
 const t=k=>COPY[lang][k]||COPY.fr[k],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=s=>{let n=2166136261;for(let i=0;i<s.length;i++)n=Math.imul(n^s.charCodeAt(i),16777619);return n>>>0};
-function levelOpacity(level){const thresholds=[0,.10,.16,.24,.4,.7,1.1],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
+function levelOpacity(level){const thresholds=[0,.10,.16,.24,.65,1.05,1.5],t=thresholds[Math.min(level,thresholds.length-1)];return level===0?1:clamp((scale-t*.72)/(t*.42),0,1);}
 function screen(n){return{x:w/2+offset.x+n.x*scale,y:h/2+offset.y+n.y*scale}}
 function buildNetwork(){
  canvas.dataset.engine="public-mycology-constellation";
@@ -63,7 +63,7 @@ function syncUniverseRail(n){
  });
  canvas.dataset.activeUniverse=root||"";
 }
-function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];targetScale=zoomTo??(mobile?Math.min(defaultZoom*.31,1.2):defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.34:h*.38;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
+function focusNode(n,zoomTo){if(!n)return;if(!selected||selected.id!==n.id){viewHistory.push({scale:targetScale,offset:{...targetOffset},selected});if(viewHistory.length>80)viewHistory.shift();}const mobile=w<600;const zoomByLevel=[1.05,1.65,2.8,3.8,5.2,6.5,8,9.5,10.5];const defaultZoom=zoomByLevel[Math.min(n.level,zoomByLevel.length-1)];const focusNodes=nodes.filter(candidate=>candidate.id===n.id||candidate.parent===n.id);const extentX=Math.max(0,...focusNodes.map(candidate=>Math.abs(candidate.x-n.x)));const extentY=Math.max(0,...focusNodes.map(candidate=>Math.abs(candidate.y-n.y)));const availableHeight=Math.max(180,h-(mobile?260:150));const fitX=(w-72)/(extentX*2+80);const fitY=availableHeight/(extentY*2+80);const fittedZoom=Math.min(defaultZoom,fitX,fitY);targetScale=zoomTo??clamp(fittedZoom,.38,defaultZoom);targetScale=clamp(targetScale,.3,12);const focusY=mobile?h*.31:h*.34;targetOffset={x:-n.x*targetScale,y:focusY-h/2-n.y*targetScale};selected=n;syncUniverseRail(n);updateSelection();draw();}
 function activateNode(n){if(!n)return;focusNode(n);}
 function hit(x,y){
  const visibleLabels=new Set(JSON.parse(canvas.dataset.visibleNodeIds||"[]"));
