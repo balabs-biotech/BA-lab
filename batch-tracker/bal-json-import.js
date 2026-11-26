@@ -185,9 +185,9 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
     importButton.disabled = true; previewButton.disabled = true;
     status.textContent = "Validation serveur et import atomique en cours…"; status.dataset.state = "pending";
     try {
-      const client = window.BA_LABS_SUPABASE_CLIENT;
-      if (!client?.functions?.invoke) throw new Error("Client Supabase authentifié indisponible.");
-      const { data, error } = await client.functions.invoke("bal-json-ingest", { body: approvedRecord });
+      const importer = window.BA_LABS_IMPORT_BAL_JSON;
+      if (typeof importer !== "function") throw new Error("Canal d’import authentifié indisponible.");
+      const { data, error } = await importer(approvedRecord);
       if (error) throw new Error(error.message || "Le serveur a refusé l’import.");
       if (data?.error) throw new Error(data.message || data.error);
       status.textContent = data?.status === "duplicate"
