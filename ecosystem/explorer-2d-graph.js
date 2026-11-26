@@ -179,7 +179,8 @@ export function createPublicMycologyNetwork(sourceTree,hub){
     const created=[];
     kids.forEach((child,index)=>{
       const seed=hash(child.id);
-      const laneWidth=usable*masses[index]/totalMass;
+      const equalLane=usable/kids.length;
+      const laneWidth=equalLane*.72+(usable*.28)*masses[index]/totalMass;
       const sectorMin=cursor;
       const sectorMax=cursor+laneWidth;
       const angle=(sectorMin+sectorMax)/2;
