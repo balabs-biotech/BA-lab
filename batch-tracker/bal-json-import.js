@@ -97,7 +97,9 @@
     const workspace = domain === "mycology" ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification" : "LABORATORY — géloses, cultures liquides, grain, micropropagation, milieux, lots et opérations de laboratoire";
     return `# BA Labs CultureOps — assistant de structuration BAL-JSON
 
-Organisation active CultureOps : ${currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.\n\nTu aides à transformer des notes expérimentales en données structurées pour CultureOps.
+Organisation active CultureOps : ${currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.
+
+Tu aides à transformer des notes expérimentales en données structurées pour CultureOps.
 Espace actif : ${workspace}.
 
 ## Règles impératives
