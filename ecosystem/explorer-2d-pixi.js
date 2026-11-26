@@ -23,7 +23,8 @@ const lineageWidth=generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generati
   cameraScale=scale;
   field.clear().rect(0,0,width,height).fill({color:0x111b1d});
   field.circle(width*.5,height*.48,Math.max(width,height)*.78).fill({color:0x172925,alpha:.35});
-  const dishRadius=Math.max(...nodes.map(n=>Math.hypot(n.x,n.y)))+64;
+  const overviewNodes=nodes.filter(n=>n.level<=2);
+  const dishRadius=Math.max(...overviewNodes.map(n=>Math.hypot(n.x,n.y)))+64;
   field.circle(width/2+offset.x,height/2+offset.y,dishRadius*scale).stroke({color:0xa9c4b1,alpha:.24,width:1.35});
   field.circle(width/2+offset.x,height/2+offset.y,Math.max(0,dishRadius-5)*scale).stroke({color:0xa9c4b1,alpha:.075,width:1});
   for(let i=0;i<110;i++){const x=(i*137.51)%width,y=(i*83.71)%height;field.circle(x,y,i%9===0?1.1:.6).fill({color:i%7===0?0xb96b4d:0xd1d0c5,alpha:i%5===0?.16:.055});}
@@ -32,10 +33,11 @@ const lineageWidth=generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generati
   const branchParents=new Set(edges.filter(e=>!e.cross).map(e=>e.a.id));
   const terminalIds=new Set(nodes.filter(n=>n.level>0&&!branchParents.has(n.id)).map(n=>n.id));
   const bezierPoint=(a,c1,c2,b,t)=>{const u=1-t;return{x:u*u*u*a.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*b.y};};
+  const visibleEdgeDepths=new Set();
   for(const e of edges){
    const selectedRelation=!!selected&&(e.a.id===selected.id||e.b.id===selected.id);
    if(e.cross&&!selectedRelation&&scale<3)continue;
-   const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;
+   const depth=Math.max(e.a.level,e.b.level),alpha=alphaFor(depth);if(alpha<.015)continue;visibleEdgeDepths.add(depth);
    const a=point(e.a),b=point(e.b),dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    const seed=(e.seed??hash(e.a.id+e.b.id))>>>0,side=(seed&1)?1:-1;
    const parentAngle=e.a.angle??Math.atan2(dy,dx),childAngle=e.b.angle??Math.atan2(dy,dx);
@@ -69,6 +71,7 @@ const lineageWidth=generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generati
    if(e.verified&&(selectedRelation||scale>=3))junctions.circle(bezierPoint(a,c1,c2,b,.5).x,bezierPoint(a,c1,c2,b,.5).y,Math.max(1.1,1.45/Math.sqrt(scale))).fill({color:e.basis==="notion-link"?0xb96b4d:0x7eaaa3,alpha:selectedRelation?.8:.48});
    if(!reduced&&!e.cross&&alpha>.2){const particleCount=depth<=2&&len>150?3:depth<=2&&len>72?2:1;for(let particle=0;particle<particleCount;particle++){const phase=time*.00012+(seed%100)*.013+particle/particleCount,q=(phase*(depth===1?.7:.48))%1,p=bezierPoint(a,c1,c2,b,q);filaments.circle(p.x,p.y,Math.max(.8,1.2*scale**.15)).fill({color:0xdce5d9,alpha:particleCount===1?.82:.68});}}
   }
+  canvas.dataset.visibleEdgeDepths=JSON.stringify([...visibleEdgeDepths].sort((a,b)=>a-b));
   for(const n of nodes){
    const alpha=alphaFor(n.level);if(alpha<.015)continue;
    const r=Math.max(1.25,n.r),color=PALETTE[n.colorKey||n.rootId]||0xd1d0c5,seed=hash(n.id);
