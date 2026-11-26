@@ -5,7 +5,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // Eight inoculation points form a true, evenly spaced first growth ring.
 const ROOT_RING_RADIUS=430;
-const SECTOR_HALF_ANGLE=.72;
+const SECTOR_HALF_ANGLE=.39;
 const LOCAL_FAN_HALF_ANGLE=.68;
 const ANCHORS=Array.from({length:8},(_,index)=>{
   const angle=-Math.PI/2+index*Math.PI/4;
