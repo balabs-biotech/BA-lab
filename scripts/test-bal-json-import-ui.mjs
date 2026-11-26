@@ -61,7 +61,8 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
-  const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };\n  vm.runInNewContext(source, { document, window, navigator, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
+  const navigator = { clipboard: { async writeText(value) { clipboard.text = value;
+  vm.runInNewContext(source, { document, window, navigator, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
   return { elements, calls, clipboard, get refreshCalls() { return refreshCalls; } };
 }
 
@@ -136,7 +137,7 @@ assert.ok(recordSchema.oneOf.some(ref => ref.$ref === measurementSchema.$id), "m
 assert.ok(recordSchema.oneOf.some(ref => ref.$ref === observationSchema.$id), "observation schema must be registered by id");
 assert.ok(measurementSchema.properties.data.required.includes("raw_value"), "measurement contract must require a flat data.raw_value");
 assert.ok(observationSchema.properties.data.required.includes("value_text"), "observation contract must require a flat data.value_text");
-assert.match(source, /raw_value:\s*"number"/, "copyable prompt contract must match the flat measurement payload");
-assert.match(source, /value_text:\s*"description factuelle"/, "copyable prompt contract must match the flat observation payload");
+assert.match(source, /raw_value:\s*"number/, "copyable prompt contract must match the flat measurement payload");
+assert.match(source, /value_text:\s*"description factuelle/, "copyable prompt contract must match the flat observation payload");
 
 console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");
