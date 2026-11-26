@@ -1,0 +1,164 @@
+/* BA Labs CultureOps — interior surfaces pass.
+   Shared treatment for records, dashboards, forms and data-heavy panels. */
+html body[data-domain] .card:not(.app-hero) {
+  --panel-edge: color-mix(in srgb,var(--workspace-accent) 24%,var(--border));
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-metric,.statistics-summary-item,.culture-detail-field) {
+  position:relative !important;
+  overflow:hidden !important;
+  border:1px solid rgba(169,192,179,.15) !important;
+  border-radius:11px !important;
+  background:
+    linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent) 5%,transparent),transparent 58%),
+    linear-gradient(180deg,#202e2a,#17221f) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-metric,.statistics-summary-item) {
+  min-height:92px !important;
+  padding:15px !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-metric,.statistics-summary-item) :is(span,small,.label) {
+  color:#a9b9af !important;
+  font-size:10px !important;
+  font-weight:720 !important;
+  letter-spacing:.065em !important;
+  line-height:1.4 !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-metric,.statistics-summary-item) :is(strong,b) {
+  color:#f0f3ed !important;
+  font-size:clamp(20px,2.3vw,29px) !important;
+  font-weight:780 !important;
+  font-variant-numeric:tabular-nums !important;
+  letter-spacing:-.045em !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-metric,.statistics-summary-item)::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:auto 12px 0 !important;
+  height:2px !important;
+  border-radius:2px !important;
+  background:linear-gradient(90deg,var(--workspace-accent),transparent 82%) !important;
+  opacity:.55 !important;
+  pointer-events:none !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-panel,.overview-activity,.overview-shortcuts,.bio-operation-panel,.bio-lineage-panel,.culture-catalog,.batch-create-panel,.batch-compare-panel) {
+  border:1px solid rgba(169,192,179,.14) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.78),rgba(17,27,25,.88)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.overview-panel,.overview-activity,.overview-shortcuts,.bio-operation-panel,.bio-lineage-panel,.culture-catalog) > :is(h3,h4) {
+  color:#e8eee8 !important;
+  letter-spacing:-.02em !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.culture-catalog-row,.measurement-entry,.batch-event-item,.stage,.qc-row,.culture-timeline-entry) {
+  border-color:rgba(169,192,179,.16) !important;
+  border-inline-start-color:var(--workspace-accent) !important;
+  background:linear-gradient(110deg,color-mix(in srgb,var(--workspace-accent) 5%,transparent),transparent 58%),#202e2a !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.culture-catalog-row,.measurement-entry,.batch-event-item,.stage,.qc-row,.culture-timeline-entry) :is(strong,h3,h4) {
+  color:#edf2ec !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.culture-catalog-meta,.measurement-meta,.batch-event-meta,.stage small,.qc-row small) {
+  color:#a5b5aa !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(form,.bio-operation-form,#plantCultureForm,.batch-create-panel,.batch-compare-panel) {
+  gap:13px !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(form,.bio-operation-form,#plantCultureForm) > :is(div,fieldset) {
+  min-width:0 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(input,select,textarea) {
+  min-width:0 !important;
+  border-color:rgba(169,192,179,.25) !important;
+  background:linear-gradient(180deg,rgba(7,15,15,.82),rgba(13,22,20,.94)) !important;
+  color:#edf2ed !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(input,select,textarea)::placeholder {
+  color:#82958a !important;
+  opacity:1 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(input,select,textarea):focus-visible {
+  border-color:var(--workspace-accent) !important;
+  outline:2px solid color-mix(in srgb,var(--workspace-accent) 22%,transparent) !important;
+  outline-offset:2px !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(table,.statistics-table) {
+  color:#dce5dd !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(th,thead th) {
+  color:var(--workspace-accent) !important;
+  background:#1b2925 !important;
+  font-size:10px !important;
+  font-weight:780 !important;
+  letter-spacing:.065em !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(td,tbody td) {
+  color:#d2ddd4 !important;
+  border-color:rgba(169,192,179,.12) !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.empty-state,.empty-state-panel,[data-empty-state]) {
+  display:grid !important;
+  justify-items:start !important;
+  gap:7px !important;
+  padding:18px !important;
+  border:1px dashed rgba(169,192,179,.25) !important;
+  border-radius:11px !important;
+  color:#a9b9af !important;
+  background:rgba(10,18,17,.25) !important;
+  line-height:1.6 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.status-badge,.state-badge,[data-status]) {
+  border-radius:999px !important;
+  font-size:10px !important;
+  font-weight:750 !important;
+  letter-spacing:.025em !important;
+}
+html body[data-domain] .card:not(.app-hero) details {
+  border:1px solid rgba(169,192,179,.15) !important;
+  border-radius:11px !important;
+  background:rgba(9,17,16,.24) !important;
+}
+html body[data-domain] .card:not(.app-hero) details > summary {
+  padding:12px 14px !important;
+  color:#e1eae2 !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+}
+html body[data-domain] .card:not(.app-hero) details[open] > summary {
+  color:var(--workspace-accent) !important;
+  border-bottom:1px solid rgba(169,192,179,.13) !important;
+}
+html body[data-domain] .card:not(.app-hero) details > :not(summary) {
+  min-width:0 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(button,.button,.primary-button) {
+  min-height:40px !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] .card:not(.app-hero) :is(.overview-panel,.overview-activity,.overview-shortcuts,.bio-operation-panel,.bio-lineage-panel,.culture-catalog,.batch-create-panel,.batch-compare-panel) {
+    padding:14px !important;
+  }
+  html body[data-domain] .card:not(.app-hero) :is(.overview-metric,.statistics-summary-item) {
+    min-height:78px !important;
+    padding:12px !important;
+  }
+}
+@media(max-width:600px) {
+  html body[data-domain] .card:not(.app-hero) :is(input,select,textarea) {
+    min-height:44px !important;
+    font-size:16px !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] .card:not(.app-hero) * {
+    scroll-behavior:auto !important;
+    transition:none !important;
+  }
+}
