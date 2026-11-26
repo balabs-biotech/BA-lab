@@ -129,15 +129,15 @@
         card.addChild(new Graphics().roundRect(0, 0, nodeWidth, 54, 9).fill({ color: 0x292725, alpha: 0.98 }).stroke({ color, alpha: 0.68, width: 1.2 }));
         const title = new Text({ text: item.title.length > 24 ? item.title.slice(0, 22) + "…" : item.title, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "700", fill: 0xeee5dc } });
         title.position.set(10, 9); card.addChild(title);
-        const detail = new Text({ text: item.detail.length > 27 ? item.detail.slice(0, 25) + "…" : item.detail || "Détail non renseigné", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 8, fill: 0xb6aaa0 } });
+        const detail = new Text({ text: item.detail.length > 27 ? item.detail.slice(0, 25) + "…" : item.detail || "Détail non renseigné", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xb6aaa0 } });
         detail.position.set(10, 29); card.addChild(detail);
         root.addChild(card);
         const marker = new Graphics().circle(x + nodeWidth / 2, y, 5).fill({ color }).stroke({ color: 0x171d1c, width: 2 });
         root.addChild(marker);
-        const date = new Text({ text: item.dateLabel.length > 20 ? item.dateLabel.slice(0, 18) + "…" : item.dateLabel, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 8, fill: 0xc7b8ab } });
+        const date = new Text({ text: item.dateLabel.length > 20 ? item.dateLabel.slice(0, 18) + "…" : item.dateLabel, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xc7b8ab } });
         date.anchor.set(0.5, 0); date.position.set(x + nodeWidth / 2, 101); root.addChild(date);
       });
-      const caption = new Text({ text: ordered.length + " enregistrement(s) affiché(s) · ordre chronologique", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fontWeight: "600", fill: 0xb9a99d, letterSpacing: 0.6 } });
+      const caption = new Text({ text: ordered.length + " enregistrement(s) affiché(s) · ordre chronologique", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "600", fill: 0xb9a99d, letterSpacing: 0.6 } });
       caption.position.set(left, 158); root.addChild(caption);
       next.render();
       next.stop();
