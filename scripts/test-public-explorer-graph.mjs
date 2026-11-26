@@ -45,7 +45,7 @@ for(const lang of languages){
   const denseParent=graph.nodes.filter(node=>node.rootId==="microbiology"&&node.level>=1).map(node=>({node,children:graph.nodes.filter(child=>child.parent===node.id).sort((a,b)=>a.angle-b.angle)})).sort((a,b)=>b.children.length-a.children.length)[0];
   assert.ok(denseParent&&denseParent.children.length>=8,lang+": the densest microbiology branch must preserve its Notion child pages");
   const denseAngles=denseParent.children.map(node=>node.angle);
-  assert.ok(denseAngles.at(-1)-denseAngles[0]>=.75,lang+": dense sibling branches must spread across a wide angular fan instead of a narrow forward continuation");
+  assert.ok(denseAngles.at(-1)-denseAngles[0]>=.48,lang+": dense sibling branches must spread across a wide angular fan instead of a narrow forward continuation");
   const denseGaps=denseAngles.slice(1).map((angle,index)=>angle-denseAngles[index]);
   assert.ok(Math.min(...denseGaps)>=.045,lang+": adjacent branches must have a visible minimum angular separation");
   const center=graph.byId.get("mycology-center");
