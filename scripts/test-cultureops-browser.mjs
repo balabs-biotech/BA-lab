@@ -180,11 +180,11 @@ try {
           moduleScrollMargin: document.querySelector("#overviewCard") ? getComputedStyle(document.querySelector("#overviewCard")).scrollMarginTop : null,
           cultureDetailBackground: document.querySelector("#cultureDetailPanel") ? getComputedStyle(document.querySelector("#cultureDetailPanel")).backgroundImage : null,
           cultureDetailSummaryDisplay: document.querySelector("#cultureDetailSummary") ? getComputedStyle(document.querySelector("#cultureDetailSummary")).display : null,
-          movementSelectBackground: (() => {
+          movementStatusBackground: (() => {
             const control = document.querySelector("#moveBatchStatus");
             return control ? getComputedStyle(control).backgroundColor : null;
           })(),
-          movementSelectColorScheme: (() => {
+          movementStatusColorScheme: (() => {
             const control = document.querySelector("#moveBatchStatus");
             return control ? getComputedStyle(control).colorScheme : null;
           })(),
@@ -218,9 +218,9 @@ try {
       if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
       if (!metrics.cultureDetailBackground?.includes("linear-gradient")) failures.push(`${workspace.slug}/${viewport.name}: scientific culture detail surface styling is missing`);
       if (metrics.cultureDetailSummaryDisplay !== "grid") failures.push(`${workspace.slug}/${viewport.name}: culture detail summary is not rendered as a responsive grid (${metrics.cultureDetailSummaryDisplay})`);
-      const movementSurface = metrics.movementSelectBackground?.match(/\d+/g)?.slice(0,3).map(Number) || [];
-      if (movementSurface.length !== 3 || movementSurface.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: batch movement status is not using the shared dark surface (${metrics.movementSelectBackground})`);
-      if (metrics.movementSelectColorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: batch movement status should inherit dark color scheme (${metrics.movementSelectColorScheme})`);
+      const movementSurface = metrics.movementStatusBackground?.match(/\d+/g)?.slice(0,3).map(Number) || [];
+      if (movementSurface.length !== 3 || movementSurface.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: batch movement status is not using the shared dark surface (${metrics.movementStatusBackground})`);
+      if (metrics.movementStatusColorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: batch movement status should inherit dark color scheme (${metrics.movementStatusColorScheme})`);
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
       const keyboardNavigation = await page.evaluate(() => {
         const nav = document.querySelector(".section-nav");
