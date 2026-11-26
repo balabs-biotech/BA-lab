@@ -508,7 +508,7 @@ From `motion` 14.2, Motion's shorthand properties (`x`, `y`, `scale`, `rotate`) 
 
 Some Motion animations still run on the main thread in every version: layout animations (`layout`, `layoutId`), animations with `onUpdate` or `transformTemplate`, inertia (drag momentum), and values driven every frame by a motion value (drag, `useTransform`).
 
-This matters when the browser is simultaneously loading content, running scripts, or painting. At Vercel, the dashboard tab animation used Shared Layout Animations and dropped frames during page loads. Switching to CSS animations (on `transform`/`opacity`, they run on the compositor) fixed it.
+This matters when the browser is simultaneously loading content, running scripts, or painting. A production dashboard's tab animation used Shared Layout Animations and dropped frames during page loads. Switching to CSS animations (on `transform`/`opacity`, they run on the compositor) fixed it.
 
 ### CSS animations beat JS under load
 
