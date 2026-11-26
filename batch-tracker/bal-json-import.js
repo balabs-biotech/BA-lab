@@ -8,7 +8,7 @@
   const panel = $("balJsonImportPanel");
   if (!panel) return;
   const domain = window.BA_LABS_DOMAIN;
-  if (!["mycology", "laboratory"].includes(domain)) { panel.hidden = true; return; }
+  if (!["mycology", "laboratory", "agronomy"].includes(domain)) { panel.hidden = true; return; }
 
   const source = $("balJsonImportSource");
   const previewButton = $("balJsonPreviewButton");
@@ -89,7 +89,7 @@
   }
 
   function buildPrompt() {
-    const workspace = domain === "mycology" ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification" : "LABORATORY — géloses, cultures liquides, grain, micropropagation, milieux, lots et opérations de laboratoire";
+    const workspace = domain === "mycology"\n      ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification"\n      : domain === "agronomy"\n        ? "GREEN TECH — cultures végétales, semis, croissance, micropropagation, substrats, irrigation, serre et paramètres environnementaux"\n        : "LABORATORY — géloses, cultures liquides, grain, milieux, lots et opérations de laboratoire";
     return `# BA Labs CultureOps — assistant de structuration BAL-JSON
 
 Organisation active CultureOps : ${currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.
@@ -111,7 +111,7 @@ Espace actif : ${workspace}.
 ${JSON.stringify(schema, null, 2)}
 
 ## Identifiants de contexte
-Utilise exactement les UUID fournis par l'utilisateur pour organization_id et un seul ancrage valide dans data.context (culture_id, batch_id ou plant_culture_id). Si l'un manque, demande-le. record_id doit être un UUID généré une seule fois pour cette proposition et conservé lors des nouvelles tentatives du même enregistrement.
+Utilise exactement les UUID fournis par l'utilisateur pour organization_id et un seul ancrage valide dans data.context (culture_id, plant_culture_id ou batch_id). Si l'un manque, demande-le. record_id doit être un UUID généré une seule fois pour cette proposition et conservé lors des nouvelles tentatives du même enregistrement.
 
 ## Exemple de forme — observation
 {
