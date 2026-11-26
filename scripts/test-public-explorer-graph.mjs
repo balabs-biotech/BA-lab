@@ -4,10 +4,19 @@ import { createPublicMycologyNetwork } from "../ecosystem/explorer-2d-graph.js";
 
 const explorerPage=readFileSync(new URL("../ecosystem/index.html",import.meta.url),"utf8");
 assert.match(explorerPage,/@media\(max-width:700px\)\{[\s\S]*?\.selection-path,[\s\S]*?\.selection-description,[\s\S]*?\.child-branches\{display:none!important\}/,"Mobile selection must hide ancestry, long descriptions, and child lists to preserve canvas space");
+const explorer2dPage=readFileSync(new URL("../ecosystem/explorer-2d.html",import.meta.url),"utf8");
+assert.match(explorer2dPage,/#selection \.selection-dock\{[^}]*background:[^;}]+/,"The 2D selection dock must have a visible card surface instead of rendering unstyled text over the graph");
+assert.match(explorer2dPage,/@media\(max-width:700px\)[\s\S]*?#selection \.selection-dock\{[^}]*padding:/,"The mobile selection dock must have its own compact layout and padding");
+assert.match(explorer2dPage,/@media\(max-width:700px\)[\s\S]*?#selection\{[^}]*max-height:40%/,"The mobile selection dock must stay compact and leave most of the viewport available to explore the graph");
 const pixiRenderer=readFileSync(new URL("../ecosystem/explorer-2d-pixi.js",import.meta.url),"utf8");
 assert.match(pixiRenderer,/const mobileLabelScaleFactor=mobile\?\.68:1/,"Mobile labels must require a later zoom threshold instead of exposing the full hierarchy in the overview");
 assert.match(pixiRenderer,/const labelBudget=rootCount\+\(mobile\?3:Math\.min\(34,Math\.max\(8,Math\.round\(10\+scale\*5\)\)\)\)/,"Mobile overview must cap non-root labels to three at a time");
-assert.match(pixiRenderer,/e\.hubLink\?5\.2:e\.primaryHypha\?3\.2:e\.fractal\?Math\.max\(\.48,3\.2\*Math\.pow\(\.68,Math\.max\(0,generation-1\)\)\)/,"Hyphal connection thickness must encode lineage: hub-to-universe thickest, then progressively thinner generations");
+assert.match(pixiRenderer,/e\.hubLink\?5\.2:e\.primaryHypha\?3\.2:e\.fractal\?lineageWidth\(generation\)/,"Hyphal connection thickness must encode lineage: hub-to-universe thickest, then progressively thinner generations");
+const widthScaleMatch=pixiRenderer.match(/const lineageWidth=generation=>Math\.max\(\.48,3\.2\*Math\.pow\(\.64,Math\.max\(0,generation-1\)\)\);/);
+assert.ok(widthScaleMatch,"The renderer must expose a deliberate generation-based hypha width scale");
+const lineageWidths=[1,2,3,4,5].map(generation=>Math.max(.48,3.2*Math.pow(.64,Math.max(0,generation-1))));
+assert.deepEqual(lineageWidths.slice(0,3),[3.2,2.048,1.31072],"First-, second-, and third-generation hyphae must have distinct measurable thicknesses");
+assert.ok(lineageWidths.every((width,index)=>index===0||width<lineageWidths[index-1]),"Every successive hypha generation must become thinner");
 
 const languages=["fr","en","ar","pt"];
 const expected=["microbiology","plants","ecology","bioprocesses","biomaterials","instrumentation","digital","physical"];
@@ -182,6 +191,7 @@ assert.match(publicExplorer,/const bounds=nodes\.filter\(n=>Number\.isFinite\(n\
 
 assert.match(publicExplorer,/const mobile=w<600;/,"Selected-node zoom must adapt to narrow mobile viewports instead of forcing desktop magnification");
 assert.match(publicExplorer,/mobile\?Math\.min\(defaultZoom\*\.31,1\.2\):defaultZoom/,"Mobile focus must preserve surrounding branches instead of magnifying a single selected node beyond the portrait viewport");
+assert.match(publicExplorer,/const focusY=mobile\?h\*\.34:h\*\.38/,"Selected-node framing must leave a clear lower viewport zone for the selection dock instead of centring the graph behind it");
 assert.match(publicExplorer,/selected\?12:3\.2/,"The overview must allow meaningful wheel and button zoom before a node is selected");
 assert.match(publicExplorer,/const zoomByLevel=\[1\.05,1\.65,2\.8,3\.8,5\.2,6\.5,8,9\.5,10\.5\]/,"Every graph generation must have a distinct, reachable focus zoom");
 assert.match(publicExplorer,/mobile\?\.25:1/,"Mobile hit testing must scale its reveal thresholds with the mobile focus zoom");

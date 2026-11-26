@@ -106,8 +106,13 @@ export function createPublicMycologyNetwork(tree,hub){
     // Hyphae advance from the real parent, not from the global origin.
     // This preserves a constant local growth step while allowing each generation
     // to form a genuinely branching, tree-like colony instead of concentric fans.
-    const parentMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
-    const parentMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
+    const inheritedMin=parent.sectorMin??parent.angle-SECTOR_HALF_ANGLE+.015;
+    const inheritedMax=parent.sectorMax??parent.angle+SECTOR_HALF_ANGLE-.015;
+    const territoryCenter=ANCHORS[inoculationIndex].angle;
+    // Keep every child fan centred on its actual parent, inside both its
+    // inherited sibling lane and the fixed radial sector of its universe.
+    const parentMin=Math.max(inheritedMin,parent.angle-.39,territoryCenter-.39);
+    const parentMax=Math.min(inheritedMax,parent.angle+.39,territoryCenter+.39);
     // Allocate space by actual subtree complexity: a dense colony receives a wider
     // growth sector, while every sibling keeps a separate, non-overlapping lane.
     const gap=kids.length>1?Math.min(.006,(parentMax-parentMin)/(kids.length*3)):0;
@@ -139,7 +144,6 @@ export function createPublicMycologyNetwork(tree,hub){
     // Each child inherits a local growth fan around its own axis, not the
     // narrow midpoint lane between siblings. This lets every generation branch
     // laterally while keeping the colony inside a bounded territory.
-    const territoryCenter=ANCHORS[inoculationIndex].angle;
     const territoryHalfAngle=.62;
     const orderedFan=[...created].sort((a,b)=>a.angle-b.angle);
     orderedFan.forEach((node,index)=>{
