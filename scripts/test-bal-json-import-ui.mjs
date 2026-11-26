@@ -13,7 +13,8 @@ for (const page of ["batch-tracker/mycology/index.html", "batch-tracker/laborato
 for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
 }
-assert.match(tracker, /window\.BA_LABS_SUPABASE_CLIENT\s*=\s*supabaseClient/, "tracker must expose its authenticated Supabase client");
+assert.match(tracker, /window\.BA_LABS_IMPORT_BAL_JSON\s*=\s*\(record\)\s*=>\s*supabaseClient\.functions\.invoke/, "tracker must expose only the authenticated BAL-JSON import operation");
+assert.doesNotMatch(tracker, /window\.BA_LABS_SUPABASE_CLIENT/, "tracker must not expose the whole Supabase client to the bridge");
 assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
 
 function element(id) {
