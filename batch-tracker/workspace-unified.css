@@ -5,6 +5,7 @@
 @import url("./styles/greentech-workspace.css?v=20261117-ndvi-chart-1");
 @import url("./styles/motion.css?v=20261126-organic-cover-1");
 @import url("./styles/responsive.css?v=20261116-interior-pass-1");
+@import url("./styles/interior-harmonization.css?v=20261126-interior-surfaces-1");
 
 /* Existing navigation refinements are retained while the shared component
    foundation is progressively extracted from the legacy stylesheet. */
