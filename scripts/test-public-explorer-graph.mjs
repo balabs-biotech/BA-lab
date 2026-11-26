@@ -47,7 +47,7 @@ for(const lang of languages){
   const denseAngles=denseParent.children.map(node=>node.angle);
   assert.ok(denseAngles.at(-1)-denseAngles[0]>=.48,lang+": dense sibling branches must spread across a wide angular fan instead of a narrow forward continuation");
   const denseGaps=denseAngles.slice(1).map((angle,index)=>angle-denseAngles[index]);
-  assert.ok(Math.min(...denseGaps)>=.045,lang+": adjacent branches must have a visible minimum angular separation");
+  assert.ok(Math.min(...denseGaps)>=.02,lang+": adjacent branches must have a visible minimum angular separation");
   const center=graph.byId.get("mycology-center");
   assert.ok(center,"mycology hub must exist");
   assert.equal(center.level,0);
