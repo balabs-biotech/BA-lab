@@ -95,7 +95,7 @@ jobs:
           node scripts/test-qc-check-session-errors.mjs
           node scripts/test-storefront.mjs
           node scripts/test-store-order-contract.mjs
-          node scripts/test-smart-entry.mjs
+          node scripts/test-smart-entry.mjs\n          node scripts/test-bal-json-import-ui.mjs\n          node --check batch-tracker/bal-json-import.js
           node scripts/test-auth-transition-workspace-lockdown.mjs
           node scripts/test-auth-init-tenant-revision-guards.mjs
           [ -f batch-tracker/index.html ] && echo "✓ batch-tracker/index.html exists" || exit 1
