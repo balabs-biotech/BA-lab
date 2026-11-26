@@ -249,5 +249,10 @@ assert.ok(measurementSchema.properties.data.required.includes("raw_value"), "mea
 assert.ok(observationSchema.properties.data.required.includes("value_text"), "observation contract must require a flat data.value_text");
 assert.match(source, /raw_value:\s*"number/, "copyable prompt contract must match the flat measurement payload");
 assert.match(source, /value_text:\s*"description factuelle/, "copyable prompt contract must match the flat observation payload");
+assert.match(tracker, /BA_LABS_GET_BAL_JSON_CONTEXT/, "tracker must expose only the active tenant BAL-JSON context catalogue");
+assert.match(tracker, /workspaceMeasurementVariables\(measurementVariables, domain\)/, "BAL-JSON context must expose only variables enabled for the active workspace");
+assert.match(source, /contextCatalogue/, "copyable prompt must include the live CultureOps context catalogue");
+assert.match(source, /catalogue des variables de l’espace actif/, "prompt must constrain the LLM to existing workspace variable codes");
+assert.match(source, /batch_id et le culture_id associé/, "prompt must preserve batch-to-culture traceability");
 
 console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");
