@@ -61,6 +61,13 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_DOMAIN: domain,
     BA_LABS_IMPORT_BAL_JSON: importBalJson,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
+    BA_LABS_GET_BAL_JSON_CONTEXT: () => ({
+      organization_id: organizationId,
+      workspace: domain,
+      targets: [{ type: domain === "agronomy" ? "plant_culture" : "culture", id: "b0b0b0b0-0000-4000-8000-000000000001", code: "TEST-TARGET", label: "Cible de test" }],
+      variables: [{ code: "temperature", label: "Température", dimension: "temperature", canonical_unit_code: "degC" }],
+      units: [{ code: "degC", label: "°C", dimension: "temperature" }]
+    }),
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
   const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };
@@ -74,6 +81,10 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.match(h.clipboard.text, /BA Labs CultureOps/);
   assert.match(h.clipboard.text, /Organisation active CultureOps : a0a0a0a0-0000-4000-8000-000000000001/);
   assert.match(h.clipboard.text, /LABORATORY/);
+  assert.match(h.clipboard.text, /"code": "TEST-TARGET"/, "copied prompt must include the live target catalogue");
+  assert.match(h.clipboard.text, /"code": "temperature"/, "copied prompt must include the active variable catalogue");
+  assert.match(h.clipboard.text, /"code": "degC"/, "copied prompt must include compatible unit references");
+  assert.match(h.clipboard.text, /Cible de test/);
   assert.match(h.clipboard.text, /Seul record_id peut être généré/);
   assert.match(h.clipboard.text, /plant_culture_id/);
   assert.match(h.clipboard.text, /UUID_V4_GÉNÉRÉ_UNIQUE/);
