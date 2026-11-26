@@ -5,6 +5,7 @@ const html = fs.readFileSync("batch-tracker/workspace.html", "utf8");
 const visuals = fs.readFileSync("batch-tracker/workspace-visuals.js", "utf8");
 const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
+const visualizationFoundation = fs.readFileSync("batch-tracker/styles/visualization-foundation.css", "utf8");
 const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
 const mycology = fs.readFileSync("batch-tracker/styles/mycology-workspace.css", "utf8");
 const mycologyEntry = fs.readFileSync("batch-tracker/mycology/index.html", "utf8");
@@ -31,6 +32,9 @@ assert.ok(motion.includes("ba-reactor-bubble"), "Laboratory reactor bubbles must
 assert.ok(motion.includes("workspace-authenticated .hero-art.ba-sector-art"), "Sector identity must remain visible in authenticated workspaces");
 assert.ok(motion.includes("prefers-reduced-motion:reduce"), "CSS motion must include a reduced-motion fallback");
 assert.ok(shared.includes("backdrop-filter:blur(18px)"), "Workspace toolbar must retain the glass navigation treatment");
+assert.ok(visualizationFoundation.includes(".mycology-activity-tools,.lab-process-map-controls"), "Scientific visualization controls must share a common interaction foundation");
+assert.ok(visualizationFoundation.includes(":focus-visible"), "Scientific visualization controls must expose a visible keyboard focus state");
+assert.ok(visualizationFoundation.includes("prefers-reduced-motion:reduce"), "Visualization controls must respect reduced-motion preferences");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
 assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curved biological topology");
 assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
