@@ -43,7 +43,7 @@ A lookup skill. When invoked with a task ("I need toasts", "what should I use fo
 | General-purpose animation (springs, layout animations, enter/exit) | [motion](https://motion.dev) (Framer Motion) |
 | Animating numbers (counters, prices, stats) | [NumberFlow](https://number-flow.barvian.me) |
 | Animated text components | [torph](https://torph.lochie.me/) |
-| 3D globes | [Cobe](https://cobe.vercel.app) |
+| 3D globes | [Cobe](https://github.com/shuding/cobe) |
 | Dynamic OG images (HTML/CSS → SVG) | [Satori](https://github.com/vercel/satori) |
 | Syntax highlighting | [shiki](https://shiki.style) |
 
