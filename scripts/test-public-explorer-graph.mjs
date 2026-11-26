@@ -171,8 +171,12 @@ for(const root of expected.map(id=>original.byId.get(id))){
   for(const node of descendants){
     const parent=original.byId.get(node.parent);
     assert.ok(Math.hypot(node.x,node.y)>Math.hypot(parent.x,parent.y)+80,"Each generation must advance into a distinct outward growth ring");
-    const offset=Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle));
-    assert.ok(Math.abs(offset)<=.39,"Every branch must remain inside its own evenly spaced radial sector");
+    const localOffset=Math.atan2(Math.sin(node.angle-parent.angle),Math.cos(node.angle-parent.angle));
+    assert.ok(Math.abs(localOffset)<=.701,"Every descendant must fan from its actual parent within the biological lateral-growth envelope");
+  }
+  if(descendants.some(node=>node.level>=2)){
+    const escapesRootSector=descendants.some(node=>Math.abs(Math.atan2(Math.sin(node.angle-root.angle),Math.cos(node.angle-root.angle)))>.39);
+    assert.ok(escapesRootSector,root.id+": deeper hyphae must be allowed to expand beyond the initial inoculation sector instead of remaining trapped in fixed radial wedges");
   }
 }
 assert.ok(expected.every(id=>{const a=original.byId.get(id),b=createPublicMycologyNetwork(fixture,{id:"mycology-center",title:"Mycology",url:hubUrls.fr}).byId.get(id);return a.x===b.x&&a.y===b.y;}),"Spatial relaxation must preserve deterministic inoculation anchors");
