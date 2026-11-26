@@ -170,7 +170,7 @@ for(const root of expected.map(id=>original.byId.get(id))){
   const descendants=original.nodes.filter(node=>node.rootId===root.id&&node.level>0);
   for(const node of descendants){
     const parent=original.byId.get(node.parent);
-    assert.ok(Math.hypot(node.x,node.y)>Math.hypot(parent.x,parent.y)+80,"Each generation must advance into a distinct outward growth ring");
+    assert.ok(Math.hypot(node.x-parent.x,node.y-parent.y)>115,"Each hypha must advance by a real local segment from its parent, even when its growth turns laterally");
     const localOffset=Math.atan2(Math.sin(node.angle-parent.angle),Math.cos(node.angle-parent.angle));
     assert.ok(Math.abs(localOffset)<=.841,"Every descendant must fan from its actual parent within the expanded biological lateral-growth envelope");
   }
