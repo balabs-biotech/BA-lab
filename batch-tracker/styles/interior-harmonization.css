@@ -443,3 +443,26 @@ html body[data-domain] .card:not(.app-hero) .culture-linked-batches .culture-tim
     width:100% !important;
   }
 }
+
+
+/* PASS 202 — readable scientific section hierarchy across sector palettes.
+   Keep sector color for markers and borders; use mineral text for long-form
+   headings and labels so copper/sage/blue never become low-contrast body text. */
+html body[data-domain] .card:not(.app-hero) :is(h2,h3,h4) {
+  color:#e8eee8 !important;
+  text-shadow:none !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.section-kicker,.section-label,.panel-kicker) {
+  color:#c4cfc6 !important;
+  font-size:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.075em !important;
+}
+html body[data-domain] .card:not(.app-hero) label {
+  color:#c3cec5 !important;
+  font-size:11px !important;
+  font-weight:650 !important;
+}
+html body[data-domain] .card:not(.app-hero) :is(.muted,.help-text,.field-hint,.form-hint) {
+  color:#aebdb2 !important;
+}
