@@ -61,7 +61,7 @@ assert.ok(laboratoryStyles.includes(".lab-process-map-stage"), "Laboratory proce
 assert.ok(laboratoryEntry.includes("20261117-lab-process-map-161"), "Laboratory must load the new process map runtime");
 
 
-const cultureDetailMarkup = html.slice(html.indexOf('id="cultureDetailPanel"'), html.indexOf('<!-- ======================================================\n       REGISTRE AGRITECH'));
+const cultureDetailMarkup = html.slice(html.indexOf('id="cultureDetailPanel"'), html.indexOf('id="plantCard"'));
 assert.ok(cultureDetailMarkup.includes('id="cultureDetailSummary"') && cultureDetailMarkup.includes('id="bioOperationForm"'), "Culture detail must expose its summary and biological-operation form");
 assert.ok(cultureDetailMarkup.includes('id="cultureLineage"') && cultureDetailMarkup.includes('id="cultureDetailTimeline"'), "Culture detail must preserve lineage and the complete evidence timeline");
 assert.ok(interiorHarmonization.includes(".culture-detail-summary") && interiorHarmonization.includes("grid-template-columns:repeat(auto-fit"), "Culture summary fields must use a responsive, content-aware grid");
