@@ -104,6 +104,7 @@
       console.warn("Administration des domaines biologiques indisponible :", error);
     }
   }
+  window.addEventListener("ba-labs-organization-ready", setupLegacyDomainAdmin);
   setupLegacyDomainAdmin();
 
   function currentOrganization() {
