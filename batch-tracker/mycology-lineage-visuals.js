@@ -78,6 +78,7 @@
   }
 
   function showFallback(message, revealList = false) {
+    if (app) { app.destroy(true, true); app = null; }
     stage.replaceChildren();
     const note = document.createElement("p");
     note.className = "lineage-graph-status";
