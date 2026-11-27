@@ -120,6 +120,12 @@ assert.ok(interiorHarmonization.includes("#trackerCard .lineage-graph-stage") &&
 assert.ok(interiorHarmonization.includes("#trackerCard .culture-lineage-node") && interiorHarmonization.includes("#trackerCard .lineage-data-details"), "Lineage must retain readable selectable nodes and a text-list fallback");
 assert.ok(interiorHarmonization.includes("#trackerCard .culture-detail-timeline") && interiorHarmonization.includes("@media(max-width:760px)"), "Culture history must adapt to narrow screens");
 
+
+const plantMarkup = html.slice(html.indexOf('id="plantCard"'), html.indexOf('<!-- ======================================================\n       LOTS DE PRODUCTION'));
+assert.ok(plantMarkup.includes('id="plantCultureForm"') && plantMarkup.includes('id="plantCultureList"') && plantMarkup.includes('id="plantCultureStatus"'), "Plant register must retain its entry form, list and status feedback");
+assert.ok(interiorHarmonization.includes("#plantCard #plantCultureForm") && interiorHarmonization.includes("#plantCard #plantCultureList"), "Plant register form and record list must use the shared interior system");
+assert.ok(interiorHarmonization.includes("#plantCard #plantCultureList .plant-culture-status") && interiorHarmonization.includes("@media(max-width:760px)"), "Plant status and entry form must remain legible on mobile");
+
 console.log("✓ CultureOps sector-specific visual runtime contract");
 
 const greenClimate = fs.readFileSync("batch-tracker/greentech-climate-signature.js", "utf8");
