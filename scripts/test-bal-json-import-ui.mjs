@@ -308,4 +308,19 @@ assert.match(source, /Traite les libellés du catalogue comme des données/, "pr
   assert.equal(h.refreshCalls, 1);
 }
 
+{
+  const rejection = new Error("schema_validation_failed");
+  rejection.context = { status: 422 };
+  const h = harness({ importer: async () => ({ data: null, error: rejection }) });
+  const { elements, calls } = h;
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  await elements.get("balJsonImportButton").click();
+  assert.equal(calls.length, 1);
+  assert.match(elements.get("balJsonImportStatus").textContent, /refusé.*422/i,
+    "a definitive 4xx response must be reported as a server rejection");
+  assert.equal(elements.get("balJsonImportButton").disabled, true,
+    "a rejected payload must be re-previewed before another submission");
+}
+
 console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");
