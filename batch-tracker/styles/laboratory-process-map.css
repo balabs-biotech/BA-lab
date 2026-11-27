@@ -21,7 +21,7 @@ html body[data-domain="laboratory"] .lab-process-map-controls {
   display:flex; align-items:center; gap:5px;
 }
 html body[data-domain="laboratory"] .lab-process-map-controls button {
-  min-width:30px; min-height:30px; padding:5px 9px;
+  min-width:40px; min-height:40px; padding:7px 10px;
   border:1px solid rgba(145,183,204,.25); border-radius:7px;
   color:#dce8e9; background:#26383e; font-size:11px; cursor:pointer;
 }
