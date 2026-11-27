@@ -38,7 +38,7 @@ assert.ok(visualizationFoundation.includes("min-height:40px"), "Scientific visua
 assert.ok(visualizationFoundation.includes("prefers-reduced-motion:reduce"), "Visualization controls must respect reduced-motion preferences");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
 assert.ok(lineage.includes("descendant: 0xd9a36e") && !lineage.includes("descendant: 0xb4f477"), "Mycology lineage descendants must use the copper/amber palette, not GreenTech lime");
-assert.ok(!mycology.includes("#b4f477") && mycology.includes("background:#d9a36e"), "Mycology lineage legend must match the copper/amber descendant nodes");
+assert.ok(!mycology.includes("#b4f477") && !mycology.includes("#83a7a0") && mycology.includes("background:#9b9a8f") && mycology.includes("background:#d9a36e"), "Mycology lineage legend must use warm neutral origins and copper/amber descendants");
 assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curved biological topology");
 assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
 assert.ok(lineage.includes('data-graph-zoom="fit"'), "PixiJS lineage graph must expose a recenter action");
