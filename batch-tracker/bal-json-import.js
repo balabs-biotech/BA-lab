@@ -114,9 +114,9 @@
     const contextExample = domain === "agronomy"
       ? '"plant_culture_id": "<UUID_CULTURE_VÉGÉTALE_FOURNI>"'
       : '"culture_id": "<UUID_CULTURE_FOURNI>"';
-    return `# BA Labs CultureOps — assistant de structuration BAL-JSON
+    const promptText = `# BA Labs CultureOps — assistant de structuration BAL-JSON
 
-Organisation active CultureOps : ${liveContext.organization_id || currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.
+Organisation active CultureOps : ${catalogueReady ? organizationId : "INDISPONIBLE — session CultureOps authentifiée et catalogue chargé requis"}.
 
 Tu aides à transformer des notes expérimentales en données structurées pour CultureOps.
 Espace actif : ${workspace}.
