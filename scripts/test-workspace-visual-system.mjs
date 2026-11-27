@@ -111,6 +111,15 @@ assert.ok(interiorHarmonization.includes("#batchCard #batchStages") && interiorH
 assert.ok(interiorHarmonization.includes("#batchCard .batch-harvest-entry .grid") && interiorHarmonization.includes("#batchCard #batchEventList"), "Harvest and movement forms plus event history must be responsive and contained");
 assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchCard .batch-actions"), "Production actions must stack on mobile");
 
+
+const cultureDetailMarkup = html.slice(html.indexOf('id="cultureDetailPanel"'), html.indexOf('<!-- ======================================================\n       REGISTRE AGRITECH'));
+assert.ok(cultureDetailMarkup.includes('id="cultureDetailSummary"') && cultureDetailMarkup.includes('id="bioOperationForm"'), "Culture detail must retain summary and biological operation form");
+assert.ok(cultureDetailMarkup.includes('id="cultureLineage"') && cultureDetailMarkup.includes('id="cultureDetailTimeline"'), "Culture detail must retain lineage and complete timeline");
+assert.ok(interiorHarmonization.includes("#trackerCard .bio-operation-form") && interiorHarmonization.includes("#trackerCard .bio-operation-wide"), "Biological operation form must use a responsive structured grid");
+assert.ok(interiorHarmonization.includes("#trackerCard .lineage-graph-stage") && interiorHarmonization.includes("#trackerCard .lineage-graph-toolbar"), "Lineage graph must provide a contained stage and accessible controls");
+assert.ok(interiorHarmonization.includes("#trackerCard .culture-lineage-node") && interiorHarmonization.includes("#trackerCard .lineage-data-details"), "Lineage must retain readable selectable nodes and a text-list fallback");
+assert.ok(interiorHarmonization.includes("#trackerCard .culture-detail-timeline") && interiorHarmonization.includes("@media(max-width:760px)"), "Culture history must adapt to narrow screens");
+
 console.log("✓ CultureOps sector-specific visual runtime contract");
 
 const greenClimate = fs.readFileSync("batch-tracker/greentech-climate-signature.js", "utf8");
