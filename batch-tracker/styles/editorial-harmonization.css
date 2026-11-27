@@ -152,3 +152,15 @@ html body[data-domain="mycology"] #measurementCard :is(.section-kicker,.section-
   color:#D69A78 !important;
   -webkit-text-fill-color:#D69A78 !important;
 }
+
+
+/* PASS 222 — final Mycology editorial contrast for bridge and operation journal. */
+html body[data-domain="mycology"] :is(.context-eyebrow,.section-kicker,.section-kicker-label) {
+  color:#D69A78 !important;
+  -webkit-text-fill-color:#D69A78 !important;
+}
+html body[data-domain="mycology"] :is(#balJsonImportTitle,#resultCard h2,#bioOperationTitle) {
+  color:#E8EEE8 !important;
+  -webkit-text-fill-color:#E8EEE8 !important;
+  text-shadow:none !important;
+}
