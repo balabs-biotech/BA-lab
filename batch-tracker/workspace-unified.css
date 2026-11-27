@@ -622,3 +622,21 @@ html body[data-domain="mycology"] #measurementCard .bal-json-panel :is(
 ) {
   color:#b8c6bc !important;
 }
+
+/* PASS 216 — Explicit Mycology contrast on the rendered measurement and BAL-JSON titles.
+   These IDs are the actual headings in workspace.html; keep kickers legible too. */
+html body[data-domain="mycology"] #measurementTitle,
+html body[data-domain="mycology"] #balJsonImportTitle {
+  color:#f0eee8 !important;
+  text-shadow:none !important;
+}
+html body[data-domain="mycology"] #measurementCard > .section-kicker,
+html body[data-domain="mycology"] #measurementCard > .section-kicker span,
+html body[data-domain="mycology"] #balJsonImportPanel .context-eyebrow,
+html body[data-domain="mycology"] #balJsonImportPanel .bal-json-version {
+  color:#e2b092 !important;
+}
+html body[data-domain="mycology"] #measurementCard > .muted,
+html body[data-domain="mycology"] #balJsonImportPanel .muted {
+  color:#b8c6bc !important;
+}
