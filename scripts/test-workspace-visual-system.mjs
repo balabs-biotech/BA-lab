@@ -94,6 +94,14 @@ assert.ok(interiorHarmonization.includes("#measurementCard > .grid") && interior
 assert.ok(interiorHarmonization.includes("#measurementCard .bal-json-panel") && interiorHarmonization.includes("overflow-wrap:anywhere"), "BAL-JSON import content must remain readable without horizontal overflow");
 assert.ok(interiorHarmonization.includes("#measurementCard #measurementHistory") && interiorHarmonization.includes("min-width:0"), "Measurement history must remain constrained within its workspace card");
 
+
+const statisticsMarkup = html.slice(html.indexOf('id="statisticsCard"'), html.indexOf('id="resultCard"'));
+assert.ok(statisticsMarkup.includes('class="statistics-filters"') && statisticsMarkup.includes('id="statisticsSummary"') && statisticsMarkup.includes('id="statisticsChart"') && statisticsMarkup.includes('class="statistics-table-wrap"'), "Statistics workspace must retain filters, summary, chart and raw-data table");
+assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-filters") && interiorHarmonization.includes("@media(max-width:760px)"), "Statistics filters must adapt from desktop grid to mobile stack");
+assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-summary-item") && interiorHarmonization.includes("repeat(auto-fit,minmax(min(100%,150px),1fr))"), "Statistics summary must form responsive metric tiles");
+assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-chart") && interiorHarmonization.includes("min-height:180px"), "Statistics chart must have a bounded, readable visualization surface");
+assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-table") && interiorHarmonization.includes("min-width:620px") && interiorHarmonization.includes("overflow-x:auto"), "Raw statistics table must remain legible through horizontal scrolling on narrow screens");
+
 console.log("✓ CultureOps sector-specific visual runtime contract");
 
 const greenClimate = fs.readFileSync("batch-tracker/greentech-climate-signature.js", "utf8");
