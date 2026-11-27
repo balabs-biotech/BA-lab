@@ -22,7 +22,7 @@ on conflict (organization_id,user_id,terms_version) do nothing;
 
 insert into public.materials(organization_id,id,material_code,material_type,state,generation,metadata)
 values
- ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c921','DOMAIN-ROOT-MYC','strain','active',0,'{"domain":"mycology"}'::jsonb),
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c921','DOMAIN-ROOT-MYC','strain','active',0,'{}'::jsonb),
  ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c922','DOMAIN-ROOT-UNKNOWN','strain','active',0,'{}'::jsonb)
 on conflict (organization_id,id) do nothing;
 
@@ -37,6 +37,32 @@ declare
   v_domain text;
   v_rejected boolean := false;
 begin
+  -- Root-material workspace assignment is a separate owner/admin decision, not client metadata.
+  perform public.classify_legacy_biological_domain(
+    '00000000-0000-0000-0000-00000000c911',
+    'material',
+    '00000000-0000-0000-0000-00000000c921',
+    'mycology',
+    'Verified root material for workspace inheritance test'
+  );
+
+  -- A new root material cannot self-assign a workspace through metadata.
+  v_rejected := false;
+  begin
+    insert into public.materials(
+      organization_id,material_code,material_type,state,metadata
+    ) values (
+      '00000000-0000-0000-0000-00000000c911','DOMAIN-ROOT-SPOOF','strain',
+      'active','{"domain":"laboratory"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm = 'root_material_domain_requires_admin_classification' then
+      v_rejected := true;
+    else raise;
+    end if;
+  end;
+  if not v_rejected then raise exception 'FAIL: root material self-assigned a workspace domain'; end if;
+
   -- Client attempts to force laboratory while parent is mycology: server must ignore and inherit mycology.
   v_created := public.create_culture_with_generation(
     '00000000-0000-0000-0000-00000000c911',
