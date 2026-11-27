@@ -22,6 +22,8 @@ const supabaseClient =
    ============================================================ */
 
 let organizationId = null;
+  organizationRole = null;
+let organizationRole = null;
 
 // Narrow integration surface for the BAL-JSON bridge. These getters expose
 // only the current tenant context and an existing UI refresh action; no keys
@@ -72,6 +74,48 @@ window.BA_LABS_GET_BAL_JSON_CONTEXT = () => {
 };
 window.BA_LABS_IMPORT_BAL_JSON = (record) =>
   supabaseClient.functions.invoke("bal-json-ingest", { body: record });
+window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT = async () => {
+  if (!organizationId || !["owner", "admin"].includes(organizationRole)) {
+    throw new Error("La classification des archives est réservée aux propriétaires et administrateurs.");
+  }
+  const [culturesResult, materialsResult] = await Promise.all([
+    supabaseClient.from("cultures")
+      .select("id,code,culture_type,material_id,metadata")
+      .eq("organization_id", organizationId).limit(1000),
+    supabaseClient.from("materials")
+      .select("id,material_code,material_type,metadata")
+      .eq("organization_id", organizationId).limit(2000)
+  ]);
+  if (culturesResult.error) throw culturesResult.error;
+  if (materialsResult.error) throw materialsResult.error;
+  return {
+    organization_id: organizationId,
+    role: organizationRole,
+    cultures: (culturesResult.data || []).map(row => ({
+      id: row.id, code: row.code || "Culture sans code",
+      detail: row.culture_type || "type non précisé",
+      material_id: row.material_id || null,
+      metadata_domain: row.metadata?.domain || null
+    })),
+    materials: (materialsResult.data || []).map(row => ({
+      id: row.id, code: row.material_code || "Matériel sans code",
+      detail: row.material_type || "type non précisé",
+      metadata_domain: row.metadata?.domain || null
+    }))
+  };
+};
+window.BA_LABS_CLASSIFY_LEGACY_DOMAIN = async (targetType, targetId, domain, reason) => {
+  if (!organizationId || !["owner", "admin"].includes(organizationRole)) {
+    throw new Error("Droits administrateur requis.");
+  }
+  return supabaseClient.rpc("classify_legacy_biological_domain", {
+    p_organization_id: organizationId,
+    p_target_type: targetType,
+    p_target_id: targetId,
+    p_domain: domain,
+    p_reason: reason
+  });
+};
 window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
   const results = await Promise.allSettled([
     loadRecentMeasurements(),
@@ -125,6 +169,7 @@ function clearAuthenticatedWorkspaceState() {
   if (sectionNavigation) sectionNavigation.hidden = true;
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
+  organizationRole = null;
   organization = null;
   strainOptions = [];
   referenceData = [];
@@ -832,6 +877,7 @@ async function signOut() {
 
   authStateRevision += 1;
   organizationId = null;
+  organizationRole = null;
   organization = null;
   strainOptions = [];
   referenceData = [];
@@ -977,6 +1023,7 @@ async function initializeAuthenticatedTracker(
     // still current; an obsolete claim must never overwrite the active tenant.
     organization = claim.organization;
     organizationId = claim.organization.id;
+    organizationRole = claim.role || null;
 
     if (!organizationId) {
 
