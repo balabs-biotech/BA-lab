@@ -303,6 +303,9 @@ try {
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (metrics.navigationOverflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: section navigation is not horizontally scrollable (${metrics.navigationOverflowX})`);
       if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
+      if (metrics.measurementFieldLabels.length < 4) failures.push(`${workspace.slug}/${viewport.name}: scientific measurement form labels are missing (${metrics.measurementFieldLabels.length})`);
+      if (metrics.measurementControls.length < 4) failures.push(`${workspace.slug}/${viewport.name}: scientific measurement controls are missing (${metrics.measurementControls.length})`);
+      if (!metrics.statisticsTableWrap) failures.push(`${workspace.slug}/${viewport.name}: analytical table wrapper is missing`);
       for (const label of metrics.measurementFieldLabels) {
         if (Number.parseFloat(label.fontSize) < 11) failures.push(`${workspace.slug}/${viewport.name}: measurement label is below 11px (${label.fontSize})`);
         if (contrastRatio(label.color, metrics.cardBackground) < 4.5) failures.push(`${workspace.slug}/${viewport.name}: measurement label contrast is below 4.5:1 (${label.color})`);
