@@ -96,7 +96,7 @@ begin
   v_created := public.create_culture_with_generation(
     '00000000-0000-0000-0000-00000000c911',
     'DOMAIN-CHILD-MYC',
-    (select code from public.culture_types order by code limit 1),
+    'plate',
     '00000000-0000-0000-0000-00000000c921',
     null,null,null,null,null,now(),
     '{"domain":"laboratory","source":"test"}'::jsonb
@@ -111,30 +111,13 @@ begin
     raise exception 'FAIL: derived material/culture did not inherit parent domain';
   end if;
 
-  -- Derived material cannot spoof a domain that conflicts with its biological parent.
-  v_rejected := false;
-  begin
-    insert into public.materials(
-      organization_id,material_code,material_type,parent_material_id,state,metadata
-    ) values (
-      '00000000-0000-0000-0000-00000000c911','DOMAIN-SPOOF-MATERIAL','derived',
-      '00000000-0000-0000-0000-00000000c921','active','{"domain":"laboratory"}'::jsonb
-    );
-  exception when others then
-    if sqlerrm in ('derived_material_domain_mismatch','invalid_biological_domain') then
-      v_rejected := true;
-    else raise;
-    end if;
-  end;
-  if not v_rejected then raise exception 'FAIL: derived material accepted spoofed domain'; end if;
-
   -- An unclassified parent cannot be used to create a culture with a client-supplied domain.
   v_rejected := false;
   begin
     perform public.create_culture_with_generation(
       '00000000-0000-0000-0000-00000000c911',
       'DOMAIN-CHILD-UNKNOWN',
-      (select code from public.culture_types order by code limit 1),
+      'plate',
       '00000000-0000-0000-0000-00000000c922',
       null,null,null,null,null,now(),
       '{"domain":"mycology"}'::jsonb
@@ -144,20 +127,6 @@ begin
   end;
   if not v_rejected then raise exception 'FAIL: creation accepted unclassified parent material'; end if;
 
-  -- Direct culture insert also inherits the material domain, and cannot override it.
-  v_rejected := false;
-  begin
-    insert into public.cultures(organization_id,code,culture_type,material_id,metadata)
-    values (
-      '00000000-0000-0000-0000-00000000c911','DOMAIN-DIRECT-SPOOF',
-      (select code from public.culture_types order by code limit 1),
-      '00000000-0000-0000-0000-00000000c921','{"domain":"laboratory"}'::jsonb
-    );
-  exception when others then
-    if sqlerrm = 'culture_domain_mismatch_with_parent_material' then v_rejected := true; else raise; end if;
-  end;
-  if not v_rejected then raise exception 'FAIL: direct culture insert accepted conflicting domain'; end if;
-
   -- SECURITY DEFINER must not let a read-only viewer create a culture.
   perform set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000c902',true);
   v_rejected := false;
@@ -165,7 +134,7 @@ begin
     perform public.create_culture_with_generation(
       '00000000-0000-0000-0000-00000000c911',
       'DOMAIN-VIEWER-MUST-FAIL',
-      (select code from public.culture_types order by code limit 1),
+      'plate',
       '00000000-0000-0000-0000-00000000c921',
       null,null,null,null,null,now(),'{}'::jsonb
     );
@@ -177,5 +146,44 @@ end;
 $test$;
 
 reset role;
+-- Direct table-insert trigger tests run as the migration owner because the
+-- authenticated application role intentionally has no direct write grants.
+do $direct_insert_guards$
+begin
+  begin
+    insert into public.materials(
+      organization_id,material_code,material_type,parent_material_id,state,metadata
+    ) values (
+      '00000000-0000-0000-0000-00000000c911','DOMAIN-SPOOF-MATERIAL','derived',
+      '00000000-0000-0000-0000-00000000c921','active','{"domain":"laboratory"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm in ('derived_material_domain_mismatch','invalid_biological_domain') then
+      null;
+    else raise;
+    end if;
+  end;
+  if exists (select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000c911' and material_code='DOMAIN-SPOOF-MATERIAL') then
+    raise exception 'FAIL: derived material accepted spoofed domain';
+  end if;
+
+  begin
+    insert into public.cultures(organization_id,code,culture_type,material_id,metadata)
+    values (
+      '00000000-0000-0000-0000-00000000c911','DOMAIN-DIRECT-SPOOF',
+      'plate','00000000-0000-0000-0000-00000000c921','{"domain":"laboratory"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm = 'culture_domain_mismatch_with_parent_material' then
+      null;
+    else raise;
+    end if;
+  end;
+  if exists (select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000c911' and code='DOMAIN-DIRECT-SPOOF') then
+    raise exception 'FAIL: direct culture insert accepted conflicting domain';
+  end if;
+end;
+$direct_insert_guards$;
+
 rollback;
 select 'PASS: trusted culture domain inheritance and anti-spoofing' as test_result;
