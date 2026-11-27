@@ -56,8 +56,7 @@
   stage.addEventListener("wheel", event => {
     if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
-    const label = shell.querySelector(".lineage-graph-zoom-label");
-    applyZoom(currentZoom + (event.deltaY < 0 ? 0.08 : -0.08));
+    applyZoom(zoom + (event.deltaY < 0 ? 0.08 : -0.08));
   }, { passive: false });
   let PIXI = null;
   let app = null;
