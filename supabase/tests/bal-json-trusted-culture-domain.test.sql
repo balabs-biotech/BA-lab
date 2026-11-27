@@ -45,6 +45,18 @@ begin
     'mycology',
     'Verified root material for workspace inheritance test'
   );
+  if public.resolve_material_biological_domain(
+       '00000000-0000-0000-0000-00000000c911',
+       '00000000-0000-0000-0000-00000000c921'
+     ) is distinct from 'mycology' then
+    raise exception 'FAIL: material domain resolver ignored audited root classification';
+  end if;
+  if public.resolve_material_biological_domain(
+       '00000000-0000-0000-0000-00000000c911',
+       '00000000-0000-0000-0000-00000000c922'
+     ) is not null then
+    raise exception 'FAIL: unclassified root material received a workspace domain';
+  end if;
 
   -- A new root material cannot self-assign a workspace through metadata.
   v_rejected := false;
