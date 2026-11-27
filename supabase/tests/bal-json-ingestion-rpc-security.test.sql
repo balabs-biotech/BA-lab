@@ -42,8 +42,11 @@ begin
 
   if not exists (select 1 from pg_trigger where tgrelid = 'public.cultures'::regclass and tgname = 'cultures_domain_immutable' and not tgisinternal)
      or not exists (select 1 from pg_trigger where tgrelid = 'public.materials'::regclass and tgname = 'materials_domain_immutable' and not tgisinternal)
-     or not exists (select 1 from pg_trigger where tgrelid = 'public.plant_cultures'::regclass and tgname = 'plant_cultures_domain_immutable' and not tgisinternal) then
-    raise exception 'FAIL: biological domain metadata must be protected against later rewrites';
+     or not exists (select 1 from pg_trigger where tgrelid = 'public.plant_cultures'::regclass and tgname = 'plant_cultures_domain_immutable' and not tgisinternal)
+     or not exists (select 1 from pg_trigger where tgrelid = 'public.cultures'::regclass and tgname = 'cultures_domain_insert_guard' and not tgisinternal)
+     or not exists (select 1 from pg_trigger where tgrelid = 'public.materials'::regclass and tgname = 'materials_domain_insert_guard' and not tgisinternal)
+     or not exists (select 1 from pg_trigger where tgrelid = 'public.plant_cultures'::regclass and tgname = 'plant_cultures_domain_insert_guard' and not tgisinternal) then
+    raise exception 'FAIL: biological domain metadata must be validated on insert and protected against later rewrites';
   end if;
 
   if public.is_bal_json_variable_allowed('mycology', 'cfu') is not true
