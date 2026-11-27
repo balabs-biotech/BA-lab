@@ -48,6 +48,7 @@ assert.ok(lineage.includes('data-graph-zoom="fit"'), "PixiJS lineage graph must 
 assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS lineage graph must support pointer panning without capturing node taps");
 assert.equal((lineage.match(/window\.addEventListener\("pointermove"/g) || []).length, 1, "Lineage graph must register pointer listeners once, not on every render");
 assert.ok(lineage.includes("graphWidth * zoom") && lineage.includes("graphHeight * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
+assert.ok(lineage.includes("function showFallback(message, revealList = false)") && lineage.includes("if (app) { app.destroy(true, true); app = null; }\n    stage.replaceChildren();"), "Lineage renderer must release its PixiJS application when entering fallback");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycology.includes(".lineage-graph-toolbar button:focus-visible"), "Mycology lineage controls must expose a visible keyboard focus state");
 assert.ok(mycology.includes("min-width:40px !important") && mycology.includes("min-height:40px !important"), "Mycology lineage controls must meet the 40px touch target");
@@ -117,5 +118,6 @@ assert.ok(mycologyActivity.includes("shell.dataset.state = \"ready\"") && mycolo
 assert.ok(greenClimate.includes("panel.dataset.state = \"empty\"") && greenClimate.includes("panel.dataset.state = \"ready\"") && greenClimate.includes("panel.dataset.state = \"fallback\""), "GreenTech climate signature must distinguish empty, ready and fallback states");
 assert.ok(laboratoryProcess.includes("shell.dataset.state = \"empty\"") && laboratoryProcess.includes("shell.dataset.state = \"ready\"") && laboratoryProcess.includes("shell.dataset.state = \"fallback\""), "Laboratory process map must distinguish empty, ready and fallback states");
 assert.ok(greenClimate.includes("renderText(series)"), "GreenTech must retain textual climate values when graphical rendering is unavailable");
+assert.ok(greenClimate.includes("if (!charts) {\n      destroy();\n      panel.hidden = true;\n      panel.dataset.state = \"empty\";"), "GreenTech must release stale charts when its source panel disappears");
 assert.ok(laboratoryProcess.includes("querySelectorAll(\":scope > .stage\")"), "Laboratory map must only project the currently selected batch stages");
 assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology must load the activity timeline runtime");
