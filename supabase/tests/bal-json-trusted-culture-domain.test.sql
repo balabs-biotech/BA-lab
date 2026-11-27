@@ -118,7 +118,7 @@ begin
     if sqlerrm = 'organization_write_access_denied' then v_rejected := true; else raise; end if;
   end;
   if not v_rejected then raise exception 'FAIL: viewer created culture through SECURITY DEFINER RPC'; end if;
-end
+end;
 $;
 
 reset role;
