@@ -56,6 +56,9 @@
     note.className = "mycology-activity-status";
     note.textContent = message;
     stage.appendChild(note);
+    pageLabel.textContent = "Liste complète";
+    previousPage.disabled = true;
+    nextPage.disabled = true;
     shell.dataset.state = "fallback";
   }
 
