@@ -94,12 +94,17 @@
     const liveContext = typeof window.BA_LABS_GET_BAL_JSON_CONTEXT === "function"
       ? window.BA_LABS_GET_BAL_JSON_CONTEXT()
       : { organization_id: currentOrganization(), workspace: domain, targets: [], variables: [], units: [] };
+    const organizationId = liveContext.organization_id || currentOrganization();
+    const targets = Array.isArray(liveContext.targets) ? liveContext.targets : [];
+    const variables = Array.isArray(liveContext.variables) ? liveContext.variables : [];
+    const units = Array.isArray(liveContext.units) ? liveContext.units : [];
+    const catalogueReady = uuid(organizationId) && targets.length > 0 && variables.length > 0 && units.length > 0;
     const contextCatalogue = JSON.stringify({
-      organization_id: liveContext.organization_id || currentOrganization(),
+      organization_id: catalogueReady ? organizationId : null,
       workspace: liveContext.workspace || domain,
-      targets: Array.isArray(liveContext.targets) ? liveContext.targets : [],
-      variables: Array.isArray(liveContext.variables) ? liveContext.variables : [],
-      units: Array.isArray(liveContext.units) ? liveContext.units : []
+      targets,
+      variables,
+      units
     }, null, 2);
     const workspace = domain === "mycology"
       ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification"
@@ -159,6 +164,12 @@ Utilise exactement organization_id et les UUID de cible du catalogue. Pour un lo
 }
 
 Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
+
+    const safePrompt = catalogueReady ? promptText : promptText.replace(
+      "## Catalogue réel extrait de l’espace CultureOps actif",
+      "## CATALOGUE INDISPONIBLE — ARRÊT OBLIGATOIRE\n\nAucune session CultureOps authentifiée ou catalogue complet n’a été détecté. Ne demande jamais à l’utilisateur de fournir un UUID, ne déduis aucun identifiant et ne produis aucun objet BAL-JSON. Demande uniquement de se connecter à CultureOps, d’attendre le chargement des données, puis de recopier ce prompt depuis l’application.\n\n## Catalogue réel extrait de l’espace CultureOps actif"
+    );
+    return { text: safePrompt, catalogueReady };
   }
 
   async function copyText(text) {
@@ -171,15 +182,16 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
   }
 
   promptButton.addEventListener("click", async () => {
-    try { await copyText(buildPrompt()); status.textContent = "Prompt CultureOps copié. Collez-le dans votre LLM généraliste."; status.dataset.state = "success"; }
+    try { const prompt = buildPrompt(); await copyText(prompt.text); status.textContent = prompt.catalogueReady ? "Prompt CultureOps copié. Collez-le dans votre LLM généraliste." : "Prompt copié, mais catalogue indisponible : connectez-vous et régénérez-le après chargement des données."; status.dataset.state = prompt.catalogueReady ? "success" : "error"; }
     catch (error) { status.textContent = error.message; status.dataset.state = "error"; }
   });
   downloadButton.addEventListener("click", () => {
-    const blob = new Blob([buildPrompt()], { type: "text/markdown;charset=utf-8" });
+    const prompt = buildPrompt();
+    const blob = new Blob([prompt.text], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob); const link = document.createElement("a");
     link.href = url; link.download = "BA-Labs-CultureOps-prompt-BAL-JSON.md";
     document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
-    status.textContent = "Prompt téléchargé au format Markdown."; status.dataset.state = "success";
+    status.textContent = prompt.catalogueReady ? "Prompt téléchargé au format Markdown." : "Prompt téléchargé, mais catalogue indisponible : connectez-vous et régénérez-le après chargement des données."; status.dataset.state = prompt.catalogueReady ? "success" : "error";
   });
   schemaButton.addEventListener("click", async () => {
     try { await copyText(JSON.stringify(schema, null, 2)); status.textContent = "Contrat BAL-JSON copié."; status.dataset.state = "success"; }
