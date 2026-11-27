@@ -256,6 +256,11 @@ begin
   v_batch_id := nullif(p_event->>'batch_id','')::uuid;
   v_variable_code := nullif(p_data->>'variable_code','');
 
+  if nullif(p_event->>'culture_id','')::uuid is distinct from v_culture_id
+     or nullif(p_event->>'plant_culture_id','')::uuid is distinct from v_plant_culture_id then
+    raise exception 'BAL-JSON event and data biological anchors do not match' using errcode = '22023';
+  end if;
+
   if v_variable_code is null then
     raise exception 'BAL-JSON variable code is required' using errcode = '22023';
   end if;
