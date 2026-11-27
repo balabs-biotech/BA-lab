@@ -30,7 +30,7 @@ begin
      v_definition not ilike '%set event_id = v_event_id%' then
     raise exception 'FAIL: duplicate retries must lock and return the original committed event receipt';
   end if;
-  if v_definition not ilike '%set search_path to ''''' then
+  if position('set search_path to ' || chr(39) || chr(39) in lower(v_definition)) = 0 then
     raise exception 'FAIL: BAL-JSON SECURITY DEFINER RPC must use an empty search_path';
   end if;
   if not exists (
