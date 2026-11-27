@@ -12,12 +12,16 @@ for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycolo
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
   assert.match(html, /20261126-bal-json-live-catalogue-2/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
 }
-for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
+for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus","legacyDomainAdminPanel","legacyDomainTarget","legacyDomainValue","legacyDomainReason","legacyDomainClassifyButton","legacyDomainAdminStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
 }
 assert.match(tracker, /window\.BA_LABS_IMPORT_BAL_JSON\s*=\s*\(record\)\s*=>\s*supabaseClient\.functions\.invoke/, "tracker must expose only the authenticated BAL-JSON import operation");
 assert.doesNotMatch(tracker, /window\.BA_LABS_SUPABASE_CLIENT/, "tracker must not expose the whole Supabase client to the bridge");
 assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
+assert.match(tracker, /window\.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT/, "tracker must expose a narrow owner/admin-only legacy classification catalogue");
+assert.match(tracker, /window\.BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "tracker must expose the authenticated classification RPC only");
+assert.match(tracker, /organizationRole\s*=\s*claim\.role/, "admin capability must use the role returned by the authenticated organization claim");
+assert.match(source, /classify_legacy_biological_domain|BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "admin panel must submit the audited classification operation");
 
 function element(id) {
   return {
@@ -59,6 +63,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
   const window = {
     BA_LABS_DOMAIN: domain,
+    addEventListener() {},
     BA_LABS_IMPORT_BAL_JSON: importBalJson,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
