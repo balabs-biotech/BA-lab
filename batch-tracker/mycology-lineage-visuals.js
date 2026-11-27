@@ -22,6 +22,28 @@
   details.appendChild(target);
 
   const stage = shell.querySelector(".lineage-graph-stage");
+  let drag = null;
+  stage.addEventListener("pointerdown", event => {
+    if (event.target?.classList?.contains("lineage-graph-canvas")) {
+      drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
+      stage.classList.add("is-panning");
+    }
+  });
+  window.addEventListener("pointermove", event => {
+    if (!drag) return;
+    stage.scrollLeft = drag.left - (event.clientX - drag.x);
+    stage.scrollTop = drag.top - (event.clientY - drag.y);
+  });
+  const stopDrag = () => { drag = null; stage.classList.remove("is-panning"); };
+  window.addEventListener("pointerup", stopDrag);
+  window.addEventListener("pointercancel", stopDrag);
+  stage.addEventListener("wheel", event => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    const label = shell.querySelector(".lineage-graph-zoom-label");
+    const currentZoom = Number.parseInt(label?.textContent || "100", 10) / 100;
+    applyZoom(currentZoom + (event.deltaY < 0 ? 0.08 : -0.08));
+  }, { passive: false });
   let PIXI = null;
   let app = null;
   let frame = 0;
@@ -135,26 +157,6 @@
         applyZoom(1);
         stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
       });
-      let drag = null;
-      stage.addEventListener("pointerdown", event => {
-        if (event.target === nextApp.canvas) {
-          drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
-          stage.classList.add("is-panning");
-        }
-      });
-      window.addEventListener("pointermove", event => {
-        if (!drag) return;
-        stage.scrollLeft = drag.left - (event.clientX - drag.x);
-        stage.scrollTop = drag.top - (event.clientY - drag.y);
-      });
-      const stopDrag = () => { drag = null; stage.classList.remove("is-panning"); };
-      window.addEventListener("pointerup", stopDrag);
-      window.addEventListener("pointercancel", stopDrag);
-      stage.addEventListener("wheel", event => {
-        if (!event.ctrlKey && !event.metaKey) return;
-        event.preventDefault();
-        applyZoom(zoom + (event.deltaY < 0 ? 0.08 : -0.08));
-      }, { passive: false });
       const nodeWidth = 184, nodeHeight = 68;
       const byId = graph.positions;
       const drawEdge = (from, to) => {
