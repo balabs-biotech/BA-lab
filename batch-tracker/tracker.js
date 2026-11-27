@@ -94,32 +94,12 @@ async function getAuthenticatedDomainAdminRole(expectedOrganizationId) {
 window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT = async () => {
   const expectedOrganizationId = organizationId;
   const role = await getAuthenticatedDomainAdminRole(expectedOrganizationId);
-  const [culturesResult, materialsResult] = await Promise.all([
-    supabaseClient.from("cultures")
-      .select("id,code,culture_type,material_id,metadata_domain:metadata->>domain")
-      .eq("organization_id", expectedOrganizationId).limit(1000),
-    supabaseClient.from("materials")
-      .select("id,material_code,material_type,metadata_domain:metadata->>domain")
-      .eq("organization_id", expectedOrganizationId).limit(2000)
-  ]);
+  const { data, error } = await supabaseClient.rpc("get_biological_domain_admin_context", {
+    p_organization_id: expectedOrganizationId
+  });
   if (organizationId !== expectedOrganizationId) throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
-  if (culturesResult.error) throw culturesResult.error;
-  if (materialsResult.error) throw materialsResult.error;
-  return {
-    organization_id: expectedOrganizationId,
-    role,
-    cultures: (culturesResult.data || []).map(row => ({
-      id: row.id, code: row.code || "Culture sans code",
-      detail: row.culture_type || "type non précisé",
-      material_id: row.material_id || null,
-      metadata_domain: row.metadata_domain || null
-    })),
-    materials: (materialsResult.data || []).map(row => ({
-      id: row.id, code: row.material_code || "Matériel sans code",
-      detail: row.material_type || "type non précisé",
-      metadata_domain: row.metadata?.domain || null
-    }))
-  };
+  if (error) throw error;
+  return { ...(data || {}), organization_id: expectedOrganizationId, role };
 };
 window.BA_LABS_CLASSIFY_LEGACY_DOMAIN = async (targetType, targetId, domain, reason) => {
   const expectedOrganizationId = organizationId;
