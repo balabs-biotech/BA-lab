@@ -16,6 +16,7 @@
   const zoomLabel = shell.querySelector("[data-activity-zoom-label]");
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   let PIXI = null, app = null, zoom = 1, baseWidth = 0, frame = 0, revision = 0, pageIndex = 0;
+  let pendingApp = null;
   const pageSize = 24;
   const pageLabel = shell.querySelector("[data-activity-page-label]");
   const previousPage = shell.querySelector('[data-activity-page="prev"]');
@@ -118,10 +119,11 @@
       const nodeWidth = 176, gap = 24, left = 22;
       baseWidth = Math.max(340, left * 2 + ordered.length * nodeWidth + Math.max(0, ordered.length - 1) * gap);
       const height = 190;
-      const next = new pixi.Application();
+      const next = pendingApp = new pixi.Application();
       await next.init({ width: baseWidth, height, backgroundAlpha: 0, antialias: true, autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 1.5), autoStart: false, preference: "webgl" });
       if (token !== revision) { next.destroy(true, true); return; }
       app = next;
+      pendingApp = null;
       next.canvas.className = "mycology-activity-canvas";
       next.canvas.setAttribute("aria-hidden", "true");
       next.canvas.style.width = baseWidth + "px";
@@ -162,6 +164,7 @@
       shell.dataset.state = "ready";
     } catch (error) {
       console.info("BA Labs: chronologie PixiJS indisponible; historique textuel conservé.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       fallback("La chronologie graphique est indisponible. L’historique détaillé reste accessible.");
     }
   }
