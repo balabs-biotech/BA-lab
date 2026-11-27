@@ -506,6 +506,31 @@ try {
           ["#batchEventList", "batch-event-item", "Événement de traçabilité"],
         ];
         const checks = [];
+        const visualizationHost = document.querySelector("#trackerCard") || document.body;
+        const visualizationFixture = document.createElement("section");
+        visualizationFixture.className = "visualization-browser-fixture";
+        visualizationFixture.innerHTML = `
+          <div class="mycology-activity-map">
+            <div class="mycology-activity-tools"><button type="button">−</button><button type="button">+</button><button type="button">Ajuster</button></div>
+            <div class="mycology-activity-stage"></div>
+          </div>
+          <div class="lineage-graph-shell"><div class="lineage-graph-toolbar"><button type="button">−</button><button type="button">+</button><button type="button">Recentrer</button></div></div>
+          <div class="lab-process-map"><div class="lab-process-map-controls"><button type="button">−</button><button type="button">+</button><button type="button">Ajuster</button></div><div class="lab-process-map-stage"></div></div>
+          <div class="greentech-climate-signature"><div class="greentech-climate-plot"></div><ul class="greentech-climate-values"><li>Température <strong>24 °C</strong></li></ul></div>
+        `;
+        visualizationHost.appendChild(visualizationFixture);
+        const visualizationControls = [...visualizationFixture.querySelectorAll(".mycology-activity-tools button,.lineage-graph-toolbar button,.lab-process-map-controls button")].map(button => {
+          const style = getComputedStyle(button);
+          return { group: button.parentElement.className, minWidth: style.minWidth, minHeight: style.minHeight, focusStyle: style.outlineStyle };
+        });
+        const visualizationStages = [...visualizationFixture.querySelectorAll(".mycology-activity-stage,.lab-process-map-stage")].map(stage => ({
+          className: stage.className, overflowX: getComputedStyle(stage).overflowX, minWidth: getComputedStyle(stage).minWidth
+        }));
+        const visualizationClimate = {
+          plotOverflow: getComputedStyle(visualizationFixture.querySelector(".greentech-climate-plot")).overflowX,
+          valuesColumns: getComputedStyle(visualizationFixture.querySelector(".greentech-climate-values")).gridTemplateColumns
+        };
+        visualizationFixture.remove();
         for (const [parentSelector, className, label] of fixtures) {
           const parent = document.querySelector(parentSelector);
           if (!parent) {
@@ -567,6 +592,9 @@ try {
           catalogLayout: getComputedStyle(document.querySelector("#cultureCatalogList")).display,
           measurementLayout: getComputedStyle(document.querySelector("#measurementHistory")).display,
           detailGrid: getComputedStyle(document.querySelector("#cultureDetailSummary")).gridTemplateColumns,
+          visualizationControls,
+          visualizationStages,
+          visualizationClimate,
         };
       });
       for (const check of interiorState.checks) {
@@ -577,6 +605,17 @@ try {
       }
       if (interiorState.catalogLayout !== "grid" || interiorState.measurementLayout !== "grid") {
         failures.push(`${workspace.slug}/${viewport.name}: interior list layout not applied (${JSON.stringify(interiorState)})`);
+      }
+      for (const control of interiorState.visualizationControls) {
+        if (Number.parseFloat(control.minWidth) < 40 || Number.parseFloat(control.minHeight) < 40) {
+          failures.push(`${workspace.slug}/${viewport.name}: scientific visualization control is below 40px (${JSON.stringify(control)})`);
+        }
+      }
+      for (const stage of interiorState.visualizationStages) {
+        if (stage.overflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: scientific visualization stage is not horizontally scrollable (${JSON.stringify(stage)})`);
+      }
+      if (workspace.domain === "agronomy" && interiorState.visualizationClimate.plotOverflow !== "hidden") {
+        failures.push(`${workspace.slug}/${viewport.name}: GreenTech climate plot must clip its responsive chart surface (${interiorState.visualizationClimate.plotOverflow})`);
       }
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
       if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);
