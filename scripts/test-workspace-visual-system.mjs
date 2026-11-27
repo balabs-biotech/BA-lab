@@ -111,6 +111,7 @@ assert.ok(mycologyActivity.includes("L’historique détaillé reste accessible"
 assert.ok(mycologyActivityStyles.includes(".mycology-activity-stage"), "Mycology timeline must provide a bounded scrollable visualization");
 assert.ok(mycologyActivity.includes("if (!entries.length)"), "Mycology timeline must explicitly handle a genuinely empty culture history");
 assert.ok(mycologyActivity.includes("const pageSize = 24") && mycologyActivity.includes("data-activity-page=\"prev\"") && mycologyActivity.includes("data-activity-page=\"next\""), "Mycology timeline must paginate long histories without dropping records");
+assert.ok(mycologyActivity.includes('pageLabel.textContent = "Liste complète"') && mycologyActivity.includes("previousPage.disabled = true") && mycologyActivity.includes("nextPage.disabled = true"), "Mycology timeline controls must disable cleanly when the graphic falls back");
 assert.ok(mycologyActivityStyles.includes("flex-wrap:wrap"), "Mycology timeline controls must wrap on narrow screens");
 assert.ok(mycologyActivity.includes("shell.dataset.state = \"ready\"") && mycologyActivity.includes("shell.dataset.state = \"fallback\""), "Mycology timeline must expose ready and fallback render states");
 assert.ok(greenClimate.includes("panel.dataset.state = \"empty\"") && greenClimate.includes("panel.dataset.state = \"ready\"") && greenClimate.includes("panel.dataset.state = \"fallback\""), "GreenTech climate signature must distinguish empty, ready and fallback states");
