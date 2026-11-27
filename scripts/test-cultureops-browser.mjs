@@ -505,6 +505,28 @@ try {
         await page.waitForFunction(() => window.scrollY === 0);
         const overviewPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}-overview-preview.png`);
         await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
+        if (workspace.domain === "mycology") {
+          const visibleContrast = await page.evaluate(() => {
+            const root = document.querySelector("#measurementCard");
+            const headings = [...(root?.querySelectorAll("h1,h2,h3,h4,h5,h6") || [])]
+              .filter(node => node.getClientRects().length)
+              .map(node => ({ text: node.textContent.trim(), color: getComputedStyle(node).color }));
+            const kickers = [...(root?.querySelectorAll(".section-kicker,.section-label,.panel-kicker,.context-eyebrow") || [])]
+              .filter(node => node.getClientRects().length)
+              .map(node => ({ text: node.textContent.trim(), color: getComputedStyle(node).color }));
+            return { visible: !!root && root.getBoundingClientRect().height > 0, headings, kickers };
+          });
+          const expectedHeading = "rgb(240, 238, 232)";
+          const expectedKicker = "rgb(226, 176, 146)";
+          if (!visibleContrast.visible || !visibleContrast.headings.length ||
+              visibleContrast.headings.some(item => item.color !== expectedHeading)) {
+            failures.push(`${workspace.slug}/${viewport.name}: visible Mycology module headings are not mineral-light (${JSON.stringify(visibleContrast.headings)})`);
+          }
+          if (!visibleContrast.kickers.length ||
+              visibleContrast.kickers.some(item => item.color !== expectedKicker)) {
+            failures.push(`${workspace.slug}/${viewport.name}: visible Mycology module kickers are not light copper (${JSON.stringify(visibleContrast.kickers)})`);
+          }
+        }
         const overviewState = await page.evaluate(() => {
           const card = document.querySelector("#overviewCard");
           return {
