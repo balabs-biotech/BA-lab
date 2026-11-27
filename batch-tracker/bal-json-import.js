@@ -18,6 +18,7 @@
   const promptButton = $("balJsonCopyPromptButton");
   const downloadButton = $("balJsonDownloadPromptButton");
   const schemaButton = $("balJsonCopySchemaButton");
+  const adminPanel = $("legacyDomainAdminPanel");
   let approvedRecord = null;
   let approvedOrganization = null;
 
@@ -47,6 +48,78 @@
       review_status: "unreviewed"
     }
   };
+
+
+  async function setupLegacyDomainAdmin() {
+    if (!adminPanel || domain === "agronomy") return;
+    const targetSelect = $("legacyDomainTarget");
+    const domainSelect = $("legacyDomainValue");
+    const reasonInput = $("legacyDomainReason");
+    const classifyButton = $("legacyDomainClassifyButton");
+    const adminStatus = $("legacyDomainAdminStatus");
+    const getContext = window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT;
+    if (typeof getContext !== "function") return;
+    try {
+      const context = await getContext();
+      if (!["owner", "admin"].includes(context.role)) return;
+      adminPanel.dataset.organizationId = context.organization_id;
+      adminPanel.hidden = false;
+      targetSelect.replaceChildren(new Option("Sélectionner une archive…", ""));
+      const addGroup = (label, rows, type) => {
+        if (!rows.length) return;
+        const group = document.createElement("optgroup");
+        group.label = label;
+        rows.forEach(row => {
+          const option = new Option(
+            [row.code, row.detail, row.metadata_domain ? "domaine déclaré : " + row.metadata_domain : "domaine à confirmer"].join(" · "),
+            type + ":" + row.id
+          );
+          group.appendChild(option);
+        });
+        targetSelect.appendChild(group);
+      };
+      addGroup("Cultures", (context.cultures || []).filter(row => !row.metadata_domain), "culture");
+      addGroup("Matériels / souches", (context.materials || []).filter(row => !row.metadata_domain), "material");
+      if (!targetSelect.options.length) targetSelect.add(new Option("Aucune archive accessible", ""));
+      classifyButton.onclick = async () => {
+        if (adminPanel.dataset.organizationId !== context.organization_id) {
+          adminStatus.textContent = "L’organisation active a changé. Rechargez le panneau avant de continuer.";
+          return;
+        }
+        const [targetType, targetId] = targetSelect.value.split(":");
+        const reason = reasonInput.value.trim();
+        if (!targetType || !targetId) { adminStatus.textContent = "Sélectionnez une culture ou un matériel."; return; }
+        if (reason.length < 8 || reason.length > 500) { adminStatus.textContent = "La justification doit contenir entre 8 et 500 caractères."; return; }
+        classifyButton.disabled = true;
+        adminStatus.textContent = "Vérification des droits et enregistrement de la décision…";
+        try {
+          const classify = window.BA_LABS_CLASSIFY_LEGACY_DOMAIN;
+          if (typeof classify !== "function") throw new Error("Canal de classification indisponible.");
+          const { data, error } = await classify(targetType, targetId, domainSelect.value, reason);
+          if (error) throw error;
+          adminStatus.textContent = data?.status === "already_classified"
+            ? "Cette archive possède déjà cette classification. Aucune modification effectuée."
+            : "Classification enregistrée et auditée. La décision est immuable.";
+          reasonInput.value = "";
+          await setupLegacyDomainAdmin();
+        } catch (error) {
+          adminStatus.textContent = "Classification refusée : " + (error.message || "erreur inconnue");
+        } finally { classifyButton.disabled = false; }
+      };
+    } catch (error) {
+      adminPanel.hidden = true;
+      console.warn("Administration des domaines biologiques indisponible :", error);
+    }
+  }
+  window.addEventListener("ba-labs-organization-ready", setupLegacyDomainAdmin);
+  window.addEventListener("ba-labs-organization-cleared", () => {
+    if (adminPanel) { adminPanel.hidden = true; adminPanel.dataset.organizationId = ""; }
+    const classifyButton = $("legacyDomainClassifyButton");
+    if (classifyButton) classifyButton.onclick = null;
+    const targetSelect = $("legacyDomainTarget");
+    if (targetSelect) targetSelect.replaceChildren(new Option("Connectez-vous pour charger les archives…", ""));
+  });
+  setupLegacyDomainAdmin();
 
   function currentOrganization() {
     return typeof window.BA_LABS_GET_ORGANIZATION_ID === "function"

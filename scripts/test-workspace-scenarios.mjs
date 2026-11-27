@@ -513,3 +513,22 @@ assert.match(reloadListener,
   /const operationRevision = authStateRevision;[\s\S]*?const operationOrganizationId = organizationId;[\s\S]*?loadRecentMeasurements\(\)\.catch\(error => \{[\s\S]*?if \(!isCurrentWorkspaceRevision\(operationRevision, operationOrganizationId\)\) return;[\s\S]*?showMessage\(error\.message, "error"\);/,
   "measurement-history reload errors must be discarded after a workspace transition");
 console.log("✓ Measurement history reload: stale errors are discarded");
+
+const cultureCreationRpc = engine.slice(
+  engine.indexOf('create_culture_with_generation'),
+  engine.indexOf('create_culture_with_generation') + 2600
+);
+assert.ok(cultureCreationRpc.includes('p_metadata: {') && cultureCreationRpc.includes('interface_version: "2.0"'));
+assert.ok(!cultureCreationRpc.includes('domain: document.body.dataset.domain'),
+  "client workspace metadata must not be authoritative for biological domain assignment");
+assert.ok(engine.includes("Un propriétaire ou administrateur doit d’abord le classer"),
+  "unclassified parent materials need an actionable admin explanation");
+console.log("✓ Culture creation: biological domain is server-derived and unclassified parents have actionable guidance");
+
+const strainLoaderStart = engine.indexOf("async function loadStrainOptions()");
+const strainLoaderEnd = engine.indexOf("/* ============================================================", strainLoaderStart);
+const strainLoader = engine.slice(strainLoaderStart, strainLoaderEnd);
+assert.ok(strainLoader.includes('["mycology", "laboratory"].includes(activeDomain)'));
+assert.ok(strainLoader.includes('"biological_domain"') && strainLoader.includes('activeDomain'),
+  "culture parent material options must be filtered by the active biological workspace");
+console.log("✓ Culture creation parent choices are isolated by audited biological workspace domain");

@@ -72,6 +72,47 @@ window.BA_LABS_GET_BAL_JSON_CONTEXT = () => {
 };
 window.BA_LABS_IMPORT_BAL_JSON = (record) =>
   supabaseClient.functions.invoke("bal-json-ingest", { body: record });
+async function getAuthenticatedDomainAdminRole(expectedOrganizationId) {
+  if (!expectedOrganizationId || organizationId !== expectedOrganizationId) {
+    throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
+  }
+  const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+  if (authError || !authData?.user?.id) throw new Error("Session authentifiée indisponible.");
+  const { data: membership, error: membershipError } = await supabaseClient
+    .from("organization_members")
+    .select("role")
+    .eq("organization_id", expectedOrganizationId)
+    .eq("user_id", authData.user.id)
+    .maybeSingle();
+  if (membershipError) throw membershipError;
+  const role = membership?.role || null;
+  if (!["owner", "admin"].includes(role)) {
+    throw new Error("La classification des archives est réservée aux propriétaires et administrateurs.");
+  }
+  return role;
+}
+window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT = async () => {
+  const expectedOrganizationId = organizationId;
+  const role = await getAuthenticatedDomainAdminRole(expectedOrganizationId);
+  const { data, error } = await supabaseClient.rpc("get_biological_domain_admin_context", {
+    p_organization_id: expectedOrganizationId
+  });
+  if (organizationId !== expectedOrganizationId) throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
+  if (error) throw error;
+  return { ...(data || {}), organization_id: expectedOrganizationId, role };
+};
+window.BA_LABS_CLASSIFY_LEGACY_DOMAIN = async (targetType, targetId, domain, reason) => {
+  const expectedOrganizationId = organizationId;
+  await getAuthenticatedDomainAdminRole(expectedOrganizationId);
+  if (organizationId !== expectedOrganizationId) throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
+  return supabaseClient.rpc("classify_legacy_biological_domain", {
+    p_organization_id: expectedOrganizationId,
+    p_target_type: targetType,
+    p_target_id: targetId,
+    p_domain: domain,
+    p_reason: reason
+  });
+};
 window.BA_LABS_REFRESH_EXPERIMENTAL_DATA = async () => {
   const results = await Promise.allSettled([
     loadRecentMeasurements(),
@@ -150,6 +191,9 @@ function clearAuthenticatedWorkspaceState() {
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
   if (saveObservationButton) saveObservationButton.disabled = true;
+  if (typeof window !== "undefined" && typeof CustomEvent !== "undefined") {
+    window.dispatchEvent(new CustomEvent("ba-labs-organization-cleared"));
+  }
 }
 
 
@@ -832,6 +876,7 @@ async function signOut() {
 
   authStateRevision += 1;
   organizationId = null;
+  organizationRole = null;
   organization = null;
   strainOptions = [];
   referenceData = [];
@@ -977,6 +1022,7 @@ async function initializeAuthenticatedTracker(
     // still current; an obsolete claim must never overwrite the active tenant.
     organization = claim.organization;
     organizationId = claim.organization.id;
+    window.dispatchEvent(new CustomEvent("ba-labs-organization-ready"));
 
     if (!organizationId) {
 
@@ -1188,10 +1234,20 @@ async function loadStrainOptions() {
   const requestId = ++strainOptionsRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
+  const activeDomain = document.body.dataset.domain;
   if (!loadOrganizationId) {
     throw new Error(
       "Organisation absente avant chargement des souches."
     );
+  }
+  if (!["mycology", "laboratory"].includes(activeDomain)) {
+    strainOptions = [];
+    strainSelect.replaceChildren();
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Sélectionnez un espace Mycologie ou Laboratoire.";
+    strainSelect.appendChild(option);
+    return;
   }
 
   const {
@@ -1213,11 +1269,16 @@ async function loadStrainOptions() {
         strain_designation,
         organism_id,
         scientific_name,
-        common_name
+        common_name,
+        biological_domain
       `)
       .eq(
         "organization_id",
         loadOrganizationId
+      )
+      .eq(
+        "biological_domain",
+        activeDomain
       )
       .order(
         "strain_code"
@@ -2105,8 +2166,7 @@ async function createCulture() {
 
           p_metadata: {
             source: "BA Labs Culture Tracker",
-            interface_version: "2.0",
-            domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
+            interface_version: "2.0"
           }
 
         }
@@ -2115,11 +2175,16 @@ async function createCulture() {
 
 
     if (error) {
-
-      throw new Error(
-        error.message
-      );
-
+      const message = String(error.message || "");
+      if (message.includes("parent_material_domain_unclassified")) {
+        throw new Error(
+          "Le matériel parent n’a pas encore de domaine biologique vérifié. Un propriétaire ou administrateur doit d’abord le classer dans le panneau « Classification des archives »."
+        );
+      }
+      if (message.includes("organization_write_access_denied")) {
+        throw new Error("Votre rôle ne permet pas de créer une culture dans cette organisation.");
+      }
+      throw new Error(message || "La création de la culture a échoué.");
     }
 
 

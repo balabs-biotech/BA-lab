@@ -143,6 +143,19 @@ Deno.serve(async (req: Request) => {
       return response(422, { error: "biological_context_required" });
     }
 
+    const { data: workspaceDomain, error: domainError } = await supabase.rpc("resolve_bal_json_domain", {
+      p_organization_id: organizationId,
+      p_culture_id: cultureId,
+      p_plant_culture_id: plantCultureId,
+      p_batch_id: batchId,
+    });
+    if (domainError?.message?.includes("organization_access_denied")) {
+      return response(403, { error: "organization_access_denied" });
+    }
+    if (domainError || !["mycology", "laboratory", "agronomy"].includes(workspaceDomain)) {
+      return response(422, { error: "workspace_domain_unresolved", message: "The biological target has no trusted, unambiguous workspace domain." });
+    }
+
     // Every biological and environmental reference must belong to the active
     // tenant. UUID format validation alone is not an authorization check.
     if (cultureId) {
@@ -177,6 +190,12 @@ Deno.serve(async (req: Request) => {
       const { data: variable, error: variableError } = await supabase
         .from("variables").select("code, dimension").eq("code", data.variable_code).maybeSingle();
       if (variableError || !variable) return response(422, { error: "unknown_variable_code" });
+      const { data: variableAllowed, error: allowlistError } = await supabase.rpc("is_bal_json_variable_allowed", {
+        p_domain: workspaceDomain,
+        p_variable_code: data.variable_code,
+      });
+      if (allowlistError) return response(500, { error: "workspace_variable_policy_unavailable" });
+      if (variableAllowed !== true) return response(422, { error: "variable_not_allowed_for_workspace", workspace_domain: workspaceDomain, variable_code: data.variable_code });
 
       const unitCodes = [data.raw_unit_code, data.normalized_unit_code].filter(Boolean);
       const { data: units, error: unitsError } = await supabase
@@ -193,6 +212,12 @@ Deno.serve(async (req: Request) => {
       const { data: variable, error } = await supabase
         .from("variables").select("code").eq("code", data.variable_code).maybeSingle();
       if (error || !variable) return response(422, { error: "unknown_variable_code" });
+      const { data: variableAllowed, error: allowlistError } = await supabase.rpc("is_bal_json_variable_allowed", {
+        p_domain: workspaceDomain,
+        p_variable_code: data.variable_code,
+      });
+      if (allowlistError) return response(500, { error: "workspace_variable_policy_unavailable" });
+      if (variableAllowed !== true) return response(422, { error: "variable_not_allowed_for_workspace", workspace_domain: workspaceDomain, variable_code: data.variable_code });
     }
 
     const recordData: Record<string, unknown> = {

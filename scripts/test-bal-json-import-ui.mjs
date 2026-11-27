@@ -10,14 +10,25 @@ const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
-  assert.match(html, /20261126-bal-json-live-catalogue-2/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
+  assert.match(html, /20261127-legacy-domain-admin-7/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
 }
-for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"]) {
+for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus","legacyDomainAdminPanel","legacyDomainTarget","legacyDomainValue","legacyDomainReason","legacyDomainClassifyButton","legacyDomainAdminStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
 }
 assert.match(tracker, /window\.BA_LABS_IMPORT_BAL_JSON\s*=\s*\(record\)\s*=>\s*supabaseClient\.functions\.invoke/, "tracker must expose only the authenticated BAL-JSON import operation");
 assert.doesNotMatch(tracker, /window\.BA_LABS_SUPABASE_CLIENT/, "tracker must not expose the whole Supabase client to the bridge");
 assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
+assert.match(tracker, /window\.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT/, "tracker must expose a narrow owner/admin-only legacy classification catalogue");
+assert.match(tracker, /rpc\("get_biological_domain_admin_context"/, "admin catalogue must display effective audited classifications from the database");
+assert.match(tracker, /window\.BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "tracker must expose the authenticated classification RPC only");
+assert.match(tracker, /from\("organization_members"\)[\s\S]*?select\("role"\)[\s\S]*?eq\("organization_id", expectedOrganizationId\)[\s\S]*?eq\("user_id", authData\.user\.id\)/, "admin capability must verify the authenticated user's membership in the active organization");
+assert.match(tracker, /getAuthenticatedDomainAdminRole\(expectedOrganizationId\)/, "classification must recheck admin membership before invoking the RPC");
+assert.match(source, /classify_legacy_biological_domain|BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "admin panel must submit the audited classification operation");
+assert.match(source, /classifyButton\.onclick\s*=\s*async/, "repeated organization-ready events must not duplicate classification click handlers");
+assert.match(source, /await setupLegacyDomainAdmin\(\)/, "successful classification must refresh the unresolved archive queue immediately");
+assert.match(source, /adminPanel\.dataset\.organizationId\s*!==\s*context\.organization_id/, "classification panel must be bound to the organization whose records it loaded");
+assert.match(source, /context\.cultures\s*\|\|\s*\[\]\)\.filter\(row\s*=>\s*!row\.metadata_domain\)/, "already-classified cultures must disappear from the legacy classification queue");
+assert.match(source, /context\.materials\s*\|\|\s*\[\]\)\.filter\(row\s*=>\s*!row\.metadata_domain\)/, "already-classified materials must disappear from the legacy classification queue");
 
 function element(id) {
   return {
@@ -59,6 +70,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
   const window = {
     BA_LABS_DOMAIN: domain,
+    addEventListener() {},
     BA_LABS_IMPORT_BAL_JSON: importBalJson,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
