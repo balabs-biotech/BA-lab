@@ -75,40 +75,45 @@ begin
     raise exception 'invalid_biological_domain';
   end if;
 
-  if tg_op = 'INSERT' and tg_table_name = 'materials' and new.parent_material_id is not null then
-    v_parent_id := new.parent_material_id;
-    select private.get_biological_domain(
-             new.organization_id, 'material', parent.id, parent.metadata ->> 'domain'
-           )
-      into v_domain
-      from public.materials parent
-     where parent.organization_id = new.organization_id and parent.id = v_parent_id;
-    if v_domain is null then
-      if new.metadata ? 'domain' then
-        raise exception 'parent_material_domain_unclassified';
+  if tg_op = 'INSERT' then
+    if tg_table_name = 'materials' then
+      if new.parent_material_id is not null then
+        select private.get_biological_domain(
+                 new.organization_id, 'material', parent.id, parent.metadata ->> 'domain'
+               )
+          into v_domain
+          from public.materials parent
+         where parent.organization_id = new.organization_id and parent.id = new.parent_material_id;
+        if v_domain is null then
+          if new.metadata ? 'domain' then
+            raise exception 'parent_material_domain_unclassified';
+          end if;
+        else
+          if new.metadata ? 'domain' and new.metadata ->> 'domain' is distinct from v_domain then
+            raise exception 'derived_material_domain_mismatch';
+          end if;
+          new.metadata := coalesce(new.metadata, '{}'::jsonb) || jsonb_build_object('domain', v_domain);
+        end if;
       end if;
-    else
-      if new.metadata ? 'domain' and new.metadata ->> 'domain' is distinct from v_domain then
-        raise exception 'derived_material_domain_mismatch';
+    elsif tg_table_name = 'cultures' then
+      if new.material_id is not null then
+        select private.get_biological_domain(
+                 new.organization_id, 'material', parent.id, parent.metadata ->> 'domain'
+               )
+          into v_domain
+          from public.materials parent
+         where parent.organization_id = new.organization_id and parent.id = new.material_id;
+        if v_domain is null then
+          if new.metadata ? 'domain' then
+            raise exception 'parent_material_domain_unclassified';
+          end if;
+        else
+          if new.metadata ? 'domain' and new.metadata ->> 'domain' is distinct from v_domain then
+            raise exception 'culture_domain_mismatch_with_parent_material';
+          end if;
+          new.metadata := coalesce(new.metadata, '{}'::jsonb) || jsonb_build_object('domain', v_domain);
+        end if;
       end if;
-      new.metadata := coalesce(new.metadata, '{}'::jsonb) || jsonb_build_object('domain', v_domain);
-    end if;
-  elsif tg_op = 'INSERT' and tg_table_name = 'cultures' and new.material_id is not null then
-    select private.get_biological_domain(
-             new.organization_id, 'material', parent.id, parent.metadata ->> 'domain'
-           )
-      into v_domain
-      from public.materials parent
-     where parent.organization_id = new.organization_id and parent.id = new.material_id;
-    if v_domain is null then
-      if new.metadata ? 'domain' then
-        raise exception 'parent_material_domain_unclassified';
-      end if;
-    else
-      if new.metadata ? 'domain' and new.metadata ->> 'domain' is distinct from v_domain then
-        raise exception 'culture_domain_mismatch_with_parent_material';
-      end if;
-      new.metadata := coalesce(new.metadata, '{}'::jsonb) || jsonb_build_object('domain', v_domain);
     end if;
   end if;
 
