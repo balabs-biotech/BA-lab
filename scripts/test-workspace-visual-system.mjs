@@ -6,6 +6,7 @@ const visuals = fs.readFileSync("batch-tracker/workspace-visuals.js", "utf8");
 const motion = fs.readFileSync("batch-tracker/styles/motion.css", "utf8");
 const shared = fs.readFileSync("batch-tracker/styles/workspace-components.css", "utf8");
 const visualizationFoundation = fs.readFileSync("batch-tracker/styles/visualization-foundation.css", "utf8");
+const interiorHarmonization = fs.readFileSync("batch-tracker/styles/interior-harmonization.css", "utf8");
 const lineage = fs.readFileSync("batch-tracker/mycology-lineage-visuals.js", "utf8");
 const mycology = fs.readFileSync("batch-tracker/styles/mycology-workspace.css", "utf8");
 const mycologyEntry = fs.readFileSync("batch-tracker/mycology/index.html", "utf8");
@@ -43,6 +44,7 @@ assert.ok(lineage.includes("bezierCurveTo"), "PixiJS lineage edges must use curv
 assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-graph-zoom="out"'), "PixiJS lineage graph must expose zoom controls");
 assert.ok(lineage.includes('data-graph-zoom="fit"'), "PixiJS lineage graph must expose a recenter action");
 assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS lineage graph must support pointer panning without capturing node taps");
+assert.equal((lineage.match(/window\.addEventListener\("pointermove"/g) || []).length, 1, "Lineage graph must register pointer listeners once, not on every render");
 assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
@@ -90,12 +92,12 @@ assert.ok(greenTechEntry.includes("20261117-climate-signature-162"), "GreenTech 
 
 const mycologyActivity = fs.readFileSync("batch-tracker/mycology-activity-timeline.js", "utf8");
 const mycologyActivityStyles = fs.readFileSync("batch-tracker/styles/mycology-activity-timeline.css", "utf8");
-const interiorHarmonization = fs.readFileSync("batch-tracker/styles/interior-harmonization.css", "utf8");
 assert.ok(interiorHarmonization.includes("color:#e8eee8 !important") && interiorHarmonization.includes("color:#c3cec5 !important") && interiorHarmonization.includes("color:#aebdb2 !important"), "Scientific headings, form labels and helper text must use high-contrast mineral tones");
 assert.ok(interiorHarmonization.includes(":is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > h2") && interiorHarmonization.includes("color:#e2b092 !important"), "Legacy ID-scoped interior headings and sector kickers must retain readable contrast");
 assert.ok(interiorHarmonization.includes("#balJsonImportPanel .bal-json-heading h3") && interiorHarmonization.includes("#balJsonImportPanel .bal-json-preview"), "BAL-JSON import title, help text and preview must remain legible on dark surfaces");
 assert.ok(mycologyActivity.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "Mycology activity timeline must use pinned PixiJS");
 assert.ok(mycologyActivity.includes('querySelectorAll(":scope > .culture-timeline-entry")'), "Mycology timeline must derive nodes from existing culture history entries");
+assert.ok(!mycologyActivity.includes(".slice(0, 18)"), "Mycology timeline must not silently truncate large culture histories");
 assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
 assert.ok(mycologyActivity.includes("observation: 0xd9a36e") && mycologyActivity.includes("measurement: 0x9b6d54") && !mycologyActivity.includes("observation: 0xb5d98c") && !mycologyActivity.includes("measurement: 0x8dbce0"), "Mycology activity timeline must stay within copper/amber/brown tones");
 assert.ok(mycologyActivity.includes("next.stop()"), "Mycology timeline must render on demand without a permanent GPU ticker");
