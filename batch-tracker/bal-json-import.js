@@ -243,8 +243,19 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
         if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
       }
     } catch (error) {
-      status.textContent = "Import non effectué : " + (error.message || "erreur inconnue");
-      status.dataset.state = "error"; importButton.disabled = false;
+      const httpStatus = Number(error?.context?.status ?? error?.status ?? 0);
+      if (httpStatus >= 400 && httpStatus < 500) {
+        status.textContent = "Import refusé par le serveur (HTTP " + httpStatus + ") : " +
+          (error.message || "vérifiez la session et les données, puis relancez la prévisualisation.");
+        status.dataset.state = "error";
+        approvedRecord = null;
+        approvedOrganization = null;
+        importButton.disabled = true;
+      } else {
+        status.textContent = "Résultat non confirmé : la connexion ou le serveur n’a pas confirmé la réponse. Ne modifiez pas record_id. Réessayez avec exactement le même JSON ; le serveur déduplique les imports déjà enregistrés.";
+        status.dataset.state = "warning";
+        importButton.disabled = false;
+      }
     } finally { previewButton.disabled = false; }
   });
 
