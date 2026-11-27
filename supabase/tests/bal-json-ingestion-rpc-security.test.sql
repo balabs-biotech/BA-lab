@@ -23,6 +23,11 @@ begin
      v_definition not ilike '%record_manual_observation%' then
     raise exception 'FAIL: BAL-JSON RPC does not reuse atomic domain write functions';
   end if;
+
+  if v_definition not ilike '%resolve_bal_json_domain%' or
+     v_definition not ilike '%is_bal_json_variable_allowed%' then
+    raise exception 'FAIL: direct BAL-JSON RPC calls must enforce biological domain and variable policy';
+  end if;
   if not (select prosecdef from pg_proc where oid = v_proc) then
     raise exception 'FAIL: BAL-JSON RPC must be SECURITY DEFINER to write the private receipt table';
   end if;
