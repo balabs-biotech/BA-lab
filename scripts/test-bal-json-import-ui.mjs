@@ -69,6 +69,16 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
 }
 
 {
+  const h = harness({ domain: "mycology", organizationId: null });
+  await h.elements.get("balJsonCopyPromptButton").click();
+  assert.match(h.clipboard.text, /session CultureOps authentifiée/i,
+    "prompt generated without an active session must explicitly require an authenticated CultureOps session");
+  assert.match(h.clipboard.text, /ne demande jamais à l’utilisateur de fournir un UUID/i,
+    "prompt without a live tenant catalogue must not ask the LLM to request or invent tenant identifiers");
+  assert.match(h.elements.get("balJsonImportStatus").textContent, /catalogue.*indisponible|session.*connectée/i);
+}
+
+{
   const h = harness({ domain: "laboratory" });
   await h.elements.get("balJsonCopyPromptButton").click();
   assert.match(h.clipboard.text, /BA Labs CultureOps/);
