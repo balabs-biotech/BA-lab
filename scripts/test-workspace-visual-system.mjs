@@ -184,3 +184,12 @@ assert.ok(greenClimate.includes("renderText(series)"), "GreenTech must retain te
 assert.ok(greenClimate.includes("if (!charts) {\n      destroy();\n      panel.hidden = true;\n      panel.dataset.state = \"empty\";"), "GreenTech must release stale charts when its source panel disappears");
 assert.ok(laboratoryProcess.includes("querySelectorAll(\":scope > .stage\")"), "Laboratory map must only project the currently selected batch stages");
 assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology must load the activity timeline runtime");
+
+const editorial = fs.readFileSync("batch-tracker/styles/editorial-harmonization.css", "utf8");
+for (const [name, page] of entryPages) {
+  assert.ok(page.includes("editorial-harmonization.css?v=20261127-editorial-finish-1"), name + " must load the shared BA Labs editorial finishing layer");
+}
+assert.ok(editorial.includes("background-attachment:fixed") && editorial.includes("#111B1D"), "CultureOps must share the BA Labs graphite editorial canvas");
+assert.ok(editorial.includes("ui-monospace,SFMono-Regular,Menlo,monospace"), "Editorial metadata must use the BA Labs technical label typography");
+assert.ok(editorial.includes("border-radius:12px") && editorial.includes("box-shadow:0 10px 28px"), "Workspace panels must use restrained BA Labs geometry and depth");
+assert.ok(editorial.includes("var(--workspace-accent)") && editorial.includes("prefers-reduced-motion:reduce"), "Editorial finishing must preserve sector accents and reduced-motion support");
