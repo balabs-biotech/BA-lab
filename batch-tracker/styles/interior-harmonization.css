@@ -1284,3 +1284,101 @@ html body[data-domain] #trackerCard .culture-detail-timeline .culture-timeline-e
     grid-template-columns:minmax(0,1fr) !important;
   }
 }
+
+
+/* PASS 212 — plant culture register, shared across workspace entry points. */
+html body[data-domain] #plantCard #plantCultureForm {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:13px !important;
+  margin:16px 0 20px !important;
+  padding:clamp(14px,2vw,20px) !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-radius:14px !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.7),rgba(17,27,25,.88)) !important;
+}
+html body[data-domain] #plantCard #plantCultureForm > div {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:6px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #plantCard #plantCultureForm .bio-operation-wide {
+  grid-column:1 / -1 !important;
+}
+html body[data-domain] #plantCard #plantCultureForm :is(input,select,textarea) {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+}
+html body[data-domain] #plantCard #savePlantCultureButton {
+  min-height:44px !important;
+}
+html body[data-domain] #plantCard #plantCultureStatus {
+  min-height:1.5em !important;
+  margin:4px 0 0 !important;
+  color:#aebdb2 !important;
+  line-height:1.5 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #plantCard .overview-section-heading {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
+  margin:20px 0 12px !important;
+}
+html body[data-domain] #plantCard #plantCultureList {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)) !important;
+  gap:10px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #plantCard #plantCultureList .plant-culture-row {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:9px !important;
+  min-width:0 !important;
+  padding:14px !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:11px !important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--workspace-accent) 5%,transparent),transparent 62%),#1b2925 !important;
+}
+html body[data-domain] #plantCard #plantCultureList .plant-culture-row :is(strong,h3,h4) {
+  color:#edf2ec !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #plantCard #plantCultureList .plant-culture-row :is(p,small,.culture-catalog-meta) {
+  color:#aebdb2 !important;
+  line-height:1.5 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #plantCard #plantCultureList .plant-culture-status {
+  display:inline-flex !important;
+  align-items:center !important;
+  align-self:flex-start !important;
+  min-height:26px !important;
+  max-width:100% !important;
+  padding:4px 9px !important;
+  border:1px solid color-mix(in srgb,var(--workspace-accent) 35%,transparent) !important;
+  border-radius:999px !important;
+  color:#dbe5dc !important;
+  background:color-mix(in srgb,var(--workspace-accent) 10%,transparent) !important;
+  font-size:10px !important;
+  overflow-wrap:anywhere !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #plantCard #plantCultureForm {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #plantCard #plantCultureForm .bio-operation-wide {
+    grid-column:1 !important;
+  }
+  html body[data-domain] #plantCard #savePlantCultureButton {
+    width:100% !important;
+  }
+}
