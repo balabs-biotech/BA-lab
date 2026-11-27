@@ -13,7 +13,6 @@
   panel.innerHTML = '<div class="greentech-climate-heading"><div><span class="greentech-climate-kicker">LECTURE DES SÉRIES</span><h3>Signature climatique</h3><p>Vue condensée des courbes historiques chargées dans ce module</p></div><span class="greentech-climate-source">NASA POWER · DONNÉES IMPORTÉES</span></div><div class="greentech-climate-plot" aria-hidden="true"></div><ul class="greentech-climate-values" aria-label="Dernières valeurs visibles des séries"></ul><p class="greentech-climate-footnote">Les courbes conservent leurs unités propres. Ce contexte météo estimé sur grille ne constitue pas une mesure dans la parcelle.</p>';
   const plot = panel.querySelector(".greentech-climate-plot");
   const values = panel.querySelector(".greentech-climate-values");
-  let insertedInto = null;
 
   function extractSeries() {
     const charts = [...document.querySelectorAll("#envWeatherCharts > .environmental-weather-chart")];
@@ -57,7 +56,12 @@
   async function draw() {
     const revision = ++renderRevision;
     const charts = document.getElementById("envWeatherCharts");
-    if (!charts) return;
+    if (!charts) {
+      destroy();
+      panel.hidden = true;
+      panel.dataset.state = "empty";
+      return;
+    }
     const series = extractSeries();
     if (!series.length) {
       destroy();
@@ -149,7 +153,6 @@
     if (!charts || charts.dataset.signatureEnhanced === "true") return;
     charts.dataset.signatureEnhanced = "true";
     charts.prepend(panel);
-    insertedInto = charts;
     resizeObserver.observe(charts);
     schedule();
   };
