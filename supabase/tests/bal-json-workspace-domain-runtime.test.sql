@@ -141,7 +141,7 @@ end
 $$;
 
 reset role;
-do $
+do $$
 begin
   if (select count(*) from private.biological_domain_classification_audit
        where organization_id='00000000-0000-0000-0000-00000000b911'
