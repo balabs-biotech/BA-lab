@@ -524,3 +524,11 @@ assert.ok(!cultureCreationRpc.includes('domain: document.body.dataset.domain'),
 assert.ok(engine.includes("Un propriétaire ou administrateur doit d’abord le classer"),
   "unclassified parent materials need an actionable admin explanation");
 console.log("✓ Culture creation: biological domain is server-derived and unclassified parents have actionable guidance");
+
+const strainLoaderStart = engine.indexOf("async function loadStrainOptions()");
+const strainLoaderEnd = engine.indexOf("/* ============================================================", strainLoaderStart);
+const strainLoader = engine.slice(strainLoaderStart, strainLoaderEnd);
+assert.ok(strainLoader.includes('["mycology", "laboratory"].includes(activeDomain)'));
+assert.ok(strainLoader.includes('"biological_domain"') && strainLoader.includes('activeDomain'),
+  "culture parent material options must be filtered by the active biological workspace");
+console.log("✓ Culture creation parent choices are isolated by audited biological workspace domain");
