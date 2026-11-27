@@ -18,6 +18,7 @@
   const zoomLabel = shell.querySelector("[data-process-zoom-label]");
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   let PIXI = null, app = null, frame = 0, renderToken = 0, zoom = 1;
+  let pendingApp = null;
   let baseWidth = 0, baseHeight = 0;
 
   const palette = {
@@ -91,7 +92,7 @@
       const nodeWidth = 190, nodeHeight = 104, gap = 54, left = 30, top = 42;
       baseWidth = Math.max(340, left * 2 + stages.length * nodeWidth + (stages.length - 1) * gap);
       baseHeight = 190;
-      const next = new pixi.Application();
+      const next = pendingApp = new pixi.Application();
       await next.init({
         width: baseWidth, height: baseHeight, backgroundAlpha: 0,
         antialias: true, autoDensity: true,
@@ -100,6 +101,7 @@
       });
       if (token !== renderToken) { next.destroy(true, true); return; }
       app = next;
+      pendingApp = null;
       next.canvas.className = "lab-process-map-canvas";
       next.canvas.setAttribute("aria-hidden", "true");
       next.canvas.style.width = baseWidth + "px";
@@ -149,6 +151,7 @@
       shell.dataset.state = "ready";
     } catch (error) {
       console.info("BA Labs: schéma PixiJS indisponible, liste des étapes conservée.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       shell.dataset.state = "fallback";
       fallback("La vue graphique est indisponible. La liste détaillée des étapes reste accessible.");
     }
