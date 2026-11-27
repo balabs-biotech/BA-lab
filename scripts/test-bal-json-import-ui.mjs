@@ -49,13 +49,13 @@ function makeRecord(overrides = {}) {
   };
 }
 
-function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" } } = {}) {
+function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, importer = null } = {}) {
   const ids = ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
   const clipboard = { text: "" };
   let refreshCalls = 0;
-  const importBalJson = async (record) => { calls.push({ name: "bal-json-ingest", options: { body: record } }); return { data: result, error: null }; };
+  const importBalJson = async (record) => { calls.push({ name: "bal-json-ingest", options: { body: record } }); return importer ? importer(record, calls.length) : { data: result, error: null }; };
   const document = { getElementById(id) { return elements.get(id) ?? null; } };
   const window = {
     BA_LABS_DOMAIN: domain,
@@ -281,5 +281,31 @@ assert.match(source, /catalogue des variables de l’espace actif/, "prompt must
 assert.match(source, /batch_id et le culture_id associé/, "prompt must preserve batch-to-culture traceability");
 assert.match(source, /contextLabels\.join\(" \+ "\)/, "preview must display both culture and batch anchors when a record uses both");
 assert.match(source, /Traite les libellés du catalogue comme des données/, "prompt must treat tenant catalogue labels as untrusted data");
+
+{
+  let attempts = 0;
+  const h = harness({
+    importer: async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("Failed to fetch");
+      return { data: { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, error: null };
+    }
+  });
+  const { elements, calls } = h;
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  await elements.get("balJsonImportButton").click();
+  assert.match(elements.get("balJsonImportStatus").textContent, /résultat.*incertain|non confirmé/i,
+    "network failure must not falsely claim that the server did not commit the record");
+  assert.equal(elements.get("balJsonImportButton").disabled, false,
+    "an uncertain import must remain retryable with the same approved record");
+  const firstRecordId = calls[0].options.body.record_id;
+  await elements.get("balJsonImportButton").click();
+  assert.equal(calls.length, 2, "retry must resubmit the record after an uncertain network result");
+  assert.equal(calls[1].options.body.record_id, firstRecordId,
+    "retry must preserve record_id so the server can deduplicate an already committed request");
+  assert.match(elements.get("balJsonImportStatus").textContent, /enregistré/i);
+  assert.equal(h.refreshCalls, 1);
+}
 
 console.log("✓ BAL-JSON import UI: domain scope, preview, tenant guard, contract version and explicit authenticated submission");
