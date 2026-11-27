@@ -204,6 +204,8 @@ try {
           viewportWidth: innerWidth,
           documentWidth: root.scrollWidth,
           bodyBackground: style.backgroundColor,
+          htmlBackground: getComputedStyle(root).backgroundColor,
+          bodyBackgroundAttachment: style.backgroundAttachment,
           workspaceAccent: style.getPropertyValue("--workspace-accent").trim(),
           surfaceToken: style.getPropertyValue("--surface").trim(),
           cardBackground: cardStyle?.backgroundColor || null,
@@ -295,6 +297,10 @@ try {
       if (viewport.name !== "desktop" && metrics.measurementControls.some(control => Number.parseFloat(control.minHeight) < 44 || Number.parseFloat(control.fontSize) < 16)) {
         failures.push(`${workspace.slug}/${viewport.name}: measurement fields must retain 44px touch targets and 16px text (${JSON.stringify(metrics.measurementControls.filter(control => Number.parseFloat(control.minHeight) < 44 || Number.parseFloat(control.fontSize) < 16))})`);
       }
+      if (!parseColor(metrics.htmlBackground)) failures.push(`${workspace.slug}/${viewport.name}: document root background is not explicitly defined (${metrics.htmlBackground})`);
+      if (metrics.bodyBackgroundAttachment === "fixed") failures.push(`${workspace.slug}/${viewport.name}: full-page rendering must not depend on a fixed body background`);
+      const editorialKickerContrast = contrastRatio(metrics.measurementKickerColor, metrics.measurementCardBackground);
+      if (editorialKickerContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: editorial section metadata contrast ${editorialKickerContrast.toFixed(2)}:1 is below 4.5:1`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
       if (!metrics.organicField) failures.push(`${workspace.slug}/${viewport.name}: shared organic mycelium canvas missing`);
