@@ -73,23 +73,42 @@ window.BA_LABS_GET_BAL_JSON_CONTEXT = () => {
 };
 window.BA_LABS_IMPORT_BAL_JSON = (record) =>
   supabaseClient.functions.invoke("bal-json-ingest", { body: record });
-window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT = async () => {
-  if (!organizationId || !["owner", "admin"].includes(organizationRole)) {
+async function getAuthenticatedDomainAdminRole(expectedOrganizationId) {
+  if (!expectedOrganizationId || organizationId !== expectedOrganizationId) {
+    throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
+  }
+  const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+  if (authError || !authData?.user?.id) throw new Error("Session authentifiée indisponible.");
+  const { data: membership, error: membershipError } = await supabaseClient
+    .from("organization_members")
+    .select("role")
+    .eq("organization_id", expectedOrganizationId)
+    .eq("user_id", authData.user.id)
+    .maybeSingle();
+  if (membershipError) throw membershipError;
+  const role = membership?.role || null;
+  if (!["owner", "admin"].includes(role)) {
     throw new Error("La classification des archives est réservée aux propriétaires et administrateurs.");
   }
+  return role;
+}
+window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT = async () => {
+  const expectedOrganizationId = organizationId;
+  const role = await getAuthenticatedDomainAdminRole(expectedOrganizationId);
   const [culturesResult, materialsResult] = await Promise.all([
     supabaseClient.from("cultures")
       .select("id,code,culture_type,material_id,metadata")
-      .eq("organization_id", organizationId).limit(1000),
+      .eq("organization_id", expectedOrganizationId).limit(1000),
     supabaseClient.from("materials")
       .select("id,material_code,material_type,metadata")
-      .eq("organization_id", organizationId).limit(2000)
+      .eq("organization_id", expectedOrganizationId).limit(2000)
   ]);
+  if (organizationId !== expectedOrganizationId) throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
   if (culturesResult.error) throw culturesResult.error;
   if (materialsResult.error) throw materialsResult.error;
   return {
-    organization_id: organizationId,
-    role: organizationRole,
+    organization_id: expectedOrganizationId,
+    role,
     cultures: (culturesResult.data || []).map(row => ({
       id: row.id, code: row.code || "Culture sans code",
       detail: row.culture_type || "type non précisé",
@@ -104,11 +123,11 @@ window.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT = async () => {
   };
 };
 window.BA_LABS_CLASSIFY_LEGACY_DOMAIN = async (targetType, targetId, domain, reason) => {
-  if (!organizationId || !["owner", "admin"].includes(organizationRole)) {
-    throw new Error("Droits administrateur requis.");
-  }
+  const expectedOrganizationId = organizationId;
+  await getAuthenticatedDomainAdminRole(expectedOrganizationId);
+  if (organizationId !== expectedOrganizationId) throw new Error("Le contexte de l'organisation a changé. Rechargez la page.");
   return supabaseClient.rpc("classify_legacy_biological_domain", {
-    p_organization_id: organizationId,
+    p_organization_id: expectedOrganizationId,
     p_target_type: targetType,
     p_target_id: targetId,
     p_domain: domain,
