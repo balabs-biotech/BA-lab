@@ -13,6 +13,22 @@ const mycologyEntry = fs.readFileSync("batch-tracker/mycology/index.html", "utf8
 const greenTechEntry = fs.readFileSync("batch-tracker/green-tech/index.html", "utf8");
 const laboratoryEntry = fs.readFileSync("batch-tracker/laboratory/index.html", "utf8");
 
+const entryPages = [
+  ["Mycology", mycologyEntry, "data-domain=\"mycology\""],
+  ["GreenTech", greenTechEntry, "data-domain=\"agronomy\""],
+  ["Laboratory", laboratoryEntry, "data-domain=\"laboratory\""]
+];
+
+for (const [name, page, domain] of entryPages) {
+  assert.ok(page.includes(domain), name + " must preserve its workspace identity");
+  assert.ok(page.includes("workspace-entry-state") && page.includes("workspace-entry-indicator"), name + " must use the shared loading state");
+  assert.ok(page.includes("workspace-entry-error") && page.includes("role='alert'"), name + " must use the shared recoverable-error surface");
+  assert.ok(page.includes("workspace-unified.css?v=20261127-entry-state-213"), name + " must load the current shared visual system");
+}
+assert.ok(interiorHarmonization.includes(".workspace-entry-state") && interiorHarmonization.includes(".workspace-entry-indicator"), "Workspace entry and loading states must share the BA Labs visual system");
+assert.ok(interiorHarmonization.includes(".workspace-entry-error") && interiorHarmonization.includes("ba-entry-spin"), "Workspace failures must use a legible branded recovery surface");
+assert.ok(interiorHarmonization.includes("prefers-reduced-motion:reduce") && interiorHarmonization.includes(".workspace-entry-indicator { animation:none"), "Entry loading motion must respect reduced-motion preferences");
+
 assert.ok(html.includes('class="app-hero"'), "Each sector must retain the shared workspace header");
 assert.ok(!html.includes('id="ba-particle-field"'), "The obsolete global particle layer must be removed from the shared workspace markup");
 assert.ok(!html.includes("visual-mycology"), "The obsolete branching mycelium hero SVG must not be shipped in the shared markup");
