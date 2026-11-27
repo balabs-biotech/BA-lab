@@ -77,7 +77,11 @@ begin
 
   if tg_op = 'INSERT' then
     if tg_table_name = 'materials' then
-      if new.parent_material_id is not null then
+      if new.parent_material_id is null then
+        if new.metadata ? 'domain' then
+          raise exception 'root_material_domain_requires_admin_classification';
+        end if;
+      else
         select private.get_biological_domain(
                  new.organization_id, 'material', parent.id, parent.metadata ->> 'domain'
                )
