@@ -1044,3 +1044,243 @@ html body[data-domain] #batchCard #batchEventList > * {
     width:100% !important;
   }
 }
+
+
+/* PASS 211 — biological record detail, operation capture and lineage map. */
+html body[data-domain] #trackerCard #cultureDetailPanel {
+  min-width:0 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard .bio-operation-panel,
+html body[data-domain] #trackerCard .bio-lineage-panel {
+  min-width:0 !important;
+  margin-top:16px !important;
+  padding:clamp(13px,2vw,18px) !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.72),rgba(17,27,25,.88)) !important;
+}
+html body[data-domain] #trackerCard :is(.bio-operation-panel,.bio-lineage-panel) > h4 {
+  margin:0 0 7px !important;
+  color:#e8eee8 !important;
+  font-size:14px !important;
+}
+html body[data-domain] #trackerCard .bio-operation-panel > p {
+  color:#aebdb2 !important;
+  line-height:1.6 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard .bio-operation-form {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+  min-width:0 !important;
+  margin-top:14px !important;
+}
+html body[data-domain] #trackerCard .bio-operation-form > div {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  min-width:0 !important;
+  gap:6px !important;
+}
+html body[data-domain] #trackerCard .bio-operation-form .bio-operation-wide {
+  grid-column:1 / -1 !important;
+}
+html body[data-domain] #trackerCard .bio-operation-form small {
+  color:#aebdb2 !important;
+  font-size:11px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain] #trackerCard .bio-operation-form :is(input,select,textarea) {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+}
+html body[data-domain] #trackerCard #saveBioOperation {
+  min-height:44px !important;
+  align-self:flex-start !important;
+}
+html body[data-domain] #trackerCard #bioOperationMessage {
+  min-height:1.4em !important;
+  margin:4px 0 0 !important;
+  color:#c0cec4 !important;
+  line-height:1.5 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-shell {
+  display:grid !important;
+  gap:10px !important;
+  min-width:0 !important;
+  margin:12px 0 !important;
+  padding:13px !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-radius:12px !important;
+  background:rgba(7,15,14,.48) !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-heading {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:baseline !important;
+  justify-content:space-between !important;
+  gap:6px 12px !important;
+  color:#e0e9e1 !important;
+  font-size:10px !important;
+  font-weight:760 !important;
+  letter-spacing:.07em !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-heading small {
+  color:#aebdb2 !important;
+  font-size:11px !important;
+  font-weight:450 !important;
+  letter-spacing:normal !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-legend {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:7px 12px !important;
+  color:#c4d0c6 !important;
+  font-size:10px !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-legend [data-kind]::before {
+  display:inline-block !important;
+  width:7px !important;
+  height:7px !important;
+  margin-inline-end:6px !important;
+  border-radius:50% !important;
+  background:var(--workspace-accent) !important;
+  content:"" !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-legend [data-kind="ancestor"]::before { background:#9b9a8f !important; }
+html body[data-domain] #trackerCard .lineage-graph-legend [data-kind="current"]::before { background:#c98259 !important; }
+html body[data-domain] #trackerCard .lineage-graph-legend [data-kind="descendant"]::before { background:#d9a36e !important; }
+html body[data-domain] #trackerCard .lineage-graph-toolbar {
+  display:flex !important;
+  align-items:center !important;
+  flex-wrap:wrap !important;
+  gap:7px !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-toolbar button {
+  min-width:40px !important;
+  min-height:40px !important;
+  padding:7px 10px !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-zoom-label {
+  color:#b8c6bc !important;
+  font-size:11px !important;
+  font-variant-numeric:tabular-nums !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-stage {
+  position:relative !important;
+  min-width:0 !important;
+  min-height:210px !important;
+  max-width:100% !important;
+  overflow:auto !important;
+  overscroll-behavior:contain !important;
+  border:1px solid rgba(169,192,179,.13) !important;
+  border-radius:9px !important;
+  background:radial-gradient(ellipse at 50% 45%,rgba(190,118,88,.07),transparent 65%),#0e1816 !important;
+  scrollbar-color:#52685d #172321 !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-stage:focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:2px !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-canvas {
+  display:block !important;
+  max-width:none !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-stage.is-panning {
+  cursor:grabbing !important;
+}
+html body[data-domain] #trackerCard .lineage-graph-status {
+  margin:0 !important;
+  padding:18px !important;
+  color:#aebdb2 !important;
+  font-size:12px !important;
+  line-height:1.6 !important;
+}
+html body[data-domain] #trackerCard .lineage-data-details {
+  margin-top:10px !important;
+  padding:10px 12px !important;
+  border:1px solid rgba(169,192,179,.14) !important;
+  border-radius:10px !important;
+  background:rgba(7,15,14,.3) !important;
+}
+html body[data-domain] #trackerCard .lineage-data-details > summary {
+  min-height:40px !important;
+  display:flex !important;
+  align-items:center !important;
+  color:#d6e0d7 !important;
+  cursor:pointer !important;
+  font-size:12px !important;
+  font-weight:650 !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-list {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  gap:8px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  gap:5px !important;
+  min-width:min(100%,180px) !important;
+  max-width:100% !important;
+  min-height:54px !important;
+  padding:10px 12px !important;
+  border:1px solid rgba(169,192,179,.2) !important;
+  border-radius:9px !important;
+  background:#1c2b27 !important;
+  color:#e8eee8 !important;
+  text-align:start !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node[data-lineage-role="current"] {
+  border-color:#c98259 !important;
+  background:rgba(190,118,88,.13) !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node strong {
+  color:#edf2ec !important;
+  font-size:12px !important;
+}
+html body[data-domain] #trackerCard .culture-lineage-node small {
+  color:#aebdb2 !important;
+  font-size:10px !important;
+  line-height:1.4 !important;
+}
+html body[data-domain] #trackerCard .culture-detail-timeline {
+  display:grid !important;
+  gap:9px !important;
+  min-width:0 !important;
+  margin-top:12px !important;
+}
+html body[data-domain] #trackerCard .culture-detail-timeline > * {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard .culture-detail-timeline .culture-timeline-entry {
+  grid-template-columns:minmax(110px,.3fr) minmax(0,1fr) !important;
+  align-items:start !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #trackerCard .bio-operation-form {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #trackerCard .bio-operation-form .bio-operation-wide {
+    grid-column:1 !important;
+  }
+  html body[data-domain] #trackerCard #saveBioOperation {
+    width:100% !important;
+  }
+  html body[data-domain] #trackerCard .culture-lineage-node {
+    width:100% !important;
+  }
+  html body[data-domain] #trackerCard .culture-detail-timeline .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
