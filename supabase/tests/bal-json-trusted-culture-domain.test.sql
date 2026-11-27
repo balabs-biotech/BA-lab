@@ -26,6 +26,27 @@ values
  ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c922','DOMAIN-ROOT-UNKNOWN','strain','active',0,'{}'::jsonb)
 on conflict (organization_id,id) do nothing;
 
+-- Exercise the root-material trigger as the migration owner. Authenticated users
+-- cannot insert materials directly; their creation path is separately RPC-guarded.
+do $root_guard$
+begin
+  begin
+    insert into public.materials(
+      organization_id,material_code,material_type,state,metadata
+    ) values (
+      '00000000-0000-0000-0000-00000000c911','DOMAIN-ROOT-SPOOF','strain',
+      'active','{"domain":"laboratory"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm = 'root_material_domain_requires_admin_classification' then
+      return;
+    end if;
+    raise;
+  end;
+  raise exception 'FAIL: root material self-assigned a workspace domain';
+end;
+$root_guard$;
+
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000c901',true);
 set local role authenticated;
 
@@ -70,23 +91,6 @@ begin
   ) then
     raise exception 'FAIL: admin context did not expose the audited material domain';
   end if;
-
-  -- A new root material cannot self-assign a workspace through metadata.
-  v_rejected := false;
-  begin
-    insert into public.materials(
-      organization_id,material_code,material_type,state,metadata
-    ) values (
-      '00000000-0000-0000-0000-00000000c911','DOMAIN-ROOT-SPOOF','strain',
-      'active','{"domain":"laboratory"}'::jsonb
-    );
-  exception when others then
-    if sqlerrm = 'root_material_domain_requires_admin_classification' then
-      v_rejected := true;
-    else raise;
-    end if;
-  end;
-  if not v_rejected then raise exception 'FAIL: root material self-assigned a workspace domain'; end if;
 
   -- Client attempts to force laboratory while parent is mycology: server must ignore and inherit mycology.
   v_created := public.create_culture_with_generation(
