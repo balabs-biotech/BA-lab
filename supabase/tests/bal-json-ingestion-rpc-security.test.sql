@@ -33,10 +33,10 @@ begin
     raise exception 'FAIL: authenticated role must be able to execute BAL-JSON ingestion';
   end if;
 
-  if to_regprocedure('private.resolve_bal_json_domain(uuid,uuid,uuid,uuid)') is null then
+  if to_regprocedure('public.resolve_bal_json_domain(uuid,uuid,uuid,uuid)') is null then
     raise exception 'FAIL: BAL-JSON must resolve the persisted workspace domain from its biological anchor';
   end if;
-  if to_regprocedure('private.is_bal_json_variable_allowed(text,text)') is null then
+  if to_regprocedure('public.is_bal_json_variable_allowed(text,text)') is null then
     raise exception 'FAIL: BAL-JSON must enforce workspace-specific variable allowlists server-side';
   end if;
 
