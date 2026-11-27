@@ -22,8 +22,8 @@ html body[data-domain] :is(.mycology-activity-tools,.lab-process-map-controls) b
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-width:34px;
-  min-height:34px;
+  min-width:40px;
+  min-height:40px;
   font:inherit;
   font-variant-numeric:tabular-nums;
   transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
