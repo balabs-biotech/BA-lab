@@ -1382,6 +1382,12 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button:hov
   border-color:rgba(201,130,89,.62) !important;
   background:rgba(201,130,89,.16) !important;
 }
+html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button:focus-visible {
+  outline:2px solid #e0ad91 !important;
+  outline-offset:3px !important;
+  position:relative !important;
+  z-index:2 !important;
+}
 html body[data-domain="mycology"] #trackerCard .lineage-graph-zoom-label {
   min-width:42px !important;
   color:#aebdb4 !important;
