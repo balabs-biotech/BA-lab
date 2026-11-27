@@ -3,14 +3,18 @@
 \set ON_ERROR_STOP on
 begin;
 
-insert into auth.users(id) values ('00000000-0000-0000-0000-00000000b901')
+insert into auth.users(id) values
+ ('00000000-0000-0000-0000-00000000b901'),
+ ('00000000-0000-0000-0000-00000000b902')
 on conflict do nothing;
 insert into public.organizations(id,code,name)
 values ('00000000-0000-0000-0000-00000000b911','BALJSON-DOMAIN-TEST','BAL-JSON domain test')
 on conflict do nothing;
-insert into public.organization_members(organization_id,user_id)
-values ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b901')
-on conflict do nothing;
+insert into public.organization_members(organization_id,user_id,role)
+values
+ ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b901','owner'),
+ ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b902','member')
+on conflict (organization_id,user_id) do update set role=excluded.role;
 
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
 select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b921','BALJSON-MYC','strain','active','{"domain":"mycology"}'::jsonb
@@ -38,6 +42,17 @@ select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b
        '00000000-0000-0000-0000-00000000b923','{"domain":"mycology"}'::jsonb
 where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b933');
 
+-- Legacy records have no metadata.domain and require explicit owner/admin classification.
+insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
+values ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b924',
+        'BALJSON-LEGACY-MATERIAL','strain','active','{}'::jsonb)
+on conflict do nothing;
+insert into public.cultures(organization_id,id,code,culture_type,material_id,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b934',
+       'BALJSON-LEGACY-CULTURE',(select code from public.culture_types order by code limit 1),
+       '00000000-0000-0000-0000-00000000b924','{}'::jsonb
+where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b934');
+
 insert into public.plant_cultures(organization_id,id,code,crop_type,species_name,cultivar_name,metadata)
 values ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b941',
         'BALJSON-PLANT','vegetable','Solanum lycopersicum','Test cultivar','{}'::jsonb)
@@ -52,6 +67,25 @@ on conflict do nothing;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
 set local role authenticated;
+
+-- Ordinary members cannot classify legacy biological records.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b902',true);
+do $
+declare v_denied boolean := false;
+begin
+  begin
+    perform public.classify_legacy_biological_domain(
+      '00000000-0000-0000-0000-00000000b911','material',
+      '00000000-0000-0000-0000-00000000b924','mycology',
+      'Verified legacy fungal material'
+    );
+  exception when insufficient_privilege then
+    if sqlerrm = 'domain_classification_requires_admin' then v_denied := true; else raise; end if;
+  end;
+  if not v_denied then raise exception 'FAIL: ordinary member classified a legacy record'; end if;
+end $;
+
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
 
 do $$
 declare
@@ -87,6 +121,19 @@ begin
     if sqlerrm = 'batch_culture_mismatch' then v_caught := true; else raise; end if;
   end;
   if not v_caught then raise exception 'FAIL: mismatched explicit culture and batch anchors were accepted'; end if;
+
+
+  -- Owner/admin classification is auditable and becomes the resolver's source for legacy records.
+  perform public.classify_legacy_biological_domain(
+    v_org,'material','00000000-0000-0000-0000-00000000b924',
+    'mycology','Verified fungal strain registry entry'
+  );
+  v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b934',null,null);
+  if v_result is distinct from 'mycology' then raise exception 'FAIL: legacy culture did not inherit audited material classification'; end if;
+  if (select count(*) from private.biological_domain_classification_audit
+       where organization_id=v_org and target_type='material'
+         and target_id='00000000-0000-0000-0000-00000000b924') <> 1 then
+    raise exception 'FAIL: legacy domain classification audit receipt missing'; end if;
 
   if public.is_bal_json_variable_allowed('mycology','cfu') is not true
      or public.is_bal_json_variable_allowed('mycology','root_length') is not false
