@@ -3,16 +3,21 @@
 begin;
 
 insert into auth.users(id) values
- ('00000000-0000-0000-0000-00000000c901')
+ ('00000000-0000-0000-0000-00000000c901'),
+ ('00000000-0000-0000-0000-00000000c902')
 on conflict do nothing;
 insert into public.organizations(id,code,name)
 values ('00000000-0000-0000-0000-00000000c911','CULTURE-DOMAIN-TEST','Culture domain inheritance test')
 on conflict do nothing;
 insert into public.organization_members(organization_id,user_id,role)
-values ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c901','owner')
+values
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c901','owner'),
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c902','viewer')
 on conflict (organization_id,user_id) do update set role=excluded.role;
 insert into public.culture_data_consents(organization_id,user_id,terms_version)
-values ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c901','2026-10-09-v1')
+values
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c901','2026-10-09-v1'),
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c902','2026-10-09-v1')
 on conflict (organization_id,user_id,terms_version) do nothing;
 
 insert into public.materials(organization_id,id,material_code,material_type,state,generation,metadata)
@@ -97,8 +102,24 @@ begin
     if sqlerrm = 'culture_domain_mismatch_with_parent_material' then v_rejected := true; else raise; end if;
   end;
   if not v_rejected then raise exception 'FAIL: direct culture insert accepted conflicting domain'; end if;
+
+  -- SECURITY DEFINER must not let a read-only viewer create a culture.
+  perform set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000c902',true);
+  v_rejected := false;
+  begin
+    perform public.create_culture_with_generation(
+      '00000000-0000-0000-0000-00000000c911',
+      'DOMAIN-VIEWER-MUST-FAIL',
+      (select code from public.culture_types order by code limit 1),
+      '00000000-0000-0000-0000-00000000c921',
+      null,null,null,null,null,now(),'{}'::jsonb
+    );
+  exception when insufficient_privilege then
+    if sqlerrm = 'organization_write_access_denied' then v_rejected := true; else raise; end if;
+  end;
+  if not v_rejected then raise exception 'FAIL: viewer created culture through SECURITY DEFINER RPC'; end if;
 end
-$$;
+$;
 
 reset role;
 rollback;
