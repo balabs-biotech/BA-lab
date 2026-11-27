@@ -266,6 +266,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-ingestion-rpc-security.test.sql
       - name: Test BAL-JSON workspace domain resolution runtime scenarios
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-workspace-domain-runtime.test.sql
+      - name: Test audited legacy BAL-JSON domain classification
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-workspace-domain-runtime.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
