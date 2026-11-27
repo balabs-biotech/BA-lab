@@ -86,6 +86,14 @@ assert.ok(batchMarkup.includes('<div class="batch-harvest-entry">') && batchMark
 assert.ok(interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .grid"), "Batch journal subforms must have an explicit nested-grid layout");
 assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .grid {\n    grid-template-columns:minmax(0,1fr)"), "Harvest and movement fields must stack on narrow screens");
 
+
+const measurementMarkup = html.slice(html.indexOf('id="measurementCard"'), html.indexOf('id="statisticsCard"'));
+assert.ok(measurementMarkup.includes('class="quick-capture-grid"') && measurementMarkup.includes('id="measurementHistory"') && measurementMarkup.includes('class="observation-details"'), "Measurement workspace must retain quick capture, history and qualitative observation surfaces");
+assert.ok(interiorHarmonization.includes("#measurementCard .quick-capture-grid") && interiorHarmonization.includes("grid-template-columns:repeat(2,minmax(0,1fr))"), "Quick capture tiles must use a responsive two-column layout");
+assert.ok(interiorHarmonization.includes("#measurementCard > .grid") && interiorHarmonization.includes("#measurementCard .observation-details > .grid"), "Measurement and observation fields must have explicit responsive grid rules");
+assert.ok(interiorHarmonization.includes("#measurementCard .bal-json-panel") && interiorHarmonization.includes("overflow-wrap:anywhere"), "BAL-JSON import content must remain readable without horizontal overflow");
+assert.ok(interiorHarmonization.includes("#measurementCard #measurementHistory") && interiorHarmonization.includes("min-width:0"), "Measurement history must remain constrained within its workspace card");
+
 console.log("✓ CultureOps sector-specific visual runtime contract");
 
 const greenClimate = fs.readFileSync("batch-tracker/greentech-climate-signature.js", "utf8");
