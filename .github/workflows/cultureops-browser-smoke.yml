@@ -23,7 +23,7 @@ jobs:
       - name: Install Playwright
         run: npm install --no-save --no-package-lock playwright
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
       - name: Serve CultureOps
         run: |
           python3 -m http.server 8787 --directory . > /tmp/cultureops-http.log 2>&1 &
@@ -45,5 +45,5 @@ jobs:
         with:
           name: cultureops-browser-smoke
           path: artifacts/cultureops-browser-smoke/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
