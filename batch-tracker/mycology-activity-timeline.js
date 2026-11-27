@@ -128,9 +128,6 @@
       const root = new Container();
       next.stage.addChild(root);
       const y = 86;
-      const dates = ordered.map(item => item.timestamp).filter(Number.isFinite);
-      const minDate = dates.length ? Math.min(...dates) : null;
-      const maxDate = dates.length ? Math.max(...dates) : null;
       const axis = new Graphics().moveTo(left + nodeWidth / 2, y).lineTo(baseWidth - left - nodeWidth / 2, y)
         .stroke({ color: 0x765c4d, alpha: 0.72, width: 2 });
       root.addChild(axis);
