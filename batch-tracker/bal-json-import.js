@@ -101,6 +101,7 @@
             ? "Cette archive possède déjà cette classification. Aucune modification effectuée."
             : "Classification enregistrée et auditée. La décision est immuable.";
           reasonInput.value = "";
+          await setupLegacyDomainAdmin();
         } catch (error) {
           adminStatus.textContent = "Classification refusée : " + (error.message || "erreur inconnue");
         } finally { classifyButton.disabled = false; }
