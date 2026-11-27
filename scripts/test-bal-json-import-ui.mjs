@@ -10,7 +10,7 @@ const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
-  assert.match(html, /20261127-legacy-domain-admin-5/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
+  assert.match(html, /20261127-legacy-domain-admin-6/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
 }
 for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus","legacyDomainAdminPanel","legacyDomainTarget","legacyDomainValue","legacyDomainReason","legacyDomainClassifyButton","legacyDomainAdminStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
@@ -23,6 +23,8 @@ assert.match(tracker, /window\.BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "tracker must ex
 assert.match(tracker, /from\("organization_members"\)[\s\S]*?select\("role"\)[\s\S]*?eq\("organization_id", expectedOrganizationId\)[\s\S]*?eq\("user_id", authData\.user\.id\)/, "admin capability must verify the authenticated user's membership in the active organization");
 assert.match(tracker, /getAuthenticatedDomainAdminRole\(expectedOrganizationId\)/, "classification must recheck admin membership before invoking the RPC");
 assert.match(source, /classify_legacy_biological_domain|BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "admin panel must submit the audited classification operation");
+assert.match(source, /classifyButton\.onclick\s*=\s*async/, "repeated organization-ready events must not duplicate classification click handlers");
+assert.match(source, /adminPanel\.dataset\.organizationId\s*!==\s*context\.organization_id/, "classification panel must be bound to the organization whose records it loaded");
 
 function element(id) {
   return {
