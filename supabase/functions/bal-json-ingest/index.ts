@@ -149,6 +149,9 @@ Deno.serve(async (req: Request) => {
       p_plant_culture_id: plantCultureId,
       p_batch_id: batchId,
     });
+    if (domainError?.message?.includes("organization_access_denied")) {
+      return response(403, { error: "organization_access_denied" });
+    }
     if (domainError || !["mycology", "laboratory", "agronomy"].includes(workspaceDomain)) {
       return response(422, { error: "workspace_domain_unresolved", message: "The biological target has no trusted, unambiguous workspace domain." });
     }
