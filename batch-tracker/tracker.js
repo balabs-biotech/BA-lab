@@ -22,7 +22,6 @@ const supabaseClient =
    ============================================================ */
 
 let organizationId = null;
-let organizationRole = null;
 
 // Narrow integration surface for the BAL-JSON bridge. These getters expose
 // only the current tenant context and an existing UI refresh action; no keys
@@ -187,7 +186,6 @@ function clearAuthenticatedWorkspaceState() {
   if (sectionNavigation) sectionNavigation.hidden = true;
   // Remove the previous tenant context before an auth transition can yield.
   organizationId = null;
-  organizationRole = null;
   organization = null;
   strainOptions = [];
   referenceData = [];
@@ -1044,7 +1042,6 @@ async function initializeAuthenticatedTracker(
     // still current; an obsolete claim must never overwrite the active tenant.
     organization = claim.organization;
     organizationId = claim.organization.id;
-    organizationRole = claim.role || null;
     window.dispatchEvent(new CustomEvent("ba-labs-organization-ready"));
 
     if (!organizationId) {
