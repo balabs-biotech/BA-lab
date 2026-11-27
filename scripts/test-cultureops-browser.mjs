@@ -280,6 +280,9 @@ try {
 
       if (viewport.width >= 821 && (metrics.toolbarPosition !== "sticky" || metrics.toolbarTop < 0 || metrics.heroTop < metrics.toolbarBottom + 8 || metrics.toolbarWidth > metrics.viewportWidth)) failures.push(`${workspace.slug}/${viewport.name}: horizontal sticky toolbar layout is invalid (${JSON.stringify({ position: metrics.toolbarPosition, top: metrics.toolbarTop, bottom: metrics.toolbarBottom, heroTop: metrics.heroTop, width: metrics.toolbarWidth, viewport: metrics.viewportWidth })})`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
+      if (viewport.name !== "desktop" && metrics.measurementControls.some(control => Number.parseFloat(control.minHeight) < 44 || Number.parseFloat(control.fontSize) < 16)) {
+        failures.push(`${workspace.slug}/${viewport.name}: measurement fields must retain 44px touch targets and 16px text (${JSON.stringify(metrics.measurementControls.filter(control => Number.parseFloat(control.minHeight) < 44 || Number.parseFloat(control.fontSize) < 16))})`);
+      }
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
       if (!metrics.organicField) failures.push(`${workspace.slug}/${viewport.name}: shared organic mycelium canvas missing`);
