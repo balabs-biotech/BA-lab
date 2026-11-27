@@ -825,3 +825,222 @@ html body[data-domain] #statisticsCard .statistics-footnote {
     width:100% !important;
   }
 }
+
+
+/* PASS 210 — production lot workspace: creation, comparison and lifecycle.
+   Keep workflow actions and QC state distinct while improving mobile flow. */
+html body[data-domain] #batchCard .batch-create-panel,
+html body[data-domain] #batchCard .batch-compare-panel {
+  min-width:0 !important;
+  padding:clamp(14px,2vw,20px) !important;
+  border:1px solid rgba(169,192,179,.17) !important;
+  border-radius:14px !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.78),rgba(17,27,25,.9)) !important;
+}
+html body[data-domain] #batchCard .batch-create-heading {
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  flex-wrap:wrap !important;
+  margin-bottom:14px !important;
+}
+html body[data-domain] #batchCard .batch-create-heading > div {
+  min-width:0 !important;
+  flex:1 1 280px !important;
+}
+html body[data-domain] #batchCard .batch-create-heading h3,
+html body[data-domain] #batchCard .batch-compare-panel h3 {
+  color:#edf2ec !important;
+  margin:5px 0 7px !important;
+}
+html body[data-domain] #batchCard .batch-create-heading p,
+html body[data-domain] #batchCard .batch-compare-panel > .muted {
+  color:#aebdb2 !important;
+  line-height:1.6 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #batchCard .batch-required-note {
+  align-self:flex-start !important;
+  padding:6px 9px !important;
+  border:1px solid rgba(190,118,88,.28) !important;
+  border-radius:8px !important;
+  color:#e5c3ad !important;
+  font-size:11px !important;
+  white-space:normal !important;
+}
+html body[data-domain] #batchCard .batch-create-panel > .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:13px !important;
+  margin:0 0 12px !important;
+}
+html body[data-domain] #batchCard .batch-create-panel > .grid > div {
+  min-width:0 !important;
+}
+html body[data-domain] #batchCard .batch-create-panel :is(label,.hint) {
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #batchCard .batch-create-panel .hint {
+  display:block !important;
+  margin-top:5px !important;
+  color:#aebdb2 !important;
+  font-size:11px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain] #batchCard #createBatchButton {
+  min-height:44px !important;
+  margin-top:5px !important;
+}
+html body[data-domain] #batchCard .batch-list {
+  display:grid !important;
+  gap:10px !important;
+  min-width:0 !important;
+  margin-top:12px !important;
+}
+html body[data-domain] #batchCard .batch-compare-panel {
+  margin-top:18px !important;
+}
+html body[data-domain] #batchCard .batch-compare-panel > label {
+  display:block !important;
+  margin:12px 0 6px !important;
+  color:#d5dfd6 !important;
+  font-weight:650 !important;
+}
+html body[data-domain] #batchCard #batchCompareSelect {
+  width:100% !important;
+  min-height:132px !important;
+  padding:8px !important;
+  border-radius:9px !important;
+}
+html body[data-domain] #batchCard #compareBatchesButton {
+  min-height:44px !important;
+  margin-top:12px !important;
+}
+html body[data-domain] #batchCard #batchCompareStatus {
+  margin:12px 0 !important;
+  color:#bdc9bf !important;
+  line-height:1.55 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #batchCard #batchCompareResults {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-x:auto !important;
+}
+html body[data-domain] #batchCard #batchStages,
+html body[data-domain] #batchCard #batchQc {
+  min-width:0 !important;
+  margin-top:18px !important;
+  padding:clamp(14px,2vw,18px) !important;
+  border:1px solid rgba(169,192,179,.15) !important;
+  border-radius:13px !important;
+  background:rgba(17,27,25,.52) !important;
+}
+html body[data-domain] #batchCard #batchStages > h3,
+html body[data-domain] #batchCard #batchQc > h3 {
+  margin-top:0 !important;
+  color:#edf2ec !important;
+}
+html body[data-domain] #batchCard #stageProgress {
+  min-width:0 !important;
+  margin:12px 0 16px !important;
+}
+html body[data-domain] #batchCard #stageProgressTrack {
+  overflow:hidden !important;
+  border-radius:999px !important;
+}
+html body[data-domain] #batchCard .stage-list,
+html body[data-domain] #batchCard .qc-list {
+  display:grid !important;
+  gap:9px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #batchCard .stage,
+html body[data-domain] #batchCard .qc-row {
+  min-width:0 !important;
+  padding:12px !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #batchCard .batch-actions {
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:9px !important;
+  margin-top:14px !important;
+}
+html body[data-domain] #batchCard .batch-actions button,
+html body[data-domain] #batchCard #releaseBatchButton {
+  min-height:44px !important;
+}
+html body[data-domain] #batchCard #batchEvents {
+  min-width:0 !important;
+  margin-top:18px !important;
+  padding:clamp(14px,2vw,20px) !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-radius:14px !important;
+  background:rgba(17,27,25,.58) !important;
+}
+html body[data-domain] #batchCard #batchEvents > h3 {
+  margin-top:4px !important;
+  color:#edf2ec !important;
+}
+html body[data-domain] #batchCard #batchEvents > .muted {
+  color:#aebdb2 !important;
+  line-height:1.6 !important;
+}
+html body[data-domain] #batchCard .batch-harvest-entry {
+  min-width:0 !important;
+  margin-top:13px !important;
+  padding:14px !important;
+  border:1px solid rgba(169,192,179,.14) !important;
+  border-radius:11px !important;
+  background:rgba(37,54,49,.38) !important;
+}
+html body[data-domain] #batchCard .batch-harvest-entry h4 {
+  margin:0 0 6px !important;
+  color:#e5ece5 !important;
+}
+html body[data-domain] #batchCard .batch-harvest-entry .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:11px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #batchCard .batch-harvest-entry .grid > div {
+  min-width:0 !important;
+}
+html body[data-domain] #batchCard .batch-harvest-entry :is(button,input,select,textarea) {
+  max-width:100% !important;
+}
+html body[data-domain] #batchCard .batch-harvest-entry button {
+  min-height:44px !important;
+  margin-top:10px !important;
+}
+html body[data-domain] #batchCard #batchEventList {
+  display:grid !important;
+  gap:9px !important;
+  min-width:0 !important;
+  margin-top:16px !important;
+}
+html body[data-domain] #batchCard #batchEventList > * {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-wrap:anywhere !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #batchCard .batch-create-panel > .grid,
+  html body[data-domain] #batchCard .batch-harvest-entry .grid {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #batchCard .batch-actions {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #batchCard .batch-actions button,
+  html body[data-domain] #batchCard #createBatchButton,
+  html body[data-domain] #batchCard #compareBatchesButton,
+  html body[data-domain] #batchCard #releaseBatchButton,
+  html body[data-domain] #batchCard .batch-harvest-entry button {
+    width:100% !important;
+  }
+}
