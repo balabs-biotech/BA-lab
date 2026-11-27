@@ -529,10 +529,10 @@ try {
         const visualizationStages = [...visualizationFixture.querySelectorAll(".mycology-activity-stage,.lab-process-map-stage")].map(stage => ({
           className: stage.className, overflowX: getComputedStyle(stage).overflowX, minWidth: getComputedStyle(stage).minWidth
         }));
-        const visualizationClimate = {
+        const visualizationClimate = domain === "agronomy" ? {
           plotOverflow: getComputedStyle(visualizationFixture.querySelector(".greentech-climate-plot")).overflowX,
           valuesColumns: getComputedStyle(visualizationFixture.querySelector(".greentech-climate-values")).gridTemplateColumns
-        };
+        } : null;
         visualizationFixture.remove();
         for (const [parentSelector, className, label] of fixtures) {
           const parent = document.querySelector(parentSelector);
