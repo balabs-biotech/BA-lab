@@ -831,6 +831,20 @@
         <ol><li>Copiez le prompt, puis collez-le dans votre LLM généraliste avec vos notes d’observation.</li><li>Demandez une sortie JSON stricte conforme au contrat BAL-JSON.</li><li>Copiez uniquement l’objet JSON retourné et collez-le ici.</li><li>Vérifiez l’aperçu et le rattachement à la culture ou au lot, puis importez.</li></ol>
         <p>Le LLM ne se connecte jamais à votre base. Il prépare une proposition ; CultureOps valide le contrat, l’identité de l’organisation, les variables et les unités avant l’écriture atomique.</p>
       </details>
+      <section id="legacyDomainAdminPanel" class="bal-json-help" hidden aria-labelledby="legacyDomainAdminTitle">
+        <div class="context-divider"></div>
+        <span class="context-eyebrow">ADMINISTRATION / INTÉGRITÉ DES DONNÉES</span>
+        <h4 id="legacyDomainAdminTitle">Classer les archives biologiques</h4>
+        <p class="muted">Réservé aux propriétaires et administrateurs. Cette opération attribue une fois un domaine à une ancienne culture ou à un matériel. La décision et sa justification sont auditées ; une classification existante ne peut pas être écrasée.</p>
+        <label for="legacyDomainTarget">Culture ou matériel à classer</label>
+        <select id="legacyDomainTarget"><option value="">Chargement des archives…</option></select>
+        <label for="legacyDomainValue">Domaine biologique confirmé</label>
+        <select id="legacyDomainValue"><option value="mycology">Mycologie</option><option value="laboratory">Laboratoire</option></select>
+        <label for="legacyDomainReason">Justification (8 à 500 caractères)</label>
+        <textarea id="legacyDomainReason" rows="2" minlength="8" maxlength="500" placeholder="Ex. registre historique vérifié : souche Pleurotus utilisée pour la production de mycélium."></textarea>
+        <button id="legacyDomainClassifyButton" type="button" class="secondary-button">Enregistrer la classification auditée</button>
+        <p id="legacyDomainAdminStatus" class="muted" role="status" aria-live="polite">Aucune archive modifiée.</p>
+      </section>
     </section>
 
     <div class="quick-capture" aria-label="Saisie rapide">
