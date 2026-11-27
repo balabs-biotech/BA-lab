@@ -441,7 +441,7 @@ html body[data-domain="mycology"] #trackerCard .culture-lineage-node[data-lineag
   letter-spacing:.1em;
 }
 html body[data-domain="mycology"] #trackerCard .culture-lineage-node[data-lineage-role="ancestor"] {
-  border-inline-start-color:#83a7a0 !important;
+  border-inline-start-color:#9b9a8f !important;
 }
 html body[data-domain="mycology"] #trackerCard .culture-lineage-node[data-lineage-role="descendant"] {
   border-inline-start-color:var(--workspace-accent) !important;
