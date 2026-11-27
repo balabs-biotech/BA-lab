@@ -94,7 +94,6 @@ assert.ok(cultureDetailMarkup.includes('id="cultureLineage"') && cultureDetailMa
 assert.ok(interiorHarmonization.includes(".culture-detail-summary") && interiorHarmonization.includes("grid-template-columns:repeat(auto-fit"), "Culture summary fields must use a responsive, content-aware grid");
 assert.ok(interiorHarmonization.includes(".culture-detail-heading") && interiorHarmonization.includes("flex-direction:column"), "Culture detail heading and close action must stack on narrow screens");
 assert.ok(interiorHarmonization.includes(".culture-linked-batches .culture-timeline-entry") && interiorHarmonization.includes("grid-template-columns:minmax(0,1fr) auto"), "Linked production batches must retain a readable record/action layout");
-const batchMarkup = html.slice(html.indexOf('id="batchCard"'), html.indexOf('id="statisticsCard"'));
 assert.ok(batchMarkup.includes('class="batch-create-panel"') && batchMarkup.includes('id="batchQcList"'), "Production workspace must retain lot creation and quality-control surfaces");
 assert.ok(batchMarkup.includes('id="batchEvents"') && batchMarkup.includes('id="batchEventList"'), "Production workspace must retain its traceability journal and event list");
 assert.ok(batchMarkup.includes('id="harvestQuantity"') && batchMarkup.includes('id="moveBatchLocation"'), "Production journal must retain harvest and movement controls");
@@ -130,7 +129,6 @@ assert.ok(interiorHarmonization.includes("#batchCard .batch-harvest-entry .grid"
 assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchCard .batch-actions"), "Production actions must stack on mobile");
 
 
-const cultureDetailMarkup = html.slice(html.indexOf('id="cultureDetailPanel"'), html.indexOf('<!-- ======================================================\n       REGISTRE AGRITECH'));
 assert.ok(cultureDetailMarkup.includes('id="cultureDetailSummary"') && cultureDetailMarkup.includes('id="bioOperationForm"'), "Culture detail must retain summary and biological operation form");
 assert.ok(cultureDetailMarkup.includes('id="cultureLineage"') && cultureDetailMarkup.includes('id="cultureDetailTimeline"'), "Culture detail must retain lineage and complete timeline");
 assert.ok(interiorHarmonization.includes("#trackerCard .bio-operation-form") && interiorHarmonization.includes("#trackerCard .bio-operation-wide"), "Biological operation form must use a responsive structured grid");
