@@ -55,12 +55,12 @@
           document.body.appendChild(script);
         };
         i18nScript.onerror = () => {
-          document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le module de langues n’a pas pu être chargé. Rechargez la page.</p></main>";
+          document.getElementById("workspace-root").innerHTML = "<main class='container workspace-entry-state'><section class='card workspace-entry-error' role='alert'><h1>Chargement interrompu</h1><p>Le module de langues n’a pas pu être chargé. Rechargez la page.</p></section></main>";
         };
         document.body.appendChild(i18nScript);
       })
       .catch(() => {
-        document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>L’interface n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></main>";
+        document.getElementById("workspace-root").innerHTML = "<main class='container workspace-entry-state'><section class='card workspace-entry-error' role='alert'><h1>Chargement interrompu</h1><p>L’interface n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
       });
     }
   </script>
