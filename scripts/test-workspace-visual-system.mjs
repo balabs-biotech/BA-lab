@@ -45,7 +45,7 @@ assert.ok(lineage.includes('data-graph-zoom="in"') && lineage.includes('data-gra
 assert.ok(lineage.includes('data-graph-zoom="fit"'), "PixiJS lineage graph must expose a recenter action");
 assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS lineage graph must support pointer panning without capturing node taps");
 assert.equal((lineage.match(/window\.addEventListener\("pointermove"/g) || []).length, 1, "Lineage graph must register pointer listeners once, not on every render");
-assert.ok(lineage.includes("graph.width * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
+assert.ok(lineage.includes("graphWidth * zoom") && lineage.includes("graphHeight * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycology.includes(".lineage-graph-toolbar button:focus-visible"), "Mycology lineage controls must expose a visible keyboard focus state");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
