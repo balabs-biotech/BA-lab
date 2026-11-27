@@ -6,14 +6,40 @@ returns trigger
 language plpgsql
 set search_path = ''
 as $$
+declare
+  v_domain text;
 begin
-  if old.metadata ? 'domain'
+  v_domain := new.metadata ->> 'domain';
+  if new.metadata ? 'domain' and (
+       (tg_table_name = 'plant_cultures' and v_domain is distinct from 'agronomy')
+       or
+       (tg_table_name <> 'plant_cultures' and v_domain not in ('mycology', 'laboratory'))
+     ) then
+    raise exception 'invalid_biological_domain';
+  end if;
+
+  if tg_op = 'UPDATE'
      and new.metadata ->> 'domain' is distinct from old.metadata ->> 'domain' then
     raise exception 'biological_domain_is_immutable';
   end if;
   return new;
 end;
 $$;
+
+drop trigger if exists cultures_domain_insert_guard on public.cultures;
+create trigger cultures_domain_insert_guard
+before insert on public.cultures
+for each row execute function private.prevent_biological_domain_rewrite();
+
+drop trigger if exists materials_domain_insert_guard on public.materials;
+create trigger materials_domain_insert_guard
+before insert on public.materials
+for each row execute function private.prevent_biological_domain_rewrite();
+
+drop trigger if exists plant_cultures_domain_insert_guard on public.plant_cultures;
+create trigger plant_cultures_domain_insert_guard
+before insert on public.plant_cultures
+for each row execute function private.prevent_biological_domain_rewrite();
 
 drop trigger if exists cultures_domain_immutable on public.cultures;
 create trigger cultures_domain_immutable
