@@ -288,7 +288,7 @@ for (const [fn, label] of [
   const block = engine.slice(start, next);
   if (!block.includes("row.metadata?.bal_json?.record_id") ||
       !block.includes("escapeHtml(traceabilityId)") ||
-      !block.includes("${traceabilityLabel}")) {
+      (block.match(/traceabilityLabel/g) || []).length < 2) {
     throw new Error("BAL-JSON record_id must be safely visible in the " + label + " history");
   }
 }
