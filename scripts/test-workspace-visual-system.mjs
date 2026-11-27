@@ -23,6 +23,8 @@ for (const [name, page, domain] of entryPages) {
   assert.ok(page.includes(domain), name + " must preserve its workspace identity");
   assert.ok(page.includes("workspace-entry-state") && page.includes("workspace-entry-indicator"), name + " must use the shared loading state");
   assert.ok(page.includes("workspace-entry-error") && page.includes("role='alert'"), name + " must use the shared recoverable-error surface");
+  assert.ok(!page.includes("<main class='container'><p role='alert'>"), name + " must not retain unstyled legacy failure fallbacks");
+  assert.ok((page.match(/workspace-entry-error/g) || []).length >= 3, name + " must harmonize service, language and application-load failures");
   assert.ok(page.includes("workspace-unified.css?v=20261127-entry-state-213"), name + " must load the current shared visual system");
 }
 assert.ok(interiorHarmonization.includes(".workspace-entry-state") && interiorHarmonization.includes(".workspace-entry-indicator"), "Workspace entry and loading states must share the BA Labs visual system");
