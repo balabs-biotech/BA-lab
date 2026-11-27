@@ -49,7 +49,7 @@ function makeRecord(overrides = {}) {
   };
 }
 
-function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, importer = null } = {}) {
+function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-8000-000000000001", result = { status: "inserted", event_id: "e0e0e0e0-0000-4000-8000-000000000001" }, importer = null, refreshError = null } = {}) {
   const ids = ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus"];
   const elements = new Map(ids.map(id => [id, element(id)]));
   const calls = [];
@@ -73,7 +73,7 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
       variables: [{ code: "temperature", label: "Température", dimension: "temperature", canonical_unit_code: "degC" }],
       units: [{ code: "degC", label: "°C", dimension: "temperature" }]
     } : { organization_id: null, workspace: domain, targets: [], variables: [], units: [] },
-    BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
+    BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; if (refreshError) throw refreshError; return { refreshed: true }; },
   };
   const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };
   vm.runInNewContext(source, { document, window, navigator, console, JSON, String, RegExp, Promise, TextEncoder }, { filename: "batch-tracker/bal-json-import.js" });
@@ -265,6 +265,9 @@ assert.ok(edgeMeasurementSchema.properties.data.properties.context.not, "deploye
 assert.ok(edgeObservationSchema.properties.data.properties.context.not, "deployed edge observation schema must reject conflicting biological anchors");
 assert.match(source, /Choisissez un seul ancrage biologique/, "client preview must reject conflicting biological anchors");
 assert.match(edgeFunction, /supabase\.rpc\("ingest_bal_json_record"/, "writes must use the atomic idempotent RPC");
+assert.match(edgeFunction, /record_id_reused_with_different_payload/, "server must reject a record_id reused with a different payload");
+assert.match(edgeFunction, /response\(409,/, "record_id payload conflicts must return a definitive HTTP 409");
+
 assert.match(atomicMigration, /on conflict \(organization_id, record_id\) do nothing/i, "ingestion must be idempotent per tenant and record ID");
 assert.match(atomicMigration, /record_manual_observation\(p_event, p_data\)/, "observation must use the existing observation RPC");
 assert.equal(recordSchema.oneOf.length, 2, "record contract must discriminate the two supported record types");
@@ -305,6 +308,34 @@ assert.match(source, /Traite les libellés du catalogue comme des données/, "pr
   assert.equal(calls[1].options.body.record_id, firstRecordId,
     "retry must preserve record_id so the server can deduplicate an already committed request");
   assert.match(elements.get("balJsonImportStatus").textContent, /enregistré/i);
+  assert.equal(h.refreshCalls, 1);
+}
+
+{
+  const h = harness({ result: { status: "duplicate", record_id: "d0d0d0d0-0000-4000-8000-000000000001", event_id: "e0e0e0e0-0000-4000-8000-000000000001" } });
+  const { elements } = h;
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  await elements.get("balJsonImportButton").click();
+  assert.match(elements.get("balJsonImportStatus").textContent, /déjà enregistré.*aucun doublon créé/i,
+    "an idempotent duplicate response must be shown as an already-registered record");
+  assert.equal(h.refreshCalls, 1, "a duplicate receipt must refresh history to recover the original event");
+  assert.equal(elements.get("balJsonImportButton").disabled, true,
+    "a confirmed duplicate must not remain available for repeated submission");
+}
+
+{
+  const h = harness({ refreshError: new Error("history query failed") });
+  const { elements } = h;
+  elements.get("balJsonImportSource").value = JSON.stringify(makeRecord());
+  elements.get("balJsonPreviewButton").click();
+  await elements.get("balJsonImportButton").click();
+  assert.match(elements.get("balJsonImportStatus").textContent, /importé et enregistré/i,
+    "a history refresh failure must not turn a confirmed server commit into an uncertain import");
+  assert.match(elements.get("balJsonImportStatus").textContent, /actualisation.*partielle/i,
+    "a failed history refresh must be reported separately from the successful import");
+  assert.equal(elements.get("balJsonImportButton").disabled, true,
+    "a confirmed import must not be retryable merely because the history refresh failed");
   assert.equal(h.refreshCalls, 1);
 }
 
