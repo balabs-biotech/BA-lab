@@ -68,15 +68,16 @@ declare
   v_user_id uuid := auth.uid();
   v_role text;
   v_metadata_domain text;
-  v_related_domain text;
+  v_related_conflict boolean := false;
   v_existing_domain text;
   v_rows integer;
 begin
   if v_user_id is null then
     raise exception 'authentication_required' using errcode = '42501';
   end if;
-  if p_target_type not in ('culture','material')
-     or p_domain not in ('mycology','laboratory')
+  if p_organization_id is null
+     or p_target_type is null or p_target_type not in ('culture','material')
+     or p_domain is null or p_domain not in ('mycology','laboratory')
      or p_target_id is null
      or p_reason is null
      or length(btrim(p_reason)) not between 8 and 500 then
@@ -87,7 +88,7 @@ begin
     from public.organization_members om
    where om.organization_id = p_organization_id
      and om.user_id = v_user_id;
-  if v_role not in ('owner','admin') then
+  if coalesce(v_role,'') not in ('owner','admin') then
     raise exception 'domain_classification_requires_admin' using errcode = '42501';
   end if;
 
@@ -97,31 +98,38 @@ begin
      where c.organization_id = p_organization_id and c.id = p_target_id;
     if not found then raise exception 'culture_not_found_or_access_denied'; end if;
 
-    select private.get_biological_domain(p_organization_id,'material',c.material_id,m.metadata ->> 'domain')
-      into v_related_domain
-      from public.cultures c
-      left join public.materials m
-        on m.organization_id = c.organization_id and m.id = c.material_id
-     where c.organization_id = p_organization_id and c.id = p_target_id;
+    select exists (
+      select 1
+        from public.cultures c
+        join public.materials m
+          on m.organization_id = c.organization_id and m.id = c.material_id
+       where c.organization_id = p_organization_id and c.id = p_target_id
+         and private.get_biological_domain(p_organization_id,'material',m.id,m.metadata ->> 'domain')
+             is not null
+         and private.get_biological_domain(p_organization_id,'material',m.id,m.metadata ->> 'domain')
+             is distinct from p_domain
+    ) into v_related_conflict;
   else
     select m.metadata ->> 'domain' into v_metadata_domain
       from public.materials m
      where m.organization_id = p_organization_id and m.id = p_target_id;
     if not found then raise exception 'material_not_found_or_access_denied'; end if;
 
-    select private.get_biological_domain(p_organization_id,'culture',c.id,c.metadata ->> 'domain')
-      into v_related_domain
-      from public.cultures c
-     where c.organization_id = p_organization_id and c.material_id = p_target_id
-       and c.metadata ? 'domain'
-     order by c.created_at
-     limit 1;
+    select exists (
+      select 1
+        from public.cultures c
+       where c.organization_id = p_organization_id and c.material_id = p_target_id
+         and private.get_biological_domain(p_organization_id,'culture',c.id,c.metadata ->> 'domain')
+             is not null
+         and private.get_biological_domain(p_organization_id,'culture',c.id,c.metadata ->> 'domain')
+             is distinct from p_domain
+    ) into v_related_conflict;
   end if;
 
   if v_metadata_domain is not null and v_metadata_domain is distinct from p_domain then
     raise exception 'domain_classification_conflicts_with_record_metadata';
   end if;
-  if v_related_domain is not null and v_related_domain is distinct from p_domain then
+  if v_related_conflict then
     raise exception 'domain_classification_conflicts_with_related_record';
   end if;
 
