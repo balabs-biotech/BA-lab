@@ -2171,8 +2171,7 @@ async function createCulture() {
 
           p_metadata: {
             source: "BA Labs Culture Tracker",
-            interface_version: "2.0",
-            domain: document.body.dataset.domain === "laboratory" ? "laboratory" : "mycology"
+            interface_version: "2.0"
           }
 
         }
@@ -2181,11 +2180,16 @@ async function createCulture() {
 
 
     if (error) {
-
-      throw new Error(
-        error.message
-      );
-
+      const message = String(error.message || "");
+      if (message.includes("parent_material_domain_unclassified")) {
+        throw new Error(
+          "Le matériel parent n’a pas encore de domaine biologique vérifié. Un propriétaire ou administrateur doit d’abord le classer dans le panneau « Classification des archives »."
+        );
+      }
+      if (message.includes("organization_write_access_denied")) {
+        throw new Error("Votre rôle ne permet pas de créer une culture dans cette organisation.");
+      }
+      throw new Error(message || "La création de la culture a échoué.");
     }
 
 
