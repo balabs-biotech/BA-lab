@@ -154,8 +154,8 @@ declare
   v_domain text;
   v_metadata jsonb;
 begin
-  if not private.is_org_member(p_organization_id) then
-    raise exception 'organization_access_denied';
+  if not private.is_org_writer(p_organization_id) then
+    raise exception 'organization_write_access_denied' using errcode = '42501';
   end if;
 
   if not exists (
