@@ -166,7 +166,9 @@ try {
         const importPreview = await page.locator("#balJsonPreview").textContent();
         if (!importPreview.includes("measurement") || !importPreview.includes("temperature") || !importPreview.includes("24.5")) {
           failures.push(`${workspace.slug}: pasted BAL-JSON payload did not produce the expected preview (${importPreview})`);
-        }
+          await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForFunction(() => window.scrollY === 0);
+      }
       }
 
       await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
