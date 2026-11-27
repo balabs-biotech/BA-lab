@@ -509,13 +509,16 @@ try {
         const visualizationHost = document.querySelector("#trackerCard") || document.body;
         const visualizationFixture = document.createElement("section");
         visualizationFixture.className = "visualization-browser-fixture";
-        visualizationFixture.innerHTML = `
+        const domain = document.body.dataset.domain;
+        visualizationFixture.innerHTML = domain === "mycology" ? `
           <div class="mycology-activity-map">
             <div class="mycology-activity-tools"><button type="button">−</button><button type="button">+</button><button type="button">Ajuster</button></div>
             <div class="mycology-activity-stage"></div>
           </div>
           <div class="lineage-graph-shell"><div class="lineage-graph-toolbar"><button type="button">−</button><button type="button">+</button><button type="button">Recentrer</button></div></div>
+        ` : domain === "laboratory" ? `
           <div class="lab-process-map"><div class="lab-process-map-controls"><button type="button">−</button><button type="button">+</button><button type="button">Ajuster</button></div><div class="lab-process-map-stage"></div></div>
+        ` : `
           <div class="greentech-climate-signature"><div class="greentech-climate-plot"></div><ul class="greentech-climate-values"><li>Température <strong>24 °C</strong></li></ul></div>
         `;
         visualizationHost.appendChild(visualizationFixture);
