@@ -85,4 +85,10 @@ assert.ok(mycologyActivity.includes("resizeObserver?.disconnect()"), "Mycology t
 assert.ok(mycologyActivity.includes("if (!shell.isConnected) target.prepend(shell)"), "Mycology timeline must survive culture selection replacing the history container contents");
 assert.ok(mycologyActivity.includes("L’historique détaillé reste accessible"), "Mycology timeline must preserve its text fallback");
 assert.ok(mycologyActivityStyles.includes(".mycology-activity-stage"), "Mycology timeline must provide a bounded scrollable visualization");
+assert.ok(mycologyActivity.includes("if (!entries.length)"), "Mycology timeline must explicitly handle a genuinely empty culture history");
+assert.ok(mycologyActivity.includes("shell.dataset.state = \"ready\"") && mycologyActivity.includes("shell.dataset.state = \"fallback\""), "Mycology timeline must expose ready and fallback render states");
+assert.ok(greenClimate.includes("panel.dataset.state = \"empty\"") && greenClimate.includes("panel.dataset.state = \"ready\"") && greenClimate.includes("panel.dataset.state = \"fallback\""), "GreenTech climate signature must distinguish empty, ready and fallback states");
+assert.ok(laboratoryProcess.includes("shell.dataset.state = \"empty\"") && laboratoryProcess.includes("shell.dataset.state = \"ready\"") && laboratoryProcess.includes("shell.dataset.state = \"fallback\""), "Laboratory process map must distinguish empty, ready and fallback states");
+assert.ok(greenClimate.includes("renderText(series)"), "GreenTech must retain textual climate values when graphical rendering is unavailable");
+assert.ok(laboratoryProcess.includes("querySelectorAll(\":scope > .stage\")"), "Laboratory map must only project the currently selected batch stages");
 assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology must load the activity timeline runtime");
