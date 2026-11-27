@@ -138,3 +138,10 @@ html body[data-domain] #measurementCard > #measurementTitle {
 html body[data-domain] #measurementCard > .section-kicker {
   color:var(--workspace-accent) !important;
 }
+
+
+/* PASS 220 — Mycology labels use the light copper tier, not the dark brand base. */
+html body[data-domain="mycology"] :is(.section-kicker,.panel-kicker,.card-kicker) {
+  color:#D69A78 !important;
+  -webkit-text-fill-color:#D69A78 !important;
+}
