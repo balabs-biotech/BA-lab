@@ -189,7 +189,7 @@ const editorial = fs.readFileSync("batch-tracker/styles/editorial-harmonization.
 for (const [name, page] of entryPages) {
   assert.ok(page.includes("editorial-harmonization.css?v=20261127-editorial-finish-1"), name + " must load the shared BA Labs editorial finishing layer");
 }
-assert.ok(editorial.includes("background-attachment:fixed") && editorial.includes("#111B1D"), "CultureOps must share the BA Labs graphite editorial canvas");
+assert.ok(editorial.includes("background-attachment:scroll") && editorial.includes("background:#111B1D") && editorial.includes("html {"), "CultureOps must share a stable BA Labs graphite canvas in full-page and viewport rendering");
 assert.ok(editorial.includes("ui-monospace,SFMono-Regular,Menlo,monospace"), "Editorial metadata must use the BA Labs technical label typography");
 assert.ok(editorial.includes("border-radius:12px") && editorial.includes("box-shadow:0 10px 28px"), "Workspace panels must use restrained BA Labs geometry and depth");
 assert.ok(editorial.includes("var(--workspace-accent)") && editorial.includes("prefers-reduced-motion:reduce"), "Editorial finishing must preserve sector accents and reduced-motion support");
