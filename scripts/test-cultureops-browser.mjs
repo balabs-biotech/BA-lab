@@ -431,6 +431,14 @@ try {
         if (message) message.replaceChildren();
       });
 
+      // Restore document origin after form interactions so full-page captures
+      // do not freeze the sticky toolbar at the last interaction scroll offset.
+      await page.evaluate(() => {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        window.scrollTo(0, 0);
+      });
+      await page.waitForFunction(() => window.scrollY === 0);
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
 
@@ -465,6 +473,12 @@ try {
             }
           }
         });
+        await page.evaluate(() => {
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          window.scrollTo(0, 0);
+        });
+        await page.waitForFunction(() => window.scrollY === 0);
         const overviewPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}-overview-preview.png`);
         await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
         const overviewState = await page.evaluate(() => {
