@@ -23,6 +23,22 @@
 
   const stage = shell.querySelector(".lineage-graph-stage");
   let drag = null;
+  let zoom = 1, graphWidth = 0, graphHeight = 0;
+  function applyZoom(value) {
+    zoom = Math.max(0.55, Math.min(1.8, value));
+    if (app?.canvas) {
+      app.canvas.style.width = Math.round(graphWidth * zoom) + "px";
+      app.canvas.style.height = Math.round(graphHeight * zoom) + "px";
+    }
+    const label = shell.querySelector(".lineage-graph-zoom-label");
+    if (label) label.textContent = Math.round(zoom * 100) + " %";
+  }
+  shell.querySelector('[data-graph-zoom="in"]').addEventListener("click", () => applyZoom(zoom + 0.15));
+  shell.querySelector('[data-graph-zoom="out"]').addEventListener("click", () => applyZoom(zoom - 0.15));
+  shell.querySelector('[data-graph-zoom="fit"]').addEventListener("click", () => {
+    applyZoom(1);
+    stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+  });
   stage.addEventListener("pointerdown", event => {
     if (event.target?.classList?.contains("lineage-graph-canvas")) {
       drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
@@ -141,22 +157,9 @@
       const { Container, Graphics, Text, Rectangle } = pixi;
       const scene = new Container();
       nextApp.stage.addChild(scene);
-      const zoomLabel = shell.querySelector(".lineage-graph-zoom-label");
-      let zoom = 1;
-      const applyZoom = value => {
-        zoom = Math.max(0.55, Math.min(1.8, value));
-        if (nextApp.canvas) {
-          nextApp.canvas.style.width = Math.round(graph.width * zoom) + "px";
-          nextApp.canvas.style.height = Math.round(graph.height * zoom) + "px";
-        }
-        if (zoomLabel) zoomLabel.textContent = Math.round(zoom * 100) + " %";
-      };
-      shell.querySelector('[data-graph-zoom="in"]').addEventListener("click", () => applyZoom(zoom + 0.15));
-      shell.querySelector('[data-graph-zoom="out"]').addEventListener("click", () => applyZoom(zoom - 0.15));
-      shell.querySelector('[data-graph-zoom="fit"]').addEventListener("click", () => {
-        applyZoom(1);
-        stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
-      });
+      graphWidth = graph.width;
+      graphHeight = graph.height;
+      applyZoom(zoom);
       const nodeWidth = 184, nodeHeight = 68;
       const byId = graph.positions;
       const drawEdge = (from, to) => {
