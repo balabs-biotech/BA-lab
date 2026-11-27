@@ -185,7 +185,8 @@ try {
         const style = getComputedStyle(body);
         const cardStyle = card ? getComputedStyle(card) : null;
         const headingStyle = heading ? getComputedStyle(heading) : null;
-        const measurementTitle = document.querySelector("#measurementCard > h2");
+        const measurementTitle = document.querySelector("#measurementTitle");
+        const measurementKicker = document.querySelector("#measurementCard > .section-kicker");
         const bridgeHeading = document.querySelector("#balJsonImportPanel .bal-json-heading h3");
         const bridgeEyebrow = document.querySelector("#balJsonImportPanel .context-eyebrow");
         const measurementCard = document.querySelector("#measurementCard");
@@ -210,6 +211,7 @@ try {
           headingText: heading?.textContent?.trim() || null,
           measurementHeadingColor: measurementTitle ? getComputedStyle(measurementTitle).color : null,
           measurementCardBackground: measurementCard ? getComputedStyle(measurementCard).backgroundColor : null,
+          measurementKickerColor: measurementKicker ? getComputedStyle(measurementKicker).color : null,
           bridgeHeadingColor: bridgeHeading ? getComputedStyle(bridgeHeading).color : null,
           bridgePanelBackground: bridgePanel ? getComputedStyle(bridgePanel).backgroundColor : null,
           bridgeEyebrowColor: bridgeEyebrow ? getComputedStyle(bridgeEyebrow).color : null,
@@ -302,9 +304,11 @@ try {
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
       if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);      if (workspace.domain === "mycology") {
         const measurementContrast = contrastRatio(metrics.measurementHeadingColor, metrics.measurementCardBackground);
+        const measurementKickerContrast = contrastRatio(metrics.measurementKickerColor, metrics.measurementCardBackground);
         const bridgeHeadingContrast = contrastRatio(metrics.bridgeHeadingColor, metrics.bridgePanelBackground);
         const bridgeEyebrowContrast = contrastRatio(metrics.bridgeEyebrowColor, metrics.bridgePanelBackground);
         if (measurementContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology measurement heading contrast ${measurementContrast.toFixed(2)}:1 is below 4.5:1`);
+        if (measurementKickerContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology measurement section kicker contrast ${measurementKickerContrast.toFixed(2)}:1 is below 4.5:1`);
         if (bridgeHeadingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology BAL-JSON heading contrast ${bridgeHeadingContrast.toFixed(2)}:1 is below 4.5:1`);
         if (bridgeEyebrowContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology BAL-JSON eyebrow contrast ${bridgeEyebrowContrast.toFixed(2)}:1 is below 4.5:1`);
       }
