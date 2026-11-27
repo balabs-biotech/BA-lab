@@ -78,8 +78,8 @@
         });
         targetSelect.appendChild(group);
       };
-      addGroup("Cultures", context.cultures || [], "culture");
-      addGroup("Matériels / souches", context.materials || [], "material");
+      addGroup("Cultures", (context.cultures || []).filter(row => !row.metadata_domain), "culture");
+      addGroup("Matériels / souches", (context.materials || []).filter(row => !row.metadata_domain), "material");
       if (!targetSelect.options.length) targetSelect.add(new Option("Aucune archive accessible", ""));
       classifyButton.onclick = async () => {
         if (adminPanel.dataset.organizationId !== context.organization_id) {
