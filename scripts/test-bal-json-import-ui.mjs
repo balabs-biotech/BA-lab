@@ -19,6 +19,7 @@ assert.match(tracker, /window\.BA_LABS_IMPORT_BAL_JSON\s*=\s*\(record\)\s*=>\s*s
 assert.doesNotMatch(tracker, /window\.BA_LABS_SUPABASE_CLIENT/, "tracker must not expose the whole Supabase client to the bridge");
 assert.match(tracker, /window\.BA_LABS_GET_ORGANIZATION_ID\s*=\s*\(\)\s*=>\s*organizationId/, "tracker must expose the active organization getter");
 assert.match(tracker, /window\.BA_LABS_GET_DOMAIN_ADMIN_CONTEXT/, "tracker must expose a narrow owner/admin-only legacy classification catalogue");
+assert.match(tracker, /rpc\("get_biological_domain_admin_context"/, "admin catalogue must display effective audited classifications from the database");
 assert.match(tracker, /window\.BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "tracker must expose the authenticated classification RPC only");
 assert.match(tracker, /from\("organization_members"\)[\s\S]*?select\("role"\)[\s\S]*?eq\("organization_id", expectedOrganizationId\)[\s\S]*?eq\("user_id", authData\.user\.id\)/, "admin capability must verify the authenticated user's membership in the active organization");
 assert.match(tracker, /getAuthenticatedDomainAdminRole\(expectedOrganizationId\)/, "classification must recheck admin membership before invoking the RPC");
