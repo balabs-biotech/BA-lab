@@ -18,7 +18,7 @@
   const zoomLabel = shell.querySelector("[data-process-zoom-label]");
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   let PIXI = null, app = null, frame = 0, renderToken = 0, zoom = 1;
-  let pendingApp = null;
+
   let baseWidth = 0, baseHeight = 0;
 
   const palette = {
@@ -84,6 +84,7 @@
       shell.dataset.state = "empty";
       return;
     }
+    let pendingApp = null;
     try {
       const pixi = await loadPixi();
       if (token !== renderToken) return;
