@@ -13,7 +13,7 @@ begin
   if new.metadata ? 'domain' and (
        (tg_table_name = 'plant_cultures' and v_domain is distinct from 'agronomy')
        or
-       (tg_table_name <> 'plant_cultures' and v_domain not in ('mycology', 'laboratory'))
+       (tg_table_name <> 'plant_cultures' and (v_domain is null or v_domain not in ('mycology', 'laboratory')))
      ) then
     raise exception 'invalid_biological_domain';
   end if;
