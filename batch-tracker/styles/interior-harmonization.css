@@ -510,3 +510,48 @@ html body[data-domain] #balJsonImportPanel .bal-json-preview {
   background:#101b19 !important;
   border:1px solid rgba(169,192,179,.20) !important;
 }
+
+
+/* PASS 205 — batch journal subforms.
+   Harvest and movement panels contain nested two-column grids; collapse those
+   grids independently on touch widths without changing the batch-creation form. */
+html body[data-domain] #batchEvents .batch-harvest-entry {
+  min-width:0 !important;
+  border-color:rgba(169,192,179,.18) !important;
+  background:linear-gradient(145deg,rgba(38,59,56,.62),rgba(17,27,25,.78)) !important;
+}
+html body[data-domain] #batchEvents .batch-harvest-entry > h4 {
+  margin:0 0 7px !important;
+  color:#e8eee8 !important;
+  font-size:13px !important;
+}
+html body[data-domain] #batchEvents .batch-harvest-entry > .muted {
+  margin:0 0 10px !important;
+  color:#aebdb2 !important;
+  line-height:1.55 !important;
+}
+html body[data-domain] #batchEvents .batch-harvest-entry > .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #batchEvents .batch-harvest-entry > .grid > div {
+  min-width:0 !important;
+}
+html body[data-domain] #batchEvents :is(#harvestStatus,#moveBatchStatus) {
+  margin:9px 0 0 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #batchEvents #batchEventList {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #batchEvents .batch-harvest-entry > .grid {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #batchEvents .batch-harvest-entry > button {
+    width:100% !important;
+  }
+}
