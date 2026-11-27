@@ -25,6 +25,7 @@ assert.match(tracker, /from\("organization_members"\)[\s\S]*?select\("role"\)[\s
 assert.match(tracker, /getAuthenticatedDomainAdminRole\(expectedOrganizationId\)/, "classification must recheck admin membership before invoking the RPC");
 assert.match(source, /classify_legacy_biological_domain|BA_LABS_CLASSIFY_LEGACY_DOMAIN/, "admin panel must submit the audited classification operation");
 assert.match(source, /classifyButton\.onclick\s*=\s*async/, "repeated organization-ready events must not duplicate classification click handlers");
+assert.match(source, /await setupLegacyDomainAdmin\(\)/, "successful classification must refresh the unresolved archive queue immediately");
 assert.match(source, /adminPanel\.dataset\.organizationId\s*!==\s*context\.organization_id/, "classification panel must be bound to the organization whose records it loaded");
 assert.match(source, /context\.cultures\s*\|\|\s*\[\]\)\.filter\(row\s*=>\s*!row\.metadata_domain\)/, "already-classified cultures must disappear from the legacy classification queue");
 assert.match(source, /context\.materials\s*\|\|\s*\[\]\)\.filter\(row\s*=>\s*!row\.metadata_domain\)/, "already-classified materials must disappear from the legacy classification queue");
