@@ -76,6 +76,8 @@ assert.ok(greenTechEntry.includes("20261117-climate-signature-162"), "GreenTech 
 
 const mycologyActivity = fs.readFileSync("batch-tracker/mycology-activity-timeline.js", "utf8");
 const mycologyActivityStyles = fs.readFileSync("batch-tracker/styles/mycology-activity-timeline.css", "utf8");
+const interiorHarmonization = fs.readFileSync("batch-tracker/styles/interior-harmonization.css", "utf8");
+assert.ok(interiorHarmonization.includes("color:#e8eee8 !important") && interiorHarmonization.includes("color:#c3cec5 !important") && interiorHarmonization.includes("color:#aebdb2 !important"), "Scientific headings, form labels and helper text must use high-contrast mineral tones");
 assert.ok(mycologyActivity.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "Mycology activity timeline must use pinned PixiJS");
 assert.ok(mycologyActivity.includes('querySelectorAll(":scope > .culture-timeline-entry")'), "Mycology timeline must derive nodes from existing culture history entries");
 assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
