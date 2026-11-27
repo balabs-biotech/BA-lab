@@ -22,7 +22,6 @@ const supabaseClient =
    ============================================================ */
 
 let organizationId = null;
-  organizationRole = null;
 let organizationRole = null;
 
 // Narrow integration surface for the BAL-JSON bridge. These getters expose
@@ -1024,6 +1023,7 @@ async function initializeAuthenticatedTracker(
     organization = claim.organization;
     organizationId = claim.organization.id;
     organizationRole = claim.role || null;
+    window.dispatchEvent(new CustomEvent("ba-labs-organization-ready"));
 
     if (!organizationId) {
 
