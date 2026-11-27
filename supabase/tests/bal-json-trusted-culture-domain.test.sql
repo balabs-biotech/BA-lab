@@ -1,0 +1,105 @@
+-- Trusted domain inheritance tests for culture generation; disposable CI database only.
+\set ON_ERROR_STOP on
+begin;
+
+insert into auth.users(id) values
+ ('00000000-0000-0000-0000-00000000c901')
+on conflict do nothing;
+insert into public.organizations(id,code,name)
+values ('00000000-0000-0000-0000-00000000c911','CULTURE-DOMAIN-TEST','Culture domain inheritance test')
+on conflict do nothing;
+insert into public.organization_members(organization_id,user_id,role)
+values ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c901','owner')
+on conflict (organization_id,user_id) do update set role=excluded.role;
+insert into public.culture_data_consents(organization_id,user_id,terms_version)
+values ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c901','2026-10-09-v1')
+on conflict (organization_id,user_id,terms_version) do nothing;
+
+insert into public.materials(organization_id,id,material_code,material_type,state,generation,metadata)
+values
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c921','DOMAIN-ROOT-MYC','strain','active',0,'{"domain":"mycology"}'::jsonb),
+ ('00000000-0000-0000-0000-00000000c911','00000000-0000-0000-0000-00000000c922','DOMAIN-ROOT-UNKNOWN','strain','active',0,'{}'::jsonb)
+on conflict (organization_id,id) do nothing;
+
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000c901',true);
+set local role authenticated;
+
+do $$
+declare
+  v_created jsonb;
+  v_material_id uuid;
+  v_culture_id uuid;
+  v_domain text;
+  v_rejected boolean := false;
+begin
+  -- Client attempts to force laboratory while parent is mycology: server must ignore and inherit mycology.
+  v_created := public.create_culture_with_generation(
+    '00000000-0000-0000-0000-00000000c911',
+    'DOMAIN-CHILD-MYC',
+    (select code from public.culture_types order by code limit 1),
+    '00000000-0000-0000-0000-00000000c921',
+    null,null,null,null,null,now(),
+    '{"domain":"laboratory","source":"test"}'::jsonb
+  );
+  v_material_id := (v_created->>'material_id')::uuid;
+  v_culture_id := (v_created->>'culture_id')::uuid;
+  if v_created->>'domain' <> 'mycology' then
+    raise exception 'FAIL: creation RPC trusted client domain instead of parent';
+  end if;
+  if (select metadata->>'domain' from public.materials where id=v_material_id) <> 'mycology'
+     or (select metadata->>'domain' from public.cultures where id=v_culture_id) <> 'mycology' then
+    raise exception 'FAIL: derived material/culture did not inherit parent domain';
+  end if;
+
+  -- Derived material cannot spoof a domain that conflicts with its biological parent.
+  v_rejected := false;
+  begin
+    insert into public.materials(
+      organization_id,material_code,material_type,parent_material_id,state,metadata
+    ) values (
+      '00000000-0000-0000-0000-00000000c911','DOMAIN-SPOOF-MATERIAL','derived',
+      '00000000-0000-0000-0000-00000000c921','active','{"domain":"laboratory"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm in ('derived_material_domain_mismatch','invalid_biological_domain') then
+      v_rejected := true;
+    else raise;
+    end if;
+  end;
+  if not v_rejected then raise exception 'FAIL: derived material accepted spoofed domain'; end if;
+
+  -- An unclassified parent cannot be used to create a culture with a client-supplied domain.
+  v_rejected := false;
+  begin
+    perform public.create_culture_with_generation(
+      '00000000-0000-0000-0000-00000000c911',
+      'DOMAIN-CHILD-UNKNOWN',
+      (select code from public.culture_types order by code limit 1),
+      '00000000-0000-0000-0000-00000000c922',
+      null,null,null,null,null,now(),
+      '{"domain":"mycology"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm = 'parent_material_domain_unclassified' then v_rejected := true; else raise; end if;
+  end;
+  if not v_rejected then raise exception 'FAIL: creation accepted unclassified parent material'; end if;
+
+  -- Direct culture insert also inherits the material domain, and cannot override it.
+  v_rejected := false;
+  begin
+    insert into public.cultures(organization_id,code,culture_type,material_id,metadata)
+    values (
+      '00000000-0000-0000-0000-00000000c911','DOMAIN-DIRECT-SPOOF',
+      (select code from public.culture_types order by code limit 1),
+      '00000000-0000-0000-0000-00000000c921','{"domain":"laboratory"}'::jsonb
+    );
+  exception when others then
+    if sqlerrm = 'culture_domain_mismatch_with_parent_material' then v_rejected := true; else raise; end if;
+  end;
+  if not v_rejected then raise exception 'FAIL: direct culture insert accepted conflicting domain'; end if;
+end
+$$;
+
+reset role;
+rollback;
+select 'PASS: trusted culture domain inheritance and anti-spoofing' as test_result;
