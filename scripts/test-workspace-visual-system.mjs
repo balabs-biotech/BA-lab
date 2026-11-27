@@ -187,7 +187,7 @@ assert.ok(mycologyEntry.includes("20261117-mycology-activity-163"), "Mycology mu
 
 const editorial = fs.readFileSync("batch-tracker/styles/editorial-harmonization.css", "utf8");
 for (const [name, page] of entryPages) {
-  assert.ok(page.includes("editorial-harmonization.css?v=20261127-editorial-finish-3"), name + " must load the shared BA Labs editorial finishing layer");
+  assert.ok(page.includes("editorial-harmonization.css?v=20261127-editorial-finish-4"), name + " must load the shared BA Labs editorial finishing layer");
 }
 assert.ok(editorial.includes("background-attachment:scroll") && editorial.includes("background:#111B1D") && editorial.includes("html {"), "CultureOps must share a stable BA Labs graphite canvas in full-page and viewport rendering");
 assert.ok(editorial.includes("ui-monospace,SFMono-Regular,Menlo,monospace"), "Editorial metadata must use the BA Labs technical label typography");
