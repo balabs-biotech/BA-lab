@@ -27,7 +27,7 @@
   let frame = 0;
   let renderToken = 0;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  const colors = { ancestor: 0x83a7a0, current: 0xc98259, descendant: 0xb4f477, line: 0x657b70, text: 0xe9eee7, muted: 0xa8b9ad };
+  const colors = { ancestor: 0x9b9a8f, current: 0xc98259, descendant: 0xd9a36e, line: 0x765c4d, text: 0xe9eee7, muted: 0xb6aaa0 };
 
   function collectNodes() {
     return [...target.querySelectorAll("button.culture-lineage-node[data-culture-id]")].map(button => ({
