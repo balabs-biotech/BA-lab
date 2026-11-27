@@ -16,7 +16,7 @@
   const zoomLabel = shell.querySelector("[data-activity-zoom-label]");
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   let PIXI = null, app = null, zoom = 1, baseWidth = 0, frame = 0, revision = 0, pageIndex = 0;
-  let pendingApp = null;
+
   const pageSize = 24;
   const pageLabel = shell.querySelector("[data-activity-page-label]");
   const previousPage = shell.querySelector('[data-activity-page="prev"]');
@@ -103,6 +103,7 @@
       shell.dataset.state = "empty";
       return;
     }
+    let pendingApp = null;
     try {
       const pixi = await loadPixi();
       if (token !== revision) return;
