@@ -10,12 +10,16 @@
   const shell = document.createElement("section");
   shell.className = "mycology-activity-map";
   shell.setAttribute("aria-label", "Chronologie visuelle des événements de la culture sélectionnée");
-  shell.innerHTML = '<div class="mycology-activity-heading"><div><span class="mycology-activity-kicker">HISTORIQUE BIOLOGIQUE</span><h3>Chronologie de la culture</h3><p>Événements, mesures et observations enregistrés dans la fiche</p></div><div class="mycology-activity-tools" role="group" aria-label="Commandes de la chronologie"><button type="button" data-activity-zoom="out" aria-label="Réduire le zoom">−</button><button type="button" data-activity-zoom="in" aria-label="Augmenter le zoom">+</button><button type="button" data-activity-zoom="fit">Ajuster</button><span data-activity-zoom-label aria-live="polite">100 %</span></div></div><div class="mycology-activity-stage" tabindex="0" aria-label="Chronologie horizontale. Faites défiler horizontalement pour parcourir les enregistrements."><p class="mycology-activity-status">Sélectionnez une culture pour afficher son historique.</p></div><p class="mycology-activity-note">La chronologie reprend les enregistrements chargés dans la fiche. Elle ne constitue pas une mesure de croissance mycélienne.</p>';
+  shell.innerHTML = '<div class="mycology-activity-heading"><div><span class="mycology-activity-kicker">HISTORIQUE BIOLOGIQUE</span><h3>Chronologie de la culture</h3><p>Événements, mesures et observations enregistrés dans la fiche</p></div><div class="mycology-activity-tools" role="group" aria-label="Commandes de la chronologie"><button type="button" data-activity-page="prev" aria-label="Page précédente">‹</button><span data-activity-page-label aria-live="polite">0 / 0</span><button type="button" data-activity-page="next" aria-label="Page suivante">›</button><button type="button" data-activity-zoom="out" aria-label="Réduire le zoom">−</button><button type="button" data-activity-zoom="in" aria-label="Augmenter le zoom">+</button><button type="button" data-activity-zoom="fit">Ajuster</button><span data-activity-zoom-label aria-live="polite">100 %</span></div></div><div class="mycology-activity-stage" tabindex="0" aria-label="Chronologie horizontale. Faites défiler horizontalement pour parcourir les enregistrements."><p class="mycology-activity-status">Sélectionnez une culture pour afficher son historique.</p></div><p class="mycology-activity-note">La chronologie reprend les enregistrements chargés dans la fiche. Elle ne constitue pas une mesure de croissance mycélienne.</p>';
   target.prepend(shell);
   const stage = shell.querySelector(".mycology-activity-stage");
   const zoomLabel = shell.querySelector("[data-activity-zoom-label]");
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  let PIXI = null, app = null, zoom = 1, baseWidth = 0, frame = 0, revision = 0;
+  let PIXI = null, app = null, zoom = 1, baseWidth = 0, frame = 0, revision = 0, pageIndex = 0;
+  const pageSize = 24;
+  const pageLabel = shell.querySelector("[data-activity-page-label]");
+  const previousPage = shell.querySelector('[data-activity-page="prev"]');
+  const nextPage = shell.querySelector('[data-activity-page="next"]');
   let resizeObserver = null;
 
   function collectEntries() {
@@ -75,6 +79,8 @@
     applyZoom(1);
     stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
   });
+  previousPage.addEventListener("click", () => { pageIndex = Math.max(0, pageIndex - 1); schedule(); });
+  nextPage.addEventListener("click", () => { pageIndex += 1; schedule(); });
 
   async function render() {
     const token = ++revision;
@@ -86,6 +92,10 @@
       note.className = "mycology-activity-status";
       note.textContent = "Aucun événement, mesure ou observation n’est encore enregistré pour cette culture.";
       stage.appendChild(note);
+      pageIndex = 0;
+      pageLabel.textContent = "0 / 0";
+      previousPage.disabled = true;
+      nextPage.disabled = true;
       shell.dataset.state = "empty";
       return;
     }
@@ -94,7 +104,14 @@
       if (token !== revision) return;
       if (app) { app.destroy(true, true); app = null; }
       stage.replaceChildren();
-      const ordered = entries.slice().reverse();
+      const allEntries = entries.slice().reverse();
+      const pageCount = Math.max(1, Math.ceil(allEntries.length / pageSize));
+      pageIndex = Math.min(pageIndex, pageCount - 1);
+      const startIndex = pageIndex * pageSize;
+      const ordered = allEntries.slice(startIndex, startIndex + pageSize);
+      pageLabel.textContent = (startIndex + 1) + "–" + (startIndex + ordered.length) + " / " + allEntries.length;
+      previousPage.disabled = pageIndex === 0;
+      nextPage.disabled = pageIndex >= pageCount - 1;
       const nodeWidth = 176, gap = 24, left = 22;
       baseWidth = Math.max(340, left * 2 + ordered.length * nodeWidth + Math.max(0, ordered.length - 1) * gap);
       const height = 190;
@@ -137,7 +154,7 @@
         const date = new Text({ text: item.dateLabel.length > 20 ? item.dateLabel.slice(0, 18) + "…" : item.dateLabel, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xc7b8ab } });
         date.anchor.set(0.5, 0); date.position.set(x + nodeWidth / 2, 101); root.addChild(date);
       });
-      const caption = new Text({ text: ordered.length + " enregistrement(s) affiché(s) · ordre chronologique", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "600", fill: 0xb9a99d, letterSpacing: 0.6 } });
+      const caption = new Text({ text: "Page " + (pageIndex + 1) + " / " + pageCount + " · " + allEntries.length + " enregistrement(s) au total", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "600", fill: 0xb9a99d, letterSpacing: 0.6 } });
       caption.position.set(left, 158); root.addChild(caption);
       next.render();
       next.stop();
