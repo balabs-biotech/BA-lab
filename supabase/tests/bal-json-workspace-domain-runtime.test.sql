@@ -1,0 +1,102 @@
+-- Runtime behavior tests for BAL-JSON biological workspace resolution.
+-- Executed only after full migration replay in disposable CI PostgreSQL.
+\set ON_ERROR_STOP on
+begin;
+
+insert into auth.users(id) values ('00000000-0000-0000-0000-00000000b901')
+on conflict do nothing;
+insert into public.organizations(id,code,name)
+values ('00000000-0000-0000-0000-00000000b911','BALJSON-DOMAIN-TEST','BAL-JSON domain test')
+on conflict do nothing;
+insert into public.organization_members(organization_id,user_id)
+values ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b901')
+on conflict do nothing;
+
+insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b921','BALJSON-MYC','strain','active','{"domain":"mycology"}'::jsonb
+where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b921');
+insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b922','BALJSON-LAB','strain','active','{"domain":"laboratory"}'::jsonb
+where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b922');
+insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b923','BALJSON-CONFLICT','strain','active','{"domain":"laboratory"}'::jsonb
+where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b923');
+
+insert into public.cultures(organization_id,id,code,culture_type,material_id,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b931','BALJSON-CULTURE-MYC',
+       (select code from public.culture_types order by code limit 1),
+       '00000000-0000-0000-0000-00000000b921','{"domain":"mycology"}'::jsonb
+where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b931');
+insert into public.cultures(organization_id,id,code,culture_type,material_id,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b932','BALJSON-CULTURE-LAB',
+       (select code from public.culture_types order by code limit 1),
+       '00000000-0000-0000-0000-00000000b922','{"domain":"laboratory"}'::jsonb
+where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b932');
+insert into public.cultures(organization_id,id,code,culture_type,material_id,metadata)
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b933','BALJSON-CULTURE-CONFLICT',
+       (select code from public.culture_types order by code limit 1),
+       '00000000-0000-0000-0000-00000000b923','{"domain":"mycology"}'::jsonb
+where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b933');
+
+insert into public.plant_cultures(organization_id,id,code,crop_type,species_name,cultivar_name,metadata)
+values ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b941',
+        'BALJSON-PLANT','vegetable','Solanum lycopersicum','Test cultivar','{}'::jsonb)
+on conflict do nothing;
+
+insert into public.batches(organization_id,id,batch_code,name,batch_type,material_id,culture_id)
+values
+ ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b951','BALJSON-BATCH-MYC','Mycology batch','culture','00000000-0000-0000-0000-00000000b921','00000000-0000-0000-0000-00000000b931'),
+ ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b952','BALJSON-BATCH-MATERIAL','Material-only batch','material','00000000-0000-0000-0000-00000000b922',null),
+ ('00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b953','BALJSON-BATCH-CONFLICT','Conflicting batch','culture','00000000-0000-0000-0000-00000000b923','00000000-0000-0000-0000-00000000b933')
+on conflict do nothing;
+
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
+set local role authenticated;
+
+do $$
+declare
+  v_org uuid := '00000000-0000-0000-0000-00000000b911';
+  v_result text;
+  v_caught boolean;
+begin
+  v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b931',null,null);
+  if v_result is distinct from 'mycology' then raise exception 'FAIL: mycology culture resolved as %',v_result; end if;
+
+  v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b932',null,null);
+  if v_result is distinct from 'laboratory' then raise exception 'FAIL: laboratory culture resolved as %',v_result; end if;
+
+  v_result := public.resolve_bal_json_domain(v_org,null,'00000000-0000-0000-0000-00000000b941',null);
+  if v_result is distinct from 'agronomy' then raise exception 'FAIL: plant culture did not resolve to agronomy'; end if;
+
+  v_result := public.resolve_bal_json_domain(v_org,null,null,'00000000-0000-0000-0000-00000000b952');
+  if v_result is distinct from 'laboratory' then raise exception 'FAIL: material-only batch resolved as %',v_result; end if;
+
+  v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b931',null,'00000000-0000-0000-0000-00000000b951');
+  if v_result is distinct from 'mycology' then raise exception 'FAIL: culture-linked batch resolved as %',v_result; end if;
+
+  v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b933',null,null);
+  if v_result is not null then raise exception 'FAIL: culture/material domain conflict was accepted'; end if;
+
+  v_result := public.resolve_bal_json_domain(v_org,null,null,'00000000-0000-0000-0000-00000000b953');
+  if v_result is not null then raise exception 'FAIL: conflicting batch material/culture domains were accepted'; end if;
+
+  v_caught := false;
+  begin
+    perform public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b931',null,'00000000-0000-0000-0000-00000000b952');
+  exception when others then
+    if sqlerrm = 'batch_culture_mismatch' then v_caught := true; else raise; end if;
+  end;
+  if not v_caught then raise exception 'FAIL: mismatched explicit culture and batch anchors were accepted'; end if;
+
+  if public.is_bal_json_variable_allowed('mycology','cfu') is not true
+     or public.is_bal_json_variable_allowed('mycology','root_length') is not false
+     or public.is_bal_json_variable_allowed('agronomy','root_length') is not true
+     or public.is_bal_json_variable_allowed('agronomy','cfu') is not false then
+    raise exception 'FAIL: workspace variable allowlist returned an invalid decision';
+  end if;
+end
+$$;
+
+reset role;
+rollback;
+select 'PASS: BAL-JSON workspace domain resolution runtime scenarios' as test_result;
