@@ -106,7 +106,17 @@ begin
     if sqlerrm = 'domain_classification_requires_admin' then v_denied := true; else raise; end if;
   end;
   if not v_denied then raise exception 'FAIL: ordinary member classified a legacy record'; end if;
-end $$;
+
+  v_denied := false;
+  begin
+    perform public.get_biological_domain_admin_context(
+      '00000000-0000-0000-0000-00000000b911'
+    );
+  exception when insufficient_privilege then
+    if sqlerrm = 'domain_classification_requires_admin' then v_denied := true; else raise; end if;
+  end;
+  if not v_denied then raise exception 'FAIL: ordinary member accessed the admin classification catalogue'; end if;
+end $;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
 
