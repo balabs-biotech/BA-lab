@@ -94,6 +94,7 @@ assert.ok(cultureDetailMarkup.includes('id="cultureLineage"') && cultureDetailMa
 assert.ok(interiorHarmonization.includes(".culture-detail-summary") && interiorHarmonization.includes("grid-template-columns:repeat(auto-fit"), "Culture summary fields must use a responsive, content-aware grid");
 assert.ok(interiorHarmonization.includes(".culture-detail-heading") && interiorHarmonization.includes("flex-direction:column"), "Culture detail heading and close action must stack on narrow screens");
 assert.ok(interiorHarmonization.includes(".culture-linked-batches .culture-timeline-entry") && interiorHarmonization.includes("grid-template-columns:minmax(0,1fr) auto"), "Linked production batches must retain a readable record/action layout");
+const batchMarkup = html.slice(html.indexOf('id="batchCard"'), html.indexOf('id="statisticsCard"'));
 assert.ok(batchMarkup.includes('class="batch-create-panel"') && batchMarkup.includes('id="batchQcList"'), "Production workspace must retain lot creation and quality-control surfaces");
 assert.ok(batchMarkup.includes('id="batchEvents"') && batchMarkup.includes('id="batchEventList"'), "Production workspace must retain its traceability journal and event list");
 assert.ok(batchMarkup.includes('id="harvestQuantity"') && batchMarkup.includes('id="moveBatchLocation"'), "Production journal must retain harvest and movement controls");
@@ -120,7 +121,6 @@ assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-chart") &&
 assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-table") && interiorHarmonization.includes("min-width:620px") && interiorHarmonization.includes("overflow-x:auto"), "Raw statistics table must remain legible through horizontal scrolling on narrow screens");
 
 
-const batchMarkup = html.slice(html.indexOf('id="batchCard"'), html.indexOf('id="statisticsCard"'));
 assert.ok(batchMarkup.includes('class="batch-create-panel"') && batchMarkup.includes('id="batchList"') && batchMarkup.includes('class="batch-compare-panel"'), "Production workspace must retain lot creation, list and comparison surfaces");
 assert.ok(batchMarkup.includes('id="batchStages"') && batchMarkup.includes('id="batchQc"') && batchMarkup.includes('id="batchEvents"') && batchMarkup.includes('id="batchEventList"'), "Production workspace must retain lifecycle, quality and traceability surfaces");
 assert.ok(interiorHarmonization.includes("#batchCard .batch-create-panel > .grid") && interiorHarmonization.includes("#batchCard .batch-compare-panel"), "Lot creation and comparison panels must have dedicated visual hierarchy");
