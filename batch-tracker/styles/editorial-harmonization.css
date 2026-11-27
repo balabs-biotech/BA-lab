@@ -127,3 +127,14 @@ html body[data-domain] :is(.overview-panel,.overview-activity,.overview-shortcut
   color:var(--ba-paper) !important;
   text-shadow:none !important;
 }
+
+
+/* PASS 219 — keep the measurement workspace title mineral across legacy domain overrides. */
+html body[data-domain] #measurementCard > #measurementTitle {
+  color:#E8EEE8 !important;
+  -webkit-text-fill-color:#E8EEE8 !important;
+  text-shadow:none !important;
+}
+html body[data-domain] #measurementCard > .section-kicker {
+  color:var(--workspace-accent) !important;
+}
