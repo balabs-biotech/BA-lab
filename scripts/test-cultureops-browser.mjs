@@ -494,7 +494,72 @@ try {
           failures.push(`${workspace.slug}/${viewport.name}: dashboard overview preview failed ${JSON.stringify(overviewState)}`);
         }
       }
-      // Exercise the scientific visualizations with deterministic, synthetic DOM records.\n      // These fixtures never touch Supabase or persist biological observations.\n      if (viewport.name === "desktop") {\n        await page.evaluate(domain => {\n          if (domain === "mycology") {\n            const lineage = document.querySelector("#cultureLineage");\n            if (lineage) {\n              const node = document.createElement("button");\n              node.type = "button";\n              node.className = "culture-lineage-node";\n              node.dataset.cultureId = "qa-ple-001";\n              node.dataset.lineageRole = "current";\n              node.innerHTML = "<strong>Pleurotus QA</strong><small>Souche de test · QA</small>";\n              lineage.append(node);\n            }\n            const timeline = document.querySelector("#cultureDetailTimeline");\n            if (timeline) {\n              const entry = document.createElement("article");\n              entry.className = "culture-timeline-entry";\n              entry.innerHTML = '<time datetime="2026-11-26T10:00:00Z">26 nov. 2026</time><strong>Observation QA</strong><p>Mycélium blanc, croissance homogène</p>';\n              timeline.append(entry);\n            }\n          } else if (domain === "laboratory") {\n            const list = document.querySelector("#batchStageList");\n            if (list) {\n              const stage = document.createElement("article");\n              stage.className = "stage active";\n              stage.innerHTML = '<span class="stage-name">Incubation QA</span><span class="muted">INC-QA-01</span><span class="stage-status">En cours</span>';\n              list.append(stage);\n            }\n          } else if (domain === "agronomy") {\n            const charts = document.querySelector("#envWeatherCharts");\n            if (charts) {\n              const card = document.createElement("article");\n              card.className = "environmental-weather-chart";\n              card.innerHTML = '<h4>Température QA</h4><svg viewBox="0 0 300 120" role="img" aria-label="Série de température de test"><polyline points="10,80 100,55 190,62 280,28" stroke="#b5d38b" fill="none"/><circle cx="10" cy="80" r="3"><title>18 °C</title></circle><circle cx="100" cy="55" r="3"><title>21 °C</title></circle><circle cx="190" cy="62" r="3"><title>20 °C</title></circle><circle cx="280" cy="28" r="3"><title>24 °C</title></circle></svg>';\n              charts.append(card);\n            }\n          }\n        }, workspace.domain);\n        const visualSelectors = workspace.domain === "mycology"\n          ? ["#cultureLineage .lineage-graph-shell", "#cultureDetailTimeline .mycology-activity-map"]\n          : workspace.domain === "agronomy"\n            ? [".greentech-climate-signature"]\n            : ["#batchStages .lab-process-map"];\n        for (const selector of visualSelectors) {\n          try { await page.waitForFunction(sel => { const el = document.querySelector(sel); return !!el && ["ready", "fallback", "empty"].includes(el.dataset.graphState || el.dataset.state); }, selector, { timeout: 12000 }); }\n          catch { failures.push(`${workspace.slug}: populated visualization did not reach a terminal render state (${selector})`); }\n        }\n        const visualState = await page.evaluate(domain => {\n          const selectors = domain === "mycology"\n            ? ["#cultureLineage .lineage-graph-shell", "#cultureDetailTimeline .mycology-activity-map"]\n            : domain === "agronomy" ? [".greentech-climate-signature"] : ["#batchStages .lab-process-map"];\n          return selectors.map(selector => {\n            const el = document.querySelector(selector);\n            const stage = el?.querySelector("canvas") || el?.querySelector(".lineage-graph-stage,.mycology-activity-stage,.greentech-climate-plot,.lab-process-map-stage");\n            const state = el?.dataset.graphState || el?.dataset.state || "missing";\n            return { selector, state, canvas: !!el?.querySelector("canvas"), stageWidth: stage?.clientWidth ?? 0, stageScrollWidth: stage?.scrollWidth ?? 0 };\n          });\n        }, workspace.domain);\n        for (const visual of visualState) {\n          if (visual.state === "empty" || visual.state === "missing") failures.push(`${workspace.slug}: populated visualization remained empty (${JSON.stringify(visual)})`);\n          if (visual.canvas && visual.stageWidth > 0 && visual.stageScrollWidth < visual.stageWidth) failures.push(`${workspace.slug}: visualization canvas has invalid scroll geometry (${JSON.stringify(visual)})`);\n        }\n      }\n      const interiorState = await page.evaluate(() => {
+      // Exercise the scientific visualizations with deterministic, synthetic DOM records.
+      // These fixtures never touch Supabase or persist biological observations.
+      if (viewport.name === "desktop") {
+        await page.evaluate(domain => {
+          if (domain === "mycology") {
+            const lineage = document.querySelector("#cultureLineage");
+            if (lineage) {
+              const node = document.createElement("button");
+              node.type = "button";
+              node.className = "culture-lineage-node";
+              node.dataset.cultureId = "qa-ple-001";
+              node.dataset.lineageRole = "current";
+              node.innerHTML = "<strong>Pleurotus QA</strong><small>Souche de test · QA</small>";
+              lineage.append(node);
+            }
+            const timeline = document.querySelector("#cultureDetailTimeline");
+            if (timeline) {
+              const entry = document.createElement("article");
+              entry.className = "culture-timeline-entry";
+              entry.innerHTML = '<time datetime="2026-11-26T10:00:00Z">26 nov. 2026</time><strong>Observation QA</strong><p>Mycélium blanc, croissance homogène</p>';
+              timeline.append(entry);
+            }
+          } else if (domain === "laboratory") {
+            const list = document.querySelector("#batchStageList");
+            if (list) {
+              const stage = document.createElement("article");
+              stage.className = "stage active";
+              stage.innerHTML = '<span class="stage-name">Incubation QA</span><span class="muted">INC-QA-01</span><span class="stage-status">En cours</span>';
+              list.append(stage);
+            }
+          } else if (domain === "agronomy") {
+            const charts = document.querySelector("#envWeatherCharts");
+            if (charts) {
+              const card = document.createElement("article");
+              card.className = "environmental-weather-chart";
+              card.innerHTML = '<h4>Température QA</h4><svg viewBox="0 0 300 120" role="img" aria-label="Série de température de test"><polyline points="10,80 100,55 190,62 280,28" stroke="#b5d38b" fill="none"/><circle cx="10" cy="80" r="3"><title>18 °C</title></circle><circle cx="100" cy="55" r="3"><title>21 °C</title></circle><circle cx="190" cy="62" r="3"><title>20 °C</title></circle><circle cx="280" cy="28" r="3"><title>24 °C</title></circle></svg>';
+              charts.append(card);
+            }
+          }
+        }, workspace.domain);
+        const visualSelectors = workspace.domain === "mycology"
+          ? ["#cultureLineage .lineage-graph-shell", "#cultureDetailTimeline .mycology-activity-map"]
+          : workspace.domain === "agronomy"
+            ? [".greentech-climate-signature"]
+            : ["#batchStages .lab-process-map"];
+        for (const selector of visualSelectors) {
+          try { await page.waitForFunction(sel => { const el = document.querySelector(sel); return !!el && ["ready", "fallback", "empty"].includes(el.dataset.graphState || el.dataset.state); }, selector, { timeout: 12000 }); }
+          catch { failures.push(`${workspace.slug}: populated visualization did not reach a terminal render state (${selector})`); }
+        }
+        const visualState = await page.evaluate(domain => {
+          const selectors = domain === "mycology"
+            ? ["#cultureLineage .lineage-graph-shell", "#cultureDetailTimeline .mycology-activity-map"]
+            : domain === "agronomy" ? [".greentech-climate-signature"] : ["#batchStages .lab-process-map"];
+          return selectors.map(selector => {
+            const el = document.querySelector(selector);
+            const stage = el?.querySelector("canvas") || el?.querySelector(".lineage-graph-stage,.mycology-activity-stage,.greentech-climate-plot,.lab-process-map-stage");
+            const state = el?.dataset.graphState || el?.dataset.state || "missing";
+            return { selector, state, canvas: !!el?.querySelector("canvas"), stageWidth: stage?.clientWidth ?? 0, stageScrollWidth: stage?.scrollWidth ?? 0 };
+          });
+        }, workspace.domain);
+        for (const visual of visualState) {
+          if (visual.state === "empty" || visual.state === "missing") failures.push(`${workspace.slug}: populated visualization remained empty (${JSON.stringify(visual)})`);
+          if (visual.canvas && visual.stageWidth > 0 && visual.stageScrollWidth < visual.stageWidth) failures.push(`${workspace.slug}: visualization canvas has invalid scroll geometry (${JSON.stringify(visual)})`);
+        }
+      }
+      const interiorState = await page.evaluate(() => {
         const fixtures = [
           ["#cultureCatalogList", "culture-catalog-row", "Culture P80"],
           ["#cultureDetailSummary", "culture-detail-field", "Identifiant"],
