@@ -58,6 +58,27 @@ begin
      has_table_privilege('anon', v_receipt, 'DELETE') then
     raise exception 'FAIL: receipt table must deny all direct client mutations';
   end if;
+
+  if to_regprocedure('private.resolve_bal_json_domain(uuid,uuid,uuid,uuid)') is null then
+    raise exception 'FAIL: BAL-JSON must resolve the persisted workspace domain from its biological anchor';
+  end if;
+  if to_regprocedure('private.is_bal_json_variable_allowed(text,text)') is null then
+    raise exception 'FAIL: BAL-JSON must enforce workspace-specific variable allowlists server-side';
+  end if;
+  if not exists (
+    select 1 from pg_trigger
+     where tgrelid = 'public.cultures'::regclass
+       and tgname = 'cultures_domain_immutable'
+       and not tgisinternal
+  ) or not exists (
+    select 1 from pg_trigger
+     where tgrelid = 'public.materials'::regclass
+       and tgname = 'materials_domain_immutable'
+       and not tgisinternal
+  ) then
+    raise exception 'FAIL: persisted biological domain metadata must be immutable after creation';
+  end if;
+
   if has_table_privilege('authenticated', v_receipt, 'SELECT') or
      has_table_privilege('authenticated', v_receipt, 'INSERT') or
      has_table_privilege('anon', v_receipt, 'SELECT') then
