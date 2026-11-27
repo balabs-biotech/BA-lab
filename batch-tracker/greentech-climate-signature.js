@@ -6,7 +6,7 @@
   if (document.body.dataset.domain !== "agronomy") return;
   const host = document.getElementById("workspace-root") || document.body;
   let pixi = null, app = null, scheduled = 0, renderRevision = 0;
-  let pendingApp = null;
+
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const panel = document.createElement("section");
   panel.className = "greentech-climate-signature";
@@ -72,6 +72,7 @@
     }
     panel.hidden = false;
     renderText(series);
+    let pendingApp = null;
     try {
       if (!pixi) pixi = await import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs");
       if (revision !== renderRevision) return;
