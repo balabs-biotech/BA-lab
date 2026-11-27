@@ -232,7 +232,7 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
       const importer = window.BA_LABS_IMPORT_BAL_JSON;
       if (typeof importer !== "function") throw new Error("Canal d’import authentifié indisponible.");
       const { data, error } = await importer(approvedRecord);
-      if (error) throw new Error(error.message || "Le serveur a refusé l’import.");
+      if (error) throw error; // Preserve Supabase FunctionsHttpError context.status for definitive 4xx handling.
       if (data?.error) throw new Error(data.message || data.error);
       status.textContent = data?.status === "duplicate"
         ? "Ce record était déjà enregistré : aucun doublon créé."
