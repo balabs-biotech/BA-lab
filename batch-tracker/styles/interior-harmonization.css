@@ -481,3 +481,32 @@ html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#mea
 html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > .section-kicker :is(span:not(.kicker-line)) {
   color:#e2b092 !important;
 }
+
+
+/* PASS 204 — BAL-JSON import panel: distinguish the IA bridge from legacy
+   copper helper text while keeping its controls in the shared form system. */
+html body[data-domain] #balJsonImportPanel .bal-json-heading h3 {
+  color:#e8eee8 !important;
+  font-size:clamp(15px,1.5vw,18px) !important;
+  line-height:1.35 !important;
+}
+html body[data-domain] #balJsonImportPanel .bal-json-heading .context-eyebrow {
+  color:#e2b092 !important;
+}
+html body[data-domain] #balJsonImportPanel .bal-json-heading p,
+html body[data-domain] #balJsonImportPanel .bal-json-help {
+  color:#b7c4ba !important;
+}
+html body[data-domain] #balJsonImportPanel .bal-json-version {
+  color:#e8c0a8 !important;
+  border-color:rgba(226,176,146,.32) !important;
+  background:rgba(190,118,88,.10) !important;
+}
+html body[data-domain] #balJsonImportPanel label {
+  color:#d0dbd1 !important;
+}
+html body[data-domain] #balJsonImportPanel .bal-json-preview {
+  color:#d9e4dc !important;
+  background:#101b19 !important;
+  border:1px solid rgba(169,192,179,.20) !important;
+}
