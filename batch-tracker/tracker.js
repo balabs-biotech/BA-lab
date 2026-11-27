@@ -194,7 +194,9 @@ function clearAuthenticatedWorkspaceState() {
   if (recordHarvestButton) recordHarvestButton.disabled = true;
   if (saveMeasurementButton) saveMeasurementButton.disabled = true;
   if (saveObservationButton) saveObservationButton.disabled = true;
-  window.dispatchEvent(new CustomEvent("ba-labs-organization-cleared"));
+  if (typeof window !== "undefined" && typeof CustomEvent !== "undefined") {
+    window.dispatchEvent(new CustomEvent("ba-labs-organization-cleared"));
+  }
 }
 
 
