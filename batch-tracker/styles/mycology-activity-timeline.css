@@ -20,7 +20,7 @@ html body[data-domain="mycology"] #trackerCard .mycology-activity-tools {
   display:flex; align-items:center; gap:5px;
 }
 html body[data-domain="mycology"] #trackerCard .mycology-activity-tools button {
-  min-width:30px; min-height:30px; padding:5px 9px; border:1px solid rgba(201,130,89,.28);
+  min-width:40px; min-height:40px; padding:7px 10px; border:1px solid rgba(201,130,89,.28);
   border-radius:7px; color:#eee5dc; background:#38332f; font-size:11px; cursor:pointer;
 }
 html body[data-domain="mycology"] #trackerCard .mycology-activity-tools button:hover { border-color:#d9a17d; background:#484039; }
