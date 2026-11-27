@@ -36,6 +36,8 @@ assert.ok(shared.includes("backdrop-filter:blur(18px)"), "Workspace toolbar must
 assert.ok(visualizationFoundation.includes(".mycology-activity-tools,.lab-process-map-controls"), "Scientific visualization controls must share a common interaction foundation");
 assert.ok(visualizationFoundation.includes(":focus-visible"), "Scientific visualization controls must expose a visible keyboard focus state");
 assert.ok(visualizationFoundation.includes("min-height:40px"), "Scientific visualization controls must meet a 40px touch target");
+assert.ok(fs.readFileSync("batch-tracker/styles/mycology-activity-timeline.css", "utf8").includes("min-height:40px"), "Mycology activity controls must not override the shared touch target");
+assert.ok(fs.readFileSync("batch-tracker/styles/laboratory-process-map.css", "utf8").includes("min-height:40px"), "Laboratory process controls must meet the shared touch target");
 assert.ok(visualizationFoundation.includes("prefers-reduced-motion:reduce"), "Visualization controls must respect reduced-motion preferences");
 assert.ok(motion.includes("radial-gradient(360px circle at var(--ba-pointer-x"), "OriginKit-inspired pointer light must remain integrated into the shared surface system");
 assert.ok(lineage.includes("descendant: 0xd9a36e") && !lineage.includes("descendant: 0xb4f477"), "Mycology lineage descendants must use the copper/amber palette, not GreenTech lime");
