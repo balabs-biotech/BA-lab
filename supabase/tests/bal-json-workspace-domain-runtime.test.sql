@@ -22,6 +22,22 @@ where not exists(select 1 from public.materials where organization_id='00000000-
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
 select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b922','BALJSON-LAB','strain','active','{}'::jsonb
 where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b922');
+
+-- Assign trusted workspace classifications before creating linked cultures.
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
+set local role authenticated;
+select public.classify_legacy_biological_domain(
+  '00000000-0000-0000-0000-00000000b911','material',
+  '00000000-0000-0000-0000-00000000b921','mycology',
+  'Verified mycology material test fixture'
+);
+select public.classify_legacy_biological_domain(
+  '00000000-0000-0000-0000-00000000b911','material',
+  '00000000-0000-0000-0000-00000000b922','laboratory',
+  'Verified laboratory material test fixture'
+);
+reset role;
+
 -- Corrupt legacy material fixture: bypass the new root-domain guard only for this historical inconsistency.
 alter table public.materials disable trigger materials_domain_insert_guard;
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
@@ -100,15 +116,6 @@ declare
   v_result text;
   v_caught boolean;
 begin
-  perform public.classify_legacy_biological_domain(
-    v_org,'material','00000000-0000-0000-0000-00000000b921',
-    'mycology','Verified mycology material test fixture'
-  );
-  perform public.classify_legacy_biological_domain(
-    v_org,'material','00000000-0000-0000-0000-00000000b922',
-    'laboratory','Verified laboratory material test fixture'
-  );
-
   v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b931',null,null);
   if v_result is distinct from 'mycology' then raise exception 'FAIL: mycology culture resolved as %',v_result; end if;
 
