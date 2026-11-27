@@ -118,3 +118,12 @@ html body[data-domain] .overview-metric strong {
 html body[data-domain] :is(.section-kicker,.panel-kicker,.card-kicker) {
   color:color-mix(in srgb,var(--workspace-accent) 76%,#fff) !important;
 }
+
+
+/* PASS 218 — legacy overview headings are not always nested in .card.
+   Scope the mineral heading color to all major workspace panels, regardless
+   of their older wrapper class, while leaving labels and accent markers intact. */
+html body[data-domain] :is(.overview-panel,.overview-activity,.overview-shortcuts,.bio-operation-panel,.bio-lineage-panel,.culture-catalog,.batch-create-panel,.batch-compare-panel) :is(h1,h2,h3,h4) {
+  color:var(--ba-paper) !important;
+  text-shadow:none !important;
+}
