@@ -185,6 +185,11 @@ try {
         const style = getComputedStyle(body);
         const cardStyle = card ? getComputedStyle(card) : null;
         const headingStyle = heading ? getComputedStyle(heading) : null;
+        const measurementTitle = document.querySelector("#measurementCard > h2");
+        const bridgeHeading = document.querySelector("#balJsonImportPanel .bal-json-heading h3");
+        const bridgeEyebrow = document.querySelector("#balJsonImportPanel .context-eyebrow");
+        const measurementCard = document.querySelector("#measurementCard");
+        const bridgePanel = document.querySelector("#balJsonImportPanel");
         const description = card?.querySelector(".muted");
         const firstLabel = card?.querySelector("label");
         const status = card?.querySelector("#authStatus");
@@ -203,6 +208,11 @@ try {
           cardBackground: cardStyle?.backgroundColor || null,
           headingColor: headingStyle?.color || null,
           headingText: heading?.textContent?.trim() || null,
+          measurementHeadingColor: measurementTitle ? getComputedStyle(measurementTitle).color : null,
+          measurementCardBackground: measurementCard ? getComputedStyle(measurementCard).backgroundColor : null,
+          bridgeHeadingColor: bridgeHeading ? getComputedStyle(bridgeHeading).color : null,
+          bridgePanelBackground: bridgePanel ? getComputedStyle(bridgePanel).backgroundColor : null,
+          bridgeEyebrowColor: bridgeEyebrow ? getComputedStyle(bridgeEyebrow).color : null,
           descriptionColor: description ? getComputedStyle(description).color : null,
           labelColor: firstLabel ? getComputedStyle(firstLabel).color : null,
           statusColor: status ? getComputedStyle(status).color : null,
@@ -290,7 +300,14 @@ try {
       if (!metrics.heroCoverImage.includes(workspace.cover)) failures.push(`${workspace.slug}/${viewport.name}: expected BA Labs cover image ${workspace.cover} missing (${metrics.heroCoverImage})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
-      if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
+      if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);      if (workspace.domain === "mycology") {
+        const measurementContrast = contrastRatio(metrics.measurementHeadingColor, metrics.measurementCardBackground);
+        const bridgeHeadingContrast = contrastRatio(metrics.bridgeHeadingColor, metrics.bridgePanelBackground);
+        const bridgeEyebrowContrast = contrastRatio(metrics.bridgeEyebrowColor, metrics.bridgePanelBackground);
+        if (measurementContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology measurement heading contrast ${measurementContrast.toFixed(2)}:1 is below 4.5:1`);
+        if (bridgeHeadingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology BAL-JSON heading contrast ${bridgeHeadingContrast.toFixed(2)}:1 is below 4.5:1`);
+        if (bridgeEyebrowContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology BAL-JSON eyebrow contrast ${bridgeEyebrowContrast.toFixed(2)}:1 is below 4.5:1`);
+      }
       const descriptionContrast = contrastRatio(metrics.descriptionColor, metrics.surfaceToken);
       const labelContrast = contrastRatio(metrics.labelColor, metrics.surfaceToken);
       if (descriptionContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth description contrast ${descriptionContrast.toFixed(2)}:1 is below 4.5:1`);
