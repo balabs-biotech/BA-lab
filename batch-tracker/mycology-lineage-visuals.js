@@ -60,7 +60,7 @@
   }, { passive: false });
   let PIXI = null;
   let app = null;
-  let pendingApp = null;
+
   let frame = 0;
   let renderToken = 0;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -129,6 +129,7 @@
       showFallback("La carte apparaîtra lorsqu’une culture sera sélectionnée.");
       return;
     }
+    let pendingApp = null;
     try {
       const pixi = await loadPixi();
       if (token !== renderToken) return;
