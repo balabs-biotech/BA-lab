@@ -555,3 +555,36 @@ html body[data-domain] #batchEvents #batchEventList {
     width:100% !important;
   }
 }
+
+
+/* PASS 206 — culture detail timeline. The detail panel is nested inside a
+   hidden workspace card before authentication; anchor the record surface to
+   its actual host so the component keeps its treatment in both states. */
+html body[data-domain] #trackerCard #cultureDetailTimeline > .culture-timeline-entry {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:12px !important;
+  min-width:0 !important;
+  padding:13px 14px !important;
+  border:1px solid rgba(169,192,179,.18) !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:11px !important;
+  color:#e8eee9 !important;
+  background:linear-gradient(110deg,color-mix(in srgb,var(--workspace-accent) 6%,transparent),transparent 58%),#202e2a !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+html body[data-domain] #trackerCard #cultureDetailTimeline > .culture-timeline-entry :is(strong,h3,h4) {
+  color:#edf2ec !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #trackerCard #cultureDetailTimeline > .culture-timeline-entry p {
+  color:#aebdb2 !important;
+  overflow-wrap:anywhere !important;
+}
+@media(max-width:600px) {
+  html body[data-domain] #trackerCard #cultureDetailTimeline > .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:8px !important;
+  }
+}
