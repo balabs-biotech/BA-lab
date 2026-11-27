@@ -20,7 +20,7 @@ html body[data-domain="mycology"] #trackerCard .mycology-activity-tools {
   display:flex; align-items:center; gap:5px;
 }
 html body[data-domain="mycology"] #trackerCard .mycology-activity-tools button {
-  min-width:30px; min-height:30px; padding:5px 9px; border:1px solid rgba(201,130,89,.28);
+  min-width:40px; min-height:40px; padding:7px 10px; border:1px solid rgba(201,130,89,.28);
   border-radius:7px; color:#eee5dc; background:#38332f; font-size:11px; cursor:pointer;
 }
 html body[data-domain="mycology"] #trackerCard .mycology-activity-tools button:hover { border-color:#d9a17d; background:#484039; }
@@ -40,7 +40,7 @@ html body[data-domain="mycology"] #trackerCard .mycology-activity-status {
 html body[data-domain="mycology"] #trackerCard .mycology-activity-note { margin:0; color:#9d9187; font-size:10px; line-height:1.5; }
 @media(max-width:620px) {
   html body[data-domain="mycology"] #trackerCard .mycology-activity-map { padding:12px; }
-  html body[data-domain="mycology"] #trackerCard .mycology-activity-tools { width:100%; }
+  html body[data-domain="mycology"] #trackerCard .mycology-activity-tools { width:100%; flex-wrap:wrap; }
 }
 @media(prefers-reduced-motion:reduce) {
   html body[data-domain="mycology"] #trackerCard .mycology-activity-stage { scroll-behavior:auto; }

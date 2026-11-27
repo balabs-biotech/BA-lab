@@ -1,16 +1,22 @@
-/* BA Labs CultureOps — shared visual tokens. Domain identity is accent-only. */
+/* BA Labs CultureOps — shared brand tokens aligned with BA Labs and Academy. */
 :root {
-  --ba-graphite:#11191a;
-  --ba-forest:#263b38;
-  --ba-copper:#b96b4d;
-  --ba-mineral:#d1d0c5;
-  --ba-paper:#f2f1e9;
-  --ba-muted:#aab8b1;
-  --ba-line:#394846;
-  --ba-surface:#1b2525;
-  --ba-surface-2:#222f2e;
-  --ba-surface-raised:#293735;
-  --ba-control:#151f1e;
+  /* BA Labs core palette */
+  --ba-graphite:#111B1D;
+  --ba-forest:#263B38;
+  --ba-copper:#B96B4D;
+  --ba-mineral:#D1D0C5;
+  --ba-paper:#F2F1E9;
+  --ba-muted:#9BAEA4;
+  --ba-line:#40534D;
+
+  /* Academy-compatible working surfaces */
+  --ba-surface:#17221D;
+  --ba-surface-2:#1D2B24;
+  --ba-surface-raised:#263B38;
+  --ba-control:#101815;
+  --ba-overlay:rgba(16,24,21,.72);
+
+  /* Shared geometry and typography */
   --ba-radius-sm:8px;
   --ba-radius-md:12px;
   --ba-radius-lg:16px;
@@ -21,8 +27,9 @@
   --ba-space-5:20px;
   --ba-space-6:24px;
   --ba-space-8:32px;
-  --ba-font:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ba-font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
+
 html body[data-domain] {
   --bg:var(--ba-graphite) !important;
   --surface:var(--ba-surface) !important;
@@ -30,10 +37,10 @@ html body[data-domain] {
   --surface-raised:var(--ba-surface-raised) !important;
   --control-bg:var(--ba-control) !important;
   --border:var(--ba-line) !important;
-  --border-strong:#52645f !important;
+  --border-strong:#586D63 !important;
   --line:var(--ba-line) !important;
-  --text:#e9eeea !important;
-  --ink:#e9eeea !important;
+  --text:var(--ba-paper) !important;
+  --ink:var(--ba-paper) !important;
   --muted:var(--ba-muted) !important;
   --paper:var(--ba-paper) !important;
   --domain-accent:var(--workspace-accent) !important;
@@ -42,28 +49,59 @@ html body[data-domain] {
   background:var(--bg) !important;
   font-family:var(--ba-font) !important;
 }
+
 html body[data-domain="agronomy"] {
-  --workspace-accent:#b4f477 !important;
-  --workspace-accent-soft:rgba(180,244,119,.12) !important;
-  --workspace-accent-border:rgba(180,244,119,.42) !important;
+  --workspace-accent:#B5D38B !important;
+  --workspace-accent-soft:rgba(181,211,139,.12) !important;
+  --workspace-accent-border:rgba(181,211,139,.42) !important;
 }
+
 html body[data-domain="mycology"] {
-  --workspace-accent:#c98259 !important;
-  --workspace-accent-soft:rgba(201,130,89,.12) !important;
-  --workspace-accent-border:rgba(201,130,89,.42) !important;
+  --workspace-accent:#BE7658 !important;
+  --workspace-accent-soft:rgba(185,107,77,.13) !important;
+  --workspace-accent-border:rgba(185,107,77,.46) !important;
 }
+
 html body[data-domain="laboratory"] {
-  --workspace-accent:#78b8e8 !important;
+  --workspace-accent:#78B8E8 !important;
   --workspace-accent-soft:rgba(120,184,232,.12) !important;
   --workspace-accent-border:rgba(120,184,232,.42) !important;
 }
+
 html body[data-domain] .container {
-  width:min(100% - 32px,1240px) !important;
+  width:min(100% - 40px,1240px) !important;
   max-width:1240px !important;
   margin-inline:auto !important;
 }
+
 html body[data-domain] :is(h1,h2,h3,h4) {
   font-family:var(--ba-font) !important;
   letter-spacing:-.025em !important;
   text-transform:none !important;
+}
+
+html body[data-domain] :is(button,input,select,textarea,a) {
+  font-family:var(--ba-font);
+}
+
+html body[data-domain] :focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:3px !important;
+}
+
+@media(max-width:600px) {
+  html body[data-domain] .container {
+    width:calc(100% - 24px) !important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] *,
+  html body[data-domain] *::before,
+  html body[data-domain] *::after {
+    scroll-behavior:auto !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
 }

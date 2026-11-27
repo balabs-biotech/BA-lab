@@ -4,6 +4,30 @@
   "use strict";
   const finePointer = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+  // Keep module navigation usable with a keyboard, including touch/reduced-motion
+  // environments where pointer-reactive effects are intentionally disabled.
+  document.addEventListener("keydown", event => {
+    if (!(event.target instanceof Element)) return;
+    const current = event.target.closest(".section-nav a");
+    if (!current) return;
+    const nav = current.closest(".section-nav");
+    const links = [...(nav?.querySelectorAll("a") || [])].filter(link =>
+      !link.hidden && link.getClientRects().length > 0
+    );
+    const index = links.indexOf(current);
+    if (index < 0 || !links.length) return;
+    const rtl = getComputedStyle(nav).direction === "rtl";
+    let nextIndex = null;
+    if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = links.length - 1;
+    else if (event.key === "ArrowRight") nextIndex = index + (rtl ? -1 : 1);
+    else if (event.key === "ArrowLeft") nextIndex = index + (rtl ? 1 : -1);
+    if (nextIndex === null) return;
+    event.preventDefault();
+    links[(nextIndex + links.length) % links.length].focus();
+  });
+
   if (!finePointer || reducedMotion) return;
 
   const selectors = [

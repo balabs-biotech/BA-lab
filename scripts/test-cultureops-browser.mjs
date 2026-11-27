@@ -7,9 +7,9 @@ const artifactDir = process.env.CULTUREOPS_ARTIFACT_DIR || "artifacts/cultureops
 fs.mkdirSync(artifactDir, { recursive: true });
 
 const workspaces = [
-  { slug: "green-tech", domain: "agronomy", accent: "#b4f477" },
-  { slug: "mycology", domain: "mycology", accent: "#c98259" },
-  { slug: "laboratory", domain: "laboratory", accent: "#78b8e8" },
+  { slug: "green-tech", domain: "agronomy", accent: "#b5d38b", cover: "universe-soil.jpg" },
+  { slug: "mycology", domain: "mycology", accent: "#be7658", cover: "universe-myco.jpg" },
+  { slug: "laboratory", domain: "laboratory", accent: "#78b8e8", cover: "chapter-research.jpg" },
 ];
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
@@ -106,6 +106,77 @@ try {
         failures.push(`${workspace.slug}/${viewport.name}: BAL-JSON bridge UI incomplete ${JSON.stringify(balJsonUi)}`);
       }
 
+      if (viewport.name === "desktop") {
+        await page.evaluate(domain => {
+          const organizationId = "a0a0a0a0-0000-4000-8000-000000000001";
+          const cultureId = "b0b0b0b0-0000-4000-8000-000000000001";
+          const plantCultureId = "c0c0c0c0-0000-4000-8000-000000000001";
+          window.BA_LABS_GET_ORGANIZATION_ID = () => organizationId;
+          window.BA_LABS_GET_BAL_JSON_CONTEXT = () => ({
+            organization_id: organizationId,
+            workspace: domain,
+            targets: domain === "agronomy"
+              ? [{ type: "plant_culture", id: plantCultureId, code: "TOM-01", label: "Tomate" }]
+              : [{ type: "culture", id: cultureId, code: "PLE-01", label: "Pleurotus" }],
+            variables: [{ code: "temperature", label: "Température", dimension: "temperature" }],
+            units: [{ code: "degC", label: "°C", dimension: "temperature" }]
+          });
+          window.__balPromptCopied = "";
+          Object.defineProperty(navigator, "clipboard", {
+            configurable: true,
+            value: { writeText: async value => { window.__balPromptCopied = value; } }
+          });
+        }, workspace.domain);
+        await page.locator("#balJsonCopyPromptButton").click();
+        const copiedPrompt = await page.evaluate(() => window.__balPromptCopied);
+        if (!copiedPrompt.includes("BA Labs CultureOps") || !copiedPrompt.includes(workspace.domain === "agronomy" ? "GREEN TECH" : workspace.domain.toUpperCase())) {
+          failures.push(`${workspace.slug}: copied BAL-JSON prompt is missing the active workspace context`);
+        }
+        if (!copiedPrompt.includes("a0a0a0a0-0000-4000-8000-000000000001") || !copiedPrompt.includes("temperature")) {
+          failures.push(`${workspace.slug}: copied BAL-JSON prompt is missing the live tenant catalogue`);
+        }
+        const downloadPromise = page.waitForEvent("download");
+        await page.locator("#balJsonDownloadPromptButton").click();
+        const promptDownload = await downloadPromise;
+        if (promptDownload.suggestedFilename() !== "BA-Labs-CultureOps-prompt-BAL-JSON.md") {
+          failures.push(`${workspace.slug}: BAL-JSON prompt download has an unexpected filename (${promptDownload.suggestedFilename()})`);
+        }
+        const biologicalContext = workspace.domain === "agronomy"
+          ? { plant_culture_id: "c0c0c0c0-0000-4000-8000-000000000001" }
+          : { culture_id: "b0b0b0b0-0000-4000-8000-000000000001" };
+        const record = {
+          contract: "BA-LABS/JSON",
+          contract_version: "1.0.0",
+          record_type: "measurement",
+          record_id: "d0d0d0d0-0000-4000-8000-000000000001",
+          organization_id: "a0a0a0a0-0000-4000-8000-000000000001",
+          created_at: "2026-11-27T10:00:00.000Z",
+          data: {
+            variable_code: "temperature",
+            raw_value: 24.5,
+            raw_unit_code: "degC",
+            measured_at: "2026-11-27T09:59:00.000Z",
+            context: biologicalContext
+          },
+          provenance: { source: "ai_assisted", model: "Browser QA", review_status: "unreviewed" }
+        };
+        await page.locator("#balJsonImportSource").fill(JSON.stringify(record));
+        await page.locator("#balJsonPreviewButton").click();
+        await page.waitForFunction(() => document.querySelector("#balJsonImportButton")?.disabled === false);
+        const importPreview = await page.locator("#balJsonPreview").textContent();
+        if (!importPreview.includes("measurement") || !importPreview.includes("temperature") || !importPreview.includes("24.5")) {
+          failures.push(`${workspace.slug}: pasted BAL-JSON payload did not produce the expected preview (${importPreview})`);
+        }
+      }
+
+      await page.evaluate(() => {
+        document.documentElement.style.setProperty("scroll-behavior", "auto", "important");
+        document.body.style.setProperty("scroll-behavior", "auto", "important");
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        window.scrollTo(0, 0);
+      });
+      await page.waitForFunction(() => window.scrollY === 0);
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
@@ -114,6 +185,12 @@ try {
         const style = getComputedStyle(body);
         const cardStyle = card ? getComputedStyle(card) : null;
         const headingStyle = heading ? getComputedStyle(heading) : null;
+        const measurementTitle = document.querySelector("#measurementTitle");
+        const measurementKicker = document.querySelector("#measurementCard > .section-kicker");
+        const bridgeHeading = document.querySelector("#balJsonImportPanel .bal-json-heading h3");
+        const bridgeEyebrow = document.querySelector("#balJsonImportPanel .context-eyebrow");
+        const measurementCard = document.querySelector("#measurementCard");
+        const bridgePanel = document.querySelector("#balJsonImportPanel");
         const description = card?.querySelector(".muted");
         const firstLabel = card?.querySelector("label");
         const status = card?.querySelector("#authStatus");
@@ -127,11 +204,19 @@ try {
           viewportWidth: innerWidth,
           documentWidth: root.scrollWidth,
           bodyBackground: style.backgroundColor,
+          htmlBackground: getComputedStyle(root).backgroundColor,
+          bodyBackgroundAttachment: style.backgroundAttachment,
           workspaceAccent: style.getPropertyValue("--workspace-accent").trim(),
           surfaceToken: style.getPropertyValue("--surface").trim(),
           cardBackground: cardStyle?.backgroundColor || null,
           headingColor: headingStyle?.color || null,
           headingText: heading?.textContent?.trim() || null,
+          measurementHeadingColor: measurementTitle ? getComputedStyle(measurementTitle).color : null,
+          measurementCardBackground: measurementCard ? getComputedStyle(measurementCard).backgroundColor : null,
+          measurementKickerColor: measurementKicker ? getComputedStyle(measurementKicker).color : null,
+          bridgeHeadingColor: bridgeHeading ? getComputedStyle(bridgeHeading).color : null,
+          bridgePanelBackground: bridgePanel ? getComputedStyle(bridgePanel).backgroundColor : null,
+          bridgeEyebrowColor: bridgeEyebrow ? getComputedStyle(bridgeEyebrow).color : null,
           descriptionColor: description ? getComputedStyle(description).color : null,
           labelColor: firstLabel ? getComputedStyle(firstLabel).color : null,
           statusColor: status ? getComputedStyle(status).color : null,
@@ -147,6 +232,16 @@ try {
           contentRight: container?.getBoundingClientRect().right ?? null,
           heroTop: hero?.getBoundingClientRect().top ?? null,
           heroVisualSector: document.querySelector(".ba-sector-visual")?.dataset.sector || null,
+          organicField: !!hero?.querySelector("canvas.ba-organic-field"),
+          organicFieldInk: (() => {
+            const canvas = hero?.querySelector("canvas.ba-organic-field");
+            const context = canvas?.getContext("2d");
+            if (!context || !canvas.width || !canvas.height) return false;
+            const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+            for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) return true;
+            return false;
+          })(),
+          heroCoverImage: getComputedStyle(hero, "::before").backgroundImage,
           languageLabelWraps: languageLabel ? languageLabel.scrollWidth > languageLabel.clientWidth : true,
           overflowElements: [...document.querySelectorAll("body *")].map(element => {
             const rect = element.getBoundingClientRect();
@@ -165,20 +260,70 @@ try {
             .sort((a, b) => b.right - a.right).slice(0, 12),
           navLinks: document.querySelectorAll(".section-nav a").length,
           navigationHidden: document.querySelector(".section-nav")?.hidden ?? false,
+          navigationOverflowX: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).overflowX : null,
+          navigationMinWidth: document.querySelector(".section-nav") ? getComputedStyle(document.querySelector(".section-nav")).minWidth : null,
+          moduleScrollMargin: document.querySelector("#overviewCard") ? getComputedStyle(document.querySelector("#overviewCard")).scrollMarginTop : null,
+          cultureDetailBackground: document.querySelector("#cultureDetailPanel") ? getComputedStyle(document.querySelector("#cultureDetailPanel")).backgroundImage : null,
+          cultureDetailSummaryDisplay: document.querySelector("#cultureDetailSummary") ? getComputedStyle(document.querySelector("#cultureDetailSummary")).display : null,
+          cultureDetailScrollMargin: document.querySelector("#cultureDetailPanel") ? getComputedStyle(document.querySelector("#cultureDetailPanel")).scrollMarginTop : null,
+          measurementFieldLabels: [...document.querySelectorAll("#measurementCard label")].map(label => ({ fontSize: getComputedStyle(label).fontSize, color: getComputedStyle(label).color })),
+          measurementControls: [...document.querySelectorAll("#measurementCard input:not([type=checkbox]),#measurementCard select,#measurementCard textarea")].map(control => ({ id: control.id, minHeight: getComputedStyle(control).minHeight, fontSize: getComputedStyle(control).fontSize })),
+          statisticsTableWrap: (() => {
+            const wrap = document.querySelector("#statisticsCard .statistics-table-wrap");
+            if (!wrap) return null;
+            const style = getComputedStyle(wrap);
+            const table = wrap.querySelector("table");
+            return { overflowX: style.overflowX, maxWidth: style.maxWidth, tableMinWidth: table ? getComputedStyle(table).minWidth : null, headerFontSize: table?.querySelector("thead th") ? getComputedStyle(table.querySelector("thead th")).fontSize : null };
+          })(),
+          movementStatusBackground: (() => {
+            const control = document.querySelector("#moveBatchStatus");
+            return control ? getComputedStyle(control).backgroundColor : null;
+          })(),
+          movementStatusColorScheme: (() => {
+            const control = document.querySelector("#moveBatchStatus");
+            return control ? getComputedStyle(control).colorScheme : null;
+          })(),
+          movementSelects: ["#moveBatchLocation", "#moveBatchEnvironment"].map(selector => {
+            const control = document.querySelector(selector);
+            if (!control) return { selector, missing: true };
+            const style = getComputedStyle(control);
+            return { selector, background: style.backgroundColor, colorScheme: style.colorScheme, minHeight: style.minHeight };
+          }),
         };
       });
 
       if (viewport.width >= 821 && (metrics.toolbarPosition !== "sticky" || metrics.toolbarTop < 0 || metrics.heroTop < metrics.toolbarBottom + 8 || metrics.toolbarWidth > metrics.viewportWidth)) failures.push(`${workspace.slug}/${viewport.name}: horizontal sticky toolbar layout is invalid (${JSON.stringify({ position: metrics.toolbarPosition, top: metrics.toolbarTop, bottom: metrics.toolbarBottom, heroTop: metrics.heroTop, width: metrics.toolbarWidth, viewport: metrics.viewportWidth })})`);
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
+      if (viewport.name !== "desktop" && metrics.measurementControls.some(control => Number.parseFloat(control.minHeight) < 44 || Number.parseFloat(control.fontSize) < 16)) {
+        failures.push(`${workspace.slug}/${viewport.name}: measurement fields must retain 44px touch targets and 16px text (${JSON.stringify(metrics.measurementControls.filter(control => Number.parseFloat(control.minHeight) < 44 || Number.parseFloat(control.fontSize) < 16))})`);
+      }
+      if (!parseColor(metrics.htmlBackground)) failures.push(`${workspace.slug}/${viewport.name}: document root background is not explicitly defined (${metrics.htmlBackground})`);
+      if (metrics.bodyBackgroundAttachment === "fixed") failures.push(`${workspace.slug}/${viewport.name}: full-page rendering must not depend on a fixed body background`);
+      const editorialKickerContrast = contrastRatio(metrics.measurementKickerColor, metrics.measurementCardBackground);
+      if (editorialKickerContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: editorial section metadata contrast ${editorialKickerContrast.toFixed(2)}:1 is below 4.5:1`);
       if (metrics.domain !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: wrong data-domain ${metrics.domain}`);
       if (metrics.heroVisualSector !== workspace.domain) failures.push(`${workspace.slug}/${viewport.name}: sector-specific hero visual missing or mismatched (${metrics.heroVisualSector})`);
+      if (!metrics.organicField) failures.push(`${workspace.slug}/${viewport.name}: shared organic mycelium canvas missing`);
+      if (!metrics.organicFieldInk) failures.push(`${workspace.slug}/${viewport.name}: organic mycelium canvas rendered no visible filaments`);
+      if (!metrics.heroCoverImage.includes(workspace.cover)) failures.push(`${workspace.slug}/${viewport.name}: expected BA Labs cover image ${workspace.cover} missing (${metrics.heroCoverImage})`);
       if (metrics.workspaceAccent.toLowerCase() !== workspace.accent) failures.push(`${workspace.slug}/${viewport.name}: unexpected workspace accent ${metrics.workspaceAccent}; expected ${workspace.accent}`);
       const headingContrast = contrastRatio(metrics.headingColor, metrics.surfaceToken);
-      if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);
+      if (headingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth heading contrast ${headingContrast.toFixed(2)}:1 is below 4.5:1`);      if (workspace.domain === "mycology") {
+        const measurementContrast = contrastRatio(metrics.measurementHeadingColor, metrics.measurementCardBackground);
+        const measurementKickerContrast = contrastRatio(metrics.measurementKickerColor, metrics.measurementCardBackground);
+        const bridgeHeadingContrast = contrastRatio(metrics.bridgeHeadingColor, metrics.bridgePanelBackground);
+        const bridgeEyebrowContrast = contrastRatio(metrics.bridgeEyebrowColor, metrics.bridgePanelBackground);
+        if (measurementContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology measurement heading contrast ${measurementContrast.toFixed(2)}:1 is below 4.5:1`);
+        if (measurementKickerContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology measurement section kicker contrast ${measurementKickerContrast.toFixed(2)}:1 is below 4.5:1`);
+        if (bridgeHeadingContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology BAL-JSON heading contrast ${bridgeHeadingContrast.toFixed(2)}:1 is below 4.5:1`);
+        if (bridgeEyebrowContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: Mycology BAL-JSON eyebrow contrast ${bridgeEyebrowContrast.toFixed(2)}:1 is below 4.5:1`);
+      }
       const descriptionContrast = contrastRatio(metrics.descriptionColor, metrics.surfaceToken);
       const labelContrast = contrastRatio(metrics.labelColor, metrics.surfaceToken);
       if (descriptionContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth description contrast ${descriptionContrast.toFixed(2)}:1 is below 4.5:1`);
       if (labelContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: auth label contrast ${labelContrast.toFixed(2)}:1 is below 4.5:1`);
+      const accentContrast = contrastRatio(metrics.workspaceAccent, metrics.surfaceToken);
+      if (accentContrast < 4.5) failures.push(`${workspace.slug}/${viewport.name}: workspace accent contrast ${accentContrast.toFixed(2)}:1 is below 4.5:1`);
       if (viewport.name === "desktop" && (metrics.toolbarPosition !== "sticky" || metrics.heroTop < metrics.toolbarBottom + 8)) failures.push(`${workspace.slug}/${viewport.name}: desktop toolbar should remain sticky above the workspace content (position=${metrics.toolbarPosition}, toolbarBottom=${metrics.toolbarBottom}, heroTop=${metrics.heroTop})`);
       if (viewport.name === "desktop" && metrics.heroTop > 220) failures.push(`${workspace.slug}/${viewport.name}: workspace hero starts too far below the top navigation (${metrics.heroTop}px > 220px)`);
       if (viewport.name === "mobile" && metrics.languageLabelWraps) failures.push(`${workspace.slug}/${viewport.name}: language label wraps unexpectedly`);
@@ -186,7 +331,54 @@ try {
       if (metrics.documentWidth > metrics.viewportWidth + 1) failures.push(`${workspace.slug}/${viewport.name}: horizontal overflow ${metrics.documentWidth}px > ${metrics.viewportWidth}px`);
       if (viewport.name !== "desktop" && metrics.signInButtonBottom > viewport.height) failures.push(`${workspace.slug}/${viewport.name}: sign-in action falls below the first viewport (${metrics.signInButtonBottom}px > ${viewport.height}px)`);
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
+      if (metrics.navigationOverflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: section navigation is not horizontally scrollable (${metrics.navigationOverflowX})`);
+      if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
+      if (metrics.measurementFieldLabels.length < 4) failures.push(`${workspace.slug}/${viewport.name}: scientific measurement form labels are missing (${metrics.measurementFieldLabels.length})`);
+      if (metrics.measurementControls.length < 4) failures.push(`${workspace.slug}/${viewport.name}: scientific measurement controls are missing (${metrics.measurementControls.length})`);
+      if (!metrics.statisticsTableWrap) failures.push(`${workspace.slug}/${viewport.name}: analytical table wrapper is missing`);
+      for (const label of metrics.measurementFieldLabels) {
+        if (Number.parseFloat(label.fontSize) < 11) failures.push(`${workspace.slug}/${viewport.name}: measurement label is below 11px (${label.fontSize})`);
+        if (contrastRatio(label.color, metrics.cardBackground) < 4.5) failures.push(`${workspace.slug}/${viewport.name}: measurement label contrast is below 4.5:1 (${label.color})`);
+      }
+      for (const control of metrics.measurementControls) {
+        if (Number.parseFloat(control.minHeight) < 42) failures.push(`${workspace.slug}/${viewport.name}: measurement control ${control.id} is below 42px (${control.minHeight})`);
+      }
+      if (metrics.statisticsTableWrap && (metrics.statisticsTableWrap.overflowX !== "auto" || metrics.statisticsTableWrap.maxWidth !== "100%")) failures.push(`${workspace.slug}/${viewport.name}: analytical table wrapper is not safely horizontally scrollable (${JSON.stringify(metrics.statisticsTableWrap)})`);
+      if (metrics.statisticsTableWrap?.headerFontSize && Number.parseFloat(metrics.statisticsTableWrap.headerFontSize) < 10) failures.push(`${workspace.slug}/${viewport.name}: analytical table header is below 10px (${metrics.statisticsTableWrap.headerFontSize})`);
+      if (!metrics.cultureDetailBackground?.includes("linear-gradient")) failures.push(`${workspace.slug}/${viewport.name}: scientific culture detail surface styling is missing`);
+      if (metrics.cultureDetailSummaryDisplay !== "grid") failures.push(`${workspace.slug}/${viewport.name}: culture detail summary is not rendered as a responsive grid (${metrics.cultureDetailSummaryDisplay})`);
+       if (!metrics.cultureDetailScrollMargin || Number.parseFloat(metrics.cultureDetailScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: culture detail does not reserve space below the sticky toolbar (${metrics.cultureDetailScrollMargin})`);
+      const movementSurface = metrics.movementStatusBackground?.match(/\d+/g)?.slice(0,3).map(Number) || [];
+      if (movementSurface.length !== 3 || movementSurface.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: batch movement status is not using the shared dark surface (${metrics.movementStatusBackground})`);
+      if (metrics.movementStatusColorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: batch movement status should inherit dark color scheme (${metrics.movementStatusColorScheme})`);
+      for (const control of metrics.movementSelects) {
+        if (control.missing) failures.push(`${workspace.slug}/${viewport.name}: batch movement control missing: ${control.selector}`);
+        else {
+          const channels = control.background.match(/\d+/g)?.slice(0,3).map(Number) || [];
+          if (channels.length !== 3 || channels.some(channel => channel > 55)) failures.push(`${workspace.slug}/${viewport.name}: ${control.selector} is not using a dark surface (${control.background})`);
+          if (control.colorScheme !== "dark") failures.push(`${workspace.slug}/${viewport.name}: ${control.selector} is not using dark native controls (${control.colorScheme})`);
+          if (Number.parseFloat(control.minHeight) < 40) failures.push(`${workspace.slug}/${viewport.name}: ${control.selector} is below 40px touch height (${control.minHeight})`);
+        }
+      }
       if (!metrics.navigationHidden) failures.push(`${workspace.slug}/${viewport.name}: module navigation is exposed before authentication`);
+      const keyboardNavigation = await page.evaluate(() => {
+        const nav = document.querySelector(".section-nav");
+        if (!nav) return { ltr: false, rtl: false };
+        nav.hidden = false;
+        const links = [...nav.querySelectorAll("a")].filter(link => !link.hidden);
+        if (links.length < 2) return { ltr: false, rtl: false };
+        links[0].focus();
+        links[0].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }));
+        const ltr = document.activeElement === links[1];
+        document.documentElement.dir = "rtl";
+        links[1].focus();
+        links[1].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }));
+        const rtl = document.activeElement === links[0];
+        document.documentElement.dir = "ltr";
+        nav.hidden = true;
+        return { ltr, rtl };
+      });
+      if (!keyboardNavigation.ltr || !keyboardNavigation.rtl) failures.push(`${workspace.slug}/${viewport.name}: keyboard module navigation did not respect LTR/RTL direction (${JSON.stringify(keyboardNavigation)})`);
       if (metrics.authEmailPrefilled) failures.push(`${workspace.slug}/${viewport.name}: login email is hard-coded in the interface`);
       const compactHero = await page.evaluate(() => {
         const hero = document.querySelector(".app-hero");
@@ -269,6 +461,14 @@ try {
         if (message) message.replaceChildren();
       });
 
+      // Restore document origin after form interactions so full-page captures
+      // do not freeze the sticky toolbar at the last interaction scroll offset.
+      await page.evaluate(() => {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        window.scrollTo(0, 0);
+      });
+      await page.waitForFunction(() => window.scrollY === 0);
       const screenshotPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
 
@@ -303,8 +503,36 @@ try {
             }
           }
         });
+        await page.evaluate(() => {
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          window.scrollTo(0, 0);
+        });
+        await page.waitForFunction(() => window.scrollY === 0);
         const overviewPath = path.join(artifactDir, `${workspace.slug}-${viewport.name}-overview-preview.png`);
         await page.screenshot({ path: overviewPath, fullPage: true, animations: "disabled" });
+        if (workspace.domain === "mycology") {
+          const visibleContrast = await page.evaluate(() => {
+            const root = document.querySelector("#measurementCard");
+            const headings = [...(root?.querySelectorAll("h1,h2,h3,h4,h5,h6") || [])]
+              .filter(node => node.getClientRects().length)
+              .map(node => ({ text: node.textContent.trim(), color: getComputedStyle(node).color }));
+            const kickers = [...(root?.querySelectorAll(".section-kicker,.section-label,.panel-kicker,.context-eyebrow") || [])]
+              .filter(node => node.getClientRects().length)
+              .map(node => ({ text: node.textContent.trim(), color: getComputedStyle(node).color }));
+            return { visible: !!root && root.getBoundingClientRect().height > 0, headings, kickers };
+          });
+          const readableHeadingColors = new Set(["rgb(240, 238, 232)", "rgb(232, 238, 232)", "rgb(242, 241, 233)"]);
+          const readableKickerColors = new Set(["rgb(226, 176, 146)", "rgb(214, 154, 120)"]);
+          if (!visibleContrast.visible || !visibleContrast.headings.length ||
+              visibleContrast.headings.some(item => !readableHeadingColors.has(item.color))) {
+            failures.push(`${workspace.slug}/${viewport.name}: visible Mycology module headings are not mineral-light (${JSON.stringify(visibleContrast.headings)})`);
+          }
+          if (!visibleContrast.kickers.length ||
+              visibleContrast.kickers.some(item => !readableKickerColors.has(item.color))) {
+            failures.push(`${workspace.slug}/${viewport.name}: visible Mycology module kickers are not light copper (${JSON.stringify(visibleContrast.kickers)})`);
+          }
+        }
         const overviewState = await page.evaluate(() => {
           const card = document.querySelector("#overviewCard");
           return {
@@ -322,11 +550,42 @@ try {
         const fixtures = [
           ["#cultureCatalogList", "culture-catalog-row", "Culture P80"],
           ["#cultureDetailSummary", "culture-detail-field", "Identifiant"],
+          ["#cultureDetailTimeline", "culture-timeline-entry", "Repiquage"],
           ["#measurementHistory", "measurement-entry", "Température"],
           ["#batchList", "batch-item", "Lot de test"],
           ["#batchStageList", "stage active", "Incubation"],
+          ["#batchQcList", "qc-row", "Contrôle conforme"],
+          ["#batchEventList", "batch-event-item", "Événement de traçabilité"],
         ];
         const checks = [];
+        const visualizationHost = document.querySelector("#trackerCard") || document.body;
+        const visualizationFixture = document.createElement("section");
+        visualizationFixture.className = "visualization-browser-fixture";
+        const domain = document.body.dataset.domain;
+        visualizationFixture.innerHTML = domain === "mycology" ? `
+          <div class="mycology-activity-map">
+            <div class="mycology-activity-tools"><button type="button">−</button><button type="button">+</button><button type="button">Ajuster</button></div>
+            <div class="mycology-activity-stage"></div>
+          </div>
+          <div class="lineage-graph-shell"><div class="lineage-graph-toolbar"><button type="button">−</button><button type="button">+</button><button type="button">Recentrer</button></div></div>
+        ` : domain === "laboratory" ? `
+          <div class="lab-process-map"><div class="lab-process-map-controls"><button type="button">−</button><button type="button">+</button><button type="button">Ajuster</button></div><div class="lab-process-map-stage"></div></div>
+        ` : `
+          <div class="greentech-climate-signature"><div class="greentech-climate-plot"></div><ul class="greentech-climate-values"><li>Température <strong>24 °C</strong></li></ul></div>
+        `;
+        visualizationHost.appendChild(visualizationFixture);
+        const visualizationControls = [...visualizationFixture.querySelectorAll(".mycology-activity-tools button,.lineage-graph-toolbar button,.lab-process-map-controls button")].map(button => {
+          const style = getComputedStyle(button);
+          return { group: button.parentElement.className, minWidth: style.minWidth, minHeight: style.minHeight, focusStyle: style.outlineStyle };
+        });
+        const visualizationStages = [...visualizationFixture.querySelectorAll(".mycology-activity-stage,.lab-process-map-stage")].map(stage => ({
+          className: stage.className, overflowX: getComputedStyle(stage).overflowX, minWidth: getComputedStyle(stage).minWidth
+        }));
+        const visualizationClimate = domain === "agronomy" ? {
+          plotOverflow: getComputedStyle(visualizationFixture.querySelector(".greentech-climate-plot")).overflowX,
+          valuesColumns: getComputedStyle(visualizationFixture.querySelector(".greentech-climate-values")).gridTemplateColumns
+        } : null;
+        visualizationFixture.remove();
         for (const [parentSelector, className, label] of fixtures) {
           const parent = document.querySelector(parentSelector);
           if (!parent) {
@@ -388,6 +647,9 @@ try {
           catalogLayout: getComputedStyle(document.querySelector("#cultureCatalogList")).display,
           measurementLayout: getComputedStyle(document.querySelector("#measurementHistory")).display,
           detailGrid: getComputedStyle(document.querySelector("#cultureDetailSummary")).gridTemplateColumns,
+          visualizationControls,
+          visualizationStages,
+          visualizationClimate,
         };
       });
       for (const check of interiorState.checks) {
@@ -398,6 +660,17 @@ try {
       }
       if (interiorState.catalogLayout !== "grid" || interiorState.measurementLayout !== "grid") {
         failures.push(`${workspace.slug}/${viewport.name}: interior list layout not applied (${JSON.stringify(interiorState)})`);
+      }
+      for (const control of interiorState.visualizationControls) {
+        if (Number.parseFloat(control.minWidth) < 40 || Number.parseFloat(control.minHeight) < 40) {
+          failures.push(`${workspace.slug}/${viewport.name}: scientific visualization control is below 40px (${JSON.stringify(control)})`);
+        }
+      }
+      for (const stage of interiorState.visualizationStages) {
+        if (stage.overflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: scientific visualization stage is not horizontally scrollable (${JSON.stringify(stage)})`);
+      }
+      if (workspace.domain === "agronomy" && interiorState.visualizationClimate.plotOverflow !== "hidden") {
+        failures.push(`${workspace.slug}/${viewport.name}: GreenTech climate plot must clip its responsive chart surface (${interiorState.visualizationClimate.plotOverflow})`);
       }
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
       if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);

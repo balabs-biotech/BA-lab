@@ -1,0 +1,56 @@
+/* Shared visualization foundation — layout and interaction are normalized;
+   each workspace keeps its own scientific palette and data semantics. */
+html body[data-domain] :is(.greentech-climate-signature,.mycology-activity-map,.lab-process-map) {
+  box-sizing:border-box;
+  min-width:0;
+  isolation:isolate;
+}
+html body[data-domain] :is(.greentech-climate-heading,.mycology-activity-heading,.lab-process-map-heading) {
+  min-width:0;
+}
+html body[data-domain] :is(.greentech-climate-heading h3,.mycology-activity-heading h3) {
+  line-height:1.3;
+  letter-spacing:-.015em;
+}
+html body[data-domain] :is(.greentech-climate-plot,.mycology-activity-stage,.lab-process-map-stage) {
+  min-width:0;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-gutter:stable;
+}
+html body[data-domain] :is(.mycology-activity-tools,.lab-process-map-controls) button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:40px;
+  min-height:40px;
+  font:inherit;
+  font-variant-numeric:tabular-nums;
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+html body[data-domain] :is(.mycology-activity-tools,.lab-process-map-controls) button:focus-visible {
+  outline:2px solid var(--workspace-accent);
+  outline-offset:3px;
+  position:relative;
+  z-index:2;
+}
+html body[data-domain] :is(.mycology-activity-tools,.lab-process-map-controls) button:disabled {
+  opacity:.42;
+  cursor:not-allowed;
+}
+html body[data-domain] :is(.mycology-activity-tools,.lab-process-map-controls) button:active:not(:disabled) {
+  transform:scale(.96);
+}
+html body[data-domain] :is(.greentech-climate-values,.mycology-activity-note,.lab-process-map-status) {
+  overflow-wrap:anywhere;
+}
+@media(max-width:620px) {
+  html body[data-domain] :is(.greentech-climate-signature,.mycology-activity-map,.lab-process-map) {
+    min-width:0;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] :is(.mycology-activity-tools,.lab-process-map-controls) button {
+    transition:none;
+  }
+}

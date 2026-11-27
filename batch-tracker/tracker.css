@@ -13904,7 +13904,8 @@ body[data-domain] #authCard #authStatus[aria-busy="true"] {
 }
 body[data-domain] .workspace-inactive {display:none!important}
 body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard) {
-  scroll-margin-top:18px;
+  scroll-margin-top:112px !important;
+  scroll-margin-block-start:112px !important;
 }
 @media(max-width:1120px) {
   body[data-domain] .app-toolbar {flex-wrap:wrap; align-items:center}
@@ -23388,4 +23389,13 @@ html body[data-domain] .culture-catalog-row :is(.culture-catalog-meta,small,.mut
     min-height:0 !important;
   }
   html body[data-domain] .hero-art { display:none !important; }
+}
+
+
+/* CultureOps visual pass — final scroll target contract.
+   This must follow legacy workspace-authenticated offsets above. */
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard),
+html body[data-domain].workspace-authenticated :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) {
+  scroll-margin-top:112px !important;
+  scroll-margin-block-start:112px !important;
 }

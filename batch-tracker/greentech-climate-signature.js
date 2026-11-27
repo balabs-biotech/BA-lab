@@ -6,6 +6,7 @@
   if (document.body.dataset.domain !== "agronomy") return;
   const host = document.getElementById("workspace-root") || document.body;
   let pixi = null, app = null, scheduled = 0, renderRevision = 0;
+
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const panel = document.createElement("section");
   panel.className = "greentech-climate-signature";
@@ -13,7 +14,6 @@
   panel.innerHTML = '<div class="greentech-climate-heading"><div><span class="greentech-climate-kicker">LECTURE DES SÉRIES</span><h3>Signature climatique</h3><p>Vue condensée des courbes historiques chargées dans ce module</p></div><span class="greentech-climate-source">NASA POWER · DONNÉES IMPORTÉES</span></div><div class="greentech-climate-plot" aria-hidden="true"></div><ul class="greentech-climate-values" aria-label="Dernières valeurs visibles des séries"></ul><p class="greentech-climate-footnote">Les courbes conservent leurs unités propres. Ce contexte météo estimé sur grille ne constitue pas une mesure dans la parcelle.</p>';
   const plot = panel.querySelector(".greentech-climate-plot");
   const values = panel.querySelector(".greentech-climate-values");
-  let insertedInto = null;
 
   function extractSeries() {
     const charts = [...document.querySelectorAll("#envWeatherCharts > .environmental-weather-chart")];
@@ -57,7 +57,12 @@
   async function draw() {
     const revision = ++renderRevision;
     const charts = document.getElementById("envWeatherCharts");
-    if (!charts) return;
+    if (!charts) {
+      destroy();
+      panel.hidden = true;
+      panel.dataset.state = "empty";
+      return;
+    }
     const series = extractSeries();
     if (!series.length) {
       destroy();
@@ -67,6 +72,7 @@
     }
     panel.hidden = false;
     renderText(series);
+    let pendingApp = null;
     try {
       if (!pixi) pixi = await import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs");
       if (revision !== renderRevision) return;
@@ -77,10 +83,11 @@
       const cellWidth = (width - 36 - (columns - 1) * 14) / columns;
       const cellHeight = 112;
       const height = rows * cellHeight + (rows - 1) * 12 + 24;
-      const next = new pixi.Application();
+      const next = pendingApp = new pixi.Application();
       await next.init({ width, height, backgroundAlpha: 0, antialias: true, autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 1.5), autoStart: false, preference: "webgl" });
       if (revision !== renderRevision) { next.destroy(true, true); return; }
       app = next;
+      pendingApp = null;
       next.canvas.className = "greentech-climate-canvas";
       next.canvas.setAttribute("aria-hidden", "true");
       plot.replaceChildren(next.canvas);
@@ -116,7 +123,7 @@
             .fill({ color: Number.isFinite(stroke) ? stroke : 0x8ed16d, alpha: pointIndex === item.points.length - 1 ? 1 : 0.62 });
           card.addChild(marker);
         });
-        const count = new Text({ text: item.points.length + " dates · " + (item.latest || "dernière valeur"), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 8, fill: 0xa9b9ae } });
+        const count = new Text({ text: item.points.length + " dates · " + (item.latest || "dernière valeur"), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xa9b9ae } });
         count.position.set(12, 91); card.addChild(count);
         root.addChild(card);
       });
@@ -125,6 +132,7 @@
       panel.dataset.state = "ready";
     } catch (error) {
       console.info("BA Labs: signature PixiJS indisponible; les graphiques météo natifs restent actifs.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       destroy();
       panel.dataset.state = "fallback";
     }
@@ -149,7 +157,6 @@
     if (!charts || charts.dataset.signatureEnhanced === "true") return;
     charts.dataset.signatureEnhanced = "true";
     charts.prepend(panel);
-    insertedInto = charts;
     resizeObserver.observe(charts);
     schedule();
   };

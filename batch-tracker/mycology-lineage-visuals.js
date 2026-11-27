@@ -22,12 +22,49 @@
   details.appendChild(target);
 
   const stage = shell.querySelector(".lineage-graph-stage");
+  let drag = null;
+  let zoom = 1, graphWidth = 0, graphHeight = 0;
+  function applyZoom(value) {
+    zoom = Math.max(0.55, Math.min(1.8, value));
+    if (app?.canvas) {
+      app.canvas.style.width = Math.round(graphWidth * zoom) + "px";
+      app.canvas.style.height = Math.round(graphHeight * zoom) + "px";
+    }
+    const label = shell.querySelector(".lineage-graph-zoom-label");
+    if (label) label.textContent = Math.round(zoom * 100) + " %";
+  }
+  shell.querySelector('[data-graph-zoom="in"]').addEventListener("click", () => applyZoom(zoom + 0.15));
+  shell.querySelector('[data-graph-zoom="out"]').addEventListener("click", () => applyZoom(zoom - 0.15));
+  shell.querySelector('[data-graph-zoom="fit"]').addEventListener("click", () => {
+    applyZoom(1);
+    stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+  });
+  stage.addEventListener("pointerdown", event => {
+    if (event.target?.classList?.contains("lineage-graph-canvas")) {
+      drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
+      stage.classList.add("is-panning");
+    }
+  });
+  window.addEventListener("pointermove", event => {
+    if (!drag) return;
+    stage.scrollLeft = drag.left - (event.clientX - drag.x);
+    stage.scrollTop = drag.top - (event.clientY - drag.y);
+  });
+  const stopDrag = () => { drag = null; stage.classList.remove("is-panning"); };
+  window.addEventListener("pointerup", stopDrag);
+  window.addEventListener("pointercancel", stopDrag);
+  stage.addEventListener("wheel", event => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    applyZoom(zoom + (event.deltaY < 0 ? 0.08 : -0.08));
+  }, { passive: false });
   let PIXI = null;
   let app = null;
+
   let frame = 0;
   let renderToken = 0;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  const colors = { ancestor: 0x83a7a0, current: 0xc98259, descendant: 0xb4f477, line: 0x657b70, text: 0xe9eee7, muted: 0xa8b9ad };
+  const colors = { ancestor: 0x9b9a8f, current: 0xc98259, descendant: 0xd9a36e, line: 0x765c4d, text: 0xe9eee7, muted: 0xb6aaa0 };
 
   function collectNodes() {
     return [...target.querySelectorAll("button.culture-lineage-node[data-culture-id]")].map(button => ({
@@ -42,6 +79,7 @@
   }
 
   function showFallback(message, revealList = false) {
+    if (app) { app.destroy(true, true); app = null; }
     stage.replaceChildren();
     const note = document.createElement("p");
     note.className = "lineage-graph-status";
@@ -91,13 +129,14 @@
       showFallback("La carte apparaîtra lorsqu’une culture sera sélectionnée.");
       return;
     }
+    let pendingApp = null;
     try {
       const pixi = await loadPixi();
       if (token !== renderToken) return;
       if (app) { app.destroy(true, true); app = null; }
       stage.replaceChildren();
       const graph = layout(nodes);
-      const nextApp = new pixi.Application();
+      const nextApp = pendingApp = new pixi.Application();
       await nextApp.init({
         width: graph.width,
         height: graph.height,
@@ -110,6 +149,7 @@
       });
       if (token !== renderToken) { nextApp.destroy(true, true); return; }
       app = nextApp;
+      pendingApp = null;
       nextApp.canvas.className = "lineage-graph-canvas";
       nextApp.canvas.setAttribute("aria-hidden", "true");
       nextApp.canvas.style.width = graph.width + "px";
@@ -119,42 +159,9 @@
       const { Container, Graphics, Text, Rectangle } = pixi;
       const scene = new Container();
       nextApp.stage.addChild(scene);
-      const zoomLabel = shell.querySelector(".lineage-graph-zoom-label");
-      let zoom = 1;
-      const applyZoom = value => {
-        zoom = Math.max(0.55, Math.min(1.8, value));
-        if (nextApp.canvas) {
-          nextApp.canvas.style.width = Math.round(graph.width * zoom) + "px";
-          nextApp.canvas.style.height = Math.round(graph.height * zoom) + "px";
-        }
-        if (zoomLabel) zoomLabel.textContent = Math.round(zoom * 100) + " %";
-      };
-      shell.querySelector('[data-graph-zoom="in"]').addEventListener("click", () => applyZoom(zoom + 0.15));
-      shell.querySelector('[data-graph-zoom="out"]').addEventListener("click", () => applyZoom(zoom - 0.15));
-      shell.querySelector('[data-graph-zoom="fit"]').addEventListener("click", () => {
-        applyZoom(1);
-        stage.scrollTo({ left: 0, top: 0, behavior: reducedMotion ? "auto" : "smooth" });
-      });
-      let drag = null;
-      stage.addEventListener("pointerdown", event => {
-        if (event.target === nextApp.canvas) {
-          drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
-          stage.classList.add("is-panning");
-        }
-      });
-      window.addEventListener("pointermove", event => {
-        if (!drag) return;
-        stage.scrollLeft = drag.left - (event.clientX - drag.x);
-        stage.scrollTop = drag.top - (event.clientY - drag.y);
-      });
-      const stopDrag = () => { drag = null; stage.classList.remove("is-panning"); };
-      window.addEventListener("pointerup", stopDrag);
-      window.addEventListener("pointercancel", stopDrag);
-      stage.addEventListener("wheel", event => {
-        if (!event.ctrlKey && !event.metaKey) return;
-        event.preventDefault();
-        applyZoom(zoom + (event.deltaY < 0 ? 0.08 : -0.08));
-      }, { passive: false });
+      graphWidth = graph.width;
+      graphHeight = graph.height;
+      applyZoom(zoom);
       const nodeWidth = 184, nodeHeight = 68;
       const byId = graph.positions;
       const drawEdge = (from, to) => {
@@ -197,7 +204,7 @@
         const title = new Text({ text: node.title.length > 24 ? node.title.slice(0, 22) + "…" : node.title, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 12, fontWeight: "700", fill: colors.text } });
         title.position.set(14, 14);
         card.addChild(title);
-        const subtitle = new Text({ text: node.subtitle.length > 30 ? node.subtitle.slice(0, 28) + "…" : node.subtitle, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fill: colors.muted } });
+        const subtitle = new Text({ text: node.subtitle.length > 30 ? node.subtitle.slice(0, 28) + "…" : node.subtitle, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: colors.muted } });
         subtitle.position.set(14, 39);
         card.addChild(subtitle);
         card.on("pointertap", () => node.button.click());
@@ -216,6 +223,7 @@
       shell.dataset.graphState = "ready";
     } catch (error) {
       console.info("BA Labs: carte PixiJS indisponible, liste de filiation conservée.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       shell.dataset.graphState = "fallback";
       showFallback("La visualisation graphique est indisponible. La liste détaillée reste accessible ci-dessous.", true);
     }

@@ -441,7 +441,7 @@ html body[data-domain="mycology"] #trackerCard .culture-lineage-node[data-lineag
   letter-spacing:.1em;
 }
 html body[data-domain="mycology"] #trackerCard .culture-lineage-node[data-lineage-role="ancestor"] {
-  border-inline-start-color:#83a7a0 !important;
+  border-inline-start-color:#9b9a8f !important;
 }
 html body[data-domain="mycology"] #trackerCard .culture-lineage-node[data-lineage-role="descendant"] {
   border-inline-start-color:var(--workspace-accent) !important;
@@ -802,16 +802,16 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-legend > span::bef
   width:7px !important;
   height:7px !important;
   border-radius:50% !important;
-  background:#83a7a0 !important;
-  box-shadow:0 0 8px rgba(131,167,160,.28) !important;
+  background:#9b9a8f !important;
+  box-shadow:0 0 8px rgba(155,154,143,.28) !important;
 }
 html body[data-domain="mycology"] #trackerCard .lineage-graph-legend > span[data-kind="current"]::before {
   background:#c98259 !important;
   box-shadow:0 0 8px rgba(201,130,89,.34) !important;
 }
 html body[data-domain="mycology"] #trackerCard .lineage-graph-legend > span[data-kind="descendant"]::before {
-  background:#b4f477 !important;
-  box-shadow:0 0 8px rgba(180,244,119,.3) !important;
+  background:#d9a36e !important;
+  box-shadow:0 0 8px rgba(217,163,110,.3) !important;
 }
 
 
@@ -1367,9 +1367,9 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button {
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
-  min-width:34px !important;
-  min-height:30px !important;
-  padding:5px 9px !important;
+  min-width:40px !important;
+  min-height:40px !important;
+  padding:7px 10px !important;
   border:1px solid rgba(201,130,89,.28) !important;
   border-radius:7px !important;
   color:#e2b092 !important;
@@ -1381,6 +1381,12 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button {
 html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button:hover {
   border-color:rgba(201,130,89,.62) !important;
   background:rgba(201,130,89,.16) !important;
+}
+html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button:focus-visible {
+  outline:2px solid #e0ad91 !important;
+  outline-offset:3px !important;
+  position:relative !important;
+  z-index:2 !important;
 }
 html body[data-domain="mycology"] #trackerCard .lineage-graph-zoom-label {
   min-width:42px !important;

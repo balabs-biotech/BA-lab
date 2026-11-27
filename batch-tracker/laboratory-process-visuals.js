@@ -18,6 +18,7 @@
   const zoomLabel = shell.querySelector("[data-process-zoom-label]");
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   let PIXI = null, app = null, frame = 0, renderToken = 0, zoom = 1;
+
   let baseWidth = 0, baseHeight = 0;
 
   const palette = {
@@ -83,6 +84,7 @@
       shell.dataset.state = "empty";
       return;
     }
+    let pendingApp = null;
     try {
       const pixi = await loadPixi();
       if (token !== renderToken) return;
@@ -91,7 +93,7 @@
       const nodeWidth = 190, nodeHeight = 104, gap = 54, left = 30, top = 42;
       baseWidth = Math.max(340, left * 2 + stages.length * nodeWidth + (stages.length - 1) * gap);
       baseHeight = 190;
-      const next = new pixi.Application();
+      const next = pendingApp = new pixi.Application();
       await next.init({
         width: baseWidth, height: baseHeight, backgroundAlpha: 0,
         antialias: true, autoDensity: true,
@@ -100,6 +102,7 @@
       });
       if (token !== renderToken) { next.destroy(true, true); return; }
       app = next;
+      pendingApp = null;
       next.canvas.className = "lab-process-map-canvas";
       next.canvas.setAttribute("aria-hidden", "true");
       next.canvas.style.width = baseWidth + "px";
@@ -134,14 +137,14 @@
         number.position.set(15, 12); card.addChild(number);
         const title = new Text({ text: item.name.length > 23 ? item.name.slice(0, 21) + "…" : item.name, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 12, fontWeight: "700", fill: 0xe9eee7, wordWrap: true, wordWrapWidth: 158 } });
         title.position.set(15, 36); card.addChild(title);
-        const code = new Text({ text: item.code.length > 25 ? item.code.slice(0, 23) + "…" : item.code, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fill: 0xa8b9b4 } });
+        const code = new Text({ text: item.code.length > 25 ? item.code.slice(0, 23) + "…" : item.code, style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fill: 0xa8b9b4 } });
         code.position.set(15, 63); card.addChild(code);
-        const status = new Text({ text: item.statusText.toUpperCase().slice(0, 24), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 8, fontWeight: "700", fill: colors.badge, letterSpacing: 0.7 } });
+        const status = new Text({ text: item.statusText.toUpperCase().slice(0, 24), style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "700", fill: colors.badge, letterSpacing: 0.7 } });
         status.position.set(15, 83); card.addChild(status);
         scene.addChild(card);
       });
 
-      const legend = new Text({ text: "STATUTS DU LOT  ·  " + stages.filter(item => item.status === "completed").length + " / " + stages.length + " étapes terminées", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 9, fontWeight: "600", fill: 0xa8b9b4, letterSpacing: 1 } });
+      const legend = new Text({ text: "STATUTS DU LOT  ·  " + stages.filter(item => item.status === "completed").length + " / " + stages.length + " étapes terminées", style: { fontFamily: "Inter,Arial,sans-serif", fontSize: 10, fontWeight: "600", fill: 0xa8b9b4, letterSpacing: 1 } });
       legend.position.set(left, 12); scene.addChild(legend);
       next.render();
       next.stop();
@@ -149,6 +152,7 @@
       shell.dataset.state = "ready";
     } catch (error) {
       console.info("BA Labs: schéma PixiJS indisponible, liste des étapes conservée.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       shell.dataset.state = "fallback";
       fallback("La vue graphique est indisponible. La liste détaillée des étapes reste accessible.");
     }
