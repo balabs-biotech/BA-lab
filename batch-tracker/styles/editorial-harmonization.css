@@ -1,0 +1,91 @@
+/* BA Labs CultureOps — editorial finishing layer.
+   Aligns the three workspaces with the public BA Labs visual language:
+   graphite/forest canvas, mineral typography, copper editorial markers,
+   restrained geometry and sector accents. Functional states and data visuals
+   remain owned by their existing workspace styles. */
+html body[data-domain] {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(121,154,139,.10), transparent 34rem),
+    radial-gradient(ellipse at 88% 84%, rgba(185,107,77,.055), transparent 30rem),
+    linear-gradient(145deg,#111B1D 0%,#172321 58%,#172321 100%) !important;
+  background-attachment:fixed !important;
+  color:var(--ba-mineral) !important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+}
+html body[data-domain] .container {
+  max-width:1440px !important;
+}
+html body[data-domain] :is(.app-hero,.workspace-hero) {
+  border:1px solid rgba(155,174,164,.22) !important;
+  border-radius:12px !important;
+  box-shadow:0 18px 48px rgba(0,0,0,.18) !important;
+}
+html body[data-domain] .app-hero :is(.eyebrow,.hero-kicker,.workspace-kicker),
+html body[data-domain] :is(.section-kicker,.panel-kicker,.card-kicker) {
+  color:var(--workspace-accent) !important;
+  font:700 9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase !important;
+}
+html body[data-domain] .card:not(.app-hero) {
+  border:1px solid rgba(64,83,77,.52) !important;
+  border-radius:12px !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.12) !important;
+  background:linear-gradient(150deg,rgba(38,59,56,.72),rgba(17,27,29,.96)) !important;
+}
+html body[data-domain] .card:not(.app-hero) > :is(h2,h3) {
+  color:var(--ba-paper) !important;
+  letter-spacing:-.035em !important;
+}
+html body[data-domain] .card:not(.app-hero) > h2 {
+  padding-bottom:12px !important;
+  border-bottom:1px solid rgba(64,83,77,.42) !important;
+}
+html body[data-domain] .card:not(.app-hero) > h2::before {
+  background:var(--workspace-accent) !important;
+  width:3px !important;
+  height:20px !important;
+  border-radius:0 !important;
+}
+html body[data-domain] :is(.overview-panel,.overview-activity,.overview-shortcuts,.bio-operation-panel,.bio-lineage-panel,.culture-catalog,.batch-create-panel,.batch-compare-panel) {
+  border-radius:9px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] :is(.overview-metric,.statistics-summary-item,.culture-detail-field) {
+  border-radius:8px !important;
+  box-shadow:none !important;
+}
+html body[data-domain] :is(.section-nav a,.app-toolbar button,.card button,.card .button,.card .primary-button) {
+  border-radius:8px !important;
+}
+html body[data-domain] :is(button,.button,.primary-button):not(.secondary-button):not(.ghost-button) {
+  border-color:color-mix(in srgb,var(--workspace-accent) 72%,#40534D) !important;
+}
+html body[data-domain] :is(button,.button,.primary-button):not(.secondary-button):not(.ghost-button):hover:not(:disabled) {
+  filter:brightness(1.08) !important;
+}
+html body[data-domain] .section-nav a[aria-current="page"] {
+  border-radius:7px !important;
+  box-shadow:inset 0 -2px 0 var(--workspace-accent) !important;
+}
+html body[data-domain] :is(.muted,.hint,.helper-text,.field-help) {
+  color:#9BAEA4 !important;
+}
+html body[data-domain] :is(table,th,td) {
+  border-color:rgba(64,83,77,.38) !important;
+}
+html body[data-domain] :is(th,thead th) {
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace !important;
+  letter-spacing:.12em !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] .card:not(.app-hero) {
+    border-radius:10px !important;
+    box-shadow:0 7px 20px rgba(0,0,0,.13) !important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-domain] :is(.card,.section-nav a,button) {
+    transition:none !important;
+  }
+}
