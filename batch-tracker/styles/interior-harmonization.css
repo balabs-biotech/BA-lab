@@ -724,3 +724,104 @@ html body[data-domain] #measurementCard .observation-details[open] > summary {
     width:100% !important;
   }
 }
+
+
+/* PASS 209 — experimental analytics: filter hierarchy, summary metrics and
+   chart/table containment. Preserve the descriptive-only data semantics. */
+html body[data-domain] #statisticsCard .statistics-filters {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+  padding:clamp(14px,2vw,18px) !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.78),rgba(17,27,25,.88)) !important;
+}
+html body[data-domain] #statisticsCard .statistics-filters > div {
+  display:grid !important;
+  align-content:start !important;
+  gap:6px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #statisticsCard .statistics-filters label {
+  color:#d5dfd6 !important;
+  font-size:12px !important;
+  font-weight:650 !important;
+  line-height:1.4 !important;
+}
+html body[data-domain] #statisticsCard .statistics-filter-action {
+  align-self:end !important;
+}
+html body[data-domain] #statisticsCard .statistics-filter-action button {
+  min-height:44px !important;
+  width:100% !important;
+}
+html body[data-domain] #statisticsCard #statisticsStatus {
+  margin:14px 0 8px !important;
+  padding:10px 12px !important;
+  border-inline-start:3px solid var(--workspace-accent) !important;
+  border-radius:0 8px 8px 0 !important;
+  background:rgba(169,192,179,.055) !important;
+  color:#bdc9bf !important;
+  line-height:1.55 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #statisticsCard .statistics-summary {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr)) !important;
+  gap:10px !important;
+  padding:12px !important;
+}
+html body[data-domain] #statisticsCard .statistics-summary:empty {
+  display:none !important;
+}
+html body[data-domain] #statisticsCard .statistics-summary-item {
+  min-width:0 !important;
+  padding:13px !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #statisticsCard .statistics-chart {
+  min-width:0 !important;
+  min-height:180px !important;
+  padding:clamp(12px,2vw,18px) !important;
+  overflow:hidden !important;
+}
+html body[data-domain] #statisticsCard .statistics-chart :is(canvas,svg) {
+  display:block !important;
+  max-width:100% !important;
+}
+html body[data-domain] #statisticsCard .statistics-table-wrap {
+  max-width:100% !important;
+  overflow-x:auto !important;
+  overscroll-behavior-inline:contain !important;
+  scrollbar-width:thin !important;
+}
+html body[data-domain] #statisticsCard .statistics-table {
+  min-width:620px !important;
+}
+html body[data-domain] #statisticsCard .statistics-table caption {
+  padding:12px 14px !important;
+  color:#dce5dc !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+  text-align:start !important;
+}
+html body[data-domain] #statisticsCard .statistics-table :is(th,td) {
+  padding:11px 12px !important;
+  line-height:1.45 !important;
+}
+html body[data-domain] #statisticsCard .statistics-footnote {
+  margin-top:12px !important;
+  color:#aebdb2 !important;
+  font-size:12px !important;
+  line-height:1.6 !important;
+  overflow-wrap:anywhere !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #statisticsCard .statistics-filters {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #statisticsCard .statistics-filter-action button {
+    width:100% !important;
+  }
+}
