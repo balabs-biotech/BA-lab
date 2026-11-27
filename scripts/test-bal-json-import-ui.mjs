@@ -61,6 +61,18 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
     BA_LABS_DOMAIN: domain,
     BA_LABS_IMPORT_BAL_JSON: importBalJson,
     BA_LABS_GET_ORGANIZATION_ID: () => organizationId,
+    BA_LABS_GET_BAL_JSON_CONTEXT: () => organizationId ? {
+      organization_id: organizationId,
+      workspace: domain,
+      targets: [{
+        type: domain === "agronomy" ? "plant_culture" : "culture",
+        id: "b0b0b0b0-0000-4000-8000-000000000001",
+        code: "TEST-CULTURE",
+        label: "Culture de test"
+      }],
+      variables: [{ code: "temperature", label: "Température", dimension: "temperature", canonical_unit_code: "degC" }],
+      units: [{ code: "degC", label: "°C", dimension: "temperature" }]
+    } : { organization_id: null, workspace: domain, targets: [], variables: [], units: [] },
     BA_LABS_REFRESH_EXPERIMENTAL_DATA: async () => { refreshCalls += 1; },
   };
   const navigator = { clipboard: { async writeText(value) { clipboard.text = value; } } };
@@ -85,6 +97,9 @@ function harness({ domain = "mycology", organizationId = "a0a0a0a0-0000-4000-800
   assert.match(h.clipboard.text, /Organisation active CultureOps : a0a0a0a0-0000-4000-8000-000000000001/);
   assert.match(h.clipboard.text, /LABORATORY/);
   assert.match(h.clipboard.text, /Seul record_id peut être généré/);
+  assert.match(h.clipboard.text, /TEST-CULTURE/);
+  assert.match(h.clipboard.text, /"code": "temperature"/);
+  assert.match(h.clipboard.text, /"code": "degC"/);
   assert.match(h.clipboard.text, /plant_culture_id/);
   assert.match(h.clipboard.text, /UUID_V4_GÉNÉRÉ_UNIQUE/);
   assert.doesNotMatch(h.clipboard.text, /d0d0d0d0-0000-4000-8000-000000000001/);
