@@ -6,6 +6,7 @@
   if (document.body.dataset.domain !== "agronomy") return;
   const host = document.getElementById("workspace-root") || document.body;
   let pixi = null, app = null, scheduled = 0, renderRevision = 0;
+  let pendingApp = null;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const panel = document.createElement("section");
   panel.className = "greentech-climate-signature";
@@ -81,10 +82,11 @@
       const cellWidth = (width - 36 - (columns - 1) * 14) / columns;
       const cellHeight = 112;
       const height = rows * cellHeight + (rows - 1) * 12 + 24;
-      const next = new pixi.Application();
+      const next = pendingApp = new pixi.Application();
       await next.init({ width, height, backgroundAlpha: 0, antialias: true, autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 1.5), autoStart: false, preference: "webgl" });
       if (revision !== renderRevision) { next.destroy(true, true); return; }
       app = next;
+      pendingApp = null;
       next.canvas.className = "greentech-climate-canvas";
       next.canvas.setAttribute("aria-hidden", "true");
       plot.replaceChildren(next.canvas);
@@ -129,6 +131,7 @@
       panel.dataset.state = "ready";
     } catch (error) {
       console.info("BA Labs: signature PixiJS indisponible; les graphiques météo natifs restent actifs.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       destroy();
       panel.dataset.state = "fallback";
     }
