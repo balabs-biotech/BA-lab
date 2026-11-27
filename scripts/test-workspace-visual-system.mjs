@@ -105,7 +105,7 @@ assert.ok(interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .g
 assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .grid {\n    grid-template-columns:minmax(0,1fr)"), "Harvest and movement fields must stack on narrow screens");
 
 
-const measurementMarkup = html.slice(html.indexOf('id="measurementCard"'), html.indexOf('id="statisticsCard"'));
+const measurementMarkup = html.slice(html.indexOf('id="measurementCard"'), html.indexOf('id="resultCard"'));
 assert.ok(measurementMarkup.includes('class="quick-capture-grid"') && measurementMarkup.includes('id="measurementHistory"') && measurementMarkup.includes('class="observation-details"'), "Measurement workspace must retain quick capture, history and qualitative observation surfaces");
 assert.ok(interiorHarmonization.includes("#measurementCard .quick-capture-grid") && interiorHarmonization.includes("grid-template-columns:repeat(2,minmax(0,1fr))"), "Quick capture tiles must use a responsive two-column layout");
 assert.ok(interiorHarmonization.includes("#measurementCard > .grid") && interiorHarmonization.includes("#measurementCard .observation-details > .grid"), "Measurement and observation fields must have explicit responsive grid rules");
