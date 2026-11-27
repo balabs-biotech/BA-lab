@@ -130,10 +130,6 @@ begin
   );
   v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b934',null,null);
   if v_result is distinct from 'mycology' then raise exception 'FAIL: legacy culture did not inherit audited material classification'; end if;
-  if (select count(*) from private.biological_domain_classification_audit
-       where organization_id=v_org and target_type='material'
-         and target_id='00000000-0000-0000-0000-00000000b924') <> 1 then
-    raise exception 'FAIL: legacy domain classification audit receipt missing'; end if;
 
   if public.is_bal_json_variable_allowed('mycology','cfu') is not true
      or public.is_bal_json_variable_allowed('mycology','root_length') is not false
@@ -145,5 +141,14 @@ end
 $$;
 
 reset role;
+do $
+begin
+  if (select count(*) from private.biological_domain_classification_audit
+       where organization_id='00000000-0000-0000-0000-00000000b911'
+         and target_type='material'
+         and target_id='00000000-0000-0000-0000-00000000b924') <> 1 then
+    raise exception 'FAIL: legacy domain classification audit receipt missing';
+  end if;
+end $;
 rollback;
 select 'PASS: BAL-JSON workspace domain resolution runtime scenarios' as test_result;
