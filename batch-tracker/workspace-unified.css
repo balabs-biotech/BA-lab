@@ -604,7 +604,7 @@ html body[data-domain="mycology"] .card:not(.app-hero) :is(h2,h3,h4) {
   text-shadow:none !important;
 }
 html body[data-domain="mycology"] .card:not(.app-hero) :is(
-  .section-kicker,.section-label,.panel-kicker,.section-kicker-label,
+  .section-kicker,.section-label,.panel-kicker,.section-kicker-label,.context-eyebrow,
   .entry-step-mark,.assisted-entry-tag
 ) {
   color:#e2b092 !important;
