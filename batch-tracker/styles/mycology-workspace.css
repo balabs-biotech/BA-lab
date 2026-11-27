@@ -810,8 +810,8 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-legend > span[data
   box-shadow:0 0 8px rgba(201,130,89,.34) !important;
 }
 html body[data-domain="mycology"] #trackerCard .lineage-graph-legend > span[data-kind="descendant"]::before {
-  background:#b4f477 !important;
-  box-shadow:0 0 8px rgba(180,244,119,.3) !important;
+  background:#d9a36e !important;
+  box-shadow:0 0 8px rgba(217,163,110,.3) !important;
 }
 
 
