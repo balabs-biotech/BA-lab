@@ -48,6 +48,7 @@ assert.ok(lineage.includes('data-graph-zoom="fit"'), "PixiJS lineage graph must 
 assert.ok(lineage.includes("window.addEventListener(\"pointermove\""), "PixiJS lineage graph must support pointer panning without capturing node taps");
 assert.equal((lineage.match(/window\.addEventListener\("pointermove"/g) || []).length, 1, "Lineage graph must register pointer listeners once, not on every render");
 assert.ok(lineage.includes("graphWidth * zoom") && lineage.includes("graphHeight * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
+assert.ok(lineage.includes("let pendingApp = null") && lineage.includes("if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }"), "Lineage graph must dispose a renderer whose initialization fails");
 assert.ok(lineage.includes("function showFallback(message, revealList = false)") && lineage.includes("if (app) { app.destroy(true, true); app = null; }\n    stage.replaceChildren();"), "Lineage renderer must release its PixiJS application when entering fallback");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycology.includes(".lineage-graph-toolbar button:focus-visible"), "Mycology lineage controls must expose a visible keyboard focus state");
@@ -63,6 +64,7 @@ assert.ok(laboratoryProcess.includes('querySelectorAll(":scope > .stage")'), "La
 assert.ok(laboratoryProcess.includes('element.classList.contains("completed")') && laboratoryProcess.includes('element.classList.contains("active")') && laboratoryProcess.includes('element.classList.contains("failed")'), "Laboratory process map must reflect persisted stage states");
 assert.ok(laboratoryProcess.includes("next.stop()"), "Laboratory process map must render on demand without a permanent GPU ticker");
 assert.ok(laboratoryProcess.includes("observer.disconnect()"), "Laboratory process map must release its observer on page exit");
+assert.ok(laboratoryProcess.includes("let pendingApp = null") && laboratoryProcess.includes("if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }"), "Laboratory process map must dispose a renderer whose initialization fails");
 assert.ok(laboratoryProcess.includes("La liste détaillée des étapes reste accessible"), "Laboratory process map must retain a semantic fallback");
 assert.ok(laboratoryStyles.includes(".lab-process-map-stage"), "Laboratory process map must have a bounded scrollable stage");
 assert.ok(laboratoryEntry.includes("20261117-lab-process-map-161"), "Laboratory must load the new process map runtime");
@@ -89,6 +91,7 @@ assert.ok(greenClimate.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.
 assert.ok(greenClimate.includes('document.querySelectorAll("#envWeatherCharts > .environmental-weather-chart")'), "GreenTech visualization must read existing NASA POWER chart cards");
 assert.ok(greenClimate.includes('svg.querySelectorAll("circle")') && greenClimate.includes('circle.querySelector("title")'), "GreenTech visualization must derive plotted points and labels from real chart data");
 assert.ok(greenClimate.includes("next.stop()"), "GreenTech PixiJS visualization must render on demand without a permanent ticker");
+assert.ok(greenClimate.includes("let pendingApp = null") && greenClimate.includes("if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }"), "GreenTech must dispose a renderer whose initialization fails");
 assert.ok(greenClimate.includes("resizeObserver.disconnect()"), "GreenTech visualization must clean up resize observers");
 assert.ok(greenClimate.includes("plot.replaceChildren()") && !greenClimate.includes("charts.replaceChildren()"), "GreenTech visualization must leave the native NASA POWER chart cards intact");
 assert.ok(greenClimateStyles.includes(".greentech-climate-signature"), "GreenTech climate signature must have its own visual system");
@@ -106,6 +109,7 @@ assert.ok(!mycologyActivity.includes("}).slice(0, 18);"), "Mycology timeline mus
 assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
 assert.ok(mycologyActivity.includes("observation: 0xd9a36e") && mycologyActivity.includes("measurement: 0x9b6d54") && !mycologyActivity.includes("observation: 0xb5d98c") && !mycologyActivity.includes("measurement: 0x8dbce0"), "Mycology activity timeline must stay within copper/amber/brown tones");
 assert.ok(mycologyActivity.includes("next.stop()"), "Mycology timeline must render on demand without a permanent GPU ticker");
+assert.ok(mycologyActivity.includes("let pendingApp = null") && mycologyActivity.includes("if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }"), "Mycology timeline must dispose a renderer whose initialization fails");
 assert.ok(mycologyActivity.includes("resizeObserver?.disconnect()"), "Mycology timeline must clean up resize observers");
 assert.ok(mycologyActivity.includes("if (!shell.isConnected) target.prepend(shell)"), "Mycology timeline must survive culture selection replacing the history container contents");
 assert.ok(mycologyActivity.includes("L’historique détaillé reste accessible"), "Mycology timeline must preserve its text fallback");
