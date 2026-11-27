@@ -34,7 +34,7 @@
         : combined.includes("opération") || combined.includes("operation") ? "operation"
         : "event";
       return { index, title, detail, dateLabel, timestamp: Number.isFinite(timestamp) ? timestamp : null, kind };
-    }).slice(0, 18);
+    });
   }
 
   const colors = {
