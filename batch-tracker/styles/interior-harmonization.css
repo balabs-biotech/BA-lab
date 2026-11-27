@@ -598,3 +598,129 @@ html body[data-domain] #trackerCard #cultureDetailTimeline > .culture-timeline-e
     font-size:16px !important;
   }
 }
+
+
+/* PASS 208 — measurement workspace composition.
+   Keep capture, numeric entry, qualitative observations and BAL-JSON aligned
+   with the same scientific record surfaces without changing data behavior. */
+html body[data-domain] #measurementCard > .grid,
+html body[data-domain] #measurementCard .observation-details > .grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #measurementCard > .grid > div,
+html body[data-domain] #measurementCard .observation-details > .grid > div {
+  min-width:0 !important;
+}
+html body[data-domain] #measurementCard .quick-capture {
+  min-width:0 !important;
+  padding:clamp(14px,2vw,20px) !important;
+  border:1px solid rgba(169,192,179,.16) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.78),rgba(17,27,25,.88)) !important;
+}
+html body[data-domain] #measurementCard .quick-capture-grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #measurementCard .quick-capture-tile {
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  min-width:0 !important;
+  min-height:64px !important;
+  padding:12px !important;
+  text-align:start !important;
+  white-space:normal !important;
+}
+html body[data-domain] #measurementCard .quick-capture-tile > span:nth-child(2) {
+  display:grid !important;
+  gap:3px !important;
+  min-width:0 !important;
+}
+html body[data-domain] #measurementCard .quick-capture-tile strong,
+html body[data-domain] #measurementCard .quick-capture-tile small {
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #measurementCard .quick-capture-tip {
+  color:#aebdb2 !important;
+  line-height:1.55 !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #measurementCard .bal-json-panel {
+  box-sizing:border-box !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  padding:clamp(14px,2vw,20px) !important;
+  border-color:rgba(169,192,179,.18) !important;
+  background:linear-gradient(145deg,rgba(37,54,49,.78),rgba(17,27,25,.88)) !important;
+}
+html body[data-domain] #measurementCard .bal-json-heading,
+html body[data-domain] #measurementCard .bal-json-heading > div {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] #measurementCard .bal-json-heading p,
+html body[data-domain] #measurementCard .bal-json-help,
+html body[data-domain] #measurementCard .bal-json-preview,
+html body[data-domain] #measurementCard #balJsonImportStatus {
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+}
+html body[data-domain] #measurementCard .bal-json-actions {
+  min-width:0 !important;
+}
+html body[data-domain] #measurementCard .bal-json-actions button {
+  min-width:0 !important;
+  white-space:normal !important;
+}
+html body[data-domain] #measurementCard #measurementHistory,
+html body[data-domain] #measurementCard #observationHistory {
+  display:grid !important;
+  gap:9px !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+html body[data-domain] #measurementCard .measurement-history > * {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow-wrap:anywhere !important;
+}
+html body[data-domain] #measurementCard .measurement-history-heading {
+  align-items:center !important;
+  justify-content:space-between !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
+}
+html body[data-domain] #measurementCard .observation-details > summary {
+  min-height:44px !important;
+  padding:12px 14px !important;
+  color:#e1eae2 !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+}
+html body[data-domain] #measurementCard .observation-details[open] > summary {
+  color:var(--workspace-accent) !important;
+  border-bottom:1px solid rgba(169,192,179,.13) !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] #measurementCard > .grid,
+  html body[data-domain] #measurementCard .observation-details > .grid {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
+@media(max-width:520px) {
+  html body[data-domain] #measurementCard .quick-capture-grid {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] #measurementCard .quick-capture-tile {
+    min-height:58px !important;
+  }
+  html body[data-domain] #measurementCard .measurement-history-heading > button {
+    width:100% !important;
+  }
+}
