@@ -145,3 +145,10 @@ html body[data-domain="mycology"] :is(.section-kicker,.panel-kicker,.card-kicker
   color:#D69A78 !important;
   -webkit-text-fill-color:#D69A78 !important;
 }
+
+
+/* PASS 221 — the measurement panel also uses legacy section-label/context-eyebrow hooks. */
+html body[data-domain="mycology"] #measurementCard :is(.section-kicker,.section-label,.panel-kicker,.context-eyebrow) {
+  color:#D69A78 !important;
+  -webkit-text-fill-color:#D69A78 !important;
+}
