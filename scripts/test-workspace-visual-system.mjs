@@ -102,6 +102,15 @@ assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-summary-it
 assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-chart") && interiorHarmonization.includes("min-height:180px"), "Statistics chart must have a bounded, readable visualization surface");
 assert.ok(interiorHarmonization.includes("#statisticsCard .statistics-table") && interiorHarmonization.includes("min-width:620px") && interiorHarmonization.includes("overflow-x:auto"), "Raw statistics table must remain legible through horizontal scrolling on narrow screens");
 
+
+const batchMarkup = html.slice(html.indexOf('id="batchCard"'), html.indexOf('id="statisticsCard"'));
+assert.ok(batchMarkup.includes('class="batch-create-panel"') && batchMarkup.includes('id="batchList"') && batchMarkup.includes('class="batch-compare-panel"'), "Production workspace must retain lot creation, list and comparison surfaces");
+assert.ok(batchMarkup.includes('id="batchStages"') && batchMarkup.includes('id="batchQc"') && batchMarkup.includes('id="batchEvents"') && batchMarkup.includes('id="batchEventList"'), "Production workspace must retain lifecycle, quality and traceability surfaces");
+assert.ok(interiorHarmonization.includes("#batchCard .batch-create-panel > .grid") && interiorHarmonization.includes("#batchCard .batch-compare-panel"), "Lot creation and comparison panels must have dedicated visual hierarchy");
+assert.ok(interiorHarmonization.includes("#batchCard #batchStages") && interiorHarmonization.includes("#batchCard #batchQc") && interiorHarmonization.includes("#batchCard #batchEvents"), "Lifecycle, QC and traceability panels must share the interior visual system");
+assert.ok(interiorHarmonization.includes("#batchCard .batch-harvest-entry .grid") && interiorHarmonization.includes("#batchCard #batchEventList"), "Harvest and movement forms plus event history must be responsive and contained");
+assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchCard .batch-actions"), "Production actions must stack on mobile");
+
 console.log("✓ CultureOps sector-specific visual runtime contract");
 
 const greenClimate = fs.readFileSync("batch-tracker/greentech-climate-signature.js", "utf8");
