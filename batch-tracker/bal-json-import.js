@@ -105,6 +105,11 @@
     }
   }
   window.addEventListener("ba-labs-organization-ready", setupLegacyDomainAdmin);
+  window.addEventListener("ba-labs-organization-cleared", () => {
+    if (adminPanel) adminPanel.hidden = true;
+    const targetSelect = $("legacyDomainTarget");
+    if (targetSelect) targetSelect.replaceChildren(new Option("Connectez-vous pour charger les archives…", ""));
+  });
   setupLegacyDomainAdmin();
 
   function currentOrganization() {
