@@ -36,6 +36,7 @@ declare
   v_culture_id uuid;
   v_domain text;
   v_rejected boolean := false;
+  v_admin_context jsonb;
 begin
   -- Root-material workspace assignment is a separate owner/admin decision, not client metadata.
   perform public.classify_legacy_biological_domain(
@@ -56,6 +57,18 @@ begin
        '00000000-0000-0000-0000-00000000c922'
      ) is not null then
     raise exception 'FAIL: unclassified root material received a workspace domain';
+  end if;
+
+  v_admin_context := public.get_biological_domain_admin_context(
+    '00000000-0000-0000-0000-00000000c911'
+  );
+  if not exists (
+    select 1
+      from jsonb_array_elements(v_admin_context->'materials') item
+     where item->>'id' = '00000000-0000-0000-0000-00000000c921'
+       and item->>'metadata_domain' = 'mycology'
+  ) then
+    raise exception 'FAIL: admin context did not expose the audited material domain';
   end if;
 
   -- A new root material cannot self-assign a workspace through metadata.
