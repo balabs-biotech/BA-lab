@@ -1254,10 +1254,20 @@ async function loadStrainOptions() {
   const requestId = ++strainOptionsRequestId;
   const loadRevision = authStateRevision;
   const loadOrganizationId = organizationId;
+  const activeDomain = document.body.dataset.domain;
   if (!loadOrganizationId) {
     throw new Error(
       "Organisation absente avant chargement des souches."
     );
+  }
+  if (!["mycology", "laboratory"].includes(activeDomain)) {
+    strainOptions = [];
+    strainSelect.replaceChildren();
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Sélectionnez un espace Mycologie ou Laboratoire.";
+    strainSelect.appendChild(option);
+    return;
   }
 
   const {
@@ -1279,11 +1289,16 @@ async function loadStrainOptions() {
         strain_designation,
         organism_id,
         scientific_name,
-        common_name
+        common_name,
+        biological_domain
       `)
       .eq(
         "organization_id",
         loadOrganizationId
+      )
+      .eq(
+        "biological_domain",
+        activeDomain
       )
       .order(
         "strain_code"
