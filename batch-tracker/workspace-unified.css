@@ -640,3 +640,25 @@ html body[data-domain="mycology"] #measurementCard > .muted,
 html body[data-domain="mycology"] #balJsonImportPanel .muted {
   color:#b8c6bc !important;
 }
+
+
+/* PASS 217 — enforce legible Mycology headings across every visible module.
+   The dashboard preview exposed headings outside the measurement title IDs. */
+html body[data-domain="mycology"] :is(h1,h2,h3,h4,h5,h6) {
+  color:#f0eee8 !important;
+  text-shadow:none !important;
+}
+html body[data-domain="mycology"] .card :is(
+  .section-kicker,.section-kicker *,
+  .section-label,.section-label *,
+  .panel-kicker,.panel-kicker *,
+  .context-eyebrow,.context-eyebrow *,
+  .entry-step-mark,.assisted-entry-tag
+) {
+  color:#e2b092 !important;
+}
+html body[data-domain="mycology"] #measurementCard .bal-json-panel :is(
+  .muted,.help-text,.field-hint,.form-hint
+) {
+  color:#b8c6bc !important;
+}
