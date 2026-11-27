@@ -244,6 +244,8 @@ jobs:
           psql -At -v ON_ERROR_STOP=1 -X -q -c "select to_regclass('public.cultures'), to_regclass('public.batches'), to_regclass('public.culture_data_consents')" | grep -q 'cultures'
       - name: Verify atomic manual-write RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/manual_write_rpc_security_contract.test.sql
+      - name: Verify BAL-JSON ingestion idempotency and privilege contract after replay
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-ingestion-rpc-security.test.sql
       - name: Verify batch harvest RPC security contract after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/batch_harvest_rpc_security_contract.test.sql
       - name: Verify IoT ingestion idempotency and least-privilege contract after replay
