@@ -46,13 +46,13 @@ select
   m.material_code,
   m.generation,
   m.state as material_state,
-  public.resolve_material_biological_domain(m.organization_id,m.id) as biological_domain,
   s.id as strain_id,
   s.strain_code,
   s.designation as strain_designation,
   o.id as organism_id,
   o.scientific_name,
-  o.common_name
+  o.common_name,
+  public.resolve_material_biological_domain(m.organization_id,m.id) as biological_domain
 from public.materials m
 join public.strains s
   on s.organization_id=m.organization_id
