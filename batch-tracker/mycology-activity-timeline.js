@@ -38,10 +38,10 @@
   }
 
   const colors = {
-    observation: 0xb5d98c,
-    measurement: 0x8dbce0,
+    observation: 0xd9a36e,
+    measurement: 0x9b6d54,
     batch: 0xc98259,
-    operation: 0xd9a36e,
+    operation: 0xe2c29b,
     event: 0xb0aaa0
   };
 
