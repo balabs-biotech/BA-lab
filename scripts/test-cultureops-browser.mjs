@@ -169,6 +169,8 @@ try {
         }
       }
 
+      await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
+      await page.waitForTimeout(50);
       const metrics = await page.evaluate(() => {
         const body = document.body;
         const root = document.documentElement;
