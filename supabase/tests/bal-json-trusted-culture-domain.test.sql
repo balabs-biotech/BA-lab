@@ -29,7 +29,7 @@ on conflict (organization_id,id) do nothing;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000c901',true);
 set local role authenticated;
 
-do $$
+do $test$
 declare
   v_created jsonb;
   v_material_id uuid;
@@ -170,7 +170,7 @@ begin
   end;
   if not v_rejected then raise exception 'FAIL: viewer created culture through SECURITY DEFINER RPC'; end if;
 end;
-$;
+$test$;
 
 reset role;
 rollback;
