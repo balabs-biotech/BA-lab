@@ -40,7 +40,7 @@ html body[data-domain="mycology"] #trackerCard .mycology-activity-status {
 html body[data-domain="mycology"] #trackerCard .mycology-activity-note { margin:0; color:#9d9187; font-size:10px; line-height:1.5; }
 @media(max-width:620px) {
   html body[data-domain="mycology"] #trackerCard .mycology-activity-map { padding:12px; }
-  html body[data-domain="mycology"] #trackerCard .mycology-activity-tools { width:100%; }
+  html body[data-domain="mycology"] #trackerCard .mycology-activity-tools { width:100%; flex-wrap:wrap; }
 }
 @media(prefers-reduced-motion:reduce) {
   html body[data-domain="mycology"] #trackerCard .mycology-activity-stage { scroll-behavior:auto; }
