@@ -252,6 +252,15 @@ try {
           cultureDetailBackground: document.querySelector("#cultureDetailPanel") ? getComputedStyle(document.querySelector("#cultureDetailPanel")).backgroundImage : null,
           cultureDetailSummaryDisplay: document.querySelector("#cultureDetailSummary") ? getComputedStyle(document.querySelector("#cultureDetailSummary")).display : null,
           cultureDetailScrollMargin: document.querySelector("#cultureDetailPanel") ? getComputedStyle(document.querySelector("#cultureDetailPanel")).scrollMarginTop : null,
+          measurementFieldLabels: [...document.querySelectorAll("#measurementCard label")].map(label => ({ fontSize: getComputedStyle(label).fontSize, color: getComputedStyle(label).color })),
+          measurementControls: [...document.querySelectorAll("#measurementCard input:not([type=checkbox]),#measurementCard select,#measurementCard textarea")].map(control => ({ id: control.id, minHeight: getComputedStyle(control).minHeight, fontSize: getComputedStyle(control).fontSize })),
+          statisticsTableWrap: (() => {
+            const wrap = document.querySelector("#statisticsCard .statistics-table-wrap");
+            if (!wrap) return null;
+            const style = getComputedStyle(wrap);
+            const table = wrap.querySelector("table");
+            return { overflowX: style.overflowX, maxWidth: style.maxWidth, tableMinWidth: table ? getComputedStyle(table).minWidth : null, headerFontSize: table?.querySelector("thead th") ? getComputedStyle(table.querySelector("thead th")).fontSize : null };
+          })(),
           movementStatusBackground: (() => {
             const control = document.querySelector("#moveBatchStatus");
             return control ? getComputedStyle(control).backgroundColor : null;
@@ -294,6 +303,15 @@ try {
       if (metrics.navLinks < 5) failures.push(`${workspace.slug}/${viewport.name}: incomplete section navigation (${metrics.navLinks} links)`);
       if (metrics.navigationOverflowX !== "auto") failures.push(`${workspace.slug}/${viewport.name}: section navigation is not horizontally scrollable (${metrics.navigationOverflowX})`);
       if (!metrics.moduleScrollMargin || Number.parseFloat(metrics.moduleScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: module panels do not reserve space below the sticky toolbar (${metrics.moduleScrollMargin})`);
+      for (const label of metrics.measurementFieldLabels) {
+        if (Number.parseFloat(label.fontSize) < 11) failures.push(`${workspace.slug}/${viewport.name}: measurement label is below 11px (${label.fontSize})`);
+        if (contrastRatio(label.color, metrics.cardBackground) < 4.5) failures.push(`${workspace.slug}/${viewport.name}: measurement label contrast is below 4.5:1 (${label.color})`);
+      }
+      for (const control of metrics.measurementControls) {
+        if (Number.parseFloat(control.minHeight) < 42) failures.push(`${workspace.slug}/${viewport.name}: measurement control ${control.id} is below 42px (${control.minHeight})`);
+      }
+      if (metrics.statisticsTableWrap && (metrics.statisticsTableWrap.overflowX !== "auto" || metrics.statisticsTableWrap.maxWidth !== "100%")) failures.push(`${workspace.slug}/${viewport.name}: analytical table wrapper is not safely horizontally scrollable (${JSON.stringify(metrics.statisticsTableWrap)})`);
+      if (metrics.statisticsTableWrap?.headerFontSize && Number.parseFloat(metrics.statisticsTableWrap.headerFontSize) < 10) failures.push(`${workspace.slug}/${viewport.name}: analytical table header is below 10px (${metrics.statisticsTableWrap.headerFontSize})`);
       if (!metrics.cultureDetailBackground?.includes("linear-gradient")) failures.push(`${workspace.slug}/${viewport.name}: scientific culture detail surface styling is missing`);
       if (metrics.cultureDetailSummaryDisplay !== "grid") failures.push(`${workspace.slug}/${viewport.name}: culture detail summary is not rendered as a responsive grid (${metrics.cultureDetailSummaryDisplay})`);
        if (!metrics.cultureDetailScrollMargin || Number.parseFloat(metrics.cultureDetailScrollMargin) < 80) failures.push(`${workspace.slug}/${viewport.name}: culture detail does not reserve space below the sticky toolbar (${metrics.cultureDetailScrollMargin})`);
