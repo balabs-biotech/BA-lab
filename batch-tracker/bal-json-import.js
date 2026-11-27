@@ -62,6 +62,7 @@
     try {
       const context = await getContext();
       if (!["owner", "admin"].includes(context.role)) return;
+      adminPanel.dataset.organizationId = context.organization_id;
       adminPanel.hidden = false;
       targetSelect.replaceChildren(new Option("Sélectionner une archive…", ""));
       const addGroup = (label, rows, type) => {
@@ -80,7 +81,11 @@
       addGroup("Cultures", context.cultures || [], "culture");
       addGroup("Matériels / souches", context.materials || [], "material");
       if (!targetSelect.options.length) targetSelect.add(new Option("Aucune archive accessible", ""));
-      classifyButton.addEventListener("click", async () => {
+      classifyButton.onclick = async () => {
+        if (adminPanel.dataset.organizationId !== context.organization_id) {
+          adminStatus.textContent = "L’organisation active a changé. Rechargez le panneau avant de continuer.";
+          return;
+        }
         const [targetType, targetId] = targetSelect.value.split(":");
         const reason = reasonInput.value.trim();
         if (!targetType || !targetId) { adminStatus.textContent = "Sélectionnez une culture ou un matériel."; return; }
@@ -99,8 +104,9 @@
         } catch (error) {
           adminStatus.textContent = "Classification refusée : " + (error.message || "erreur inconnue");
         } finally { classifyButton.disabled = false; }
-      });
+      };
     } catch (error) {
+      adminPanel.hidden = true;
       console.warn("Administration des domaines biologiques indisponible :", error);
     }
   }
