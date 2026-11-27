@@ -3,12 +3,17 @@
    graphite/forest canvas, mineral typography, copper editorial markers,
    restrained geometry and sector accents. Functional states and data visuals
    remain owned by their existing workspace styles. */
+html {
+  background:#111B1D !important;
+  color-scheme:dark;
+}
 html body[data-domain] {
+  min-height:100vh !important;
   background:
     radial-gradient(ellipse at 12% 0%, rgba(121,154,139,.10), transparent 34rem),
     radial-gradient(ellipse at 88% 84%, rgba(185,107,77,.055), transparent 30rem),
     linear-gradient(145deg,#111B1D 0%,#172321 58%,#172321 100%) !important;
-  background-attachment:fixed !important;
+  background-attachment:scroll !important;
   color:var(--ba-mineral) !important;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
 }
@@ -22,7 +27,7 @@ html body[data-domain] :is(.app-hero,.workspace-hero) {
 }
 html body[data-domain] .app-hero :is(.eyebrow,.hero-kicker,.workspace-kicker),
 html body[data-domain] :is(.section-kicker,.panel-kicker,.card-kicker) {
-  color:var(--workspace-accent) !important;
+  color:color-mix(in srgb,var(--workspace-accent) 90%,#fff) !important;
   font:700 9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace !important;
   letter-spacing:.16em !important;
   text-transform:uppercase !important;
