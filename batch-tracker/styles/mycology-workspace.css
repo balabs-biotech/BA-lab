@@ -1367,9 +1367,9 @@ html body[data-domain="mycology"] #trackerCard .lineage-graph-toolbar button {
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
-  min-width:34px !important;
-  min-height:30px !important;
-  padding:5px 9px !important;
+  min-width:40px !important;
+  min-height:40px !important;
+  padding:7px 10px !important;
   border:1px solid rgba(201,130,89,.28) !important;
   border-radius:7px !important;
   color:#e2b092 !important;
