@@ -498,9 +498,12 @@ try {
         const fixtures = [
           ["#cultureCatalogList", "culture-catalog-row", "Culture P80"],
           ["#cultureDetailSummary", "culture-detail-field", "Identifiant"],
+          ["#cultureDetailTimeline", "culture-timeline-entry", "Repiquage"],
           ["#measurementHistory", "measurement-entry", "Température"],
           ["#batchList", "batch-item", "Lot de test"],
           ["#batchStageList", "stage active", "Incubation"],
+          ["#batchQcList", "qc-row", "Contrôle conforme"],
+          ["#batchEventList", "batch-event-item", "Événement de traçabilité"],
         ];
         const checks = [];
         for (const [parentSelector, className, label] of fixtures) {
@@ -564,6 +567,8 @@ try {
           catalogLayout: getComputedStyle(document.querySelector("#cultureCatalogList")).display,
           measurementLayout: getComputedStyle(document.querySelector("#measurementHistory")).display,
           detailGrid: getComputedStyle(document.querySelector("#cultureDetailSummary")).gridTemplateColumns,
+          batchEventSurface: !!document.querySelector("#batchEventList .batch-event-item"),
+          qualityControlSurface: !!document.querySelector("#batchQcList .qc-row"),
         };
       });
       for (const check of interiorState.checks) {
@@ -574,6 +579,9 @@ try {
       }
       if (interiorState.catalogLayout !== "grid" || interiorState.measurementLayout !== "grid") {
         failures.push(`${workspace.slug}/${viewport.name}: interior list layout not applied (${JSON.stringify(interiorState)})`);
+      }
+      if (!interiorState.batchEventSurface || !interiorState.qualityControlSurface) {
+        failures.push(`${workspace.slug}/${viewport.name}: production journal or QC fixture missing (${JSON.stringify(interiorState)})`);
       }
       if (pageErrors.length) failures.push(`${workspace.slug}/${viewport.name}: JS errors: ${pageErrors.join(" | ")}`);
       if (badResponses.length) failures.push(`${workspace.slug}/${viewport.name}: failed local assets: ${JSON.stringify(badResponses)}`);
