@@ -264,6 +264,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/role_aware_tenant_writes.test.sql
       - name: Verify BAL-JSON ingestion idempotency and domain security after replay
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-ingestion-rpc-security.test.sql
+      # Regression coverage includes owner/admin classification, member denial and audit persistence.
       - name: Test BAL-JSON workspace resolution and audited legacy classification
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-workspace-domain-runtime.test.sql
 
