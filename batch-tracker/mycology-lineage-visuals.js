@@ -60,6 +60,7 @@
   }, { passive: false });
   let PIXI = null;
   let app = null;
+  let pendingApp = null;
   let frame = 0;
   let renderToken = 0;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -134,7 +135,7 @@
       if (app) { app.destroy(true, true); app = null; }
       stage.replaceChildren();
       const graph = layout(nodes);
-      const nextApp = new pixi.Application();
+      const nextApp = pendingApp = new pixi.Application();
       await nextApp.init({
         width: graph.width,
         height: graph.height,
@@ -147,6 +148,7 @@
       });
       if (token !== renderToken) { nextApp.destroy(true, true); return; }
       app = nextApp;
+      pendingApp = null;
       nextApp.canvas.className = "lineage-graph-canvas";
       nextApp.canvas.setAttribute("aria-hidden", "true");
       nextApp.canvas.style.width = graph.width + "px";
@@ -220,6 +222,7 @@
       shell.dataset.graphState = "ready";
     } catch (error) {
       console.info("BA Labs: carte PixiJS indisponible, liste de filiation conservée.", error);
+      if (pendingApp) { pendingApp.destroy(true, true); pendingApp = null; }
       shell.dataset.graphState = "fallback";
       showFallback("La visualisation graphique est indisponible. La liste détaillée reste accessible ci-dessous.", true);
     }
