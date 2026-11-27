@@ -10,7 +10,7 @@ const tracker = fs.readFileSync("batch-tracker/tracker.js", "utf8");
 for (const page of ["batch-tracker/green-tech/index.html", "batch-tracker/mycology/index.html", "batch-tracker/laboratory/index.html"]) {
   const html = fs.readFileSync(page, "utf8");
   assert.match(html, /bal-json-import\.js/, page + " must load the BAL-JSON client");
-  assert.match(html, /20261126-bal-json-live-catalogue-2/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
+  assert.match(html, /20261127-legacy-domain-admin-1/, page + " must invalidate cached workspace assets after the BAL-JSON catalogue update");
 }
 for (const id of ["balJsonImportPanel","balJsonImportSource","balJsonCopyPromptButton","balJsonDownloadPromptButton","balJsonCopySchemaButton","balJsonPreviewButton","balJsonImportButton","balJsonPreview","balJsonImportStatus","legacyDomainAdminPanel","legacyDomainTarget","legacyDomainValue","legacyDomainReason","legacyDomainClassifyButton","legacyDomainAdminStatus"]) {
   assert.match(workspace, new RegExp('id="' + id + '"'), "workspace is missing " + id);
