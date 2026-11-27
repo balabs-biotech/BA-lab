@@ -415,3 +415,31 @@ html body[data-domain] #moveBatchStatus {
   font-size:11px !important;
   line-height:1.5 !important;
 }
+
+/* PASS 164 — preserve readable linked-batch rows and sticky-header clearance. */
+html body[data-domain] .card:not(.app-hero) .culture-detail {
+  scroll-margin-top:112px !important;
+  scroll-margin-block-start:112px !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-detail-field span {
+  font-size:10px !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-linked-batches .culture-timeline-entry {
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-linked-batches .culture-timeline-entry > div {
+  min-width:0 !important;
+}
+html body[data-domain] .card:not(.app-hero) .culture-linked-batches .culture-timeline-entry > button {
+  align-self:center !important;
+  white-space:nowrap !important;
+}
+@media(max-width:760px) {
+  html body[data-domain] .card:not(.app-hero) .culture-linked-batches .culture-timeline-entry {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body[data-domain] .card:not(.app-hero) .culture-linked-batches .culture-timeline-entry > button {
+    width:100% !important;
+  }
+}
