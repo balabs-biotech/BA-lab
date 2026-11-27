@@ -595,3 +595,30 @@ html body[data-domain] #overviewCard {
   scroll-margin-top:112px !important;
   scroll-margin-block-start:112px !important;
 }
+
+/* PASS 214 — Mycology scientific headings and IA bridge labels.
+   Copper remains the interaction accent; long-form text uses a mineral-light
+   tone so the mycology workspace stays legible on graphite surfaces. */
+html body[data-domain="mycology"] .card:not(.app-hero) :is(h2,h3,h4) {
+  color:#f0eee8 !important;
+  text-shadow:none !important;
+}
+html body[data-domain="mycology"] .card:not(.app-hero) :is(
+  .section-kicker,.section-label,.panel-kicker,.section-kicker-label,
+  .entry-step-mark,.assisted-entry-tag
+) {
+  color:#e2b092 !important;
+}
+html body[data-domain="mycology"] #measurementCard .bal-json-panel :is(h2,h3,h4) {
+  color:#f0eee8 !important;
+}
+html body[data-domain="mycology"] #measurementCard .bal-json-panel :is(
+  .section-kicker,.section-kicker-label,.bal-json-version
+) {
+  color:#e2b092 !important;
+}
+html body[data-domain="mycology"] #measurementCard .bal-json-panel :is(
+  .muted,.help-text,.field-hint,.form-hint
+) {
+  color:#b8c6bc !important;
+}
