@@ -36,11 +36,15 @@ select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b
        (select code from public.culture_types order by code limit 1),
        '00000000-0000-0000-0000-00000000b922','{"domain":"laboratory"}'::jsonb
 where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b932');
+-- Deliberately model a corrupt historical row so the resolver's fail-closed behavior is tested.
+-- The production trigger correctly rejects this mismatch; disable it only around this fixture insert.
+alter table public.cultures disable trigger cultures_domain_insert_guard;
 insert into public.cultures(organization_id,id,code,culture_type,material_id,metadata)
 select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b933','BALJSON-CULTURE-CONFLICT',
        (select code from public.culture_types order by code limit 1),
        '00000000-0000-0000-0000-00000000b923','{"domain":"mycology"}'::jsonb
 where not exists(select 1 from public.cultures where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b933');
+alter table public.cultures enable trigger cultures_domain_insert_guard;
 
 -- Legacy records have no metadata.domain and require explicit owner/admin classification.
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
