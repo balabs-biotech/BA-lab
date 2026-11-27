@@ -239,8 +239,13 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
         : "Record importé et enregistré dans CultureOps. Il reste non vérifié et doit être contrôlé dans l’historique.";
       status.dataset.state = "success"; approvedRecord = null; approvedOrganization = null;
       if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") {
-        const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
-        if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+        try {
+          const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
+          if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+        } catch (refreshError) {
+          console.warn("Import BAL-JSON confirmé, mais actualisation de l’historique impossible :", refreshError);
+          status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+        }
       }
     } catch (error) {
       const httpStatus = Number(error?.context?.status ?? error?.status ?? 0);
