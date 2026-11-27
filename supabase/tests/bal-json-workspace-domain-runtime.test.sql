@@ -93,7 +93,7 @@ set local role authenticated;
 
 -- Ordinary members cannot classify legacy biological records.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b902',true);
-do $$
+do $member$
 declare v_denied boolean := false;
 begin
   begin
@@ -116,7 +116,7 @@ begin
     if sqlerrm = 'domain_classification_requires_admin' then v_denied := true; else raise; end if;
   end;
   if not v_denied then raise exception 'FAIL: ordinary member accessed the admin classification catalogue'; end if;
-end $;
+end $member$;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
 
