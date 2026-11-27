@@ -70,7 +70,7 @@ set local role authenticated;
 
 -- Ordinary members cannot classify legacy biological records.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b902',true);
-do $
+do $$
 declare v_denied boolean := false;
 begin
   begin
@@ -83,7 +83,7 @@ begin
     if sqlerrm = 'domain_classification_requires_admin' then v_denied := true; else raise; end if;
   end;
   if not v_denied then raise exception 'FAIL: ordinary member classified a legacy record'; end if;
-end $;
+end $$;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b901',true);
 
@@ -149,6 +149,6 @@ begin
          and target_id='00000000-0000-0000-0000-00000000b924') <> 1 then
     raise exception 'FAIL: legacy domain classification audit receipt missing';
   end if;
-end $;
+end $$;
 rollback;
 select 'PASS: BAL-JSON workspace domain resolution runtime scenarios' as test_result;
