@@ -94,3 +94,27 @@ html body[data-domain] :is(th,thead th) {
     transition:none !important;
   }
 }
+
+
+/* PASS 217 — correct legacy low-contrast headings in dark workspace cards.
+   The older Mycology overview rules used light-theme brown text values.
+   Reassert mineral headings and accessible sector markers at the final layer. */
+html body[data-domain] .card:not(.app-hero) :is(h2,h3,h4) {
+  color:var(--ba-paper) !important;
+  text-shadow:none !important;
+}
+html body[data-domain] :is(.overview-section-heading h3,.overview-shortcuts h3) {
+  color:var(--ba-paper) !important;
+}
+html body[data-domain] .overview-observations-details > summary {
+  color:color-mix(in srgb,var(--workspace-accent) 76%,#fff) !important;
+}
+html body[data-domain] :is(.overview-metric-label,.overview-metric-note,.overview-heading .muted,.overview-footnote) {
+  color:#B8C6BD !important;
+}
+html body[data-domain] .overview-metric strong {
+  color:color-mix(in srgb,var(--workspace-accent) 72%,#fff) !important;
+}
+html body[data-domain] :is(.section-kicker,.panel-kicker,.card-kicker) {
+  color:color-mix(in srgb,var(--workspace-accent) 76%,#fff) !important;
+}
