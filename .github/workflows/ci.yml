@@ -267,6 +267,8 @@ jobs:
       # Regression coverage includes owner/admin classification, member denial and audit persistence.
       - name: Test BAL-JSON workspace resolution and audited legacy classification
         run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-workspace-domain-runtime.test.sql
+      - name: Test trusted BAL-JSON culture domain inheritance and anti-spoofing
+        run: psql -v ON_ERROR_STOP=1 -X -q -f supabase/tests/bal-json-trusted-culture-domain.test.sql
 
   ecosystem-regression:
     runs-on: ubuntu-latest
