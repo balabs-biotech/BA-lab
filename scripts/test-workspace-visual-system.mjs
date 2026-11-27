@@ -48,6 +48,7 @@ assert.equal((lineage.match(/window\.addEventListener\("pointermove"/g) || []).l
 assert.ok(lineage.includes("graphWidth * zoom") && lineage.includes("graphHeight * zoom"), "PixiJS zoom must expand the scrollable canvas surface");
 assert.ok(mycology.includes(".lineage-graph-toolbar"), "Mycology must style the PixiJS controls");
 assert.ok(mycology.includes(".lineage-graph-toolbar button:focus-visible"), "Mycology lineage controls must expose a visible keyboard focus state");
+assert.ok(mycology.includes("min-width:40px !important") && mycology.includes("min-height:40px !important"), "Mycology lineage controls must meet the 40px touch target");
 assert.ok(mycologyEntry.includes("20261117-pixi-graph-controls-159"), "Mycology must load the upgraded PixiJS runtime");
 assert.ok(greenTechEntry.includes("20261126-organic-mycelium-cover-1"), "GreenTech must load the shared BA Labs organic visual runtime");
 assert.ok(laboratoryEntry.includes("20261126-organic-mycelium-cover-1"), "Laboratory must load the shared BA Labs organic visual runtime");
