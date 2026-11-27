@@ -58,6 +58,7 @@ revoke all on function private.get_biological_domain(uuid,text,uuid,text) from p
 create or replace function private.prevent_biological_domain_rewrite()
 returns trigger
 language plpgsql
+security definer
 set search_path = ''
 as $$
 declare
@@ -135,7 +136,8 @@ create or replace function public.create_culture_with_generation(
 )
 returns jsonb
 language plpgsql
-set search_path to 'public', 'private'
+security definer
+set search_path = ''
 as $function$
 declare
   parent_material public.materials%rowtype;
