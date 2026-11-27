@@ -1531,3 +1531,21 @@ html body[data-domain] #measurementHistory > .measurement-entry .measurement-sta
   font-variant-numeric:tabular-nums !important;
   letter-spacing:.015em !important;
 }
+
+
+/* PASS 165 — strengthen scientific form and analytical-table legibility. */
+html body[data-domain] #measurementCard :is(label,.grid label) {
+  color:#d3ded6 !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  letter-spacing:.035em !important;
+  line-height:1.45 !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table thead th {
+  font-size:10px !important;
+  line-height:1.5 !important;
+}
+html body[data-domain] .card:not(.app-hero) .statistics-table-wrap:focus-visible {
+  outline:2px solid var(--workspace-accent) !important;
+  outline-offset:3px !important;
+}
