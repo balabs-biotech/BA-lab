@@ -276,3 +276,20 @@ console.log("✓ Atomic measurement/observation writes no longer perform separat
 const forbiddenDirectWrite = engine.match(/\.from\(["'](?:events|measurements|observations)["']\)\s*\.(?:insert|upsert|update|delete)\s*\(/);
 if (forbiddenDirectWrite) throw new Error("Audit-sensitive event/measurement/observation writes must go through validated RPCs, not direct table mutations");
 console.log("✓ Tracker uses RPC-backed writes for events, measurements and observations");
+
+
+for (const [fn, label] of [
+  ["async function loadRecentMeasurements()", "measurement"],
+  ["async function loadRecentObservations()", "observation"]
+]) {
+  const start = engine.indexOf(fn);
+  const next = engine.indexOf("\nasync function ", start + fn.length);
+  if (start < 0 || next < 0) throw new Error("Could not isolate " + label + " history renderer");
+  const block = engine.slice(start, next);
+  if (!block.includes("row.metadata?.bal_json?.record_id") ||
+      !block.includes("escapeHtml(traceabilityId)") ||
+      (block.match(/traceabilityLabel/g) || []).length < 2) {
+    throw new Error("BAL-JSON record_id must be safely visible in the " + label + " history");
+  }
+}
+console.log("✓ BAL-JSON record identifiers are visible and escaped in measurement and observation history");

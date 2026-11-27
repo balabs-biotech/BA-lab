@@ -5404,6 +5404,10 @@ async function loadRecentMeasurements() {
           : "Cible liée par identifiant";
     const stamp = row.measured_at ? new Date(row.measured_at).toLocaleString() : "Date inconnue";
     const note = row.metadata?.note ? `<div class="measurement-meta">${escapeHtml(row.metadata.note)}</div>` : "";
+    const traceabilityId = row.metadata?.bal_json?.record_id;
+    const traceabilityLabel = traceabilityId
+      ? `<div class="measurement-meta">BAL-JSON · ${escapeHtml(traceabilityId)}</div>`
+      : "";
     const method = row.method ? ` · ${escapeHtml(row.method)}` : "";
     const instrument = row.instrument ? ` · ${escapeHtml(row.instrument)}` : "";
     return `
@@ -5412,6 +5416,7 @@ async function loadRecentMeasurements() {
           <strong>${escapeHtml(variable?.label || row.variable_code)}</strong>
           <div class="measurement-meta">${target}${method}${instrument}</div>
           ${note}
+          ${traceabilityLabel}
         </div>
         <div class="measurement-value">${escapeHtml(row.raw_value)} <span class="measurement-meta">${escapeHtml(row.raw_unit_code)}</span></div>
         <div class="measurement-stamp">${escapeHtml(stamp)} · Réf. ${escapeHtml(row.variable_code)}</div>
@@ -5603,9 +5608,13 @@ async function loadRecentObservations() {
     const stamp = row.observed_at ? new Date(row.observed_at).toLocaleString() : "Date inconnue";
     const note = row.metadata && row.metadata.note
       ? '<div class="measurement-meta">' + escapeHtml(row.metadata.note) + '</div>' : "";
+    const traceabilityId = row.metadata?.bal_json?.record_id;
+    const traceabilityLabel = traceabilityId
+      ? '<div class="measurement-meta">BAL-JSON · ' + escapeHtml(traceabilityId) + '</div>'
+      : "";
     return '<article class="measurement-entry"><div><strong>' +
       escapeHtml(variable ? variable.label : row.variable_code) +
-      '</strong><div class="measurement-meta">' + target + '</div>' + note +
+      '</strong><div class="measurement-meta">' + target + '</div>' + note + traceabilityLabel +
       '</div><div class="measurement-meta">' + escapeHtml(stamp) +
       '</div><div class="measurement-stamp">' + escapeHtml(row.value_text) +
       '</div></article>';

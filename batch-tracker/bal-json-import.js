@@ -94,12 +94,17 @@
     const liveContext = typeof window.BA_LABS_GET_BAL_JSON_CONTEXT === "function"
       ? window.BA_LABS_GET_BAL_JSON_CONTEXT()
       : { organization_id: currentOrganization(), workspace: domain, targets: [], variables: [], units: [] };
+    const organizationId = liveContext.organization_id || currentOrganization();
+    const targets = Array.isArray(liveContext.targets) ? liveContext.targets : [];
+    const variables = Array.isArray(liveContext.variables) ? liveContext.variables : [];
+    const units = Array.isArray(liveContext.units) ? liveContext.units : [];
+    const catalogueReady = uuid(organizationId) && targets.length > 0 && variables.length > 0 && units.length > 0;
     const contextCatalogue = JSON.stringify({
-      organization_id: liveContext.organization_id || currentOrganization(),
+      organization_id: catalogueReady ? organizationId : null,
       workspace: liveContext.workspace || domain,
-      targets: Array.isArray(liveContext.targets) ? liveContext.targets : [],
-      variables: Array.isArray(liveContext.variables) ? liveContext.variables : [],
-      units: Array.isArray(liveContext.units) ? liveContext.units : []
+      targets,
+      variables,
+      units
     }, null, 2);
     const workspace = domain === "mycology"
       ? "MYCOLOGY — souches, lignées, générations, morphologie, repiquages, incubation et fructification"
@@ -109,9 +114,9 @@
     const contextExample = domain === "agronomy"
       ? '"plant_culture_id": "<UUID_CULTURE_VÉGÉTALE_FOURNI>"'
       : '"culture_id": "<UUID_CULTURE_FOURNI>"';
-    return `# BA Labs CultureOps — assistant de structuration BAL-JSON
+    const promptText = `# BA Labs CultureOps — assistant de structuration BAL-JSON
 
-Organisation active CultureOps : ${liveContext.organization_id || currentOrganization() || "NON CONNECTÉ — demander le UUID à l’utilisateur"}.
+Organisation active CultureOps : ${catalogueReady ? organizationId : "INDISPONIBLE — session CultureOps authentifiée et catalogue chargé requis"}.
 
 Tu aides à transformer des notes expérimentales en données structurées pour CultureOps.
 Espace actif : ${workspace}.
@@ -159,6 +164,12 @@ Utilise exactement organization_id et les UUID de cible du catalogue. Pour un lo
 }
 
 Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
+
+    const safePrompt = catalogueReady ? promptText : promptText.replace(
+      "## Catalogue réel extrait de l’espace CultureOps actif",
+      "## CATALOGUE INDISPONIBLE — ARRÊT OBLIGATOIRE\n\nAucune session CultureOps authentifiée ou catalogue complet n’a été détecté. Ne demande jamais à l’utilisateur de fournir un UUID, ne déduis aucun identifiant et ne produis aucun objet BAL-JSON. Demande uniquement de se connecter à CultureOps, d’attendre le chargement des données, puis de recopier ce prompt depuis l’application.\n\n## Catalogue réel extrait de l’espace CultureOps actif"
+    );
+    return { text: safePrompt, catalogueReady };
   }
 
   async function copyText(text) {
@@ -171,15 +182,16 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
   }
 
   promptButton.addEventListener("click", async () => {
-    try { await copyText(buildPrompt()); status.textContent = "Prompt CultureOps copié. Collez-le dans votre LLM généraliste."; status.dataset.state = "success"; }
+    try { const prompt = buildPrompt(); await copyText(prompt.text); status.textContent = prompt.catalogueReady ? "Prompt CultureOps copié. Collez-le dans votre LLM généraliste." : "Prompt copié, mais catalogue indisponible : connectez-vous et régénérez-le après chargement des données."; status.dataset.state = prompt.catalogueReady ? "success" : "error"; }
     catch (error) { status.textContent = error.message; status.dataset.state = "error"; }
   });
   downloadButton.addEventListener("click", () => {
-    const blob = new Blob([buildPrompt()], { type: "text/markdown;charset=utf-8" });
+    const prompt = buildPrompt();
+    const blob = new Blob([prompt.text], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob); const link = document.createElement("a");
     link.href = url; link.download = "BA-Labs-CultureOps-prompt-BAL-JSON.md";
     document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
-    status.textContent = "Prompt téléchargé au format Markdown."; status.dataset.state = "success";
+    status.textContent = prompt.catalogueReady ? "Prompt téléchargé au format Markdown." : "Prompt téléchargé, mais catalogue indisponible : connectez-vous et régénérez-le après chargement des données."; status.dataset.state = prompt.catalogueReady ? "success" : "error";
   });
   schemaButton.addEventListener("click", async () => {
     try { await copyText(JSON.stringify(schema, null, 2)); status.textContent = "Contrat BAL-JSON copié."; status.dataset.state = "success"; }
@@ -220,19 +232,35 @@ Demande maintenant les informations manquantes, puis produis l'objet BAL-JSON.`;
       const importer = window.BA_LABS_IMPORT_BAL_JSON;
       if (typeof importer !== "function") throw new Error("Canal d’import authentifié indisponible.");
       const { data, error } = await importer(approvedRecord);
-      if (error) throw new Error(error.message || "Le serveur a refusé l’import.");
+      if (error) throw error; // Preserve Supabase FunctionsHttpError context.status for definitive 4xx handling.
       if (data?.error) throw new Error(data.message || data.error);
       status.textContent = data?.status === "duplicate"
         ? "Ce record était déjà enregistré : aucun doublon créé."
         : "Record importé et enregistré dans CultureOps. Il reste non vérifié et doit être contrôlé dans l’historique.";
       status.dataset.state = "success"; approvedRecord = null; approvedOrganization = null;
       if (typeof window.BA_LABS_REFRESH_EXPERIMENTAL_DATA === "function") {
-        const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
-        if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+        try {
+          const refresh = await window.BA_LABS_REFRESH_EXPERIMENTAL_DATA();
+          if (refresh?.refreshed === false) status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+        } catch (refreshError) {
+          console.warn("Import BAL-JSON confirmé, mais actualisation de l’historique impossible :", refreshError);
+          status.textContent += " Actualisation de l’historique partielle : utilisez le bouton Actualiser.";
+        }
       }
     } catch (error) {
-      status.textContent = "Import non effectué : " + (error.message || "erreur inconnue");
-      status.dataset.state = "error"; importButton.disabled = false;
+      const httpStatus = Number(error?.context?.status ?? error?.status ?? 0);
+      if (httpStatus >= 400 && httpStatus < 500) {
+        status.textContent = "Import refusé par le serveur (HTTP " + httpStatus + ") : " +
+          (error.message || "vérifiez la session et les données, puis relancez la prévisualisation.");
+        status.dataset.state = "error";
+        approvedRecord = null;
+        approvedOrganization = null;
+        importButton.disabled = true;
+      } else {
+        status.textContent = "Résultat non confirmé : la connexion ou le serveur n’a pas confirmé la réponse. Ne modifiez pas record_id. Réessayez avec exactement le même JSON ; le serveur déduplique les imports déjà enregistrés.";
+        status.dataset.state = "warning";
+        importButton.disabled = false;
+      }
     } finally { previewButton.disabled = false; }
   });
 
