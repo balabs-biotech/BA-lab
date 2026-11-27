@@ -18,9 +18,10 @@ begin
     raise exception 'invalid_biological_domain';
   end if;
 
-  if tg_op = 'UPDATE'
-     and new.metadata ->> 'domain' is distinct from old.metadata ->> 'domain' then
-    raise exception 'biological_domain_is_immutable';
+  if tg_op = 'UPDATE' then
+    if new.metadata ->> 'domain' is distinct from old.metadata ->> 'domain' then
+      raise exception 'biological_domain_is_immutable';
+    end if;
   end if;
   return new;
 end;
