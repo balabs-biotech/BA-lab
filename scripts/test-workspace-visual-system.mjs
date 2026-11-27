@@ -131,7 +131,7 @@ assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorH
 
 assert.ok(cultureDetailMarkup.includes('id="cultureDetailSummary"') && cultureDetailMarkup.includes('id="bioOperationForm"'), "Culture detail must retain summary and biological operation form");
 assert.ok(cultureDetailMarkup.includes('id="cultureLineage"') && cultureDetailMarkup.includes('id="cultureDetailTimeline"'), "Culture detail must retain lineage and complete timeline");
-assert.ok(interiorHarmonization.includes("#trackerCard .bio-operation-form") && interiorHarmonization.includes("#trackerCard .bio-operation-wide"), "Biological operation form must use a responsive structured grid");
+assert.ok(interiorHarmonization.includes("#trackerCard .bio-operation-form") && interiorHarmonization.includes("#trackerCard .bio-operation-form .bio-operation-wide"), "Biological operation form must use a responsive structured grid");
 assert.ok(interiorHarmonization.includes("#trackerCard .lineage-graph-stage") && interiorHarmonization.includes("#trackerCard .lineage-graph-toolbar"), "Lineage graph must provide a contained stage and accessible controls");
 assert.ok(interiorHarmonization.includes("#trackerCard .culture-lineage-node") && interiorHarmonization.includes("#trackerCard .lineage-data-details"), "Lineage must retain readable selectable nodes and a text-list fallback");
 assert.ok(interiorHarmonization.includes("#trackerCard .culture-detail-timeline") && interiorHarmonization.includes("@media(max-width:760px)"), "Culture history must adapt to narrow screens");
