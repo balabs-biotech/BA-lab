@@ -172,6 +172,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Check BAL-JSON ingestion Edge Function TypeScript syntax
+        run: node --experimental-strip-types --check supabase/functions/bal-json-ingest/index.ts
       - name: Check create-store-order Edge Function TypeScript syntax
         run: node --experimental-strip-types --check supabase/functions/create-store-order/index.ts
       - name: Check store-order-sync Edge Function TypeScript syntax
