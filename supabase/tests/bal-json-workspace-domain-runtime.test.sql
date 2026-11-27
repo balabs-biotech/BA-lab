@@ -17,14 +17,17 @@ values
 on conflict (organization_id,user_id) do update set role=excluded.role;
 
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
-select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b921','BALJSON-MYC','strain','active','{"domain":"mycology"}'::jsonb
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b921','BALJSON-MYC','strain','active','{}'::jsonb
 where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b921');
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
-select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b922','BALJSON-LAB','strain','active','{"domain":"laboratory"}'::jsonb
+select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b922','BALJSON-LAB','strain','active','{}'::jsonb
 where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b922');
+-- Corrupt legacy material fixture: bypass the new root-domain guard only for this historical inconsistency.
+alter table public.materials disable trigger materials_domain_insert_guard;
 insert into public.materials(organization_id,id,material_code,material_type,state,metadata)
 select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b923','BALJSON-CONFLICT','strain','active','{"domain":"laboratory"}'::jsonb
 where not exists(select 1 from public.materials where organization_id='00000000-0000-0000-0000-00000000b911' and id='00000000-0000-0000-0000-00000000b923');
+alter table public.materials enable trigger materials_domain_insert_guard;
 
 insert into public.cultures(organization_id,id,code,culture_type,material_id,metadata)
 select '00000000-0000-0000-0000-00000000b911','00000000-0000-0000-0000-00000000b931','BALJSON-CULTURE-MYC',
@@ -97,6 +100,15 @@ declare
   v_result text;
   v_caught boolean;
 begin
+  perform public.classify_legacy_biological_domain(
+    v_org,'material','00000000-0000-0000-0000-00000000b921',
+    'mycology','Verified mycology material test fixture'
+  );
+  perform public.classify_legacy_biological_domain(
+    v_org,'material','00000000-0000-0000-0000-00000000b922',
+    'laboratory','Verified laboratory material test fixture'
+  );
+
   v_result := public.resolve_bal_json_domain(v_org,'00000000-0000-0000-0000-00000000b931',null,null);
   if v_result is distinct from 'mycology' then raise exception 'FAIL: mycology culture resolved as %',v_result; end if;
 
