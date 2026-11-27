@@ -79,6 +79,7 @@ const mycologyActivityStyles = fs.readFileSync("batch-tracker/styles/mycology-ac
 assert.ok(mycologyActivity.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "Mycology activity timeline must use pinned PixiJS");
 assert.ok(mycologyActivity.includes('querySelectorAll(":scope > .culture-timeline-entry")'), "Mycology timeline must derive nodes from existing culture history entries");
 assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
+assert.ok(mycologyActivity.includes("observation: 0xd9a36e") && mycologyActivity.includes("measurement: 0x9b6d54") && !mycologyActivity.includes("observation: 0xb5d98c") && !mycologyActivity.includes("measurement: 0x8dbce0"), "Mycology activity timeline must stay within copper/amber/brown tones");
 assert.ok(mycologyActivity.includes("next.stop()"), "Mycology timeline must render on demand without a permanent GPU ticker");
 assert.ok(mycologyActivity.includes("resizeObserver?.disconnect()"), "Mycology timeline must clean up resize observers");
 assert.ok(mycologyActivity.includes("if (!shell.isConnected) target.prepend(shell)"), "Mycology timeline must survive culture selection replacing the history container contents");
