@@ -466,3 +466,18 @@ html body[data-domain] .card:not(.app-hero) label {
 html body[data-domain] .card:not(.app-hero) :is(.muted,.help-text,.field-hint,.form-hint) {
   color:#aebdb2 !important;
 }
+
+
+/* PASS 203 — override legacy ID-scoped headings on interior workspace cards.
+   These selectors intentionally outrank older sector-specific copper headings. */
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > h2,
+html body[data-domain] #trackerCard .entry-intro h2 {
+  color:#e8eee8 !important;
+  text-shadow:none !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > .section-kicker {
+  color:#e2b092 !important;
+}
+html body[data-domain] :is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > .section-kicker :is(span:not(.kicker-line)) {
+  color:#e2b092 !important;
+}
