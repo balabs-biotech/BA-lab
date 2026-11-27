@@ -79,6 +79,7 @@ const mycologyActivityStyles = fs.readFileSync("batch-tracker/styles/mycology-ac
 const interiorHarmonization = fs.readFileSync("batch-tracker/styles/interior-harmonization.css", "utf8");
 assert.ok(interiorHarmonization.includes("color:#e8eee8 !important") && interiorHarmonization.includes("color:#c3cec5 !important") && interiorHarmonization.includes("color:#aebdb2 !important"), "Scientific headings, form labels and helper text must use high-contrast mineral tones");
 assert.ok(interiorHarmonization.includes(":is(#overviewCard,#trackerCard,#plantCard,#batchCard,#measurementCard,#statisticsCard,#resultCard) > h2") && interiorHarmonization.includes("color:#e2b092 !important"), "Legacy ID-scoped interior headings and sector kickers must retain readable contrast");
+assert.ok(interiorHarmonization.includes("#balJsonImportPanel .bal-json-heading h3") && interiorHarmonization.includes("#balJsonImportPanel .bal-json-preview"), "BAL-JSON import title, help text and preview must remain legible on dark surfaces");
 assert.ok(mycologyActivity.includes('import("https://cdn.jsdelivr.net/npm/pixi.js@8.17.1/dist/pixi.min.mjs")'), "Mycology activity timeline must use pinned PixiJS");
 assert.ok(mycologyActivity.includes('querySelectorAll(":scope > .culture-timeline-entry")'), "Mycology timeline must derive nodes from existing culture history entries");
 assert.ok(mycologyActivity.includes('time?.textContent?.trim()') && mycologyActivity.includes('heading?.textContent?.trim()'), "Mycology timeline must use stored date and event labels");
