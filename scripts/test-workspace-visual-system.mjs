@@ -197,3 +197,5 @@ assert.ok(editorial.includes(".overview-section-heading h3") && editorial.includ
 assert.ok(editorial.includes(".overview-observations-details > summary") && editorial.includes("color:#B8C6BD !important"), "Legacy observation labels and metric metadata must remain legible on dark surfaces");
 
 assert.ok(editorial.includes("#measurementCard > #measurementTitle") && editorial.includes("-webkit-text-fill-color:#E8EEE8 !important"), "Measurement workspace title must remain high-contrast across legacy domain overrides");
+
+assert.ok(editorial.includes("#measurementCard :is(.section-kicker,.section-label,.panel-kicker,.context-eyebrow)") && editorial.includes("color:#D69A78 !important"), "Mycology measurement section labels must use light copper text");
