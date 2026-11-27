@@ -84,7 +84,7 @@ assert.ok(interiorHarmonization.includes(".batch-event-item") && interiorHarmoni
 assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes(".culture-timeline-entry"), "Scientific record timelines must have a narrow-screen layout");
 assert.ok(batchMarkup.includes('<div class="batch-harvest-entry">') && batchMarkup.includes('<div class="grid">'), "Harvest and movement panels must retain their nested field grids");
 assert.ok(interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .grid"), "Batch journal subforms must have an explicit nested-grid layout");
-assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .grid {\\n    grid-template-columns:minmax(0,1fr)"), "Harvest and movement fields must stack on narrow screens");
+assert.ok(interiorHarmonization.includes("@media(max-width:760px)") && interiorHarmonization.includes("#batchEvents .batch-harvest-entry > .grid {\n    grid-template-columns:minmax(0,1fr)"), "Harvest and movement fields must stack on narrow screens");
 
 console.log("✓ CultureOps sector-specific visual runtime contract");
 
