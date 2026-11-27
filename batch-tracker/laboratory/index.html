@@ -7,15 +7,15 @@
   <meta name="description" content="Espace Laboratory BA Labs : géloses, cultures liquides, inoculation du grain, matières, protocoles et filiation des lots.">
   <title>BA Labs CultureOps — Laboratory</title>
   <link rel="stylesheet" href="../tracker.css?v=20261127-scroll-offset-2">
-  <link rel="stylesheet" href="../workspace-unified.css?v=20261127-mobile-measurements-207">
+  <link rel="stylesheet" href="../workspace-unified.css?v=20261127-entry-state-213">
   <link rel="stylesheet" href="../styles/laboratory-process-map.css?v=20261117-lab-process-map-161">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0"></script>
 </head>
 <body data-domain="laboratory">
-  <div id="workspace-root" aria-live="polite"><main class="container"><p>Chargement de l’espace Laboratory…</p></main></div>
+  <div id="workspace-root" aria-live="polite"><main class="container workspace-entry-state"><span class="workspace-entry-indicator" aria-hidden="true"></span><p>Chargement de l’espace Laboratory…</p></main></div>
   <script>
     if (!window.supabase || typeof window.supabase.createClient !== "function") {
-      document.getElementById("workspace-root").innerHTML = "<main class='container'><section class='card' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
+      document.getElementById("workspace-root").innerHTML = "<main class='container workspace-entry-state'><section class='card workspace-entry-error' role='alert'><h1>Service de données indisponible</h1><p>La bibliothèque Supabase n’a pas pu être chargée. Vérifiez la connexion puis rechargez la page.</p></section></main>";
     } else {
       window.BA_LABS_DOMAIN = "laboratory";
     fetch("../workspace.html?v=20261126-bal-json-live-catalogue-2")
@@ -36,7 +36,7 @@
           const script = document.createElement("script");
           script.src = "../tracker.js?v=20261126-bal-json-live-catalogue-2";
           script.onerror = () => {
-            document.getElementById("workspace-root").innerHTML = "<main class='container'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
+            document.getElementById("workspace-root").innerHTML = "<main class='container workspace-entry-state'><p role='alert'>Le moteur de CultureOps n’a pas pu être chargé. Rechargez la page.</p></main>";
           };
           script.onload = () => {
             const processMap = document.createElement("script");
